@@ -25,9 +25,6 @@ const Mosaic = function (provider, net, options) {
   oThis.version = version;
 };
 
-//Public Static Stuff Goes here.
-Mosaic.ValueChainId = 1;
-
 //Set the prototype.
 Mosaic.prototype = Object.create(Web3.prototype);
 //Set the constructor
