@@ -17,8 +17,6 @@ const Mosaic = function (provider, net, options) {
 
   //2. Be exactly like Web3.
   let args = Array.prototype.slice.call(arguments);
-  let valueProvider = provider + "/" + Mosaic.ValueChainId;
-  args[0] = valueProvider;
   Web3.apply(this, args);
 
   //3. Now work with deviations if any.
