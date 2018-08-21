@@ -41,7 +41,8 @@ Mosaic.prototype.aux = function ( auxiliaryId ) {
   ;
 
   //Create new Web3 Instance.
-  let auxProvider = provider + "/" + auxiliaryId;
+  auxiliaryId = String( auxiliaryId ).toLowerCase(); 
+  let auxProvider = provider + "/" + auxiliaryId + "/";
 
   if ( !oThis._auxIdToWeb3Map.hasOwnProperty( auxiliaryId ) ) {
     let web3 = new Web3( auxProvider );
