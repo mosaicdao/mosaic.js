@@ -9,13 +9,18 @@ const AuxiliaryWeb3 = function ( originCoreContractAddress ) {
       , auxiliaries = oThis.ic().configStrategy.auxiliaries
   ;
 
-
-  let provider, len = auxiliaries.length;
-  originCoreContractAddress = String( originCoreContractAddress ).toLowerCase();
-  while( len-- ) {
-    let auxConfig = auxiliaries[ len ];
-    if ( String( auxConfig.originCoreContractAddress ).toLowerCase() === originCoreContractAddress ) {
-      provider = auxConfig.provider;
+  let provider;
+  if ( typeof originCoreContractAddress === 'object' ) {
+    let auxiliaryWeb3Config = originCoreContractAddress;
+    provider = auxiliaryWeb3Config.provider;
+  } else {
+    let len = auxiliaries.length;
+    originCoreContractAddress = String( originCoreContractAddress ).toLowerCase();
+    while( len-- ) {
+      let auxConfig = auxiliaries[ len ];
+      if ( String( auxConfig.originCoreContractAddress ).toLowerCase() === originCoreContractAddress ) {
+        provider = auxConfig.provider;
+      }
     }
   }
 
