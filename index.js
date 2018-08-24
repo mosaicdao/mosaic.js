@@ -4,52 +4,91 @@
  * Load openST Platform module
  */
 
-const rootPrefix = "."
-  , version = require(rootPrefix + '/package.json').version
-  , Web3 = require('web3')
+const Web3 = require('web3')
+    , web3Utils = require('web3-utils')
 ;
+const InstanceComposer = require('./instance_composer');
+const version = require('./package.json').version;
 
-const Mosaic = function (provider, net, options) {
+require('./libs/contracts');
+require('./providers/OriginWeb3');
+require('./providers/AuxiliaryWeb3');
+
+
+
+
+const Mosaic = function (rumNodeProvider, configurations ) {
   const oThis = this;
+  oThis._sanitizeConfigurations();
 
-  //1. Note down the providerBaseEndpoint.
-  oThis.providerBaseEndpoint = provider;
+  oThis.configurations = Object.assign({}, {rumNodeProvider: rumNodeProvider}, configurations);
 
-  //2. Be exactly like Web3.
-  let args = Array.prototype.slice.call(arguments);
-  Web3.apply(this, args);
+  const _instanceComposer =  new InstanceComposer(oThis.configurations);
+  oThis.ic =  function () {
+    return _instanceComposer;
+  };
 
-  //3. Now work with deviations if any.
-  oThis._auxIdToWeb3Map = {};
+  //1. Note down the rumNodeEndPoint.
+  oThis.rumNodeEndPoint = rumNodeProvider;
 
-  oThis.version = version;
+  //2. Define origin
+  let OriginWeb3 = oThis.ic().OriginWeb3();
+  let _origin = new OriginWeb3();
+  oThis.origin = function () {
+    return _origin;
+  };
+
+  //3. Define core
+  let AuxiliaryWeb3 = oThis.ic().AuxiliaryWeb3();
+  oThis.core = function ( originCoreContractAddress ) {
+    return new AuxiliaryWeb3( originCoreContractAddress );
+  };
+
+  //4. Define contracts
+  oThis.contracts = oThis.ic().Contracts();
+
 };
 
-//Set the prototype.
-Mosaic.prototype = Object.create(Web3.prototype);
-//Set the constructor
-Mosaic.prototype.constructor = Mosaic;
+Mosaic.prototype = {
+  constructor: Mosaic,
+  configurations: null,
+  _sanitizeConfigurations: function () {
+    const oThis = this
+        , configurations = oThis.configurations
+    ;
 
-// Define instance properties here.
-Mosaic.prototype.providerBaseEndpoint = null;
-Mosaic.prototype._auxIdToWeb3Map = null;
+    let areOptionsValid = true;
 
-// Define all instance methods here.
-Mosaic.prototype.aux = function ( auxiliaryId ) {
-  const oThis = this
-      , provider = oThis.providerBaseEndpoint
-  ;
+    if ( !configurations.hasOwnProperty('origin') || typeof configurations.origin != 'object' ) {
+      throw "Config Missing. 'origin' configuration is missing.";
+    }
 
-  //Create new Web3 Instance.
-  auxiliaryId = String( auxiliaryId ).toLowerCase(); 
-  let auxProvider = provider + "/" + auxiliaryId + "/";
+    if ( typeof configurations.origin.provider !== 'string' ) {
+      throw "Invalid Origin Config. 'provider' configuration is missing.";
+    }
 
-  if ( !oThis._auxIdToWeb3Map.hasOwnProperty( auxiliaryId ) ) {
-    let web3 = new Web3( auxProvider );
-    oThis._auxIdToWeb3Map[ auxiliaryId ] = web3;
+    let auxiliaries = configurations.auxiliaries;
+    if ( !auxiliaries || !auxiliaries instanceof Array ) { 
+      throw "Config Missing. 'auxiliaries' configuration is missing. auxiliaries should be an Array of auxiliary config";
+    }
+
+    let len = auxiliaries.length;
+    while( len-- ) {
+      let auxConfig = auxiliaries[ len ];
+      if ( !auxConfig || typeof auxConfig !== 'object' ) {
+        throw "Invalid Auxiliary Config. auxiliary config should be an object.";   
+      }
+      if ( typeof auxConfig.provider !== 'string' ) {
+        throw "Invalid Auxiliary Config. 'provider' configuration is missing.";
+      }
+
+      if ( auxConfig.originCoreContractAddress && !web3Utils.isAddress( auxConfig.originCoreContractAddress ) ) {
+        throw "Invalid Auxiliary Config. 'originCoreContractAddress' should be a valid Address.";
+      }
+    }
   }
-  return oThis._auxIdToWeb3Map[ auxiliaryId ].eth;
-};
+}
+
 
 module.exports = Mosaic;
 
