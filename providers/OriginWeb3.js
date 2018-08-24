@@ -4,12 +4,19 @@ const Web3 = require('web3');
 const InstanceComposer = require('../instance_composer');
 
 
+let _instances = {};
+
 const OriginWeb3 = function () {
   const oThis = this
-      , provier = oThis.ic().configStrategy.origin.provider
+      , provider = oThis.ic().configStrategy.origin.provider
   ;
 
-  Web3.call(oThis, provier);
+  if ( _instances[ provider ] ) {
+    return _instances[ provider ];
+  }
+  _instances[ provider ] = oThis;
+
+  Web3.call(oThis, provider);
 }
 
 
