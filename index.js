@@ -19,9 +19,8 @@ require('./providers/AuxiliaryWeb3');
 
 const Mosaic = function (rumNodeProvider, configurations ) {
   const oThis = this;
-  oThis._sanitizeConfigurations();
-
   oThis.configurations = Object.assign({}, {rumNodeProvider: rumNodeProvider}, configurations);
+  oThis._sanitizeConfigurations();
 
   const _instanceComposer =  new InstanceComposer(oThis.configurations);
   oThis.ic =  function () {

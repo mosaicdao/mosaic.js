@@ -4,7 +4,7 @@ const Web3 = require('web3');
 const InstanceComposer = require('../instance_composer');
 
 
-function OriginWeb3 = function () {
+const OriginWeb3 = function () {
   const oThis = this
       , provier = oThis.ic().configStrategy.origin.provider
   ;

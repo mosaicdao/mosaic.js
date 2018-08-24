@@ -4,7 +4,7 @@ const Web3 = require('web3');
 const InstanceComposer = require('../instance_composer');
 
 
-function AuxiliaryWeb3 = function ( originCoreContractAddress ) {
+const AuxiliaryWeb3 = function ( originCoreContractAddress ) {
   const oThis = this
       , auxiliaries = oThis.ic().configStrategy.auxiliaries
   ;
