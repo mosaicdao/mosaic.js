@@ -10,7 +10,7 @@ const Web3 = require('web3')
 const InstanceComposer = require('./instance_composer');
 const version = require('./package.json').version;
 
-require('./libs/contracts');
+require('./lib/contracts');
 require('./providers/OriginWeb3');
 require('./providers/AuxiliaryWeb3');
 
