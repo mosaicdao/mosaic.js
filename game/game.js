@@ -12,15 +12,15 @@ const mosaicConfig = {
   ]
 };
 
-function Game(originCoreAddress, originWorker, auxiliaryWorker) {
+function Game(originCoreAddress, originWorkers, auxiliaryWorkers) {
   this.mosaic = new Mosaic('', mosaicConfig);
   this.origin = this.mosaic.origin();
   this.auxiliary = this.mosaic.core(originCoreAddress);
   this.core = this.mosaic.contracts.core;
   this.originBlockNumber = 0;
   this.auxiliaryBlockNumber = 0;
-  this.originWorker = originWorker;
-  this.auxiliaryWorker = auxiliaryWorker;
+  this.originWorkers = originWorkers;
+  this.auxiliaryWorkers = auxiliaryWorkers;
 }
 
 Game.prototype = {
@@ -39,7 +39,7 @@ Game.prototype = {
       // TODO Worker unlocking
       let receipt = await this.core.origin
         .commitStateRoot(auxiliaryBlock.blockNumber, auxiliaryBlock.stateRoot)
-        .send({from: this.originWorker});
+        .signAndSend({from: this.originWorkers});
 
       console.log("auxiliary receipt", receipt);
       this.auxiliaryBlockNumber = auxiliaryBlock.blockNumber;
@@ -49,7 +49,7 @@ Game.prototype = {
       // TODO Worker unlocking
       let receipt = await this.core.auxiliary
         .commitStateRoot(originBlock.blockNumber, originBlock.stateRoot)
-        .send({from: this.originWorker});
+        .signAndSend({from: this.originWorkers});
 
       console.log("origin receipt", receipt);
 
