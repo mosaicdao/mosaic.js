@@ -18,6 +18,9 @@ const OriginWeb3 = function () {
   // _instances[ provider ] = oThis;
 
   Web3.call(oThis, provider);
+
+  // Add signAndSend
+  oThis.bindSigner();
 }
 
 
@@ -27,6 +30,45 @@ if ( Web3.prototype ) {
   OriginWeb3.prototype = {};
 }
 OriginWeb3.prototype.constructor = OriginWeb3;
+OriginWeb3.prototype.bindSigner = function () {
+    // 
+
+    const oWeb3     = this
+        , Contract  = oWeb3.eth.Contract
+    ;
+
+    const org_createTxObject = Contract.prototype._createTxObject;
+    console.log("Contract.prototype", Object.keys(Contract.prototype).join("\t") );
+    console.log("org_createTxObject", org_createTxObject);
+
+    Contract.prototype._createTxObject = function () {
+      const oContract = this;
+      let txObject = org_createTxObject.apply( oContract, arguments );
+      txObject.signAndSend = function ( options, callback ) {
+        const oTxObject = this;
+
+        let requestData = oTxObject.send.request( options )
+          , txToBeSigned = Object.assign({}, requestData.params[ 0 ] )
+        ;
+
+        const signers = oWeb3.ic().Signers();
+        const oInteractor = signers.getOriginSignerService();
+        if ( !oInteractor ) {
+          return Promise.reject("Origin Signer Service is missing.");
+        }
+
+        let service = oInteractor.getSignerService();
+
+        return service.signTransaction( txToBeSigned )
+          .then( function ( signedTxPayload ) {
+            return oWeb3.eth.sendSignedTransaction( txToBeSigned.raw );
+          })
+        ;
+      }
+      return txObject;
+    };
+    Contract.prototype._createTxObject._isOst = true;
+};
 
 
 

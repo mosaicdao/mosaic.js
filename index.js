@@ -10,12 +10,11 @@ const Web3 = require('web3')
 const InstanceComposer = require('./instance_composer');
 const version = require('./package.json').version;
 
-require('./lib/contracts');
-require('./lib/setup');
 require('./providers/OriginWeb3');
 require('./providers/AuxiliaryWeb3');
-
-
+require('./lib/Signers');
+require('./lib/Setup');
+require('./lib/Contracts');
 
 
 const Mosaic = function (rumNodeProvider, configurations ) {
@@ -44,10 +43,21 @@ const Mosaic = function (rumNodeProvider, configurations ) {
     return new AuxiliaryWeb3( originCoreContractAddress );
   };
 
+
+
   //4. Define contracts
   oThis.contracts = oThis.ic().Contracts();
 
+<<<<<<< HEAD
   oThis.setup = oThis.ic().Setup();
+=======
+  //5. Provide Signers
+  oThis.signers = oThis.ic().Signers();
+  
+  //Lastly, add Utils
+  oThis.utils = Mosaic.utils;
+
+>>>>>>> few fixes.
 };
 
 Mosaic.prototype = {
@@ -88,7 +98,12 @@ Mosaic.prototype = {
       }
     }
   }
-}
+};
+
+
+Mosaic.utils = {
+  GethSignerService: require('./utils/GethSignerService')
+};
 
 
 module.exports = Mosaic;
