@@ -29,7 +29,13 @@ const AuxiliaryWeb3 = function ( originCoreContractAddress ) {
   }
 
   Web3.call(oThis, provider);
+
+  // Add signAndSend
+  oThis.bindSigner();
+
 }
+
+
 
 
 if ( Web3.prototype ) {
@@ -38,8 +44,49 @@ if ( Web3.prototype ) {
   AuxiliaryWeb3.prototype = {};
 }
 AuxiliaryWeb3.prototype.constructor = AuxiliaryWeb3;
+AuxiliaryWeb3.prototype.bindSigner = function () {
+    // 
 
+    const oWeb3     = this
+        , Contract  = oWeb3.eth.Contract
+    ;
 
+    const org_createTxObject = Contract.prototype._createTxObject;
+    console.log("Contract.prototype", Object.keys(Contract.prototype).join("\t") );
+    console.log("org_createTxObject", org_createTxObject);
+
+    Contract.prototype._createTxObject = function () {
+      const oContract = this;
+      let txObject = org_createTxObject.apply( oContract, arguments );
+      txObject.signAndSend = function ( options, callback ) {
+        const oTxObject = this;
+
+        let requestData = oTxObject.send.request( options )
+          , txToBeSigned = Object.assign({}, requestData.params[ 0 ] )
+        ;
+
+        const signers = oWeb3.ic().Signers();
+        const oInteractor = signers.getOriginSignerService();
+        if ( !oInteractor ) {
+          return Promise.reject("Origin Signer Service is missing.");
+        }
+
+        let signerService = oInteractor.getSignerService();
+
+        let signerPromise = signerService( txToBeSigned );
+
+        if ( signerPromise instanceof Promise ) {
+          return signerPromise.then( function ( signedTxPayload ) {
+            console.log("signedTxPayload", signedTxPayload);
+            return oWeb3.eth.sendSignedTransaction( signedTxPayload.raw, callback );
+          });
+        }
+        throw "Signer Service did not return a promise.";
+      }
+      return txObject;
+    };
+    Contract.prototype._createTxObject._isOst = true;
+};
 
 InstanceComposer.registerShadowableClass(AuxiliaryWeb3, 'AuxiliaryWeb3');
 
