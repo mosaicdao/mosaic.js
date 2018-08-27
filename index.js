@@ -11,6 +11,7 @@ const InstanceComposer = require('./instance_composer');
 const version = require('./package.json').version;
 
 require('./lib/contracts');
+require('./lib/setup');
 require('./providers/OriginWeb3');
 require('./providers/AuxiliaryWeb3');
 
@@ -46,6 +47,7 @@ const Mosaic = function (rumNodeProvider, configurations ) {
   //4. Define contracts
   oThis.contracts = oThis.ic().Contracts();
 
+  oThis.setup = oThis.ic().Setup();
 };
 
 Mosaic.prototype = {
