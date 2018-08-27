@@ -57,13 +57,17 @@ OriginWeb3.prototype.bindSigner = function () {
           return Promise.reject("Origin Signer Service is missing.");
         }
 
-        let service = oInteractor.getSignerService();
+        let signerService = oInteractor.getSignerService();
 
-        return service.signTransaction( txToBeSigned )
-          .then( function ( signedTxPayload ) {
-            return oWeb3.eth.sendSignedTransaction( txToBeSigned.raw );
-          })
-        ;
+        let signerPromise = signerService( txToBeSigned );
+
+        if ( signerPromise instanceof Promise ) {
+          return signerPromise.then( function ( signedTxPayload ) {
+            console.log("signedTxPayload", signedTxPayload);
+            return oWeb3.eth.sendSignedTransaction( signedTxPayload.raw, callback );
+          });
+        }
+        throw "Signer Service did not return a promise.";
       }
       return txObject;
     };

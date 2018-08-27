@@ -6,17 +6,20 @@ const Signer = function ( web3 ) {
 
   const _aToPwdMap = {};
   oThis.addAccount = function ( address, passphrase ) {
+    address = String( address ).toLowerCase();
     _aToPwdMap[ address ] = passphrase;
   };
 
   oThis.signTransaction = function (transactionData) {
+    console.log("transactionData", transactionData);
     if ( !transactionData || !transactionData.from ) {
       return Promise.reject('Invalid transactionData');
     }
 
     let _from = transactionData.from;
-    if ( !_aToPwdMap.hasOwnProperty( _from ) ) {
-      return Promise.reject('Unknown Address');
+
+    if ( !_aToPwdMap.hasOwnProperty( String( _from ).toLowerCase() ) ) {
+      return Promise.reject('Unknown Address', _from);
     }
 
     if ( !transactionData.gasPrice ) {
@@ -32,7 +35,7 @@ const Signer = function ( web3 ) {
     }
 
     if ( !transactionData.hasOwnProperty( 'value' ) ) {
-      return Promise.reject('Invalid value');
+      transactionData.value = 0;
     }
 
     if ( !transactionData.hasOwnProperty( 'data' ) ) {
@@ -47,7 +50,7 @@ const Signer = function ( web3 ) {
           nonce: _nonce
         });
         console.log("GSS :: Signing Tx");
-        let _fromPassphrase = _aToPwdMap[ _from ];
+        let _fromPassphrase = _aToPwdMap[ String( _from ).toLowerCase() ];
         return web3.eth.personal.signTransaction( finalData, _fromPassphrase )
           .then( function ( signedTx ) {
             console.log("GSS :: Tx Signed");
