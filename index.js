@@ -48,16 +48,15 @@ const Mosaic = function (rumNodeProvider, configurations ) {
   //4. Define contracts
   oThis.contracts = oThis.ic().Contracts();
 
-<<<<<<< HEAD
+
   oThis.setup = oThis.ic().Setup();
-=======
+
   //5. Provide Signers
   oThis.signers = oThis.ic().Signers();
   
   //Lastly, add Utils
   oThis.utils = Mosaic.utils;
 
->>>>>>> few fixes.
 };
 
 Mosaic.prototype = {
