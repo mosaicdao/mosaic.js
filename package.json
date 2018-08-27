@@ -12,7 +12,9 @@
   "bugs": {
     "url": "https://github.com/OpenSTFoundation/mosaic.js/issues"
   },
-  "scripts": {},
+  "scripts": {
+    "mosaic-game": "node ./game/game"
+  },
   "dependencies": {
     "merkle-patricia-tree": "2.3.1",
     "ethereumjs-util": "5.2.0",
