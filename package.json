@@ -1,47 +1,23 @@
 {
-  "name": "@openstfoundation/openst-platform",
-  "version": "0.9.4",
-  "description": "OpenST Platform provides a web3 interface to tokenise mainstream consumer applications with crypto-assets on Ethereum",
-  "keywords": [
-    "web3",
-    "openST",
-    "OST",
-    "simpletoken",
-    "utility-token",
-    "ethereum",
-    "erc20"
-  ],
+  "name": "@openstfoundation/mosaic.js",
+  "version": "0.0.1",
+  "description": "",
   "homepage": "https://openst.org",
   "author": "OpenST Ltd.",
   "license": "LGPL-3.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/OpenSTFoundation/openst-platform.git"
+    "url": "https://github.com/OpenSTFoundation/mosaic.js.git"
   },
   "bugs": {
-    "url": "https://github.com/OpenSTFoundation/openst-platform/issues"
+    "url": "https://github.com/OpenSTFoundation/mosaic.js/issues"
   },
-  "scripts": {
-    "start": "index.js",
-    "setup": "node tools/setup/index.js",
-    "make-docs": "node_modules/.bin/jsdoc -c .jsdoc.json"
-  },
+  "scripts": {},
   "dependencies": {
-    "@openstfoundation/openst-base": "0.9.1",
-    "abi-decoder": "1.0.9",
-    "bignumber.js": "4.1.0",
-    "debug": "2.2.0",
-    "edit-json-file": "1.0.8",
-    "rsync": "0.6.1",
     "merkle-patricia-tree": "2.3.1",
     "ethereumjs-util": "5.2.0",
     "leveldown": "4.0.1",
     "levelup": "3.0.1"
   },
-  "devDependencies": {
-    "chai": "4.1.2",
-    "ink-docstrap": "1.3.2",
-    "jsdoc": "3.5.5",
-    "mocha": "5.0.0"
-  }
+  "devDependencies": {}
 }
