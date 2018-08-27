@@ -59,7 +59,7 @@ AuxiliaryWeb3.prototype.bindSigner = function() {
         txToBeSigned = Object.assign({}, requestData.params[0]);
 
       const signers = oWeb3.ic().Signers();
-      const oInteractor = signers.getAuxiliarySignerService(oThis.coreId);
+      const oInteractor = signers.getAuxiliarySignerService(oWeb3.coreId);
       if (!oInteractor) {
         return Promise.reject('Auxiliary Signer Service is missing.');
       }

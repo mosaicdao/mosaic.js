@@ -61,37 +61,47 @@ Game.prototype = {
     let originBlock = await this.origin.eth.getBlock('latest');
     let auxiliaryBlock = await this.auxiliary.eth.getBlock('latest');
 
+    let auxBlockNumber = auxiliaryBlock.number;
     console.log(
       'Should Commit aux stateRoot?',
-      this.auxiliaryBlockNumber < auxiliaryBlock.blockNumber,
+      this.auxiliaryBlockNumber < auxBlockNumber,
       this.auxiliaryBlockNumber,
-      auxiliaryBlock.blockNumber
+      auxBlockNumber
     );
-    if (this.auxiliaryBlockNumber < auxiliaryBlock.blockNumber) {
+    if (this.auxiliaryBlockNumber < auxBlockNumber) {
       // TODO Worker unlocking
       console.log('Updating origin core contract');
       let receipt = await this.core.origin
-        .commitStateRoot(auxiliaryBlock.blockNumber, auxiliaryBlock.stateRoot)
-        .signAndSend({ from: this.originWorkers }, function(err, response) {
+        .commitStateRoot(auxBlockNumber, auxiliaryBlock.stateRoot)
+        .signAndSend({
+          from: this.originWorkers,
+          gasPrice: 1000000,
+          gas: 4700000
+        }, function (err, response) {
           console.log('signAndSend callback triggered.');
           console.log('err', err);
           console.log('response', response);
         });
 
       console.log('auxiliary receipt', receipt);
-      this.auxiliaryBlockNumber = auxiliaryBlock.blockNumber;
+      this.auxiliaryBlockNumber = auxBlockNumber;
     }
+    let originBlockNumber = originBlock.number;
     console.log(
       'Should commit origin state root?',
-      this.originBlockNumber < originBlock.blockNumber,
+      this.originBlockNumber < originBlockNumber,
       this.originBlockNumber,
-      originBlock.blockNumber
+      originBlockNumber
     );
-    if (this.originBlockNumber < originBlock.blockNumber) {
+    if (this.originBlockNumber < originBlockNumber) {
       // TODO Worker unlocking
       let receipt = await this.core.auxiliary
-        .commitStateRoot(originBlock.blockNumber, originBlock.stateRoot)
-        .signAndSend({ from: this.originWorkers }, function(err, response) {
+        .commitStateRoot(originBlockNumber, originBlock.stateRoot)
+        .signAndSend({
+          from: this.auxiliaryWorkers,
+          gasPrice: 1000000,
+          gas: 4700000
+        }, function (err, response) {
           console.log('signAndSend callback triggered.');
           console.log('err', err);
           console.log('response', response);
@@ -99,7 +109,7 @@ Game.prototype = {
 
       console.log('origin receipt', receipt);
 
-      this.originBlockNumber = originBlock.blockNumber;
+      this.originBlockNumber = originBlockNumber;
     }
     console.log('Waiting for new block......');
     setTimeout(function() {

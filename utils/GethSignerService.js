@@ -49,12 +49,16 @@ const Signer = function ( web3 ) {
         let finalData = Object.assign({}, transactionData, {
           nonce: _nonce
         });
-        console.log("GSS :: Signing Tx");
+        console.log("GSS :: Unlocking Account");
         let _fromPassphrase = _aToPwdMap[ String( _from ).toLowerCase() ];
-        return web3.eth.personal.signTransaction( finalData, _fromPassphrase )
-          .then( function ( signedTx ) {
-            console.log("GSS :: Tx Signed");
-            return signedTx;
+        return web3.eth.personal.unlockAccount(transactionData.from, _fromPassphrase)
+          .then(function () {
+            console.log("GSS :: Account Unlocked! Signing Tx");
+            return web3.eth.signTransaction( finalData, _fromPassphrase )
+              .then( function ( signedTx ) {
+                console.log("GSS :: Tx Signed");
+                return signedTx;
+              })
           })
       });
   };
