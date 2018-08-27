@@ -30,6 +30,8 @@ const AuxiliaryWeb3 = function ( originCoreContractAddress ) {
 
   Web3.call(oThis, provider);
 
+  oThis.coreId = originCoreContractAddress;
+
   // Add signAndSend
   oThis.bindSigner();
 
@@ -44,6 +46,7 @@ if ( Web3.prototype ) {
   AuxiliaryWeb3.prototype = {};
 }
 AuxiliaryWeb3.prototype.constructor = AuxiliaryWeb3;
+AuxiliaryWeb3.prototype.coreId = null;
 AuxiliaryWeb3.prototype.bindSigner = function () {
     // 
 
@@ -66,9 +69,9 @@ AuxiliaryWeb3.prototype.bindSigner = function () {
         ;
 
         const signers = oWeb3.ic().Signers();
-        const oInteractor = signers.getOriginSignerService();
+        const oInteractor = signers.getAuxiliarySignerService( oThis.coreId );
         if ( !oInteractor ) {
-          return Promise.reject("Origin Signer Service is missing.");
+          return Promise.reject("Auxiliary Signer Service is missing.");
         }
 
         let signerService = oInteractor.getSignerService();
