@@ -1,27 +1,24 @@
 const ethUtils = require('ethereumjs-util');
 
-const rootPrefix = '../..'
-  , AccountProof = require(rootPrefix + '/proof/lib/account_proof')
-;
+const rootPrefix = '../..',
+  AccountProof = require(rootPrefix + '/proof/lib/account_proof');
 
 /**
  * Constructor for helper methods class - ProofHelperKlass
  * @constructor
  */
 
-const ProofHelperKlass = function () {
-};
+const ProofHelperKlass = function() {};
 
 ProofHelperKlass.prototype = {
-
   /**
    * @notice left-pad value to make length 32 bytes
    * @param value
    * @return {string} padded value of length 32 bytes i.e. 64 nibbles
    * @private
    */
-  _leftPad: function (value) {
-    return ("0000000000000000000000000000000000000000000000000000000000000000" + value).substring(value.length)
+  _leftPad: function(value) {
+    return ('0000000000000000000000000000000000000000000000000000000000000000' + value).substring(value.length);
   },
   /**
    *@notice generates storagePath of a variable in the storage
@@ -29,14 +26,13 @@ ProofHelperKlass.prototype = {
    * @param mappings, key of mapping variable
    * @return {Buffer2}
    */
-  storagePath: function (storageIndex, mappings) {
-
+  storagePath: function(storageIndex, mappings) {
     let path = Buffer.from(this._leftPad(storageIndex), 'hex');
     if (mappings && mappings.length > 0) {
-      mappings.map(mapping => {
-        path = Buffer.concat([Buffer.from(this._leftPad(mapping), 'hex'), path])
+      mappings.map((mapping) => {
+        path = Buffer.concat([Buffer.from(this._leftPad(mapping), 'hex'), path]);
       });
-      path = Buffer.from(ethUtils.sha3(path), 'hex')
+      path = Buffer.from(ethUtils.sha3(path), 'hex');
     }
     path = Buffer.from(ethUtils.sha3(path), 'hex');
     return path;
@@ -50,14 +46,13 @@ ProofHelperKlass.prototype = {
    * @return {Promise<string>}
    * @private
    */
-  fetchStorageRoot: async function (stateRoot, contractAddress, db) {
+  fetchStorageRoot: async function(stateRoot, contractAddress, db) {
+    let accountProofInstance = new AccountProof(stateRoot, db),
+      accountProof = await accountProofInstance.perform(contractAddress),
+      accountValue = accountProof.value, //;accountProof.toHash().data.value
+      decodedValue = ethUtils.rlp.decode('0x' + accountValue);
 
-    let accountProofInstance = new AccountProof(stateRoot, db)
-      , accountProof = await accountProofInstance.perform(contractAddress)
-      , accountValue = accountProof.value//;accountProof.toHash().data.value
-      , decodedValue = ethUtils.rlp.decode('0x' + accountValue);
-
-    console.log("rlp encoded account  value  ", accountValue);
+    console.log('rlp encoded account  value  ', accountValue);
     return '0x' + decodedValue[2].toString('hex');
   }
 };

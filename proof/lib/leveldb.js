@@ -1,6 +1,5 @@
-const leveldown = require('leveldown')
-  , levelup = require('levelup')
-;
+const leveldown = require('leveldown'),
+  levelup = require('levelup');
 
 /**
  * @constructor
@@ -15,7 +14,7 @@ LevelDBFactory.prototype = {
    * @param dbPath
    * @return leveldb instance
    */
-  getInstance: function (dbPath) {
+  getInstance: function(dbPath) {
     const oThis = this;
 
     let lowerCasePath = dbPath.toLowerCase();
@@ -31,8 +30,8 @@ LevelDBFactory.prototype = {
    * @param dbPath
    * @return leveldb instance
    */
-  create: function (dbPath) {
+  create: function(dbPath) {
     return levelup(leveldown(dbPath));
-  },
+  }
 };
 module.exports = new LevelDBFactory();

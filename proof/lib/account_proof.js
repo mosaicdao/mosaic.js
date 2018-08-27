@@ -1,8 +1,7 @@
 const Trie = require('merkle-patricia-tree');
 
-const rootPrefix = "../.."
-  , proof = require(rootPrefix + "/proof/lib/proof")
-;
+const rootPrefix = '../..',
+  proof = require(rootPrefix + '/proof/lib/proof');
 
 /**
  * @constructor
@@ -16,13 +15,12 @@ function AccountProof(stateRoot, db) {
 }
 
 AccountProof.prototype = {
-
   /**
    * Validate and _build proof
    * @param address
    * @return {Promise<proof>}
    */
-  perform: async function (address) {
+  perform: async function(address) {
     const oThis = this;
 
     await oThis._validate(address);
@@ -33,7 +31,7 @@ AccountProof.prototype = {
    * @param address
    * @return {Promise<proof>}
    */
-  _build: async function (address) {
+  _build: async function(address) {
     const oThis = this;
 
     return proof.accountProof(address, oThis.trie);
@@ -43,17 +41,16 @@ AccountProof.prototype = {
    * @param address
    * @private
    */
-  _validate: async function (address) {
+  _validate: async function(address) {
     const oThis = this;
 
     if (!oThis.trie || oThis.trie.root === oThis.trie.EMPTY_TRIE_ROOT) {
-      return Promise.reject({"error": "tree_not_initialized"});
+      return Promise.reject({ error: 'tree_not_initialized' });
     }
     if (address === undefined) {
-      return Promise.reject({"error": "account_address_undefined"});
+      return Promise.reject({ error: 'account_address_undefined' });
     }
   }
 };
 
 module.exports = AccountProof;
-

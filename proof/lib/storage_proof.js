@@ -1,9 +1,8 @@
 const Trie = require('merkle-patricia-tree');
 
-const rootPrefix = '../..'
-  , proof = require(rootPrefix + "/proof/lib/proof")
-  , helper = require(rootPrefix + '/proof/lib/helper')
-;
+const rootPrefix = '../..',
+  proof = require(rootPrefix + '/proof/lib/proof'),
+  helper = require(rootPrefix + '/proof/lib/helper');
 
 /**
  * @constructor
@@ -21,13 +20,12 @@ function StorageProof(storageRoot, contractAddress, db) {
 }
 
 StorageProof.prototype = {
-
   /**
    * @param storageIndex
    * @param optional argument mapping key of key-value pair storage
    * @return {Promise<proof>}
    */
-  perform: async function (storageIndex) {
+  perform: async function(storageIndex) {
     const oThis = this;
 
     let mapping = Array.prototype.slice.call(arguments, 1);
@@ -41,7 +39,7 @@ StorageProof.prototype = {
    * @param storagePath
    * @return {Promise<proof>}
    */
-  _build: async function (storagePath) {
+  _build: async function(storagePath) {
     const oThis = this;
     return proof.storageProof(storagePath, oThis.trie);
   },
@@ -50,19 +48,17 @@ StorageProof.prototype = {
    * @param storageIndex
    * @private
    */
-  _validate: async function (storageIndex) {
+  _validate: async function(storageIndex) {
     const oThis = this;
 
     if (storageIndex === undefined) {
-      return Promise.reject({"error": "storage_index_undefined"});
+      return Promise.reject({ error: 'storage_index_undefined' });
     }
 
     if (!oThis.trie || oThis.trie.root === oThis.trie.EMPTY_TRIE_ROOT) {
-      return Promise.reject({"error": "tree_not_initialized"});
+      return Promise.reject({ error: 'tree_not_initialized' });
     }
-  },
-
+  }
 };
 
 module.exports = StorageProof;
-

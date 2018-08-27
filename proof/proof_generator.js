@@ -1,9 +1,8 @@
-const rootPrefix = ".."
-  , AccountProof = require(rootPrefix + '/proof/lib/account_proof')
-  , StorageProof = require(rootPrefix + '/proof/lib/storage_proof')
-  , dbFactory = require(rootPrefix + '/proof/lib/leveldb')
-  , helper = require(rootPrefix + '/proof/lib/helper')
-;
+const rootPrefix = '..',
+  AccountProof = require(rootPrefix + '/proof/lib/account_proof'),
+  StorageProof = require(rootPrefix + '/proof/lib/storage_proof'),
+  dbFactory = require(rootPrefix + '/proof/lib/leveldb'),
+  helper = require(rootPrefix + '/proof/lib/helper');
 
 /**
  * @param stateRoot
@@ -18,8 +17,7 @@ function ProofGenerator(stateRoot, chainDataPath) {
 }
 
 ProofGenerator.prototype = {
-
-  buildAccountProof: function (address) {
+  buildAccountProof: function(address) {
     const oThis = this;
 
     let accountProof = new AccountProof(oThis.stateRoot, oThis.db);
@@ -34,13 +32,11 @@ ProofGenerator.prototype = {
    * @return {*|Promise<map<key,proof>} in batch mode and Promise<proof> in non batch mode i.e. single non-mapping type variable
    */
 
-
-  buildStorageProof: async function (contractAddress, storageIndex, mappingKeys) {
+  buildStorageProof: async function(contractAddress, storageIndex, mappingKeys) {
     const oThis = this;
     let keyProofMap = {};
 
-    let storageRoot = await helper.fetchStorageRoot(oThis.stateRoot, contractAddress, oThis.db)
-      ,
+    let storageRoot = await helper.fetchStorageRoot(oThis.stateRoot, contractAddress, oThis.db),
       storageProof = new StorageProof(storageRoot, contractAddress, oThis.db);
 
     if (mappingKeys === undefined || mappingKeys.length === 0) {
@@ -52,9 +48,7 @@ ProofGenerator.prototype = {
     }
 
     return keyProofMap;
-  },
+  }
 };
 
 module.exports = ProofGenerator;
-
-
