@@ -55,8 +55,6 @@ AuxiliaryWeb3.prototype.bindSigner = function () {
     ;
 
     const org_createTxObject = Contract.prototype._createTxObject;
-    console.log("Contract.prototype", Object.keys(Contract.prototype).join("\t") );
-    console.log("org_createTxObject", org_createTxObject);
 
     Contract.prototype._createTxObject = function () {
       const oContract = this;
