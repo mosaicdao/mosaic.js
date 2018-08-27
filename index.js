@@ -19,6 +19,9 @@ require('./lib/Contracts');
 
 const Mosaic = function (rumNodeProvider, configurations ) {
   const oThis = this;
+
+  oThis.version = version;
+
   oThis.configurations = Object.assign({}, {rumNodeProvider: rumNodeProvider}, configurations);
   oThis._sanitizeConfigurations();
 
