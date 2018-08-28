@@ -1,52 +1,38 @@
 const Mosaic = require('../index.js');
 
-let orignCoreAddress = '0xaA8b1fA8cCE482bB5b87827496C79eF37ebb67E1',
-  originWorkers = '0xAc56783c6bcf3AeB02A71d8b9DC6443ad7509224',
-  auxiliaryWorkers = '0xac67A86B84BbA63De700dDEAA899c2e1E58544AD';
-
-let mosaicConfig = {
-  origin: {
-    provider: 'ws://127.0.0.1:18545'
-  },
-  auxiliaries: [
-    {
-      provider: 'ws://127.0.0.1:19546',
-      originCoreContractAddress: orignCoreAddress
-    }
-  ]
-};
-
-//auxiliary core = 0xddfda4B769b2d441B3293AcC622e0188f8438b58
-//origin core = 0xc7E63260727F44b4Ab8171a1B5F313A78BD68957
-
-function Game(originCoreAddress, originWorkers, auxiliaryWorkers) {
-  this.mosaic = new Mosaic('', mosaicConfig);
+function Game(gameConfig) {
+  this.mosaic = new Mosaic('', gameConfig.mosaicConfig);
   this.origin = this.mosaic.origin();
-  this.auxiliary = this.mosaic.core(originCoreAddress);
+  this.originCoreAddress = gameConfig.origin.core.address;
+  this.auxiliary = this.mosaic.core(this.originCoreAddress);
+
 
   let CoreContractClass = this.mosaic.contracts.Core;
   this.originBlockNumber = 0;
   this.auxiliaryBlockNumber = 0;
-  this.originWorkers = originWorkers;
-  this.auxiliaryWorkers = auxiliaryWorkers;
-  this.core = new CoreContractClass(orignCoreAddress);
+  this.originWorkers = gameConfig.origin.worker;
+  this.auxiliaryWorkers = gameConfig.auxiliary.worker;
+  this.core = new CoreContractClass(gameConfig.origin.core.address);
   this.setSigner();
 }
 
 Game.prototype = {
+
   setSigner: function() {
     //We will use the geth Signer here.
     let oThis = this,
-      mosaic = this.mosaic;
+      mosaic = oThis.mosaic;
 
     let originGethSigner = new mosaic.utils.GethSignerService(mosaic.origin());
-    originGethSigner.addAccount(originWorkers, 'testtest');
+    originGethSigner.addAccount(oThis.originWorkers.address, oThis.originWorkers.passPhrase);
+
     mosaic.signers.setOriginSignerService(function(transactionData) {
       return originGethSigner.signTransaction(transactionData);
     });
 
-    let auxiliaryGethSigner = new mosaic.utils.GethSignerService(mosaic.core(orignCoreAddress));
-    auxiliaryGethSigner.addAccount(auxiliaryWorkers, 'testtest');
+    let auxiliaryGethSigner = new mosaic.utils.GethSignerService(mosaic.core(this.originCoreAddress));
+    auxiliaryGethSigner.addAccount(oThis.auxiliaryWorkers.address, oThis.auxiliaryWorkers.passPhrase);
+
     mosaic.signers.setAuxiliarySignerService(function(transactionData) {
       return auxiliaryGethSigner.signTransaction(transactionData);
     });
@@ -62,55 +48,48 @@ Game.prototype = {
     let auxiliaryBlock = await this.auxiliary.eth.getBlock('latest');
 
     let auxBlockNumber = auxiliaryBlock.number;
-    console.log(
-      'Should Commit aux stateRoot?',
-      this.auxiliaryBlockNumber < auxBlockNumber,
-      this.auxiliaryBlockNumber,
-      auxBlockNumber
-    );
+
     if (this.auxiliaryBlockNumber < auxBlockNumber) {
-      // TODO Worker unlocking
-      console.log('Updating origin core contract');
-      let receipt = await this.core.origin
+
+      await this.core.origin
         .commitStateRoot(auxBlockNumber, auxiliaryBlock.stateRoot)
         .signAndSend({
-          from: this.originWorkers,
+          from: this.originWorkers.address,
           gasPrice: 1000000,
           gas: 4700000
         }, function (err, response) {
-          console.log('signAndSend callback triggered.');
-          console.log('err', err);
-          console.log('response', response);
+          if (!err) {
+            console.log(`Committed state root on origin chain for block ${auxBlockNumber}`);
+          }
+          else {
+            console.log(`Error while committing state root on origin chain for block ${auxBlockNumber}`)
+          }
         });
 
-      console.log('auxiliary receipt', receipt);
       this.auxiliaryBlockNumber = auxBlockNumber;
     }
+
     let originBlockNumber = originBlock.number;
-    console.log(
-      'Should commit origin state root?',
-      this.originBlockNumber < originBlockNumber,
-      this.originBlockNumber,
-      originBlockNumber
-    );
+
     if (this.originBlockNumber < originBlockNumber) {
-      // TODO Worker unlocking
-      let receipt = await this.core.auxiliary
+
+      await this.core.auxiliary
         .commitStateRoot(originBlockNumber, originBlock.stateRoot)
         .signAndSend({
-          from: this.auxiliaryWorkers,
+          from: this.auxiliaryWorkers.address,
           gasPrice: 1000000,
           gas: 4700000
         }, function (err, response) {
-          console.log('signAndSend callback triggered.');
-          console.log('err', err);
-          console.log('response', response);
+          if (!err) {
+            console.log(`Committed state root on auxiliary chain for block ${originBlockNumber}`);
+          } else {
+            console.log(`Error while committing state root on auxiliary chain for block ${auxBlockNumber}`)
+          }
         });
-
-      console.log('origin receipt', receipt);
 
       this.originBlockNumber = originBlockNumber;
     }
+
     console.log('Waiting for new block......');
     setTimeout(function() {
       oThis.commitStateRoot();
@@ -118,7 +97,45 @@ Game.prototype = {
   }
 };
 
-let game = new Game(orignCoreAddress, originWorkers, auxiliaryWorkers);
+
+let originCoreAddress = '0xaA8b1fA8cCE482bB5b87827496C79eF37ebb67E1',
+  originWorkers = '0xAc56783c6bcf3AeB02A71d8b9DC6443ad7509224',
+  auxiliaryWorkers = '0xac67A86B84BbA63De700dDEAA899c2e1E58544AD';
+
+
+let gameConfig = {
+
+  mosaicConfig: {
+    origin: {
+      provider: 'ws://127.0.0.1:18545'
+    },
+    auxiliaries: [
+      {
+        provider: 'ws://127.0.0.1:19546',
+        originCoreContractAddress: originCoreAddress
+      }
+    ]
+  },
+  origin: {
+    worker: {
+      address: originWorkers,
+      passPhrase: 'testtest'
+    },
+    core: {
+      address: originCoreAddress
+    }
+  },
+
+  auxiliary: {
+    worker: {
+      address: auxiliaryWorkers,
+      passPhrase: 'testtest'
+    }
+  }
+};
+
+let game = new Game(gameConfig);
+
 game.core.on('ready', function() {
   game.run();
 });

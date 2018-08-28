@@ -70,7 +70,7 @@ AuxiliaryWeb3.prototype.bindSigner = function() {
 
       if (signerPromise instanceof Promise) {
         return signerPromise.then(function(signedTxPayload) {
-          console.log('signedTxPayload', signedTxPayload);
+         // console.log('signedTxPayload', signedTxPayload);
           return oWeb3.eth.sendSignedTransaction(signedTxPayload.raw, callback);
         });
       }

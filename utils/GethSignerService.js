@@ -11,7 +11,7 @@ const Signer = function ( web3 ) {
   };
 
   oThis.signTransaction = function (transactionData) {
-    console.log("transactionData", transactionData);
+    //console.log("transactionData", transactionData);
     if ( !transactionData || !transactionData.from ) {
       return Promise.reject('Invalid transactionData');
     }
