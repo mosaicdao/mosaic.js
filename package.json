@@ -18,12 +18,13 @@
     "init-dev-env": "node ./tools/initDevEnv.js"
   },
   "dependencies": {
-    "merkle-patricia-tree": "2.3.1",
+    "bignumber.js": "4.1.0",
     "ethereumjs-util": "5.2.0",
     "leveldown": "4.0.1",
     "levelup": "3.0.1",
-    "web3": "1.0.0-beta.33",
-    "bignumber.js": "4.1.0"
+    "merkle-patricia-tree": "2.3.1",
+    "path": "^0.12.7",
+    "web3": "1.0.0-beta.33"
   },
   "devDependencies": {
     "lint-staged": "7.2.0",

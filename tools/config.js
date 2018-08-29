@@ -4,7 +4,8 @@ module.exports = {
     gethFolder: '~/mosaic-setup/origin-geth',
     allocAmount: '1000000000000000000', // in base currency
     gasLimit: 4700000,
-    genesisFilePath: '~/mosaic-setup/origin-geth/genesis-origin.json'
+    genesisFileTemplatePath: './tools/genesis-origin.json',
+    genesisFilePath: '~/mosaic-setup/genesis-origin.json'
   },
 
   auxiliary: {
@@ -12,6 +13,7 @@ module.exports = {
     gethFolder: '~/mosaic-setup/auxiliary-geth',
     allocAmount: '800000000', // in base currency
     gasLimit: 9000000,
-    genesisFilePath: '~/mosaic-setup/auxiliary-geth/genesis-auxiliary.json'
+    genesisFileTemplatePath: './tools/genesis-auxiliary.json',
+    genesisFilePath: '~/mosaic-setup/genesis-auxiliary.json'
   }
 };

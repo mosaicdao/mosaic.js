@@ -2,7 +2,9 @@
 
 const shell = require('shelljs'),
   editJsonFile = require('edit-json-file'),
-  BigNumber = require('bignumber.js');
+  BigNumber = require('bignumber.js'),
+  fs = require('fs'),
+  Path = require('path');
 
 const setUpConfig = require('./config.js');
 
@@ -33,21 +35,23 @@ InitDevEnv.prototype = {
     // create new setup folder
     oThis._handleShellResponse(shell.exec('mkdir -p ' + oThis.setupRoot));
 
+    oThis._handleShellResponse(shell.exec('echo {} >' + oThis.setupRoot + '/' + 'config.json'));
+
     // init value GETH
     oThis._initOriginGeth();
 
     // init auxiliary GETH
     oThis._initAuxiliaryGeth();
 
-    oThis.fundEth();
+    oThis._fundEth();
 
-    oThis.deploySimpleToken();
+    oThis._deploySimpleToken();
 
-    oThis.fundOst();
+    oThis._fundOst();
 
-    oThis.updateConfigFile();
+    oThis._updateConfigFile();
 
-    shell.exec('rm -rf ' + folder);
+    console.log('Dev env init DONE!');
   },
 
   _initOriginGeth: function() {
@@ -64,11 +68,16 @@ InitDevEnv.prototype = {
     let originFacilitator = oThis._generateAddress(originGethFolder);
     let originMiner = oThis._generateAddress(originGethFolder);
 
+    // let cmd = 'touch ' + setUpConfig.origin.genesisFilePath;
+    // console.log(cmd);
+    // oThis._handleShellResponse(shell.exec(cmd));
+
     oThis._modifyGenesisFile(
       setUpConfig.origin.chainId,
       chainOwnerOriginAddress,
       setUpConfig.origin.allocAmount,
       setUpConfig.origin.gasLimit,
+      setUpConfig.origin.genesisFileTemplatePath,
       setUpConfig.origin.genesisFilePath
     );
 
@@ -95,14 +104,23 @@ InitDevEnv.prototype = {
       chainOwnerAuxiliaryAddress,
       setUpConfig.auxiliary.allocAmount,
       setUpConfig.auxiliary.gasLimit,
+      setUpConfig.auxiliary.genesisFileTemplatePath,
       setUpConfig.auxiliary.genesisFilePath,
       auxiliarySealer
     );
 
-    oThis._handleShellResponse(
-      shell.exec('geth --datadir "' + auxiliaryGethPath + '" init ' + setUpConfig.auxiliary.genesisFilePath)
-    );
+    let initCmd = 'geth --datadir "' + auxiliaryGethFolder + '" init ' + setUpConfig.auxiliary.genesisFilePath;
+    console.log('_initOriginGeth :: Geth Init. Command:\n', initCmd);
+    oThis._handleShellResponse(shell.exec(initCmd));
   },
+
+  _fundEth: function() {},
+
+  _deploySimpleToken: function() {},
+
+  _fundOst: function() {},
+
+  _updateConfigFile: function() {},
 
   _generateAddress: function(originGethPath) {
     const oThis = this;
@@ -121,23 +139,26 @@ InitDevEnv.prototype = {
     allocAmountToAddress,
     allocAmount,
     gasLimit,
+    chainGenesisTemplateLocation,
     chainGenesisLocation,
     sealerAddress
   ) {
-    // If the file doesn't exist, the content will be an empty object by default.
-    const file = editJsonFile(chainGenesisLocation);
+    const oThis = this;
 
-    let allocAmountInWeis = new BigNumber(allocAmount).mul(etherToWeiCinversion).toString(10);
+    let fileContent = JSON.parse(fs.readFileSync(chainGenesisTemplateLocation, 'utf8'));
 
     // Alloc balance to required address
-    file.set('alloc.' + allocAmountToAddress + '.balance', allocAmountInWeis);
+    let allocAmountInWeis = new BigNumber(allocAmount).mul(etherToWeiCinversion).toString(16);
+    let allocObject = {};
+    allocObject[allocAmountToAddress] = { balance: hexStartsWith + allocAmountInWeis };
+    fileContent.alloc = allocObject;
 
     // set chain id
-    file.set('config.chainId', chainId);
+    fileContent.config.chainId = chainId;
 
     // set gas limit
     let bnGasLimit = new BigNumber(gasLimit);
-    file.set('gasLimit', hexStartsWith + bnGasLimit.toString(16));
+    fileContent.gasLimit = hexStartsWith + bnGasLimit.toString(16);
 
     // add extra data
     if (sealerAddress) {
@@ -145,10 +166,12 @@ InitDevEnv.prototype = {
         '0x0000000000000000000000000000000000000000000000000000000000000000' +
         sealerAddress.replace(hexStartsWith, '') +
         '0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000';
-      file.set('extraData', extraData);
+      fileContent.extraData = extraData;
     }
 
-    file.save();
+    console.log(JSON.stringify(fileContent));
+
+    oThis._handleShellResponse(shell.exec("echo '" + JSON.stringify(fileContent) + "' > " + chainGenesisLocation));
 
     return true;
   },
