@@ -12,7 +12,7 @@ module.exports = {
     chainId: 2000,
     gethFolder: '~/mosaic-setup/auxiliary-geth',
     allocAmount: '800000000', // in base currency
-    gasLimit: 9000000,
+    gasLimit: 4700000,
     genesisFileTemplatePath: './tools/genesis-auxiliary.json',
     genesisFilePath: '~/mosaic-setup/genesis-auxiliary.json'
   }
