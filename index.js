@@ -104,7 +104,8 @@ Mosaic.prototype = {
 
 
 Mosaic.utils = {
-  GethSignerService: require('./utils/GethSignerService')
+  GethSignerService: require('./utils/GethSignerService'),
+  deployContract:   require('./utils/deployContract')
 };
 
 
