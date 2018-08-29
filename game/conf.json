@@ -1,0 +1,28 @@
+{
+  "mosaicConfig": {
+    "origin": {
+      "provider": "ws://127.0.0.1:18545"
+    },
+    "auxiliaries": [
+      {
+        "provider": "ws://127.0.0.1:19546",
+        "originCoreContractAddress": "0xaA8b1fA8cCE482bB5b87827496C79eF37ebb67E1"
+      }
+    ]
+  },
+  "origin": {
+    "worker": {
+      "address": "0xAc56783c6bcf3AeB02A71d8b9DC6443ad7509224",
+      "passPhrase": "testtest"
+    },
+    "core": {
+      "address": "0xaA8b1fA8cCE482bB5b87827496C79eF37ebb67E1"
+    }
+  },
+  "auxiliary": {
+    "worker": {
+      "address": "0xac67A86B84BbA63De700dDEAA899c2e1E58544AD",
+      "passPhrase": "testtest"
+    }
+  }
+}

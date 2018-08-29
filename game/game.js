@@ -1,4 +1,7 @@
-const Mosaic = require('../index.js');
+const rootPrefix = '..'
+  , Mosaic = require(rootPrefix + '/index.js')
+  , gameConfig = require(rootPrefix + '/game/conf')
+;
 
 function Game(gameConfig) {
   this.mosaic = new Mosaic('', gameConfig.mosaicConfig);
@@ -94,43 +97,6 @@ Game.prototype = {
     setTimeout(function() {
       oThis.commitStateRoot();
     }, 10000);
-  }
-};
-
-
-let originCoreAddress = '0xaA8b1fA8cCE482bB5b87827496C79eF37ebb67E1',
-  originWorkers = '0xAc56783c6bcf3AeB02A71d8b9DC6443ad7509224',
-  auxiliaryWorkers = '0xac67A86B84BbA63De700dDEAA899c2e1E58544AD';
-
-
-let gameConfig = {
-
-  mosaicConfig: {
-    origin: {
-      provider: 'ws://127.0.0.1:18545'
-    },
-    auxiliaries: [
-      {
-        provider: 'ws://127.0.0.1:19546',
-        originCoreContractAddress: originCoreAddress
-      }
-    ]
-  },
-  origin: {
-    worker: {
-      address: originWorkers,
-      passPhrase: 'testtest'
-    },
-    core: {
-      address: originCoreAddress
-    }
-  },
-
-  auxiliary: {
-    worker: {
-      address: auxiliaryWorkers,
-      passPhrase: 'testtest'
-    }
   }
 };
 
