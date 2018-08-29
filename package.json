@@ -15,20 +15,22 @@
   "scripts": {
     "pre-commit": "lint-staged",
     "mosaic-game": "node ./game/game",
-    "init-dev-env": "node ./tools/initChains"
+    "init-dev-env": "node ./tools/initDevEnv.js"
   },
   "dependencies": {
     "merkle-patricia-tree": "2.3.1",
     "ethereumjs-util": "5.2.0",
     "leveldown": "4.0.1",
     "levelup": "3.0.1",
-    "web3": "1.0.0-beta.33"
+    "web3": "1.0.0-beta.33",
+    "bignumber.js": "4.1.0"
   },
   "devDependencies": {
     "lint-staged": "7.2.0",
     "pre-commit": "1.2.2",
     "prettier": "1.13.7",
-    "shelljs": "0.8.1"
+    "shelljs": "0.8.1",
+    "edit-json-file": "1.0.8"
   },
   "pre-commit": [
     "pre-commit"
