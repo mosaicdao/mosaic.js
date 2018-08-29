@@ -56,7 +56,7 @@ Game.prototype = {
 
       await this.core.origin
         .commitStateRoot(auxBlockNumber, auxiliaryBlock.stateRoot)
-        .signAndSend({
+        .send({
           from: this.originWorkers.address,
           gasPrice: 1000000,
           gas: 4700000
@@ -78,7 +78,7 @@ Game.prototype = {
 
       await this.core.auxiliary
         .commitStateRoot(originBlockNumber, originBlock.stateRoot)
-        .signAndSend({
+        .send({
           from: this.auxiliaryWorkers.address,
           gasPrice: 1000000,
           gas: 4700000
