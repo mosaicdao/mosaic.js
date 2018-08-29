@@ -38,7 +38,7 @@ Game.prototype = {
 
     mosaic.signers.setAuxiliarySignerService(function(transactionData) {
       return auxiliaryGethSigner.signTransaction(transactionData);
-    });
+    }, this.originCoreAddress);
   },
 
   run: async function() {
