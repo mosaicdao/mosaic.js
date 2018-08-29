@@ -3,7 +3,7 @@
 const fs = require('fs');
 
 const deployContract = require('../utils/deployContract')
-;
+    , helper = require('../utils/helper');
 
 /**
  * auxiliaryConfig = {
@@ -39,15 +39,19 @@ InitSTPrime.prototype = {
         console.log('Deploy STPrime contract on auxiliary chain START.');
 
         await auxiliaryWeb3.eth.personal.unlockAccount(oThis.auxiliaryConfig.deployerAddress, 'testtest');
-
         // TODO Verify ST Prime constructor parameters as it's in development
+        let contractName = 'STPrime'
+            , args = [valueTokenAddress, chainIdValue, chainIdUtility, conversionRate, conversionRateDecimals]
+        ;
         let auxiliarySTPrimeDeployResponse = await new deployContract({
             web3: oThis.auxiliaryConfig.provider,
-            contractName: 'STPrime',
+            contractName: contractName,
             deployerAddress: oThis.auxiliaryConfig.deployerAddress,
             gasPrice: oThis.gasPrice,
             gas: 4700000,
-            args: [valueTokenAddress, chainIdValue, chainIdUtility, conversionRate, conversionRateDecimals]
+            abi: helper.getABI(contractName),
+            bin: helper.getBIN(contractName),
+            args: args
         }).perform();
 
         console.log('auxiliarySTPrimeDeployResponse:', auxiliarySTPrimeDeployResponse);

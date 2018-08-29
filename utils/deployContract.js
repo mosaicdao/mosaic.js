@@ -8,10 +8,13 @@ const DeployContract = function(params) {
     oThis.deployerAddress = params.deployerAddress;
     oThis.gasPrice = params.gasPrice;
     oThis.gas = params.gas;
+    oThis.abi = params.abi;
+    oThis.bin = params.bin;
     oThis.args = params.args;
 
 };
 
+// TODO Signer integration and unlocking
 DeployContract.prototype = {
     perform: async function() {
         const oThis = this;
@@ -19,7 +22,7 @@ DeployContract.prototype = {
         let txOptions = {
             from: oThis.deployerAddress,
             gas: oThis.gas,
-            data: oThis._binFileContent(),
+            data: oThis.bin,
             gasPrice: oThis.gasPrice
         };
 
@@ -27,7 +30,7 @@ DeployContract.prototype = {
             txOptions.arguments = oThis.args;
         }
 
-        const contract = new oThis.web3.eth.Contract(oThis._abiFileContent(), null, txOptions);
+        const contract = new oThis.web3.eth.Contract(oThis.abi, null, txOptions);
 
         let tx = contract.deploy(txOptions),
             transactionHash = null,
@@ -63,23 +66,23 @@ DeployContract.prototype = {
         });
     },
 
-    _abiFileContent: function () {
-        const oThis = this;
-
-        return JSON.parse(oThis._read('../../contracts/abi/' + oThis.contractName + '.abi'));
-    },
-
-    _binFileContent: function () {
-        const oThis = this;
-
-        return '0x' + oThis._read('../../contracts/bin/' + oThis.contractName + '.bin');
-    },
-
-    _read: function(filePath) {
-        filePath = path.join(__dirname, '/' + filePath);
-        console.log('filePath', filePath);
-        return fs.readFileSync(filePath, 'utf8');
-    }
+    // _abiFileContent: function () {
+    //     const oThis = this;
+    //
+    //     return JSON.parse(oThis._read('../../contracts/abi/' + oThis.contractName + '.abi'));
+    // },
+    //
+    // _binFileContent: function () {
+    //     const oThis = this;
+    //
+    //     return '0x' + oThis._read('../../contracts/bin/' + oThis.contractName + '.bin');
+    // },
+    //
+    // _read: function(filePath) {
+    //     filePath = path.join(__dirname, '/' + filePath);
+    //     console.log('filePath', filePath);
+    //     return fs.readFileSync(filePath, 'utf8');
+    // }
 };
 
 module.exports = DeployContract;
