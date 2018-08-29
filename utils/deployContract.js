@@ -15,6 +15,7 @@ const DeployContract = function(params) {
 };
 
 // TODO Signer integration and unlocking
+// TODO add deployer by name
 DeployContract.prototype = {
     perform: async function() {
         const oThis = this;

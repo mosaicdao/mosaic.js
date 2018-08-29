@@ -1,7 +1,5 @@
 'use strict';
 
-const fs = require('fs');
-
 const deployContract = require('../utils/deployContract')
     , helper = require('../utils/helper');
 
