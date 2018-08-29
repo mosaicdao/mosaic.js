@@ -1,14 +1,12 @@
-const rootPrefix = '..'
-  , Mosaic = require(rootPrefix + '/index.js')
-  , gameConfig = require(rootPrefix + '/game/conf')
-;
+const rootPrefix = '../..',
+  Mosaic = require(rootPrefix + '/index.js'),
+  gameConfig = require(rootPrefix + '/executables/game/conf');
 
 function Game(gameConfig) {
   this.mosaic = new Mosaic('', gameConfig.mosaicConfig);
   this.origin = this.mosaic.origin();
   this.originCoreAddress = gameConfig.origin.core.address;
   this.auxiliary = this.mosaic.core(this.originCoreAddress);
-
 
   let CoreContractClass = this.mosaic.contracts.Core;
   this.originBlockNumber = 0;
@@ -20,7 +18,6 @@ function Game(gameConfig) {
 }
 
 Game.prototype = {
-
   setSigner: function() {
     //We will use the geth Signer here.
     let oThis = this,
@@ -53,21 +50,20 @@ Game.prototype = {
     let auxBlockNumber = auxiliaryBlock.number;
 
     if (this.auxiliaryBlockNumber < auxBlockNumber) {
-
-      await this.core.origin
-        .commitStateRoot(auxBlockNumber, auxiliaryBlock.stateRoot)
-        .send({
+      await this.core.origin.commitStateRoot(auxBlockNumber, auxiliaryBlock.stateRoot).send(
+        {
           from: this.originWorkers.address,
           gasPrice: 1000000,
           gas: 4700000
-        }, function (err, response) {
+        },
+        function(err, response) {
           if (!err) {
             console.log(`Committed state root on origin chain for block ${auxBlockNumber}`);
+          } else {
+            console.log(`Error while committing state root on origin chain for block ${auxBlockNumber}`);
           }
-          else {
-            console.log(`Error while committing state root on origin chain for block ${auxBlockNumber}`)
-          }
-        });
+        }
+      );
 
       this.auxiliaryBlockNumber = auxBlockNumber;
     }
@@ -75,20 +71,20 @@ Game.prototype = {
     let originBlockNumber = originBlock.number;
 
     if (this.originBlockNumber < originBlockNumber) {
-
-      await this.core.auxiliary
-        .commitStateRoot(originBlockNumber, originBlock.stateRoot)
-        .send({
+      await this.core.auxiliary.commitStateRoot(originBlockNumber, originBlock.stateRoot).send(
+        {
           from: this.auxiliaryWorkers.address,
           gasPrice: 1000000,
           gas: 4700000
-        }, function (err, response) {
+        },
+        function(err, response) {
           if (!err) {
             console.log(`Committed state root on auxiliary chain for block ${originBlockNumber}`);
           } else {
-            console.log(`Error while committing state root on auxiliary chain for block ${auxBlockNumber}`)
+            console.log(`Error while committing state root on auxiliary chain for block ${auxBlockNumber}`);
           }
-        });
+        }
+      );
 
       this.originBlockNumber = originBlockNumber;
     }
