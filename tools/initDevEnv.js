@@ -23,6 +23,7 @@ const InitDevEnv = function(params) {
   oThis.setupRoot = params.setupRoot;
   oThis.originAddresses = {};
   oThis.auxiliaryAddresses = {};
+  oThis.configJsonFilePath = oThis.setupRoot + '/' + 'config.json';
 };
 
 InitDevEnv.prototype = {
@@ -35,7 +36,7 @@ InitDevEnv.prototype = {
     // create new setup folder
     oThis._handleShellResponse(shell.exec('mkdir -p ' + oThis.setupRoot));
 
-    oThis._handleShellResponse(shell.exec('echo {} >' + oThis.setupRoot + '/' + 'config.json'));
+    oThis._handleShellResponse(shell.exec('echo {} > ' + oThis.configJsonFilePath));
 
     // init value GETH
     oThis._initOriginGeth();
@@ -43,13 +44,14 @@ InitDevEnv.prototype = {
     // init auxiliary GETH
     oThis._initAuxiliaryGeth();
 
+    // Abhay
     oThis._fundEth();
 
+    // Deepesh
     oThis._deploySimpleToken();
 
+    // Gulshan
     oThis._fundOst();
-
-    oThis._updateConfigFile();
 
     console.log('Dev env init DONE!');
   },
@@ -68,10 +70,6 @@ InitDevEnv.prototype = {
     let originFacilitator = oThis._generateAddress(originGethFolder);
     let originMiner = oThis._generateAddress(originGethFolder);
 
-    // let cmd = 'touch ' + setUpConfig.origin.genesisFilePath;
-    // console.log(cmd);
-    // oThis._handleShellResponse(shell.exec(cmd));
-
     oThis._modifyGenesisFile(
       setUpConfig.origin.chainId,
       chainOwnerOriginAddress,
@@ -84,6 +82,15 @@ InitDevEnv.prototype = {
     let initCmd = 'geth --datadir "' + originGethFolder + '" init ' + setUpConfig.origin.genesisFilePath;
     console.log('_initOriginGeth :: Geth Init. Command:\n', initCmd);
     oThis._handleShellResponse(shell.exec(initCmd));
+
+    oThis._addConfig({
+      chainOwnerOriginAddress: chainOwnerOriginAddress,
+      originWorkerAddress: originWorkerAddress,
+      originDeployerAddress: originDeployerAddress,
+      ostPrimeStakerAddress: ostPrimeStakerAddress,
+      originFacilitator: originFacilitator,
+      originMiner: originMiner
+    });
   },
 
   _initAuxiliaryGeth: function() {
@@ -112,6 +119,14 @@ InitDevEnv.prototype = {
     let initCmd = 'geth --datadir "' + auxiliaryGethFolder + '" init ' + setUpConfig.auxiliary.genesisFilePath;
     console.log('_initOriginGeth :: Geth Init. Command:\n', initCmd);
     oThis._handleShellResponse(shell.exec(initCmd));
+
+    oThis._addConfig({
+      chainOwnerAuxiliaryAddress: chainOwnerAuxiliaryAddress,
+      auxiliaryWorkerAddress: auxiliaryWorkerAddress,
+      auxiliaryDeployerAddress: auxiliaryDeployerAddress,
+      auxiliaryFacilitator: auxiliaryFacilitator,
+      auxiliarySealer: auxiliarySealer
+    });
   },
 
   _fundEth: function() {},
@@ -119,8 +134,6 @@ InitDevEnv.prototype = {
   _deploySimpleToken: function() {},
 
   _fundOst: function() {},
-
-  _updateConfigFile: function() {},
 
   _generateAddress: function(originGethPath) {
     const oThis = this;
@@ -182,11 +195,23 @@ InitDevEnv.prototype = {
     }
 
     return res;
+  },
+
+  _addConfig: function(params) {
+    const oThis = this;
+
+    let fileContent = JSON.parse(fs.readFileSync(oThis.configJsonFilePath, 'utf8'));
+
+    for (var i in params) {
+      fileContent[i] = params[i];
+    }
+
+    oThis._handleShellResponse(shell.exec("echo '" + JSON.stringify(fileContent) + "' > " + oThis.configJsonFilePath));
   }
 };
 
 // commander
-
+const os = require('os');
 new InitDevEnv({
-  setupRoot: '~/mosaic-setup' // later to come as argument for this script
+  setupRoot: os.homedir() + '/mosaic-setup' // later to come as argument for this script
 }).perform();
