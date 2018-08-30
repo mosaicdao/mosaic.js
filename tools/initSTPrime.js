@@ -33,6 +33,7 @@ InitSTPrime.prototype = {
       web3: oThis.web3Provider,
       contractName: contractName,
       deployerAddress: oThis.deployerAddress,
+      deployerPassphrase: oThis.deployerPassphrase,
       gasPrice: oThis.gasPrice,
       gas: oThis.gasLimit,
       abi: helper.getABI(contractName),

@@ -6,6 +6,7 @@ const DeployContract = function(params) {
   oThis.web3 = params.web3;
   oThis.contractName = params.contractName;
   oThis.deployerAddress = params.deployerAddress;
+  oThis.deployerPassphrase = params.deployerPassphrase;
   oThis.gasPrice = params.gasPrice;
   oThis.gas = params.gas;
   oThis.abi = params.abi;
@@ -13,10 +14,9 @@ const DeployContract = function(params) {
   oThis.args = params.args;
 };
 
-// TODO Signer integration and unlocking
-// TODO add deployer by name
 DeployContract.prototype = {
-  perform: async function() {
+
+  deploy: async function() {
     const oThis = this;
 
     let txOptions = {
@@ -36,8 +36,10 @@ DeployContract.prototype = {
       transactionHash = null,
       receipt = null;
 
-    console.log('Deploying contract ' + oThis.contractName);
+    console.log('Unlock account ' + oThis.deployerAddress);
+    await oThis.web3.eth.personal.unlockAccount(oThis.deployerAddress, oThis.deployerPassphrase);
 
+    console.log('Deploying contract ' + oThis.contractName);
     const instance = await tx
       .send()
       .on('receipt', function(value) {
