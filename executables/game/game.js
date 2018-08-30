@@ -26,16 +26,12 @@ Game.prototype = {
     let originGethSigner = new mosaic.utils.GethSignerService(mosaic.origin());
     originGethSigner.addAccount(oThis.originWorkers.address, oThis.originWorkers.passPhrase);
 
-    mosaic.signers.setOriginSignerService(function(transactionData) {
-      return originGethSigner.signTransaction(transactionData);
-    });
+    mosaic.signers.setOriginSignerService(originGethSigner);
 
     let auxiliaryGethSigner = new mosaic.utils.GethSignerService(mosaic.core(this.originCoreAddress));
     auxiliaryGethSigner.addAccount(oThis.auxiliaryWorkers.address, oThis.auxiliaryWorkers.passPhrase);
 
-    mosaic.signers.setAuxiliarySignerService(function(transactionData) {
-      return auxiliaryGethSigner.signTransaction(transactionData);
-    }, this.originCoreAddress);
+    mosaic.signers.setAuxiliarySignerService(auxiliaryGethSigner, this.originCoreAddress);
   },
 
   run: async function() {

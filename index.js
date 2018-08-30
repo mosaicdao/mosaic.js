@@ -97,7 +97,8 @@ Mosaic.prototype = {
 
 Mosaic.utils = {
   GethSignerService: require('./utils/GethSignerService'),
-  deployContract:   require('./utils/deployContract')
+  deployContract: require('./utils/deployContract'),
+  helper: require('./utils/helper')
 };
 
 module.exports = Mosaic;
