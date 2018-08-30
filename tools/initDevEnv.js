@@ -37,6 +37,13 @@ InitDevEnv.prototype = {
     // create new setup folder
     oThis._handleShellResponse(shell.exec('mkdir -p ' + oThis.setupRoot));
 
+    // create new setup folder
+    oThis._handleShellResponse(shell.exec('mkdir -p ' + oThis.setupRoot + '/bin'));
+
+    // create bin folder
+    oThis._handleShellResponse(shell.exec('mkdir -p ' + oThis.setupRoot + '/logs'));
+
+    // create logs folder
     oThis._handleShellResponse(shell.exec('echo {} > ' + oThis.configJsonFilePath));
 
     // init value GETH
@@ -93,6 +100,26 @@ InitDevEnv.prototype = {
       originFacilitator: originFacilitator,
       originMiner: originMiner
     });
+
+    let startCmd =
+      `geth --datadir '${originGethFolder}'` +
+      ` --networkid ${setUpConfig.origin.networkId}` +
+      ` --port ${setUpConfig.origin.geth.port}` +
+      ` --mine --minerthreads 1 --targetgaslimit ${setUpConfig.origin.gasLimit} --gasprice 0x3B9ACA00` +
+      ` --rpc --rpcapi eth,net,web3,personal,txpool --rpcaddr ${setUpConfig.origin.geth.host} --rpcport ${
+        setUpConfig.origin.geth.rpcport
+      }` +
+      ` --ws --wsapi eth,net,web3,personal,txpool --wsaddr ${setUpConfig.origin.geth.host} --wsport ${
+        setUpConfig.origin.geth.wsport
+      } --wsorigins '*'` +
+      ` --etherbase ${originMiner} --unlock ${originMiner} --password ${originPasswordFilePath}`;
+
+    console.log('origin start command:\n', startCmd);
+
+    //Create shell script
+    let originShellScriptPath = oThis.setupRoot + '/bin/run-origin.sh';
+    oThis._handleShellResponse(shell.exec('echo #!/bin/sh > ' + originShellScriptPath));
+    oThis._handleShellResponse(shell.exec(`echo "${startCmd}" >> ${originShellScriptPath}`));
   },
 
   _initAuxiliaryGeth: function() {
@@ -129,6 +156,34 @@ InitDevEnv.prototype = {
       auxiliaryFacilitator: auxiliaryFacilitator,
       auxiliarySealer: auxiliarySealer
     });
+
+    let startCmd =
+      `geth --datadir '${auxiliaryGethFolder}'` +
+      ` --networkid ${setUpConfig.auxiliary.networkId}` +
+      ` --port ${setUpConfig.auxiliary.geth.port}` +
+      ` --mine --minerthreads 1 --targetgaslimit ${setUpConfig.auxiliary.gasLimit} --gasprice 0x3B9ACA00` +
+      ` --rpc --rpcapi eth,net,web3,personal,txpool --rpcaddr ${setUpConfig.auxiliary.geth.host} --rpcport ${
+        setUpConfig.auxiliary.geth.rpcport
+      }` +
+      ` --ws --wsapi eth,net,web3,personal,txpool --wsaddr ${setUpConfig.auxiliary.geth.host} --wsport ${
+        setUpConfig.auxiliary.geth.wsport
+      } --wsorigins '*'` +
+      ` --etherbase ${auxiliarySealer} --unlock ${auxiliarySealer} --password ${auxiliaryPasswordFilePath}`;
+
+    console.log('auxiliary start command:\n', startCmd);
+
+    //Create shell script
+    let auxiliaryShellScriptPath = oThis.setupRoot + '/bin/run-auxiliary.sh';
+    oThis._handleShellResponse(shell.exec('echo #!/bin/sh > ' + auxiliaryShellScriptPath));
+    oThis._handleShellResponse(shell.exec(`echo "${startCmd}" >> ${auxiliaryShellScriptPath}`));
+
+    //Modify start cmd to start with zero gas.
+    startCmd = startCmd.replace('--gasprice 0x3B9ACA00', '--gasprice 0x0');
+
+    //Create shell script for zero gas price.
+    let zeroGasAuxiliaryShellScriptPath = oThis.setupRoot + '/bin/run-auxiliary-with-zero-gas.sh';
+    oThis._handleShellResponse(shell.exec('echo #!/bin/sh > ' + zeroGasAuxiliaryShellScriptPath));
+    oThis._handleShellResponse(shell.exec(`echo "${startCmd}" >> ${zeroGasAuxiliaryShellScriptPath}`));
   },
 
   _fundEth: async function() {
