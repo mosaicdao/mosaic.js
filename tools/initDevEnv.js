@@ -50,11 +50,10 @@ InitDevEnv.prototype = {
     // fund ETH
     await oThis._fundEth();
 
-    // Deepesh
-    await oThis._deploySimpleToken();
-
-    // Gulshan
-    oThis._fundOst();
+    // Deploy ERC20 Token contract
+    let contractDeploymentResponse = await oThis._deployERC20Token();
+    
+    await oThis._fundERC20Token(contractDeploymentResponse);
 
     console.log('Dev env init DONE!');
   },
@@ -155,7 +154,7 @@ InitDevEnv.prototype = {
     }
   },
 
-  _deploySimpleToken: function() {
+  _deployERC20Token: function() {
     const oThis = this;
 
     let configFileContent = JSON.parse(fs.readFileSync(oThis.configJsonFilePath, 'utf8'));
@@ -173,8 +172,23 @@ InitDevEnv.prototype = {
       gasLimit: setUpConfig.origin.gasLimit
     }).perform();
   },
-
-  _fundOst: function() {},
+	
+	_fundERC20Token: function(contractDeploymentResponse, amount) {
+	  const oThis = this;
+	
+	  let configFileContent = JSON.parse(fs.readFileSync(oThis.configJsonFilePath, 'utf8'));
+		
+		let erc20TokenContract = contractDeploymentResponse.instance;
+		
+		return erc20TokenContract.methods
+			.transfer(configFileContent.ostPrimeStakerAddress, amount)
+			.send({
+				from: configFileContent.originDeployerAddress,
+				gasPrice: setUpConfig.origin.gasprice,
+				gas: setUpConfig.origin.gasLimit
+			});
+	  
+  },
 
   _fundEthFor: function(web3Provider, senderAddr, recipient, amount) {
     return web3Provider.eth.personal.unlockAccount(senderAddr, originPassphrase).then(function() {
