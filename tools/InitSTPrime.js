@@ -3,7 +3,7 @@
 const deployContract = require('../utils/deployContract'),
   helper = require('../utils/helper');
 
-const InitERC20Token = function(params) {
+const InitSTPrime = function(params) {
   const oThis = this;
 
   oThis.web3Provider = params.web3Provider;
@@ -11,24 +11,25 @@ const InitERC20Token = function(params) {
   oThis.deployerPassphrase = params.deployerPassphrase;
   oThis.gasPrice = params.gasPrice;
   oThis.gasLimit = params.gasLimit;
+  oThis.erc20TokenAddress = params.erc20TokenAddress;
 };
 
-InitERC20Token.prototype = {
+InitSTPrime.prototype = {
   perform: function() {
     const oThis = this;
 
-    return oThis.deployERC20TokenOnOrigin();
+    return oThis.deploySTPrimeOnAuxiliary();
   },
 
-  deployERC20TokenOnOrigin: async function() {
+  deploySTPrimeOnAuxiliary: async function() {
     const oThis = this;
 
-    console.log('Deploy ERC20Token contract on origin chain START.');
+    console.log('Deploy STPrime contract on auxiliary chain START.');
 
     await oThis.web3Provider.eth.personal.unlockAccount(oThis.deployerAddress, oThis.deployerPassphrase);
-    let contractName = 'MockToken',
-      args = [];
-    let tokenDeployResponse = await new deployContract({
+    let contractName = 'STPrime',
+      args = [oThis.erc20TokenAddress, 1, 0];
+    let stPrimeDeployResponse = await new deployContract({
       web3: oThis.web3Provider,
       contractName: contractName,
       deployerAddress: oThis.deployerAddress,
@@ -39,10 +40,10 @@ InitERC20Token.prototype = {
       args: args
     }).perform();
 
-    oThis.tokenContractAddress = tokenDeployResponse.receipt.contractAddress;
-    console.log('ERC20Token ContractAddress :', oThis.tokenContractAddress);
-    return tokenDeployResponse;
+    oThis.stPrimeContractAddress = stPrimeDeployResponse.receipt.contractAddress;
+    console.log('STPrime ContractAddress :', oThis.stPrimeContractAddress);
+    return stPrimeDeployResponse;
   }
 };
 
-module.exports = InitERC20Token;
+module.exports = InitSTPrime;
