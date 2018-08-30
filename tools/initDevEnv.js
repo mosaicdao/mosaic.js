@@ -256,9 +256,15 @@ InitDevEnv.prototype = {
       'originMiner'
     ];
 
-    for (let recipientName in ethRecipients) {
+    console.log('senderAddr', senderAddr);
+
+    let len = ethRecipients.length;
+    while (len--) {
+      let recipientName = ethRecipients[len];
       let recipient = configFileContent[recipientName];
+      console.log(`Funding ${recipientName} (${recipient}) with ${amount} Wei`);
       await oThis._fundEthFor(web3Provider, senderAddr, recipient, amount);
+      console.log(`----- ${recipientName} (${recipient}) has received ${amount} Wei`);
     }
   },
 
@@ -272,13 +278,19 @@ InitDevEnv.prototype = {
 
     let InitERC20Token = require('./InitERC20Token');
 
+    console.log('Deploying ERC20 Token');
     return new InitERC20Token({
       web3Provider: web3Provider,
       deployerAddress: deployerAddress,
       deployerPassphrase: originPassphrase,
       gasPrice: setUpConfig.origin.gasprice,
       gasLimit: setUpConfig.origin.gasLimit
-    }).perform();
+    })
+      .perform()
+      .then(function(response) {
+        console.log('----- ERC20 Token has been deployed');
+        return response;
+      });
   },
 
   _fundERC20Token: function(contractDeploymentResponse, amount) {

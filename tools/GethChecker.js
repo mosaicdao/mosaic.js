@@ -35,8 +35,9 @@ GethChecker.prototype = {
       promiseArray.push(oThis._isRunning(endPoint));
     }
 
-    return Promise.all(promiseArray).then(function() {
+    return Promise.all(promiseArray).then(function(response) {
       console.log('All provided endpoints are up and running.');
+      return response;
     });
   },
 
