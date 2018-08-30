@@ -54,13 +54,19 @@ InitDevEnv.prototype = {
 
     // start services
 
+    // geth checker
+    await oThis._checkForServicesReady();
+
     // fund ETH
     await oThis._fundEth();
 
     // Deploy ERC20 Token contract
     let contractDeploymentResponse = await oThis._deployERC20Token();
-    
-    await oThis._fundERC20Token(contractDeploymentResponse, new BigNumber(1000000).mul(etherToWeiCinversion).toString(10));
+
+    await oThis._fundERC20Token(
+      contractDeploymentResponse,
+      new BigNumber(1000000).mul(etherToWeiCinversion).toString(10)
+    );
 
     console.log('Dev env init DONE!');
   },
@@ -186,6 +192,14 @@ InitDevEnv.prototype = {
     oThis._handleShellResponse(shell.exec(`echo "${startCmd}" >> ${zeroGasAuxiliaryShellScriptPath}`));
   },
 
+  _checkForServicesReady: function() {
+    const oThis = this;
+
+    let GethChecker = require('./GethChecker');
+
+    return new GethChecker([oThis._originRpc(), oThis._auxiliaryRpc()]).perform();
+  },
+
   _fundEth: async function() {
     const oThis = this;
 
@@ -227,22 +241,19 @@ InitDevEnv.prototype = {
       gasLimit: setUpConfig.origin.gasLimit
     }).perform();
   },
-	
-	_fundERC20Token: function(contractDeploymentResponse, amount) {
-	  const oThis = this;
-	
-	  let configFileContent = JSON.parse(fs.readFileSync(oThis.configJsonFilePath, 'utf8'));
-		
-		let erc20TokenContract = contractDeploymentResponse.instance;
-		
-		return erc20TokenContract.methods
-			.transfer(configFileContent.ostPrimeStakerAddress, amount)
-			.send({
-				from: configFileContent.originDeployerAddress,
-				gasPrice: setUpConfig.origin.gasprice,
-				gas: setUpConfig.origin.gasLimit
-			});
-	  
+
+  _fundERC20Token: function(contractDeploymentResponse, amount) {
+    const oThis = this;
+
+    let configFileContent = JSON.parse(fs.readFileSync(oThis.configJsonFilePath, 'utf8'));
+
+    let erc20TokenContract = contractDeploymentResponse.instance;
+
+    return erc20TokenContract.methods.transfer(configFileContent.ostPrimeStakerAddress, amount).send({
+      from: configFileContent.originDeployerAddress,
+      gasPrice: setUpConfig.origin.gasprice,
+      gas: setUpConfig.origin.gasLimit
+    });
   },
 
   _fundEthFor: function(web3Provider, senderAddr, recipient, amount) {
@@ -333,6 +344,10 @@ InitDevEnv.prototype = {
 
   _originRpc: function() {
     return 'http://' + setUpConfig.origin.geth.host + ':' + setUpConfig.origin.geth.rpcport;
+  },
+
+  _auxiliaryRpc: function() {
+    return 'http://' + setUpConfig.auxiliary.geth.host + ':' + setUpConfig.auxiliary.geth.rpcport;
   }
 };
 
