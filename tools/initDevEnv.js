@@ -4,7 +4,8 @@ const shell = require('shelljs'),
   editJsonFile = require('edit-json-file'),
   BigNumber = require('bignumber.js'),
   fs = require('fs'),
-  Path = require('path');
+  Path = require('path'),
+  Web3 = require('web3');
 
 const setUpConfig = require('./config.js');
 
@@ -24,6 +25,8 @@ const InitDevEnv = function(params) {
   oThis.originAddresses = {};
   oThis.auxiliaryAddresses = {};
   oThis.configJsonFilePath = oThis.setupRoot + '/' + 'config.json';
+
+  oThis.chainOwnerOriginAddress = null;
 };
 
 InitDevEnv.prototype = {
@@ -44,7 +47,9 @@ InitDevEnv.prototype = {
     // init auxiliary GETH
     oThis._initAuxiliaryGeth();
 
-    // Abhay
+    // start services
+
+    // fund ETH
     oThis._fundEth();
 
     // Deepesh
@@ -69,6 +74,8 @@ InitDevEnv.prototype = {
     let ostPrimeStakerAddress = oThis._generateAddress(originGethFolder);
     let originFacilitator = oThis._generateAddress(originGethFolder);
     let originMiner = oThis._generateAddress(originGethFolder);
+
+    oThis.chainOwnerOriginAddress = chainOwnerOriginAddress;
 
     oThis._modifyGenesisFile(
       setUpConfig.origin.chainId,
@@ -129,7 +136,34 @@ InitDevEnv.prototype = {
     });
   },
 
-  _fundEth: function() {},
+  _fundEth: function() {
+    const oThis = this;
+
+    let web3Provider = new Web3(oThis._originRpc());
+    return web3Provider.eth.personal
+      .unlockAccount(senderAddr, senderPassphrase)
+      .then(function() {
+        return web3Provider.eth.sendTransaction({
+          from: senderAddr,
+          to: recipient,
+          value: bigNumAmount.toString(10),
+          gasPrice: gasPrice,
+          gas: gas
+        });
+      })
+      .then(function(transactionHash) {
+        return responseHelper.successWithData({ transactionHash: transactionHash });
+      })
+      .catch(function(reason) {
+        logger.error('reason', reason);
+
+        return responseHelper.error({
+          internal_error_identifier: 't_s_fm_5',
+          api_error_identifier: 'something_went_wrong',
+          error_config: basicHelper.fetchErrorConfig()
+        });
+      });
+  },
 
   _deploySimpleToken: function() {},
 
@@ -207,6 +241,14 @@ InitDevEnv.prototype = {
     }
 
     oThis._handleShellResponse(shell.exec("echo '" + JSON.stringify(fileContent) + "' > " + oThis.configJsonFilePath));
+  },
+
+  _originRpc: function() {
+    return 'http://' + setUpConfig.origin.geth.host + ':' + setUpConfig.origin.geth.rpcport;
+  },
+
+  _readFromConfigFile: function() {
+    let fileContent = JSON.parse(fs.readFileSync(oThis.configJsonFilePath, 'utf8'));
   }
 };
 

@@ -9,6 +9,7 @@ module.exports = {
     genesisFileTemplatePath: './tools/genesis-origin.json',
     genesisFilePath: os.homedir() + '/mosaic-setup/genesis-origin.json',
     geth: {
+      host: '127.0.0.1',
       rpcport: 8545,
       wsport: 8546,
       port: 3010
@@ -23,6 +24,7 @@ module.exports = {
     genesisFileTemplatePath: './tools/genesis-auxiliary.json',
     genesisFilePath: os.homedir() + '/mosaic-setup/genesis-auxiliary.json',
     geth: {
+      host: '127.0.0.1',
       rpcport: 18545,
       wsport: 18546,
       port: 13010
