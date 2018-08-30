@@ -8,11 +8,9 @@ const DeployContract = function(params) {
     throw 'Invalid Contract Bin. Please provide params.bin.';
   }
   oThis.bin = String(oThis.bin);
-
 };
 
 DeployContract.prototype = {
-
   deploy: async function() {
     const oThis = this;
 
@@ -41,9 +39,6 @@ DeployContract.prototype = {
     let tx = contract.deploy(deployOptions),
       transactionHash = null,
       receipt = null;
-
-    console.log('Unlock account ' + oThis.deployerAddress);
-    await oThis.web3.eth.personal.unlockAccount(oThis.deployerAddress, oThis.deployerPassphrase);
 
     console.log('Deploying contract ' + oThis.contractName);
     const instance = await tx
