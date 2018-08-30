@@ -14,6 +14,8 @@ InitChains.prototype = {
     // deploy the core contracts on both the chains
     await oThis._initCore();
 
+    await oThis._deployOSTPrimeContract();
+
     console.log('Env init DONE!');
   },
 
@@ -21,6 +23,12 @@ InitChains.prototype = {
     let InitCore = require('./InitCore.js');
 
     return new InitCore().perform();
+  },
+
+  _deployOSTPrimeContract: function() {
+    let deployer = require('./DeployOSTPrime.js');
+
+    return new deployer().perform();
   }
 };
 
