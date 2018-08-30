@@ -1,13 +1,13 @@
 'use strict';
 
-const InitEnv = function(params) {
+const InitChains = function(params) {
   const oThis = this;
 
   oThis.setupRoot = params.setupRoot;
   // TODO - this setup root should be passed to every file.
 };
 
-InitEnv.prototype = {
+InitChains.prototype = {
   perform: async function() {
     const oThis = this;
 
@@ -26,6 +26,6 @@ InitEnv.prototype = {
 
 // commander
 const os = require('os');
-new InitEnv({
+new InitChains({
   setupRoot: os.homedir() + '/mosaic-setup' // later to come as argument for this script
 }).perform();

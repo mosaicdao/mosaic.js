@@ -16,7 +16,7 @@
     "pre-commit": "lint-staged",
     "mosaic-game": "node ./game/game",
     "init-dev-env": "node ./tools/initDevEnv.js",
-    "init-env": "node ./tools/initEnv.js"
+    "init-chains": "node ./tools/initChains.js"
   },
   "dependencies": {
     "bignumber.js": "4.1.0",
