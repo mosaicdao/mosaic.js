@@ -25,7 +25,7 @@ InitERC20Token.prototype = {
 
     console.log('Deploy ERC20Token contract on auxiliary chain START.');
 
-    await oThis.originWeb3.eth.personal.unlockAccount(oThis.deployerAddress, oThis.deployerPassphrase);
+    await oThis.web3Provider.eth.personal.unlockAccount(oThis.deployerAddress, oThis.deployerPassphrase);
     let contractName = 'MockToken',
       args = [];
     let tokenDeployResponse = await new deployContract({
