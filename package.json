@@ -15,17 +15,18 @@
   "scripts": {
     "pre-commit": "lint-staged",
     "mosaic-game": "node ./game/game",
-    "init-dev-env": "node ./tools/initDevEnv.js"
+    "init-dev-env": "node ./tools/initDevEnv.js",
+    "init-env": "node ./tools/initEnv.js"
   },
   "dependencies": {
     "bignumber.js": "4.1.0",
     "ethereumjs-util": "5.2.0",
-    "keccak": "^1.4.0",
+    "keccak": "1.4.0",
     "leveldown": "4.0.1",
     "levelup": "3.0.1",
     "merkle-patricia-tree": "2.3.1",
-    "os": "^0.1.1",
-    "path": "^0.12.7",
+    "os": "0.1.1",
+    "path": "0.12.7",
     "rsync": "0.6.1",
     "web3": "1.0.0-beta.33"
   },

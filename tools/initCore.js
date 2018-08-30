@@ -11,42 +11,10 @@ const deployContract = require('../utils/deployContract'),
 const originPassphrase = 'testtest',
   auxiliaryPassphrase = 'testtest';
 
-/**
- * originConfig = {
- *    provider: 'http://...',
- *    deployerAddress: '0xBAF68AC8e5966489B2b4139f07dE8188d8Ff5a99',
- *    opsAddress: '0xDCcfDAFF7aDDd20e5C64a3FE4b0B0668751EF194',
- *    workerAddress: '0x000...',
- *    registrar: '0x000...',
- *    chainId: 2001,
- *    chainIdRemote: 1000,
- *    remoteChainBlockGenerationTime: 15,
- *    openSTRemote: '0x000...',
- *    gasPrice: '',
- *    gasLimit: ''
- * }
- * auxliaryConfig = {
- *    provider: 'http://...',
- *    deployerAddress: '0x000...',
- *    opsAddress: '0x000...',
- *    workerAddress: '0x000...',
- *    registrar: '0x000...',
- *    chainId: 1000,
- *    chainIdRemote: 2001,
- *    remoteChainBlockGenerationTime: 15,
- *    openSTRemote: '0x000...',
- *    gasPrice: '',
- *    gasLimit: ''
- * }
- *
- */
-const InitCore = function(originConfig, auxliaryConfig) {
+const InitCore = function() {
   const oThis = this;
 
-  oThis.originConfig = originConfig;
-  oThis.auxliaryConfig = auxliaryConfig;
-
-  oThis.valueWorkerContractAddress = null;
+  oThis.originWorkerContractAddress = null;
   oThis.auxiliaryWorkerContractAddress = null;
 
   oThis.configJsonFilePath = os.homedir() + '/mosaic-setup' + '/config.json';
@@ -60,34 +28,38 @@ InitCore.prototype = {
 
     await oThis._deployWorkerOnAuxiliary();
 
-    let auxiliaryCoreContract = await oThis.deployCoreOnAuxiliary();
+    let auxiliaryCoreContract = await oThis._deployCoreOnAuxiliary();
 
     await oThis._deployWorkerOnOrigin();
 
-    let originCoreContract = await oThis.deployCoreOnOrigin();
+    let originCoreContract = await oThis._deployCoreOnOrigin();
 
-    await oThis.setCoCoreAddress(
+    let configFileContent = JSON.parse(fs.readFileSync(oThis.configJsonFilePath, 'utf8'));
+
+    await oThis._setCoCoreAddress(
       auxiliaryCoreContract.instance,
       originCoreContract.receipt.contractAddress,
-      oThis.auxliaryConfig.opsAddress,
-      'testtest',
-      auxiliaryWeb3
+      configFileContent.auxiliaryOpsAddress,
+      oThis.auxiliaryWeb3,
+      originPassphrase
     );
 
-    await oThis.setCoCoreAddress(
+    await oThis._setCoCoreAddress(
       originCoreContract.instance,
       auxiliaryCoreContract.receipt.contractAddress,
-      oThis.originConfig.opsAddress,
-      'testtest',
-      valueWeb3
+      configFileContent.originOpsAddress,
+      oThis.originWeb3,
+      auxiliaryPassphrase
     );
   },
 
   _initVars: function() {
     const oThis = this;
 
-    oThis.auxiliaryWeb3 = new Web3(oThis.auxliaryConfig.provider);
-    oThis.valueWeb3 = new Web3(oThis.originConfig.provider);
+    let configFileContent = JSON.parse(fs.readFileSync(oThis.configJsonFilePath, 'utf8'));
+
+    oThis.auxiliaryWeb3 = new Web3(configFileContent.auxiliaryGethRpcEndPoint);
+    oThis.originWeb3 = new Web3(configFileContent.originGethRpcEndPoint);
   },
 
   _deployWorkerOnAuxiliary: async function() {
@@ -108,8 +80,8 @@ InitCore.prototype = {
       web3: oThis.auxiliaryWeb3,
       contractName: contractName,
       deployerAddress: configFileContent.auxiliaryDeployerAddress,
-      gasPrice: oThis.auxliaryConfig.gasPrice,
-      gas: oThis.auxliaryConfig.gasLimit,
+      gasPrice: '0x0',
+      gas: configFileContent.auxiliaryGasLimit,
       abi: helper.getABI(contractName),
       bin: helper.getBIN(contractName),
       args: ['0x2c4e8f2d746113d0696ce89b35f0d8bf88e0aeca'] // DUMMY - remove this @sarvesh
@@ -120,7 +92,7 @@ InitCore.prototype = {
     let auxiliaryWorkerContract = auxiliaryWorkerContractDeployResponse.instance;
 
     oThis.auxiliaryWorkerContractAddress = auxiliaryWorkerContractDeployResponse.receipt.contractAddress;
-    oThis._addConfig({ auxiliaryWorkerContractAddress: auxiliaryWorkerContractAddress });
+    oThis._addConfig({ auxiliaryWorkerContractAddress: oThis.auxiliaryWorkerContractAddress });
 
     console.log('setOpsAddress on auxiliary chain Workers START.');
 
@@ -128,7 +100,7 @@ InitCore.prototype = {
       .setOpsAddress(configFileContent.auxiliaryOpsAddress)
       .send({
         from: configFileContent.auxiliaryDeployerAddress,
-        gasPrice: oThis.auxliaryConfig.gasPrice
+        gasPrice: '0x0'
       });
 
     console.log(
@@ -145,13 +117,63 @@ InitCore.prototype = {
       .setWorker(configFileContent.auxiliaryWorkerAddress, deactivationHeight)
       .send({
         from: configFileContent.auxiliaryOpsAddress,
-        gasPrice: oThis.auxliaryConfig.gasPrice
+        gasPrice: '0x0'
       });
 
     console.log(
       'setWorker on auxiliary chain Workers receipt:',
       JSON.stringify(setWorkerForAuxiliaryWorkersResponse, null, 4)
     );
+  },
+
+  _deployCoreOnAuxiliary: async function() {
+    const oThis = this;
+
+    let configFileContent = JSON.parse(fs.readFileSync(oThis.configJsonFilePath, 'utf8'));
+
+    // getting the latest block information from auxiliary GETH
+    let latestBlock = await oThis.auxiliaryWeb3.eth.getBlock('latest');
+
+    // extracting block number and state root from the block info
+    let blockHeight = latestBlock.number,
+      stateRoot = latestBlock.stateRoot;
+
+    console.log('Deploy core contract on auxiliary chain START.');
+
+    await oThis.auxiliaryWeb3.eth.personal.unlockAccount(
+      configFileContent.auxiliaryDeployerAddress,
+      auxiliaryPassphrase
+    );
+
+    let coreDeployParams = [
+      configFileContent.auxiliaryChainId,
+      configFileContent.originChainId,
+      blockHeight,
+      stateRoot,
+      oThis.auxiliaryWorkerContractAddress
+    ];
+
+    let contractName = 'Core';
+
+    let auxiliaryCoreDeployResponse = await new deployContract({
+      web3: oThis.auxiliaryWeb3,
+      contractName: contractName,
+      deployerAddress: configFileContent.auxiliaryDeployerAddress,
+      gasPrice: '0x0',
+      gas: configFileContent.auxiliaryGasLimit,
+      abi: helper.getABI(contractName),
+      bin: helper.getBIN(contractName),
+      args: coreDeployParams
+    }).deploy();
+
+    console.log('auxiliaryCoreDeployResponse:', auxiliaryCoreDeployResponse);
+
+    let auxiliaryCoreContractAddress = auxiliaryCoreDeployResponse.receipt.contractAddress;
+
+    console.log('auxiliaryCoreContractAddress', auxiliaryCoreContractAddress);
+    oThis._addConfig({ auxiliaryCoreContractAddress: auxiliaryCoreContractAddress });
+
+    return auxiliaryCoreDeployResponse;
   },
 
   _deployWorkerOnOrigin: async function() {
@@ -169,8 +191,8 @@ InitCore.prototype = {
       web3: oThis.originWeb3,
       contractName: contractName,
       deployerAddress: configFileContent.originDeployerAddress,
-      gasPrice: oThis.auxliaryConfig.gasPrice,
-      gas: oThis.auxliaryConfig.gasLimit,
+      gasPrice: '0x0',
+      gas: configFileContent.originGasLimit,
       abi: helper.getABI(contractName),
       bin: helper.getBIN(contractName),
       args: ['0x2c4e8f2d746113d0696ce89b35f0d8bf88e0aeca'] // DUMMY - remove this @sarvesh
@@ -181,7 +203,7 @@ InitCore.prototype = {
     let originWorkerContract = originWorkerContractDeployResponse.instance;
 
     oThis.originWorkerContractAddress = originWorkerContractDeployResponse.receipt.contractAddress;
-    oThis._addConfig({ originWorkerContractAddress: originWorkerContractAddress });
+    oThis._addConfig({ originWorkerContractAddress: oThis.originWorkerContractAddress });
 
     console.log('setOpsAddress on origin chain Workers START.');
 
@@ -189,7 +211,7 @@ InitCore.prototype = {
       .setOpsAddress(configFileContent.originOpsAddress)
       .send({
         from: configFileContent.originDeployerAddress,
-        gasPrice: oThis.auxliaryConfig.gasPrice
+        gasPrice: '0x0'
       });
 
     console.log(
@@ -206,13 +228,72 @@ InitCore.prototype = {
       .setWorker(configFileContent.originWorkerAddress, deactivationHeight)
       .send({
         from: configFileContent.originOpsAddress,
-        gasPrice: oThis.auxliaryConfig.gasPrice
+        gasPrice: '0x0'
       });
 
     console.log(
       'setWorker on origin chain Workers receipt:',
       JSON.stringify(setWorkerForOriginWorkersResponse, null, 4)
     );
+  },
+
+  _deployCoreOnOrigin: async function() {
+    const oThis = this;
+
+    let configFileContent = JSON.parse(fs.readFileSync(oThis.configJsonFilePath, 'utf8'));
+
+    // getting the latest block information from origin GETH
+    let latestBlock = await oThis.originWeb3.eth.getBlock('latest');
+
+    // extracting block number and state root from the block info
+    let blockHeight = latestBlock.number,
+      stateRoot = latestBlock.stateRoot;
+
+    console.log('Deploy core contract on origin chain START.');
+
+    await oThis.originWeb3.eth.personal.unlockAccount(configFileContent.originDeployerAddress, originPassphrase);
+
+    let coreDeployParams = [
+      configFileContent.originChainId,
+      configFileContent.auxiliaryChainId,
+      blockHeight,
+      stateRoot,
+      oThis.originWorkerContractAddress
+    ];
+
+    let contractName = 'Core';
+
+    let originCoreDeployResponse = await new deployContract({
+      web3: oThis.originWeb3,
+      contractName: contractName,
+      deployerAddress: configFileContent.originDeployerAddress,
+      gasPrice: '0x0',
+      gas: configFileContent.originGasLimit,
+      abi: helper.getABI(contractName),
+      bin: helper.getBIN(contractName),
+      args: coreDeployParams
+    }).deploy();
+
+    console.log('originCoreDeployResponse:', originCoreDeployResponse);
+
+    let originCoreContractAddress = originCoreDeployResponse.receipt.contractAddress;
+
+    console.log('originCoreContractAddress', originCoreContractAddress);
+    oThis._addConfig({ originCoreContractAddress: originCoreContractAddress });
+
+    return originCoreDeployResponse;
+  },
+
+  _setCoCoreAddress: async function(coreInstance, coCoreAddress, workerAddress, web3, passPhrase) {
+    let oThis = this;
+
+    console.log('setting co-core address ', coCoreAddress);
+    await web3.eth.personal.unlockAccount(workerAddress, passPhrase);
+
+    await coreInstance.methods.setCoCoreAddress(coCoreAddress).send({
+      from: workerAddress,
+      gasPrice: oThis.gasPrice
+    });
   },
 
   _addConfig: function(params) {
@@ -224,96 +305,18 @@ InitCore.prototype = {
       fileContent[i] = params[i];
     }
 
-    oThis._handleShellResponse(shell.exec("echo '" + JSON.stringify(fileContent) + "' > " + oThis.configJsonFilePath));
+    oThis._executeInShell("echo '" + JSON.stringify(fileContent) + "' > " + oThis.configJsonFilePath);
   },
 
-  deployCoreOnOrigin: async function() {
-    const oThis = this;
+  _executeInShell: function(cmd) {
+    let res = shell.exec(cmd);
 
-    let valueWeb3 = new (oThis.ic().OriginWeb3())();
+    if (res.code !== 0) {
+      shell.exit(1);
+    }
 
-    let latestBlock = await valueWeb3.eth.getBlock('latest');
-
-    let blockHeight = latestBlock.number,
-      stateRoot = latestBlock.stateRoot;
-
-    console.log('Deploy core contract on origin chain START.');
-
-    await valueWeb3.eth.personal.unlockAccount(oThis.originConfig.deployerAddress, 'testtest');
-
-    let coreDeployParams = [
-      oThis.originConfig.chainId,
-      oThis.originConfig.chainIdRemote,
-      blockHeight,
-      stateRoot,
-      oThis.valueWorkerContractAddress
-    ];
-
-    let valueCoreDeployResponse = await deployContract(
-      valueWeb3,
-      'Core',
-      oThis.originConfig.deployerAddress,
-      oThis.gasPrice,
-      coreDeployParams
-    );
-
-    console.log('valueCoreDeployResponse:', valueCoreDeployResponse);
-
-    return valueCoreDeployResponse;
-  },
-
-  deployCoreOnAuxiliary: async function() {
-    const oThis = this;
-
-    let auxiliaryWeb3 = new (oThis.ic().AuxiliaryWeb3())('0x0000000000000000000000000000000000000001');
-
-    let latestBlock = await auxiliaryWeb3.eth.getBlock('latest');
-
-    let blockHeight = latestBlock.number,
-      stateRoot = latestBlock.stateRoot;
-
-    console.log('Deploy core contract on auxiliary chain START.');
-
-    await auxiliaryWeb3.eth.personal.unlockAccount(oThis.auxliaryConfig.deployerAddress, 'testtest');
-
-    let coreDeployParams = [
-      oThis.auxliaryConfig.chainId,
-      oThis.auxliaryConfig.chainIdRemote,
-      blockHeight,
-      stateRoot,
-      oThis.auxiliaryWorkerContractAddress
-    ];
-
-    let auxiliaryCoreDeployResponse = await deployContract(
-      auxiliaryWeb3,
-      'Core',
-      oThis.auxliaryConfig.deployerAddress,
-      oThis.gasPrice,
-      coreDeployParams
-    );
-
-    console.log('auxiliaryCoreDeployResponse:', auxiliaryCoreDeployResponse);
-
-    let auxiliaryCoreContract = auxiliaryCoreDeployResponse.instance,
-      auxiliaryCoreContractAddress = auxiliaryCoreDeployResponse.receipt.contractAddress;
-
-    console.log('auxiliaryCoreContractAddress', auxiliaryCoreContractAddress);
-
-    return auxiliaryCoreDeployResponse;
-  },
-
-  setCoCoreAddress: async function(coreInstance, coCoreAddress, workerAddress, passPhrase, web3) {
-    let oThis = this;
-    console.log('setting co-core address ', coCoreAddress);
-    await web3.eth.personal.unlockAccount(workerAddress, passPhrase);
-
-    await coreInstance.methods.setCoCoreAddress(coCoreAddress).send({
-      from: workerAddress,
-      gasPrice: oThis.gasPrice
-    });
+    return res;
   }
 };
-
-InstanceComposer.registerShadowableClass(InitCore, 'InitCore');
 
 module.exports = InitCore;

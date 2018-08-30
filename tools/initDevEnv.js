@@ -1,10 +1,8 @@
 'use strict';
 
 const shell = require('shelljs'),
-  editJsonFile = require('edit-json-file'),
   BigNumber = require('bignumber.js'),
   fs = require('fs'),
-  Path = require('path'),
   Web3 = require('web3'),
   shellAsyncCmd = require('node-cmd');
 
@@ -34,19 +32,22 @@ InitDevEnv.prototype = {
     const oThis = this;
 
     // remove earlier setup
-    oThis._handleShellResponse(shell.exec('rm -rf ' + oThis.setupRoot + '/*'));
+    oThis._executeInShell('rm -rf ' + oThis.setupRoot + '/*');
 
     // create new setup folder
-    oThis._handleShellResponse(shell.exec('mkdir -p ' + oThis.setupRoot));
-
-    // create new setup folder
-    oThis._handleShellResponse(shell.exec('mkdir -p ' + oThis.setupRoot + '/bin'));
+    oThis._executeInShell('mkdir -p ' + oThis.setupRoot);
 
     // create bin folder
-    oThis._handleShellResponse(shell.exec('mkdir -p ' + oThis.setupRoot + '/logs'));
+    oThis._executeInShell('mkdir -p ' + oThis.setupRoot + '/bin');
 
     // create logs folder
-    oThis._handleShellResponse(shell.exec('echo {} > ' + oThis.configJsonFilePath));
+    oThis._executeInShell('mkdir -p ' + oThis.setupRoot + '/logs');
+
+    // create config file with default content
+    oThis._executeInShell('echo {} > ' + oThis.configJsonFilePath);
+
+    // init config json file
+    oThis._initConfigFile();
 
     // init value GETH
     oThis._initOriginGeth();
@@ -80,12 +81,34 @@ InitDevEnv.prototype = {
     console.log('Dev env init DONE!');
   },
 
+  _initConfigFile: function() {
+    const oThis = this;
+
+    // create config file with default content
+    oThis._executeInShell('echo {} > ' + oThis.configJsonFilePath);
+
+    oThis._addConfig({
+      originChainId: setUpConfig.origin.chainId,
+      auxiliaryChainId: setUpConfig.auxiliary.chainId,
+      originNetworkId: setUpConfig.origin.networkId,
+      auxiliaryNetworkId: setUpConfig.auxiliary.networkId,
+      originGasLimit: setUpConfig.origin.gasLimit,
+      auxiliaryGasLimit: setUpConfig.auxiliary.gasLimit,
+      originGasPrice: setUpConfig.origin.gasprice,
+      auxiliaryGasPrice: setUpConfig.auxiliary.gasprice,
+      originGethRpcEndPoint: oThis._originRpc(),
+      auxiliaryGethRpcEndPoint: oThis._auxiliaryRpc(),
+      originGethWsEndPoint: oThis._originWs(),
+      auxiliaryGethWsEndPoint: oThis._auxiliaryWs()
+    });
+  },
+
   _initOriginGeth: function() {
     const oThis = this;
 
-    oThis._handleShellResponse(shell.exec('mkdir -p ' + originGethFolder));
+    oThis._executeInShell('mkdir -p ' + originGethFolder);
 
-    oThis._handleShellResponse(shell.exec('echo "' + originPassphrase + '" > ' + originPasswordFilePath));
+    oThis._executeInShell('echo "' + originPassphrase + '" > ' + originPasswordFilePath);
 
     let chainOwnerOriginAddress = oThis._generateAddress(originGethFolder);
     let originWorkerAddress = oThis._generateAddress(originGethFolder);
@@ -106,7 +129,7 @@ InitDevEnv.prototype = {
 
     let initCmd = 'geth --datadir "' + originGethFolder + '" init ' + setUpConfig.origin.genesisFilePath;
     console.log('_initOriginGeth :: Geth Init. Command:\n', initCmd);
-    oThis._handleShellResponse(shell.exec(initCmd));
+    oThis._executeInShell(initCmd);
 
     oThis._addConfig({
       chainOwnerOriginAddress: chainOwnerOriginAddress,
@@ -137,8 +160,8 @@ InitDevEnv.prototype = {
 
     //Create shell script
     let originShellScriptPath = oThis.setupRoot + '/bin/run-origin.sh';
-    oThis._handleShellResponse(shell.exec('echo #!/bin/sh > ' + originShellScriptPath));
-    oThis._handleShellResponse(shell.exec(`echo "${startCmd}" >> ${originShellScriptPath}`));
+    oThis._executeInShell('echo #!/bin/sh > ' + originShellScriptPath);
+    oThis._executeInShell(`echo "${startCmd}" >> ${originShellScriptPath}`);
 
     oThis.originGethShellPath = originShellScriptPath;
   },
@@ -146,9 +169,9 @@ InitDevEnv.prototype = {
   _initAuxiliaryGeth: function() {
     const oThis = this;
 
-    oThis._handleShellResponse(shell.exec('mkdir -p ' + auxiliaryGethFolder));
+    oThis._executeInShell('mkdir -p ' + auxiliaryGethFolder);
 
-    oThis._handleShellResponse(shell.exec('echo "' + auxiliaryPassphrase + '" > ' + auxiliaryPasswordFilePath));
+    oThis._executeInShell('echo "' + auxiliaryPassphrase + '" > ' + auxiliaryPasswordFilePath);
 
     let chainOwnerAuxiliaryAddress = oThis._generateAddress(auxiliaryGethFolder);
     let auxiliaryWorkerAddress = oThis._generateAddress(auxiliaryGethFolder);
@@ -169,7 +192,7 @@ InitDevEnv.prototype = {
 
     let initCmd = 'geth --datadir "' + auxiliaryGethFolder + '" init ' + setUpConfig.auxiliary.genesisFilePath;
     console.log('_initOriginGeth :: Geth Init. Command:\n', initCmd);
-    oThis._handleShellResponse(shell.exec(initCmd));
+    oThis._executeInShell(initCmd);
 
     oThis._addConfig({
       chainOwnerAuxiliaryAddress: chainOwnerAuxiliaryAddress,
@@ -199,16 +222,16 @@ InitDevEnv.prototype = {
 
     //Create shell script
     let auxiliaryShellScriptPath = oThis.setupRoot + '/bin/run-auxiliary.sh';
-    oThis._handleShellResponse(shell.exec('echo #!/bin/sh > ' + auxiliaryShellScriptPath));
-    oThis._handleShellResponse(shell.exec(`echo "${startCmd}" >> ${auxiliaryShellScriptPath}`));
+    oThis._executeInShell('echo #!/bin/sh > ' + auxiliaryShellScriptPath);
+    oThis._executeInShell(`echo "${startCmd}" >> ${auxiliaryShellScriptPath}`);
 
     //Modify start cmd to start with zero gas.
     startCmd = startCmd.replace('--gasprice 0x3B9ACA00', '--gasprice 0x0');
 
     //Create shell script for zero gas price.
     let zeroGasAuxiliaryShellScriptPath = oThis.setupRoot + '/bin/run-auxiliary-with-zero-gas.sh';
-    oThis._handleShellResponse(shell.exec('echo #!/bin/sh > ' + zeroGasAuxiliaryShellScriptPath));
-    oThis._handleShellResponse(shell.exec(`echo "${startCmd}" >> ${zeroGasAuxiliaryShellScriptPath}`));
+    oThis._executeInShell('echo #!/bin/sh > ' + zeroGasAuxiliaryShellScriptPath);
+    oThis._executeInShell(`echo "${startCmd}" >> ${zeroGasAuxiliaryShellScriptPath}`);
 
     oThis.auxiliaryGethShellPath = auxiliaryShellScriptPath;
     oThis.auxiliaryGethShellPathWithZeroGas = zeroGasAuxiliaryShellScriptPath;
@@ -223,11 +246,9 @@ InitDevEnv.prototype = {
       auxiliaryGethShellPath = oThis.auxiliaryGethShellPathWithZeroGas;
     }
     shellAsyncCmd.run(`sh ${auxiliaryGethShellPath}`);
-    // oThis._handleShellResponse(shell.exec( `sh ${auxiliaryGethShellPath}` ));
 
     //Start Origin Geth
     shellAsyncCmd.run(`sh ${oThis.originGethShellPath}`);
-    // oThis._handleShellResponse(shell.exec( `sh ${oThis.originGethShellPath}` ));
 
     console.log('* Sleeping for 5 seconds. Lets wait for geth to come up.');
     return new Promise(function(resolve, reject) {
@@ -330,8 +351,8 @@ InitDevEnv.prototype = {
   _generateAddress: function(originGethPath) {
     const oThis = this;
 
-    let addressGerationResponse = oThis._handleShellResponse(
-      shell.exec('geth --datadir ' + originGethPath + ' account new --password ' + originPasswordFilePath)
+    let addressGerationResponse = oThis._executeInShell(
+      'geth --datadir ' + originGethPath + ' account new --password ' + originPasswordFilePath
     );
     return addressGerationResponse.stdout
       .replace('Address: {', hexStartsWith)
@@ -376,17 +397,9 @@ InitDevEnv.prototype = {
 
     console.log(JSON.stringify(fileContent));
 
-    oThis._handleShellResponse(shell.exec("echo '" + JSON.stringify(fileContent) + "' > " + chainGenesisLocation));
+    oThis._executeInShell("echo '" + JSON.stringify(fileContent) + "' > " + chainGenesisLocation);
 
     return true;
-  },
-
-  _handleShellResponse: function(res) {
-    if (res.code !== 0) {
-      shell.exit(1);
-    }
-
-    return res;
   },
 
   _addConfig: function(params) {
@@ -398,7 +411,17 @@ InitDevEnv.prototype = {
       fileContent[i] = params[i];
     }
 
-    oThis._handleShellResponse(shell.exec("echo '" + JSON.stringify(fileContent) + "' > " + oThis.configJsonFilePath));
+    oThis._executeInShell("echo '" + JSON.stringify(fileContent) + "' > " + oThis.configJsonFilePath);
+  },
+
+  _executeInShell: function(cmd) {
+    let res = shell.exec(cmd);
+
+    if (res.code !== 0) {
+      shell.exit(1);
+    }
+
+    return res;
   },
 
   _originRpc: function() {
@@ -407,6 +430,14 @@ InitDevEnv.prototype = {
 
   _auxiliaryRpc: function() {
     return 'http://' + setUpConfig.auxiliary.geth.host + ':' + setUpConfig.auxiliary.geth.rpcport;
+  },
+
+  _originWs: function() {
+    return 'ws://' + setUpConfig.origin.geth.host + ':' + setUpConfig.origin.geth.wsport;
+  },
+
+  _auxiliaryWs: function() {
+    return 'ws://' + setUpConfig.auxiliary.geth.host + ':' + setUpConfig.auxiliary.geth.wsport;
   }
 };
 
