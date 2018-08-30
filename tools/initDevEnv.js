@@ -51,7 +51,7 @@ InitDevEnv.prototype = {
     await oThis._fundEth();
 
     // Deepesh
-    oThis._deploySimpleToken();
+    await oThis._deploySimpleToken();
 
     // Gulshan
     oThis._fundOst();
@@ -151,15 +151,32 @@ InitDevEnv.prototype = {
 
     for (let recipientName in ethRecipients) {
       let recipient = configFileContent[recipientName];
-      await oThis._fundEthFor(senderAddr, web3Provider, recipient, amount);
+      await oThis._fundEthFor(web3Provider, senderAddr, recipient, amount);
     }
   },
 
-  _deploySimpleToken: function() {},
+  _deploySimpleToken: function() {
+    const oThis = this;
+
+    let configFileContent = JSON.parse(fs.readFileSync(oThis.configJsonFilePath, 'utf8'));
+
+    let deployerAddress = configFileContent.originDeployerAddress,
+      web3Provider = new Web3(oThis._originRpc());
+
+    let InitERC20Token = require('./InitERC20Token');
+
+    return new InitERC20Token({
+      web3Provider: web3Provider,
+      deployerAddress: deployerAddress,
+      deployerPassphrase: originPassphrase,
+      gasPrice: setUpConfig.origin.gasprice,
+      gasLimit: setUpConfig.origin.gasLimit
+    }).perform();
+  },
 
   _fundOst: function() {},
 
-  _fundEthFor: function(senderAddr, web3Provider, recipient, amount) {
+  _fundEthFor: function(web3Provider, senderAddr, recipient, amount) {
     return web3Provider.eth.personal.unlockAccount(senderAddr, originPassphrase).then(function() {
       return web3Provider.eth.sendTransaction({
         from: senderAddr,
