@@ -23,8 +23,6 @@ const InitDevEnv = function(params) {
   const oThis = this;
 
   oThis.setupRoot = params.setupRoot;
-  oThis.originAddresses = {};
-  oThis.auxiliaryAddresses = {};
   oThis.configJsonFilePath = oThis.setupRoot + '/' + 'config.json';
   oThis.originGethShellPath = null;
   oThis.auxiliaryGethShellPath = null;
@@ -95,6 +93,7 @@ InitDevEnv.prototype = {
     let ostPrimeStakerAddress = oThis._generateAddress(originGethFolder);
     let originFacilitator = oThis._generateAddress(originGethFolder);
     let originMiner = oThis._generateAddress(originGethFolder);
+    let originOpsAddress = oThis._generateAddress(originGethFolder);
 
     oThis._modifyGenesisFile(
       setUpConfig.origin.chainId,
@@ -115,7 +114,8 @@ InitDevEnv.prototype = {
       originDeployerAddress: originDeployerAddress,
       ostPrimeStakerAddress: ostPrimeStakerAddress,
       originFacilitator: originFacilitator,
-      originMiner: originMiner
+      originMiner: originMiner,
+      originOpsAddress: originOpsAddress
     });
 
     let logFilePath = oThis.setupRoot + '/logs/origin-geth.log';
@@ -155,6 +155,7 @@ InitDevEnv.prototype = {
     let auxiliaryDeployerAddress = oThis._generateAddress(auxiliaryGethFolder);
     let auxiliaryFacilitator = oThis._generateAddress(auxiliaryGethFolder);
     let auxiliarySealer = oThis._generateAddress(auxiliaryGethFolder);
+    let auxiliaryOpsAddress = oThis._generateAddress(auxiliaryGethFolder);
 
     oThis._modifyGenesisFile(
       setUpConfig.auxiliary.chainId,
@@ -175,7 +176,8 @@ InitDevEnv.prototype = {
       auxiliaryWorkerAddress: auxiliaryWorkerAddress,
       auxiliaryDeployerAddress: auxiliaryDeployerAddress,
       auxiliaryFacilitator: auxiliaryFacilitator,
-      auxiliarySealer: auxiliarySealer
+      auxiliarySealer: auxiliarySealer,
+      auxiliaryOpsAddress: auxiliaryOpsAddress
     });
 
     let logFilePath = oThis.setupRoot + '/logs/auxiliary-geth.log';
@@ -258,7 +260,8 @@ InitDevEnv.prototype = {
       'originDeployerAddress',
       'ostPrimeStakerAddress',
       'originFacilitator',
-      'originMiner'
+      'originMiner',
+      'originOpsAddress'
     ];
 
     console.log('senderAddr', senderAddr);
