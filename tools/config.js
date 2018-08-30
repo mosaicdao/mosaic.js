@@ -5,8 +5,9 @@ module.exports = {
     chainId: 1000,
     networkId: 1000,
     gethFolder: os.homedir() + '/mosaic-setup/origin-geth',
-    allocAmount: '1000000000000000000', // in base currency
+    allocAmount: '1000000000000000000000000000000000000000', // in base currency
     gasLimit: 4700000,
+    gasprice: '0x12A05F200',
     genesisFileTemplatePath: './tools/genesis-origin.json',
     genesisFilePath: os.homedir() + '/mosaic-setup/genesis-origin.json',
     geth: {
@@ -23,6 +24,7 @@ module.exports = {
     gethFolder: os.homedir() + '/mosaic-setup/auxiliary-geth',
     allocAmount: '800000000', // in base currency
     gasLimit: 4700000,
+    gasprice: '0x12A05F200',
     genesisFileTemplatePath: './tools/genesis-auxiliary.json',
     genesisFilePath: os.homedir() + '/mosaic-setup/genesis-auxiliary.json',
     geth: {

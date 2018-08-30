@@ -25,12 +25,10 @@ const InitDevEnv = function(params) {
   oThis.originAddresses = {};
   oThis.auxiliaryAddresses = {};
   oThis.configJsonFilePath = oThis.setupRoot + '/' + 'config.json';
-
-  oThis.chainOwnerOriginAddress = null;
 };
 
 InitDevEnv.prototype = {
-  perform: function() {
+  perform: async function() {
     const oThis = this;
 
     // remove earlier setup
@@ -50,7 +48,7 @@ InitDevEnv.prototype = {
     // start services
 
     // fund ETH
-    oThis._fundEth();
+    await oThis._fundEth();
 
     // Deepesh
     oThis._deploySimpleToken();
@@ -74,8 +72,6 @@ InitDevEnv.prototype = {
     let ostPrimeStakerAddress = oThis._generateAddress(originGethFolder);
     let originFacilitator = oThis._generateAddress(originGethFolder);
     let originMiner = oThis._generateAddress(originGethFolder);
-
-    oThis.chainOwnerOriginAddress = chainOwnerOriginAddress;
 
     oThis._modifyGenesisFile(
       setUpConfig.origin.chainId,
@@ -136,38 +132,44 @@ InitDevEnv.prototype = {
     });
   },
 
-  _fundEth: function() {
+  _fundEth: async function() {
     const oThis = this;
 
-    let web3Provider = new Web3(oThis._originRpc());
-    return web3Provider.eth.personal
-      .unlockAccount(senderAddr, senderPassphrase)
-      .then(function() {
-        return web3Provider.eth.sendTransaction({
-          from: senderAddr,
-          to: recipient,
-          value: bigNumAmount.toString(10),
-          gasPrice: gasPrice,
-          gas: gas
-        });
-      })
-      .then(function(transactionHash) {
-        return responseHelper.successWithData({ transactionHash: transactionHash });
-      })
-      .catch(function(reason) {
-        logger.error('reason', reason);
+    let configFileContent = JSON.parse(fs.readFileSync(oThis.configJsonFilePath, 'utf8'));
 
-        return responseHelper.error({
-          internal_error_identifier: 't_s_fm_5',
-          api_error_identifier: 'something_went_wrong',
-          error_config: basicHelper.fetchErrorConfig()
-        });
-      });
+    let senderAddr = configFileContent.chainOwnerOriginAddress,
+      web3Provider = new Web3(oThis._originRpc()),
+      amount = '100000000000000000000';
+
+    let ethRecipients = [
+      'originWorkerAddress',
+      'originDeployerAddress',
+      'ostPrimeStakerAddress',
+      'originFacilitator',
+      'originMiner'
+    ];
+
+    for (let recipientName in ethRecipients) {
+      let recipient = configFileContent[recipientName];
+      await oThis._fundEthFor(senderAddr, web3Provider, recipient, amount);
+    }
   },
 
   _deploySimpleToken: function() {},
 
   _fundOst: function() {},
+
+  _fundEthFor: function(senderAddr, web3Provider, recipient, amount) {
+    return web3Provider.eth.personal.unlockAccount(senderAddr, originPassphrase).then(function() {
+      return web3Provider.eth.sendTransaction({
+        from: senderAddr,
+        to: recipient,
+        value: amount,
+        gasPrice: setUpConfig.origin.gasprice,
+        gas: setUpConfig.origin.gasLimit
+      });
+    });
+  },
 
   _generateAddress: function(originGethPath) {
     const oThis = this;
@@ -245,10 +247,6 @@ InitDevEnv.prototype = {
 
   _originRpc: function() {
     return 'http://' + setUpConfig.origin.geth.host + ':' + setUpConfig.origin.geth.rpcport;
-  },
-
-  _readFromConfigFile: function() {
-    let fileContent = JSON.parse(fs.readFileSync(oThis.configJsonFilePath, 'utf8'));
   }
 };
 
