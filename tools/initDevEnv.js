@@ -53,7 +53,7 @@ InitDevEnv.prototype = {
     // Deploy ERC20 Token contract
     let contractDeploymentResponse = await oThis._deployERC20Token();
     
-    await oThis._fundERC20Token(contractDeploymentResponse);
+    await oThis._fundERC20Token(contractDeploymentResponse, new BigNumber(1000000).mul(etherToWeiCinversion).toString(10));
 
     console.log('Dev env init DONE!');
   },
