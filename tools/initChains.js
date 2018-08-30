@@ -14,7 +14,7 @@ InitChains.prototype = {
     // deploy the core contracts on both the chains
     await oThis._initCore();
 
-    await oThis._deployOSTPrimeContract();
+    // await oThis._deployOSTPrimeContract();
 
     console.log('Env init DONE!');
   },
