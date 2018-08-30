@@ -32,12 +32,13 @@ InitERC20Token.prototype = {
       web3: oThis.web3Provider,
       contractName: contractName,
       deployerAddress: oThis.deployerAddress,
+      deployerPassphrase: oThis.deployerPassphrase,
       gasPrice: oThis.gasPrice,
       gas: oThis.gasLimit,
       abi: helper.getABI(contractName),
       bin: helper.getBIN(contractName),
       args: args
-    }).perform();
+    }).deploy();
 
     oThis.tokenContractAddress = tokenDeployResponse.receipt.contractAddress;
     console.log('ERC20Token ContractAddress :', oThis.tokenContractAddress);

@@ -39,7 +39,7 @@ InitSTPrime.prototype = {
       abi: helper.getABI(contractName),
       bin: helper.getBIN(contractName),
       args: args
-    }).perform();
+    }).deploy();
 
     oThis.stPrimeContractAddress = stPrimeDeployResponse.receipt.contractAddress;
     console.log('STPrime ContractAddress :', oThis.stPrimeContractAddress);
