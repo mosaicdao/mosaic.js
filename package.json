@@ -33,6 +33,7 @@
     "pre-commit": "1.2.2",
     "prettier": "1.13.7",
     "shelljs": "0.8.1",
+    "node-cmd": "3.0.0",
     "edit-json-file": "1.0.8",
     "solc": "0.4.24"
   },

@@ -29,11 +29,14 @@ GethChecker.prototype = {
     const oThis = this,
       promiseArray = [];
 
-    return new Promise(async function(onResolve, onReject) {
-      for (let endPoint in oThis.providerEndpoints) {
-        promiseArray.push(oThis._isRunning(endPoint));
-      }
-      return Promise.all(promiseArray).then(onResolve);
+    let len = oThis.providerEndpoints.length;
+    while (len--) {
+      let endPoint = oThis.providerEndpoints[len];
+      promiseArray.push(oThis._isRunning(endPoint));
+    }
+
+    return Promise.all(promiseArray).then(function() {
+      console.log('All provided endpoints are up and running.');
     });
   },
 
@@ -56,7 +59,7 @@ GethChecker.prototype = {
             if (err) {
             } else {
               if (chainTimer['blockNumber'] != 0 && chainTimer['blockNumber'] != blocknumber) {
-                console.log('* Geth Checker - ' + chain + ' chain has new blocks.');
+                console.log('* Geth Checker - endPoint ' + endPoint + ' has new blocks.');
                 clearInterval(chainTimer['timer']);
                 onResolve();
               }
@@ -64,7 +67,10 @@ GethChecker.prototype = {
             }
           });
         } else {
-          console.log('Geth Checker - ' + chain + ' chain has no new blocks. Giving up after retries:', retryAttempts);
+          console.log(
+            'Geth Checker - endPoint ' + endPoint + ' has no new blocks. Giving up after retries:',
+            retryAttempts
+          );
           onReject();
           process.exit(1);
         }

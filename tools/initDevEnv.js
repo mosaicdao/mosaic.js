@@ -5,7 +5,8 @@ const shell = require('shelljs'),
   BigNumber = require('bignumber.js'),
   fs = require('fs'),
   Path = require('path'),
-  Web3 = require('web3');
+  Web3 = require('web3'),
+  shellAsyncCmd = require('node-cmd');
 
 const setUpConfig = require('./config.js');
 
@@ -25,6 +26,9 @@ const InitDevEnv = function(params) {
   oThis.originAddresses = {};
   oThis.auxiliaryAddresses = {};
   oThis.configJsonFilePath = oThis.setupRoot + '/' + 'config.json';
+  oThis.originGethShellPath = null;
+  oThis.auxiliaryGethShellPath = null;
+  oThis.auxiliaryGethShellPathWithZeroGas = null;
 };
 
 InitDevEnv.prototype = {
@@ -53,6 +57,8 @@ InitDevEnv.prototype = {
     oThis._initAuxiliaryGeth();
 
     // start services
+    let startWithZeroGas = true;
+    await oThis._startServices(startWithZeroGas);
 
     // geth checker
     await oThis._checkForServicesReady();
@@ -107,6 +113,7 @@ InitDevEnv.prototype = {
       originMiner: originMiner
     });
 
+    let logFilePath = oThis.setupRoot + '/logs/origin-geth.log';
     let startCmd =
       `geth --datadir '${originGethFolder}'` +
       ` --networkid ${setUpConfig.origin.networkId}` +
@@ -118,7 +125,8 @@ InitDevEnv.prototype = {
       ` --ws --wsapi eth,net,web3,personal,txpool --wsaddr ${setUpConfig.origin.geth.host} --wsport ${
         setUpConfig.origin.geth.wsport
       } --wsorigins '*'` +
-      ` --etherbase ${originMiner} --unlock ${originMiner} --password ${originPasswordFilePath}`;
+      ` --etherbase ${originMiner} --unlock ${originMiner} --password ${originPasswordFilePath}` +
+      ` 2> ${logFilePath}`;
 
     console.log('origin start command:\n', startCmd);
 
@@ -126,6 +134,8 @@ InitDevEnv.prototype = {
     let originShellScriptPath = oThis.setupRoot + '/bin/run-origin.sh';
     oThis._handleShellResponse(shell.exec('echo #!/bin/sh > ' + originShellScriptPath));
     oThis._handleShellResponse(shell.exec(`echo "${startCmd}" >> ${originShellScriptPath}`));
+
+    oThis.originGethShellPath = originShellScriptPath;
   },
 
   _initAuxiliaryGeth: function() {
@@ -163,6 +173,7 @@ InitDevEnv.prototype = {
       auxiliarySealer: auxiliarySealer
     });
 
+    let logFilePath = oThis.setupRoot + '/logs/auxiliary-geth.log';
     let startCmd =
       `geth --datadir '${auxiliaryGethFolder}'` +
       ` --networkid ${setUpConfig.auxiliary.networkId}` +
@@ -174,7 +185,8 @@ InitDevEnv.prototype = {
       ` --ws --wsapi eth,net,web3,personal,txpool --wsaddr ${setUpConfig.auxiliary.geth.host} --wsport ${
         setUpConfig.auxiliary.geth.wsport
       } --wsorigins '*'` +
-      ` --etherbase ${auxiliarySealer} --unlock ${auxiliarySealer} --password ${auxiliaryPasswordFilePath}`;
+      ` --etherbase ${auxiliarySealer} --unlock ${auxiliarySealer} --password ${auxiliaryPasswordFilePath}` +
+      ` 2> ${logFilePath}`;
 
     console.log('auxiliary start command:\n', startCmd);
 
@@ -190,6 +202,33 @@ InitDevEnv.prototype = {
     let zeroGasAuxiliaryShellScriptPath = oThis.setupRoot + '/bin/run-auxiliary-with-zero-gas.sh';
     oThis._handleShellResponse(shell.exec('echo #!/bin/sh > ' + zeroGasAuxiliaryShellScriptPath));
     oThis._handleShellResponse(shell.exec(`echo "${startCmd}" >> ${zeroGasAuxiliaryShellScriptPath}`));
+
+    oThis.auxiliaryGethShellPath = auxiliaryShellScriptPath;
+    oThis.auxiliaryGethShellPathWithZeroGas = zeroGasAuxiliaryShellScriptPath;
+  },
+
+  _startServices: function(startWithZeroGas) {
+    const oThis = this;
+
+    //Start Auxiliary Geth
+    let auxiliaryGethShellPath = oThis.auxiliaryGethShellPath;
+    if (startWithZeroGas) {
+      auxiliaryGethShellPath = oThis.auxiliaryGethShellPathWithZeroGas;
+    }
+    shellAsyncCmd.run(`sh ${auxiliaryGethShellPath}`);
+    // oThis._handleShellResponse(shell.exec( `sh ${auxiliaryGethShellPath}` ));
+
+    //Start Origin Geth
+    shellAsyncCmd.run(`sh ${oThis.originGethShellPath}`);
+    // oThis._handleShellResponse(shell.exec( `sh ${oThis.originGethShellPath}` ));
+
+    console.log('------- Sleeping for 5 seconds. Lets wait for geth to come up.');
+    return new Promise(function(resolve, reject) {
+      setTimeout(function() {
+        console.log('------- I am Awake.');
+        resolve();
+      }, 5000);
+    });
   },
 
   _checkForServicesReady: function() {
