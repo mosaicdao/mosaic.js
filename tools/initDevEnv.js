@@ -222,10 +222,10 @@ InitDevEnv.prototype = {
     shellAsyncCmd.run(`sh ${oThis.originGethShellPath}`);
     // oThis._handleShellResponse(shell.exec( `sh ${oThis.originGethShellPath}` ));
 
-    console.log('------- Sleeping for 5 seconds. Lets wait for geth to come up.');
+    console.log('* Sleeping for 5 seconds. Lets wait for geth to come up.');
     return new Promise(function(resolve, reject) {
       setTimeout(function() {
-        console.log('------- I am Awake.');
+        console.log('----- I am Awake.');
         resolve();
       }, 5000);
     });
@@ -262,7 +262,7 @@ InitDevEnv.prototype = {
     while (len--) {
       let recipientName = ethRecipients[len];
       let recipient = configFileContent[recipientName];
-      console.log(`Funding ${recipientName} (${recipient}) with ${amount} Wei`);
+      console.log(`* Funding ${recipientName} (${recipient}) with ${amount} Wei`);
       await oThis._fundEthFor(web3Provider, senderAddr, recipient, amount);
       console.log(`----- ${recipientName} (${recipient}) has received ${amount} Wei`);
     }
@@ -278,7 +278,7 @@ InitDevEnv.prototype = {
 
     let InitERC20Token = require('./InitERC20Token');
 
-    console.log('Deploying ERC20 Token');
+    console.log('* Deploying ERC20 Token');
     return new InitERC20Token({
       web3Provider: web3Provider,
       deployerAddress: deployerAddress,

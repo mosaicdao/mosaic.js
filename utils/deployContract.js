@@ -3,15 +3,12 @@
 const DeployContract = function(params) {
   const oThis = this;
 
-  oThis.web3 = params.web3;
-  oThis.contractName = params.contractName;
-  oThis.deployerAddress = params.deployerAddress;
-  oThis.deployerPassphrase = params.deployerPassphrase;
-  oThis.gasPrice = params.gasPrice;
-  oThis.gas = params.gas;
-  oThis.abi = params.abi;
-  oThis.bin = params.bin;
-  oThis.args = params.args;
+  Object.assign(oThis, params);
+  if (!oThis.bin) {
+    throw 'Invalid Contract Bin. Please provide params.bin.';
+  }
+  oThis.bin = String(oThis.bin);
+
 };
 
 DeployContract.prototype = {
@@ -22,7 +19,6 @@ DeployContract.prototype = {
     let txOptions = {
       from: oThis.deployerAddress,
       gas: oThis.gas,
-      data: oThis.bin,
       gasPrice: oThis.gasPrice
     };
 
@@ -30,9 +26,19 @@ DeployContract.prototype = {
       txOptions.arguments = oThis.args;
     }
 
+    if (oThis.bin.indexOf('0x') !== 0) {
+      oThis.bin = '0x' + oThis.bin;
+    }
+
+    console.log('oThis.bin', oThis.bin);
     const contract = new oThis.web3.eth.Contract(oThis.abi, null, txOptions);
 
-    let tx = contract.deploy(txOptions),
+    let deployOptions = {
+      data: oThis.bin,
+      arguments: oThis.args || []
+    };
+
+    let tx = contract.deploy(deployOptions),
       transactionHash = null,
       receipt = null;
 
@@ -41,7 +47,7 @@ DeployContract.prototype = {
 
     console.log('Deploying contract ' + oThis.contractName);
     const instance = await tx
-      .send()
+      .send(txOptions)
       .on('receipt', function(value) {
         receipt = value;
       })
