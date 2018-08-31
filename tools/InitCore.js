@@ -84,7 +84,7 @@ InitCore.prototype = {
       gas: configFileContent.auxiliaryGasLimit,
       abi: helper.getABI(contractName),
       bin: helper.getBIN(contractName),
-      args: ['0x2c4e8f2d746113d0696ce89b35f0d8bf88e0aeca'] // DUMMY - remove this @sarvesh
+      args: []
     }).deploy();
 
     console.log('auxiliaryWorkerContractDeployResponse:', auxiliaryWorkerContractDeployResponse);
@@ -195,7 +195,7 @@ InitCore.prototype = {
       gas: configFileContent.originGasLimit,
       abi: helper.getABI(contractName),
       bin: helper.getBIN(contractName),
-      args: ['0x2c4e8f2d746113d0696ce89b35f0d8bf88e0aeca'] // DUMMY - remove this @sarvesh
+      args: []
     }).deploy();
 
     console.log('originWorkerContractDeployResponse:', originWorkerContractDeployResponse);
