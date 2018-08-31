@@ -2,9 +2,13 @@
 const fs = require('fs'),
   Mosaic = require('../index');
 
-const LinkOSTPrimeGateways = function(config) {
+const LinkOSTPrimeGateways = function(config, configOutputPath) {
   const oThis = this;
   oThis.config = config;
+
+  //Temp Code. ToDo: Assign oThis.config & use oThis.config object instead of configFileContent.
+  oThis.configJsonFilePath = configOutputPath;
+  oThis.config = JSON.parse(fs.readFileSync(configOutputPath, 'utf8'));
 };
 
 LinkOSTPrimeGateways.prototype = {
@@ -15,7 +19,8 @@ LinkOSTPrimeGateways.prototype = {
     let mosaic = new Mosaic('', mosiacConfig);
 
     let linkConfig = oThis._getLinkConfig(oThis.config);
-    mosaic.setup.linkGateways(linkConfig);
+
+    await mosaic.setup.linkGateways(linkConfig);
   },
 
   _getMosaicConfig: function(configs) {
@@ -34,23 +39,25 @@ LinkOSTPrimeGateways.prototype = {
 
   _getLinkConfig: function(configs) {
     return {
-      originConfig: {
+      origin: {
         organization: {
           address: configs.originOrganizationAddress,
           passPhrase: configs.originOrganizationPassphrase
         },
         chainDataPath: configs.originChainDataPath,
         coreContractAddress: configs.originCoreContractAddress,
-        outboxPositionIndex: configs.originOutboxPositionIndex
+        outboxPositionIndex: configs.originOutboxPositionIndex,
+        gatewayAddress: configs.gatewayAddress
       },
-      auxiliaryConfig: {
+      auxiliary: {
         organization: {
           address: configs.auxiliaryOrganizationAddress,
           passPhrase: configs.auxiliaryOrganizationPassphrase
         },
         chainDataPath: configs.auxiliaryChainDataPath,
         coreContractAddress: configs.auxiliaryCoreContractAddress,
-        outboxPositionIndex: configs.auxiliaryOutboxPositionIndex
+        outboxPositionIndex: configs.auxiliaryOutboxPositionIndex,
+        coGatewayAddress: configs.coGatewayAddress
       },
       token: {
         name: 'SimpleTokenPrime',

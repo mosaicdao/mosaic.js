@@ -9,7 +9,8 @@ const shell = require('shelljs'),
 const OSTPrimeDeployer = require('./OSTPrimeDeployer.js'),
   InitCore = require('./InitCore.js'),
   GatewayDeployer = require('./GatewayDeployer'),
-  MessageBusDeployer = require('./MessageBusDeployer');
+  MessageBusDeployer = require('./MessageBusDeployer'),
+  LinkOSTPrimeGateways = require('./LinkOSTPrimeGateways');
 
 const InitChains = function(params) {
   const oThis = this;
@@ -33,6 +34,9 @@ InitChains.prototype = {
     console.log('\n* Deploying Gateways');
     await oThis._deployGateway();
 
+    console.log('\n* Linking Gateways for OSTPrime');
+    await oThis._linkOSTPrimeGateways();
+
     console.log('Auxiliary chain setup is complete');
     console.log('Output config file path:', oThis.configOutputPath);
     process.exit(0);
@@ -55,6 +59,11 @@ InitChains.prototype = {
   _messageBusLibrary: function() {
     const oThis = this;
     return new MessageBusDeployer(oThis.config, oThis.configOutputPath).perform();
+  },
+
+  _linkOSTPrimeGateways: function() {
+    const oThis = this;
+    return new LinkOSTPrimeGateways(oThis.config, oThis.configOutputPath).perform();
   }
 };
 
