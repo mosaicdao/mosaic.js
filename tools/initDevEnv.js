@@ -117,6 +117,7 @@ InitDevEnv.prototype = {
     let originFacilitator = oThis._generateAddress(originGethFolder);
     let originMiner = oThis._generateAddress(originGethFolder);
     let originOpsAddress = oThis._generateAddress(originGethFolder);
+    let originOrganizationAddress = oThis._generateAddress(originGethFolder);
 
     oThis._modifyGenesisFile(
       setUpConfig.origin.chainId,
@@ -138,7 +139,8 @@ InitDevEnv.prototype = {
       ostPrimeStakerAddress: ostPrimeStakerAddress,
       originFacilitator: originFacilitator,
       originMiner: originMiner,
-      originOpsAddress: originOpsAddress
+      originOpsAddress: originOpsAddress,
+      originOrganizationAddress: originOrganizationAddress
     });
 
     let logFilePath = oThis.setupRoot + '/logs/origin-geth.log';
@@ -179,6 +181,7 @@ InitDevEnv.prototype = {
     let auxiliaryFacilitator = oThis._generateAddress(auxiliaryGethFolder);
     let auxiliarySealer = oThis._generateAddress(auxiliaryGethFolder);
     let auxiliaryOpsAddress = oThis._generateAddress(auxiliaryGethFolder);
+    let auxiliaryOrganizationAddress = oThis._generateAddress(auxiliaryGethFolder);
 
     oThis._modifyGenesisFile(
       setUpConfig.auxiliary.chainId,
@@ -200,7 +203,8 @@ InitDevEnv.prototype = {
       auxiliaryDeployerAddress: auxiliaryDeployerAddress,
       auxiliaryFacilitator: auxiliaryFacilitator,
       auxiliarySealer: auxiliarySealer,
-      auxiliaryOpsAddress: auxiliaryOpsAddress
+      auxiliaryOpsAddress: auxiliaryOpsAddress,
+      auxiliaryOrganizationAddress: auxiliaryOrganizationAddress
     });
 
     let logFilePath = oThis.setupRoot + '/logs/auxiliary-geth.log';
@@ -282,7 +286,8 @@ InitDevEnv.prototype = {
       'ostPrimeStakerAddress',
       'originFacilitator',
       'originMiner',
-      'originOpsAddress'
+      'originOpsAddress',
+      'originOrganizationAddress'
     ];
 
     console.log('senderAddr', senderAddr);
