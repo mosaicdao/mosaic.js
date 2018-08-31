@@ -4,7 +4,7 @@
     "networkId": 1000,
     "gethFolder": "origin-geth",
     "allocAmount": "1000000000000000000000000000000000000000",
-    "gasLimit": 4700000,
+    "gasLimit": 47000000,
     "gasprice": "0x12A05F200",
     "genesisFileName": "genesis-origin.json",
     "geth": {
