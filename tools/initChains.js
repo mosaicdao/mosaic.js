@@ -32,7 +32,7 @@ InitChains.prototype = {
     return new InitCore().perform();
   },
   _deployGateway: function() {
-    return new GatewayDeployer().perform();
+    return new GatewayDeployer().deploy();
   },
 
   _deployOSTPrimeContract: function() {

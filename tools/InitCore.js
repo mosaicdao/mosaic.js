@@ -87,7 +87,8 @@ InitCore.prototype = {
       args: []
     }).deploy();
 
-    console.log('auxiliaryWorkerContractDeployResponse:', auxiliaryWorkerContractDeployResponse);
+    //console.log('auxiliaryWorkerContractDeployResponse:',
+    // auxiliaryWorkerContractDeployResponse);
 
     let auxiliaryWorkerContract = auxiliaryWorkerContractDeployResponse.instance;
 
@@ -103,10 +104,12 @@ InitCore.prototype = {
         gasPrice: '0x0'
       });
 
-    console.log(
-      'setOpsAddress on auxiliary chain Workers receipt:',
-      JSON.stringify(setOpsAddressForAuxiliaryWorkersResponse, null, 4)
-    );
+    /*
+        console.log(
+          'setOpsAddress on auxiliary chain Workers receipt:',
+          JSON.stringify(setOpsAddressForAuxiliaryWorkersResponse, null, 4)
+        );
+    */
 
     await oThis.auxiliaryWeb3.eth.personal.unlockAccount(configFileContent.auxiliaryOpsAddress, auxiliaryPassphrase);
 
@@ -120,10 +123,10 @@ InitCore.prototype = {
         gasPrice: '0x0'
       });
 
-    console.log(
+    /*console.log(
       'setWorker on auxiliary chain Workers receipt:',
       JSON.stringify(setWorkerForAuxiliaryWorkersResponse, null, 4)
-    );
+    );*/
   },
 
   _deployCoreOnAuxiliary: async function() {
@@ -166,7 +169,7 @@ InitCore.prototype = {
       args: coreDeployParams
     }).deploy();
 
-    console.log('auxiliaryCoreDeployResponse:', auxiliaryCoreDeployResponse);
+    //console.log('auxiliaryCoreDeployResponse:', auxiliaryCoreDeployResponse);
 
     let auxiliaryCoreContractAddress = auxiliaryCoreDeployResponse.receipt.contractAddress;
 
@@ -198,7 +201,8 @@ InitCore.prototype = {
       args: []
     }).deploy();
 
-    console.log('originWorkerContractDeployResponse:', originWorkerContractDeployResponse);
+    //console.log('originWorkerContractDeployResponse:',
+    // originWorkerContractDeployResponse);
 
     let originWorkerContract = originWorkerContractDeployResponse.instance;
 
@@ -214,10 +218,10 @@ InitCore.prototype = {
         gasPrice: '0x0'
       });
 
-    console.log(
+    /*console.log(
       'setOpsAddress on origin chain Workers receipt:',
       JSON.stringify(setOpsAddressForOriginWorkersResponse, null, 4)
-    );
+    );*/
 
     await oThis.originWeb3.eth.personal.unlockAccount(configFileContent.originOpsAddress, originPassphrase);
 
@@ -231,10 +235,10 @@ InitCore.prototype = {
         gasPrice: '0x0'
       });
 
-    console.log(
-      'setWorker on origin chain Workers receipt:',
-      JSON.stringify(setWorkerForOriginWorkersResponse, null, 4)
-    );
+    /*   console.log(
+         'setWorker on origin chain Workers receipt:',
+         JSON.stringify(setWorkerForOriginWorkersResponse, null, 4)
+       );*/
   },
 
   _deployCoreOnOrigin: async function() {
@@ -274,7 +278,7 @@ InitCore.prototype = {
       args: coreDeployParams
     }).deploy();
 
-    console.log('originCoreDeployResponse:', originCoreDeployResponse);
+    //console.log('originCoreDeployResponse:', originCoreDeployResponse);
 
     let originCoreContractAddress = originCoreDeployResponse.receipt.contractAddress;
 

@@ -1,6 +1,7 @@
 'use strict';
 
 const fs = require('fs'),
+  os = require('os'),
   shell = require('shelljs');
 
 const originPassphrase = 'testtest',
@@ -10,8 +11,8 @@ const Mosaic = require('../index');
 
 const GatewayDeployer = function(config) {
   const oThis = this;
-
-  oThis.config = config;
+  oThis.configJsonFilePath = os.homedir() + '/mosaic-setup' + '/config.json';
+  oThis.config = JSON.parse(fs.readFileSync(oThis.configJsonFilePath, 'utf8'));
 
   let mosaicConfig = {
     origin: {
@@ -33,7 +34,7 @@ GatewayDeployer.prototype = {
     const oThis = this;
     let config = oThis.config;
 
-    let originConfig: {
+    let originConfig = {
         coreAddress: config.originCoreContractAddress,
         deployerAddress: config.originDeployerAddress,
         deployerPassPhrase: originPassphrase,
@@ -45,7 +46,7 @@ GatewayDeployer.prototype = {
         messageBusAddress: config.originMessageBusContractAddress
       },
       //auxiliary
-      auxiliaryConfig: {
+      auxiliaryConfig = {
         coreAddress: config.auxiliaryCoreContractAddress,
         deployerAddress: config.auxiliaryDeployerAddress,
         deployerPassPhrase: auxiliaryPassphrase,
@@ -57,17 +58,14 @@ GatewayDeployer.prototype = {
         messageBusAddress: config.auxiliaryMessageBusContractAddress
       };
 
-    console.log('origin config  ', originConfig);
-    console.log('auxiliary Config   ', auxiliaryConfig);
-
-    let MosaicGatewayDeployer = oThis.mosaic.setup.GatewayDeployer,
-      gateDeployer = new MosaicGatewayDeployer(originConfig, auxiliaryConfig);
-    let deployResult = await gateDeployer.deploy();
-    console.log(
-      ` gateway ${deployResult.gateway.receipt.contractAddress} , co-gateway ${
-        deployResult.cogateway.receipt.contractAddress
-      }`
-    );
+    let deployResult = await oThis.mosaic.setup.deployGateway(originConfig, auxiliaryConfig);
+    let gatewayAddress = deployResult.gateway.receipt.contractAddress;
+    let coGatewayAddress = deployResult.cogateway.receipt.contractAddress;
+    console.log(` gateway ${gatewayAddress} , co-gateway ${coGatewayAddress}`);
+    oThis._addConfig({
+      gatewayAddress: gatewayAddress,
+      coGatewayAddress: coGatewayAddress
+    });
   },
 
   _addConfig: function(params) {
