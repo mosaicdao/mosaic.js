@@ -3,14 +3,17 @@
 const fs = require('fs'),
   Web3 = require('web3'),
   shell = require('shelljs'),
-  os = require('os');
+  os = require('os'),
+  linker = require('solc/linker');
+
 const DeployContract = require('../utils/deployContract'),
   helper = require('../utils/helper');
 
 const originPassphrase = 'testtest',
-  auxiliaryPassphrase = 'testtest';
+  auxiliaryPassphrase = 'testtest',
+  MESSAGE_BUS_NAME = 'MessageBus';
 
-const InitGateway = function() {
+const GatewayDeployer = function() {
   const oThis = this;
 
   oThis.originWorkerContractAddress = null;
@@ -19,7 +22,7 @@ const InitGateway = function() {
   oThis.configJsonFilePath = os.homedir() + '/mosaic-setup' + '/config.json';
 };
 
-InitGateway.prototype = {
+GatewayDeployer.prototype = {
   perform: async function() {
     const oThis = this;
 
@@ -60,8 +63,14 @@ InitGateway.prototype = {
       // in setup script
     ];
 
-    console.log('args ', args);
+    console.log('configFileContent.auxiliaryGasLimit', configFileContent.auxiliaryGasLimit);
 
+    let linkedBin = await oThis.linkMessageBus(
+      helper.getBIN(contractName),
+      MESSAGE_BUS_NAME,
+      configFileContent.auxiliaryMessageBusContractAddress
+    );
+    console.log('linked bin ', linkedBin);
     let auxiliaryCoGatewayContractDeployResponse = await new DeployContract({
       web3: oThis.auxiliaryWeb3,
       contractName: contractName,
@@ -69,7 +78,7 @@ InitGateway.prototype = {
       gasPrice: '0x0',
       gas: configFileContent.auxiliaryGasLimit,
       abi: helper.getABI(contractName),
-      bin: helper.getBIN(contractName),
+      bin: linkedBin,
       args: args
     }).deploy();
 
@@ -93,15 +102,20 @@ InitGateway.prototype = {
     await oThis.originWeb3.eth.personal.unlockAccount(configFileContent.originDeployerAddress, originPassphrase);
 
     let contractName = 'Gateway';
+    let linkedBin = await oThis.linkMessageBus(
+      helper.getBIN(contractName),
+      MESSAGE_BUS_NAME,
+      configFileContent.auxiliaryMessageBusContractAddress
+    );
 
-    let originGatewayContractDeployResponse = await new deployContract({
+    let originGatewayContractDeployResponse = await new DeployContract({
       web3: oThis.originWeb3,
       contractName: contractName,
       deployerAddress: configFileContent.originDeployerAddress,
       gasPrice: '0x0',
       gas: configFileContent.originGasLimit,
       abi: helper.getABI(contractName),
-      bin: helper.getBIN(contractName),
+      bin: linkedBin,
       args: [
         configFileContent.erc20TokenContractAddress,
         configFileContent.coGatewayContractAddress,
@@ -120,6 +134,15 @@ InitGateway.prototype = {
     oThis._addConfig({ gatewayContractAddress: oThis.gatewayContractAddress });
 
     return gatewayContract;
+  },
+
+  linkMessageBus: async function(bin, libraryName, libAddress) {
+    const oThis = this;
+
+    let linkOptions = {};
+    linkOptions[libraryName] = libAddress;
+
+    return linker.linkBytecode(bin, linkOptions);
   },
 
   _addConfig: function(params) {
@@ -145,4 +168,4 @@ InitGateway.prototype = {
   }
 };
 
-module.exports = InitGateway;
+module.exports = GatewayDeployer;

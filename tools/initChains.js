@@ -2,7 +2,7 @@
 
 const OSTPrimeDeployer = require('./OSTPrimeDeployer.js'),
   InitCore = require('./InitCore.js'),
-  InitGateway = require('./InitGateway'),
+  GatewayDeployer = require('./GatewayDeployer'),
   MessageBusDeployer = require('./MessageBusDeployer');
 
 const InitChains = function(params) {
@@ -23,7 +23,7 @@ InitChains.prototype = {
 
     await oThis._messageBusLibrary();
 
-    //await oThis._initGateway();
+    await oThis._deployGateway();
 
     console.log('Env init DONE!');
   },
@@ -31,8 +31,8 @@ InitChains.prototype = {
   _initCore: function() {
     return new InitCore().perform();
   },
-  _initGateway: function() {
-    return new InitGateway().perform();
+  _deployGateway: function() {
+    return new GatewayDeployer().perform();
   },
 
   _deployOSTPrimeContract: function() {
