@@ -2,7 +2,8 @@
 
 const fs = require('fs'),
   os = require('os'),
-  Web3 = require('web3');
+  Web3 = require('web3'),
+  shell = require('shelljs');
 
 const DeployContract = require('../utils/deployContract'),
   helper = require('../utils/helper');
@@ -43,8 +44,29 @@ OSTPrimeDeployer.prototype = {
 
     oThis.stPrimeContractAddress = stPrimeDeployResponse.receipt.contractAddress;
     console.log('OSTPrime ContractAddress :', oThis.stPrimeContractAddress);
-
+    oThis._addConfig({ stPrimeContractAddress: oThis.stPrimeContractAddress });
     return stPrimeDeployResponse;
+  },
+  _addConfig: function(params) {
+    const oThis = this;
+
+    let fileContent = JSON.parse(fs.readFileSync(oThis.configJsonFilePath, 'utf8'));
+
+    for (var i in params) {
+      fileContent[i] = params[i];
+    }
+
+    oThis._executeInShell("echo '" + JSON.stringify(fileContent) + "' > " + oThis.configJsonFilePath);
+  },
+
+  _executeInShell: function(cmd) {
+    let res = shell.exec(cmd);
+
+    if (res.code !== 0) {
+      shell.exit(1);
+    }
+
+    return res;
   }
 };
 
