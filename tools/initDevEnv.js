@@ -1,30 +1,31 @@
+#!/usr/bin/env node
 'use strict';
 
 const shell = require('shelljs'),
   BigNumber = require('bignumber.js'),
   fs = require('fs'),
+  path = require('path'),
   Web3 = require('web3'),
-  shellAsyncCmd = require('node-cmd');
+  shellAsyncCmd = require('node-cmd'),
+  program = require('commander');
 
-const setUpConfig = require('./config.js');
+const setUpConfig = require('./devInitConfig');
+let originGenesisFileTemplatePath = path.resolve('./tools/genesis-origin.json');
+let auxiliaryGenesisFileTemplatePath = path.resolve('./tools/genesis-origin.json');
 
-const originGethFolder = setUpConfig.origin.gethFolder,
-  auxiliaryGethFolder = setUpConfig.auxiliary.gethFolder,
-  originPassphrase = 'testtest',
-  auxiliaryPassphrase = 'testtest',
-  hexStartsWith = '0x',
-  originPasswordFilePath = originGethFolder + '/pwd',
-  auxiliaryPasswordFilePath = auxiliaryGethFolder + '/pwd',
+const hexStartsWith = '0x',
   etherToWeiCinversion = new BigNumber(1000000000000000000);
 
 const InitDevEnv = function(params) {
   const oThis = this;
 
   oThis.setupRoot = params.setupRoot;
-  oThis.configJsonFilePath = oThis.setupRoot + '/' + 'config.json';
+  oThis.configJsonFilePath = path.resolve(oThis.setupRoot, './config.json');
   oThis.originGethShellPath = null;
   oThis.auxiliaryGethShellPath = null;
   oThis.auxiliaryGethShellPathWithZeroGas = null;
+  setUpConfig.origin.genesisFilePath = path.resolve(oThis.setupRoot, './' + setUpConfig.origin.genesisFileName);
+  setUpConfig.auxiliary.genesisFilePath = path.resolve(oThis.setupRoot, './' + setUpConfig.auxiliary.genesisFileName);
 };
 
 InitDevEnv.prototype = {
@@ -126,7 +127,7 @@ InitDevEnv.prototype = {
       chainOwnerOriginAddress,
       setUpConfig.origin.allocAmount,
       setUpConfig.origin.gasLimit,
-      setUpConfig.origin.genesisFileTemplatePath,
+      originGenesisFileTemplatePath,
       setUpConfig.origin.genesisFilePath
     );
 
@@ -190,7 +191,7 @@ InitDevEnv.prototype = {
       chainOwnerAuxiliaryAddress,
       setUpConfig.auxiliary.allocAmount,
       setUpConfig.auxiliary.gasLimit,
-      setUpConfig.auxiliary.genesisFileTemplatePath,
+      auxiliaryGenesisFileTemplatePath,
       setUpConfig.auxiliary.genesisFilePath,
       auxiliarySealer
     );
@@ -425,6 +426,7 @@ InitDevEnv.prototype = {
     let res = shell.exec(cmd);
 
     if (res.code !== 0) {
+      console.error('shell cmd', cmd, 'threw an error');
       shell.exit(1);
     }
 
@@ -448,8 +450,47 @@ InitDevEnv.prototype = {
   }
 };
 
-// commander
-const os = require('os');
-new InitDevEnv({
-  setupRoot: os.homedir() + '/mosaic-setup' // later to come as argument for this script
-}).perform();
+(function() {
+  let defaultSetupPath = path.join(process.cwd(), './');
+  program
+    .version('0.1.0')
+    .usage(`<path_to_setup_directory> (default: ${defaultSetupPath})`)
+    .parse(process.argv);
+
+  let setupRoot = program.args[0] || defaultSetupPath;
+  setupRoot = path.resolve(setupRoot);
+
+  try {
+    let setupRootStats = fs.statSync(setupRoot);
+    if (!setupRootStats.isDirectory()) {
+      throw 'Invalid setup directory path.';
+    }
+  } catch (e) {
+    console.log(e.message);
+  }
+
+  setupRoot = path.resolve(setupRoot, './mosaic-setup');
+
+  (global.originGethFolder = path.resolve(setupRoot, './' + setUpConfig.origin.gethFolder)),
+    (global.auxiliaryGethFolder = path.resolve(setupRoot, './' + setUpConfig.auxiliary.gethFolder)),
+    (global.originPassphrase = 'testtest'),
+    (global.auxiliaryPassphrase = 'testtest'),
+    (global.originPasswordFilePath = path.resolve(originGethFolder, './pwd')),
+    (global.auxiliaryPasswordFilePath = path.resolve(auxiliaryGethFolder, './pwd'));
+
+  console.log('Setup datadir', setupRoot);
+  console.log('originGethFolder', originGethFolder);
+  console.log('auxiliaryGethFolder', auxiliaryGethFolder);
+  console.log('originPasswordFilePath', originPasswordFilePath);
+  console.log('auxiliaryPasswordFilePath', auxiliaryPasswordFilePath);
+
+  new InitDevEnv({
+    setupRoot: setupRoot,
+    originGethFolder: originGethFolder,
+    auxiliaryGethFolder: auxiliaryGethFolder,
+    originPassphrase: originPassphrase,
+    auxiliaryPassphrase: auxiliaryPassphrase,
+    originPasswordFilePath: originPasswordFilePath,
+    auxiliaryPasswordFilePath: auxiliaryPasswordFilePath
+  }).perform();
+})();
