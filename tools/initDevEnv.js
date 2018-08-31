@@ -26,6 +26,7 @@ const InitDevEnv = function(params) {
   oThis.auxiliaryGethShellPathWithZeroGas = null;
   setUpConfig.origin.genesisFilePath = path.resolve(oThis.setupRoot, './' + setUpConfig.origin.genesisFileName);
   setUpConfig.auxiliary.genesisFilePath = path.resolve(oThis.setupRoot, './' + setUpConfig.auxiliary.genesisFileName);
+  //
 };
 
 InitDevEnv.prototype = {
@@ -101,8 +102,8 @@ InitDevEnv.prototype = {
       auxiliaryGethRpcEndPoint: oThis._auxiliaryRpc(),
       originGethWsEndPoint: oThis._originWs(),
       auxiliaryGethWsEndPoint: oThis._auxiliaryWs(),
-      originChainDataPath: setUpConfig.origin.chainDataPath,
-      auxiliaryChainDataPath: setUpConfig.auxiliary.chainDataPath
+      originChainDataPath: path.resolve(originGethFolder, './geth/chaindata'),
+      auxiliaryChainDataPath: path.resolve(auxiliaryGethFolder, './geth/chaindata')
     });
   },
 

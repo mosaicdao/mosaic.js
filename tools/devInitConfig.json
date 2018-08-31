@@ -19,7 +19,7 @@
     "networkId": 2000,
     "gethFolder": "auxiliary-geth",
     "allocAmount": "800000000",
-    "gasLimit": 4700000,
+    "gasLimit": 47000000,
     "gasprice": "0x12A05F200",
     "genesisFileName": "genesis-auxiliary.json",
     "geth": {
