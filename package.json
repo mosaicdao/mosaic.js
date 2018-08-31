@@ -12,6 +12,9 @@
   "bugs": {
     "url": "https://github.com/OpenSTFoundation/mosaic.js/issues"
   },
+  "bin": {
+    "init-mosaic-dev-env": "./tools/initDevEnv.js"
+  },
   "scripts": {
     "pre-commit": "lint-staged",
     "mosaic-game": "node ./game/game",
