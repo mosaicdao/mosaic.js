@@ -1,6 +1,5 @@
 'use strict';
 const fs = require('fs'),
-  os = require('os'),
   Mosaic = require('../index');
 
 const LinkOSTPrimeGateways = function(config) {

@@ -23,7 +23,6 @@ InitChains.prototype = {
     // deploy the core contracts on both the chains
     console.log('\n* Deploying core contracts on both the chains');
     await oThis._initCore();
-    process.exit(0);
 
     console.log('\n* Deploying OSTPrime Contract');
     await oThis._deployOSTPrimeContract();
@@ -41,7 +40,6 @@ InitChains.prototype = {
 
   _initCore: function() {
     const oThis = this;
-    console.log('oThis.config', oThis.config, '\n-----------');
     return new InitCore(oThis.config, oThis.configOutputPath).perform();
   },
   _deployGateway: function() {
@@ -71,17 +69,20 @@ InitChains.prototype = {
 
   try {
     if (!configPath) {
-      throw 'Please provide path to chain setup config JSON file.';
+      let err = new Error('Please provide path to chain setup config JSON file.');
+      throw err;
     }
     configPath = path.resolve(configPath);
 
     let fileStats = fs.statSync(configPath);
     if (!fileStats.isFile()) {
-      throw 'Invalid config file path.';
+      let err = new Error('Invalid config file path.');
+      throw err;
     }
     config = require(configPath);
-  } catch (e) {
-    console.log(e.message);
+  } catch (err) {
+    console.log(err.message);
+    process.exit(0);
   }
 
   new InitChains({

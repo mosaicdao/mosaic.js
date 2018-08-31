@@ -1,7 +1,6 @@
 'use strict';
 
 const fs = require('fs'),
-  os = require('os'),
   shell = require('shelljs');
 
 const originPassphrase = 'testtest',
@@ -9,10 +8,11 @@ const originPassphrase = 'testtest',
 
 const Mosaic = require('../index');
 
-const GatewayDeployer = function(config) {
+const GatewayDeployer = function(config, configOutputPath) {
   const oThis = this;
-  oThis.configJsonFilePath = os.homedir() + '/mosaic-setup' + '/config.json';
-  oThis.config = JSON.parse(fs.readFileSync(oThis.configJsonFilePath, 'utf8'));
+
+  oThis.configJsonFilePath = configOutputPath;
+  oThis.config = config;
 
   let mosaicConfig = {
     origin: {
@@ -71,13 +71,10 @@ GatewayDeployer.prototype = {
   _addConfig: function(params) {
     const oThis = this;
 
-    let fileContent = JSON.parse(fs.readFileSync(oThis.configJsonFilePath, 'utf8'));
+    let config = oThis.config;
+    Object.assign(config, params);
 
-    for (var i in params) {
-      fileContent[i] = params[i];
-    }
-
-    oThis._executeInShell("echo '" + JSON.stringify(fileContent) + "' > " + oThis.configJsonFilePath);
+    oThis._executeInShell("echo '" + JSON.stringify(config, null, 2) + "' > " + oThis.configJsonFilePath);
   },
 
   _executeInShell: function(cmd) {

@@ -1,7 +1,6 @@
 'use strict';
 
 const fs = require('fs'),
-  os = require('os'),
   Web3 = require('web3'),
   shell = require('shelljs');
 
@@ -10,13 +9,15 @@ const DeployContract = require('../utils/deployContract'),
 
 const passPhrase = 'testtest';
 
-const OSTPrimeDeployer = function(params) {
+const MessageBusDeployer = function(config, configOutputPath) {
   const oThis = this;
 
-  oThis.configJsonFilePath = os.homedir() + '/mosaic-setup' + '/config.json';
+  oThis.config = config;
+  //Temp Code. ToDo: Assign oThis.config & use oThis.config object instead of configFileContent.
+  oThis.configJsonFilePath = configOutputPath;
 };
 
-OSTPrimeDeployer.prototype = {
+MessageBusDeployer.prototype = {
   perform: async function() {
     let oThis = this;
 
@@ -67,13 +68,10 @@ OSTPrimeDeployer.prototype = {
   _addConfig: function(params) {
     const oThis = this;
 
-    let fileContent = JSON.parse(fs.readFileSync(oThis.configJsonFilePath, 'utf8'));
+    let config = oThis.config;
+    Object.assign(config, params);
 
-    for (var i in params) {
-      fileContent[i] = params[i];
-    }
-
-    oThis._executeInShell("echo '" + JSON.stringify(fileContent) + "' > " + oThis.configJsonFilePath);
+    oThis._executeInShell("echo '" + JSON.stringify(config, null, 2) + "' > " + oThis.configJsonFilePath);
   },
 
   _executeInShell: function(cmd) {
@@ -87,4 +85,4 @@ OSTPrimeDeployer.prototype = {
   }
 };
 
-module.exports = OSTPrimeDeployer;
+module.exports = MessageBusDeployer;

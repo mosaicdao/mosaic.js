@@ -468,6 +468,7 @@ InitDevEnv.prototype = {
     }
   } catch (e) {
     console.log(e.message);
+    process.exit(0);
   }
 
   setupRoot = path.resolve(setupRoot, './mosaic-setup');

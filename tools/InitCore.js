@@ -2,8 +2,7 @@
 
 const fs = require('fs'),
   Web3 = require('web3'),
-  shell = require('shelljs'),
-  os = require('os');
+  shell = require('shelljs');
 
 const deployContract = require('../utils/deployContract'),
   helper = require('../utils/helper');
@@ -19,7 +18,6 @@ const InitCore = function(config, configOutputPath) {
   oThis.auxiliaryWorkerContractAddress = null;
 
   oThis.configJsonFilePath = configOutputPath;
-  console.log('config', oThis.config);
 };
 
 InitCore.prototype = {
@@ -59,7 +57,6 @@ InitCore.prototype = {
     const oThis = this;
 
     let config = oThis.config;
-    console.log('config', config);
 
     oThis.auxiliaryWeb3 = new Web3(config.auxiliaryGethRpcEndPoint);
     oThis.originWeb3 = new Web3(config.originGethRpcEndPoint);
@@ -307,10 +304,7 @@ InitCore.prototype = {
     const oThis = this;
 
     let config = oThis.config;
-
-    for (var i in params) {
-      config[i] = params[i];
-    }
+    Object.assign(config, params);
 
     oThis._executeInShell("echo '" + JSON.stringify(config, null, 2) + "' > " + oThis.configJsonFilePath);
   },
