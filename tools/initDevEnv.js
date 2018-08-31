@@ -99,7 +99,9 @@ InitDevEnv.prototype = {
       originGethRpcEndPoint: oThis._originRpc(),
       auxiliaryGethRpcEndPoint: oThis._auxiliaryRpc(),
       originGethWsEndPoint: oThis._originWs(),
-      auxiliaryGethWsEndPoint: oThis._auxiliaryWs()
+      auxiliaryGethWsEndPoint: oThis._auxiliaryWs(),
+      originChainDataPath: setUpConfig.origin.chainDataPath,
+      auxiliaryChainDataPath: setUpConfig.auxiliary.chainDataPath
     });
   },
 
