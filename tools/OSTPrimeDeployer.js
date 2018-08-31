@@ -9,13 +9,13 @@ const DeployContract = require('../utils/deployContract'),
 
 const auxiliaryPassphrase = 'testtest';
 
-const DeployOSTPrime = function(params) {
+const OSTPrimeDeployer = function(params) {
   const oThis = this;
 
   oThis.configJsonFilePath = os.homedir() + '/mosaic-setup' + '/config.json';
 };
 
-DeployOSTPrime.prototype = {
+OSTPrimeDeployer.prototype = {
   perform: async function() {
     const oThis = this;
 
@@ -42,10 +42,10 @@ DeployOSTPrime.prototype = {
     }).deploy();
 
     oThis.stPrimeContractAddress = stPrimeDeployResponse.receipt.contractAddress;
-    console.log('STPrime ContractAddress :', oThis.stPrimeContractAddress);
+    console.log('OSTPrime ContractAddress :', oThis.stPrimeContractAddress);
 
     return stPrimeDeployResponse;
   }
 };
 
-module.exports = DeployOSTPrime;
+module.exports = OSTPrimeDeployer;

@@ -3,7 +3,7 @@
 const deployContract = require('../utils/deployContract'),
   helper = require('../utils/helper');
 
-const InitERC20Token = function(params) {
+const ERC20TokenDeployer = function(params) {
   const oThis = this;
 
   oThis.web3Provider = params.web3Provider;
@@ -13,7 +13,7 @@ const InitERC20Token = function(params) {
   oThis.gasLimit = params.gasLimit;
 };
 
-InitERC20Token.prototype = {
+ERC20TokenDeployer.prototype = {
   perform: function() {
     const oThis = this;
 
@@ -45,4 +45,4 @@ InitERC20Token.prototype = {
   }
 };
 
-module.exports = InitERC20Token;
+module.exports = ERC20TokenDeployer;

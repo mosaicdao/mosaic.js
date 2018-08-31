@@ -1,4 +1,6 @@
 'use strict';
+const OSTPrimeDeployer = require('./OSTPrimeDeployer.js'),
+  InitCore = require('./InitCore.js');
 
 const InitChains = function(params) {
   const oThis = this;
@@ -14,21 +16,17 @@ InitChains.prototype = {
     // deploy the core contracts on both the chains
     await oThis._initCore();
 
-    // await oThis._deployOSTPrimeContract();
+    await oThis._deployOSTPrimeContract();
 
     console.log('Env init DONE!');
   },
 
   _initCore: function() {
-    let InitCore = require('./InitCore.js');
-
     return new InitCore().perform();
   },
 
   _deployOSTPrimeContract: function() {
-    let deployer = require('./DeployOSTPrime.js');
-
-    return new deployer().perform();
+    return new OSTPrimeDeployer().perform();
   }
 };
 

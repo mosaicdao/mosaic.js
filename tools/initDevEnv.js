@@ -305,10 +305,10 @@ InitDevEnv.prototype = {
     let deployerAddress = configFileContent.originDeployerAddress,
       web3Provider = new Web3(oThis._originRpc());
 
-    let InitERC20Token = require('./InitERC20Token');
+    let ERC20TokenDeployer = require('./ERC20TokenDeployer');
 
     console.log('* Deploying ERC20 Token');
-    return new InitERC20Token({
+    return new ERC20TokenDeployer({
       web3Provider: web3Provider,
       deployerAddress: deployerAddress,
       deployerPassphrase: originPassphrase,
