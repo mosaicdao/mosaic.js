@@ -1,148 +1,73 @@
 'use strict';
 
 const fs = require('fs'),
-  Web3 = require('web3'),
-  shell = require('shelljs'),
-  os = require('os'),
-  linker = require('solc/linker');
-
-const DeployContract = require('../utils/deployContract'),
-  helper = require('../utils/helper');
+  shell = require('shelljs');
 
 const originPassphrase = 'testtest',
-  auxiliaryPassphrase = 'testtest',
-  MESSAGE_BUS_NAME = 'MessageBus';
+  auxiliaryPassphrase = 'testtest';
 
-const GatewayDeployer = function() {
+const Mosaic = require('../index');
+
+const GatewayDeployer = function(config) {
   const oThis = this;
 
-  oThis.originWorkerContractAddress = null;
-  oThis.auxiliaryWorkerContractAddress = null;
+  oThis.config = config;
 
-  oThis.configJsonFilePath = os.homedir() + '/mosaic-setup' + '/config.json';
+  let mosaicConfig = {
+    origin: {
+      provider: oThis.config.originGethRpcEndPoint
+    },
+    auxiliaries: [
+      {
+        provider: oThis.config.auxiliaryGethRpcEndPoint,
+        originCoreContractAddress: oThis.config.originCoreContractAddress
+      }
+    ]
+  };
+
+  oThis.mosaic = new Mosaic('', mosaicConfig);
 };
 
 GatewayDeployer.prototype = {
-  perform: async function() {
+  deploy: async function() {
     const oThis = this;
+    let config = oThis.config;
 
-    oThis._initVars();
+    let originConfig: {
+        coreAddress: config.originCoreContractAddress,
+        deployerAddress: config.originDeployerAddress,
+        deployerPassPhrase: originPassphrase,
+        gasPrice: config.originGasPrice,
+        gasLimit: config.originGasLimit,
+        token: config.erc20TokenContractAddress,
+        bounty: 0,
+        organisationAddress: config.originOrganizationAddress,
+        messageBusAddress: config.originMessageBusContractAddress
+      },
+      //auxiliary
+      auxiliaryConfig: {
+        coreAddress: config.auxiliaryCoreContractAddress,
+        deployerAddress: config.auxiliaryDeployerAddress,
+        deployerPassPhrase: auxiliaryPassphrase,
+        gasPrice: config.auxiliaryGasPrice,
+        gasLimit: config.auxiliaryGasLimit,
+        token: config.stPrimeContractAddress,
+        bounty: 0,
+        organisationAddress: config.auxiliaryOrganizationAddress,
+        messageBusAddress: config.auxiliaryMessageBusContractAddress
+      };
 
-    await oThis._deployCoGateway();
-    await oThis._deployGateway();
-  },
+    console.log('origin config  ', originConfig);
+    console.log('auxiliary Config   ', auxiliaryConfig);
 
-  _initVars: function() {
-    const oThis = this;
-
-    let configFileContent = JSON.parse(fs.readFileSync(oThis.configJsonFilePath, 'utf8'));
-
-    oThis.auxiliaryWeb3 = new Web3(configFileContent.auxiliaryGethRpcEndPoint);
-    oThis.originWeb3 = new Web3(configFileContent.originGethRpcEndPoint);
-  },
-
-  _deployCoGateway: async function() {
-    const oThis = this;
-
-    let configFileContent = JSON.parse(fs.readFileSync(oThis.configJsonFilePath, 'utf8'));
-
-    console.log('Deploy co-gateway contract on value chain START.');
-
-    await oThis.auxiliaryWeb3.eth.personal.unlockAccount(
-      configFileContent.auxiliaryDeployerAddress,
-      auxiliaryPassphrase
+    let MosaicGatewayDeployer = oThis.mosaic.setup.GatewayDeployer,
+      gateDeployer = new MosaicGatewayDeployer(originConfig, auxiliaryConfig);
+    let deployResult = await gateDeployer.deploy();
+    console.log(
+      ` gateway ${deployResult.gateway.receipt.contractAddress} , co-gateway ${
+        deployResult.cogateway.receipt.contractAddress
+      }`
     );
-
-    let contractName = 'CoGateway';
-    let args = [
-      configFileContent.erc20TokenContractAddress,
-      //todo change to configFileContent.stPrimeContractAddress,
-      configFileContent.auxiliaryCoreContractAddress,
-      0, //todo need to add bounty in config
-      configFileContent.auxiliaryOpsAddress //todo add organization address
-      // in setup script
-    ];
-
-    console.log('configFileContent.auxiliaryGasLimit', configFileContent.auxiliaryGasLimit);
-
-    let linkedBin = await oThis.linkMessageBus(
-      helper.getBIN(contractName),
-      MESSAGE_BUS_NAME,
-      configFileContent.auxiliaryMessageBusContractAddress
-    );
-    console.log('linked bin ', linkedBin);
-    let auxiliaryCoGatewayContractDeployResponse = await new DeployContract({
-      web3: oThis.auxiliaryWeb3,
-      contractName: contractName,
-      deployerAddress: configFileContent.auxiliaryDeployerAddress,
-      gasPrice: '0x0',
-      gas: configFileContent.auxiliaryGasLimit,
-      abi: helper.getABI(contractName),
-      bin: linkedBin,
-      args: args
-    }).deploy();
-
-    console.log('auxiliaryCoGatewayContractDeployResponse:', auxiliaryCoGatewayContractDeployResponse);
-
-    let gatewayContract = auxiliaryCoGatewayContractDeployResponse.instance;
-
-    oThis.coGatewayContractAddress = auxiliaryCoGatewayContractDeployResponse.receipt.contractAddress;
-    oThis._addConfig({ coGatewayContractAddress: oThis.coGatewayContractAddress });
-
-    return gatewayContract;
-  },
-
-  _deployGateway: async function() {
-    const oThis = this;
-
-    let configFileContent = JSON.parse(fs.readFileSync(oThis.configJsonFilePath, 'utf8'));
-
-    console.log('Deploy gateway contract on value chain START.');
-
-    await oThis.originWeb3.eth.personal.unlockAccount(configFileContent.originDeployerAddress, originPassphrase);
-
-    let contractName = 'Gateway';
-    let linkedBin = await oThis.linkMessageBus(
-      helper.getBIN(contractName),
-      MESSAGE_BUS_NAME,
-      configFileContent.auxiliaryMessageBusContractAddress
-    );
-
-    let originGatewayContractDeployResponse = await new DeployContract({
-      web3: oThis.originWeb3,
-      contractName: contractName,
-      deployerAddress: configFileContent.originDeployerAddress,
-      gasPrice: '0x0',
-      gas: configFileContent.originGasLimit,
-      abi: helper.getABI(contractName),
-      bin: linkedBin,
-      args: [
-        configFileContent.erc20TokenContractAddress,
-        configFileContent.coGatewayContractAddress,
-        configFileContent.originCoreContractAddress,
-        0, //todo need to add bounty in config
-        configFileContent.originOpsAddress //todo add organization address
-        // in setup script
-      ]
-    }).deploy();
-
-    console.log('originGatewayContractDeployResponse:', originGatewayContractDeployResponse);
-
-    let gatewayContract = originGatewayContractDeployResponse.instance;
-
-    oThis.gatewayContractAddress = originGatewayContractDeployResponse.receipt.contractAddress;
-    oThis._addConfig({ gatewayContractAddress: oThis.gatewayContractAddress });
-
-    return gatewayContract;
-  },
-
-  linkMessageBus: async function(bin, libraryName, libAddress) {
-    const oThis = this;
-
-    let linkOptions = {};
-    linkOptions[libraryName] = libAddress;
-
-    return linker.linkBytecode(bin, linkOptions);
   },
 
   _addConfig: function(params) {
