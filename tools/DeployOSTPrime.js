@@ -27,7 +27,7 @@ DeployOSTPrime.prototype = {
 
     await auxiliaryWeb3.eth.personal.unlockAccount(configFileContent.auxiliaryDeployerAddress, auxiliaryPassphrase);
 
-    let contractName = 'STPrime',
+    let contractName = 'OSTPrime',
       args = [configFileContent.erc20TokenContractAddress, 1, 0];
 
     let stPrimeDeployResponse = await new DeployContract({
