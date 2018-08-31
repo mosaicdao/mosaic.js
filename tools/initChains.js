@@ -1,5 +1,11 @@
 'use strict';
 
+const shell = require('shelljs'),
+  BigNumber = require('bignumber.js'),
+  fs = require('fs'),
+  path = require('path'),
+  program = require('commander');
+
 const OSTPrimeDeployer = require('./OSTPrimeDeployer.js'),
   InitCore = require('./InitCore.js'),
   GatewayDeployer = require('./GatewayDeployer'),
@@ -7,9 +13,7 @@ const OSTPrimeDeployer = require('./OSTPrimeDeployer.js'),
 
 const InitChains = function(params) {
   const oThis = this;
-
-  oThis.setupRoot = params.setupRoot;
-  // TODO - this setup root should be passed to every file.
+  Object.assign(oThis, params);
 };
 
 InitChains.prototype = {
@@ -17,35 +21,71 @@ InitChains.prototype = {
     const oThis = this;
 
     // deploy the core contracts on both the chains
+    console.log('\n* Deploying core contracts on both the chains');
     await oThis._initCore();
+    process.exit(0);
 
+    console.log('\n* Deploying OSTPrime Contract');
     await oThis._deployOSTPrimeContract();
 
+    console.log('\n* Deploying Message Bus Library');
     await oThis._messageBusLibrary();
 
+    console.log('\n* Deploying Gateways');
     await oThis._deployGateway();
 
-    console.log('Env init DONE!');
+    console.log('Auxiliary chain setup is complete');
+    console.log('Output config file path:', oThis.configOutputPath);
+    process.exit(0);
   },
 
   _initCore: function() {
-    return new InitCore().perform();
+    const oThis = this;
+    console.log('oThis.config', oThis.config, '\n-----------');
+    return new InitCore(oThis.config, oThis.configOutputPath).perform();
   },
   _deployGateway: function() {
-    return new GatewayDeployer().deploy();
+    const oThis = this;
+    return new GatewayDeployer(oThis.config, oThis.configOutputPath).deploy();
   },
 
   _deployOSTPrimeContract: function() {
-    return new OSTPrimeDeployer().perform();
+    const oThis = this;
+    return new OSTPrimeDeployer(oThis.config, oThis.configOutputPath).perform();
   },
 
   _messageBusLibrary: function() {
-    return new MessageBusDeployer().perform();
+    const oThis = this;
+    return new MessageBusDeployer(oThis.config, oThis.configOutputPath).perform();
   }
 };
 
-// commander
-const os = require('os');
-new InitChains({
-  setupRoot: os.homedir() + '/mosaic-setup' // later to come as argument for this script
-}).perform();
+(function() {
+  program
+    .version('0.1.0')
+    .usage('<path_to_auxiliary_chain_config>')
+    .parse(process.argv);
+
+  let configPath = program.args[0];
+  let config;
+
+  try {
+    if (!configPath) {
+      throw 'Please provide path to chain setup config JSON file.';
+    }
+    configPath = path.resolve(configPath);
+
+    let fileStats = fs.statSync(configPath);
+    if (!fileStats.isFile()) {
+      throw 'Invalid config file path.';
+    }
+    config = require(configPath);
+  } catch (e) {
+    console.log(e.message);
+  }
+
+  new InitChains({
+    config: config,
+    configOutputPath: configPath
+  }).perform();
+})();

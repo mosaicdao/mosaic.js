@@ -472,12 +472,12 @@ InitDevEnv.prototype = {
 
   setupRoot = path.resolve(setupRoot, './mosaic-setup');
 
-  (global.originGethFolder = path.resolve(setupRoot, './' + setUpConfig.origin.gethFolder)),
-    (global.auxiliaryGethFolder = path.resolve(setupRoot, './' + setUpConfig.auxiliary.gethFolder)),
-    (global.originPassphrase = 'testtest'),
-    (global.auxiliaryPassphrase = 'testtest'),
-    (global.originPasswordFilePath = path.resolve(originGethFolder, './pwd')),
-    (global.auxiliaryPasswordFilePath = path.resolve(auxiliaryGethFolder, './pwd'));
+  global.originGethFolder = path.resolve(setupRoot, './' + setUpConfig.origin.gethFolder);
+  global.auxiliaryGethFolder = path.resolve(setupRoot, './' + setUpConfig.auxiliary.gethFolder);
+  global.originPassphrase = 'testtest';
+  global.auxiliaryPassphrase = 'testtest';
+  global.originPasswordFilePath = path.resolve(originGethFolder, './pwd');
+  global.auxiliaryPasswordFilePath = path.resolve(auxiliaryGethFolder, './pwd');
 
   console.log('Setup datadir', setupRoot);
   console.log('originGethFolder', originGethFolder);

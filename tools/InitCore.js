@@ -11,13 +11,15 @@ const deployContract = require('../utils/deployContract'),
 const originPassphrase = 'testtest',
   auxiliaryPassphrase = 'testtest';
 
-const InitCore = function() {
+const InitCore = function(config, configOutputPath) {
   const oThis = this;
 
+  oThis.config = config;
   oThis.originWorkerContractAddress = null;
   oThis.auxiliaryWorkerContractAddress = null;
 
-  oThis.configJsonFilePath = os.homedir() + '/mosaic-setup' + '/config.json';
+  oThis.configJsonFilePath = configOutputPath;
+  console.log('config', oThis.config);
 };
 
 InitCore.prototype = {
@@ -34,12 +36,12 @@ InitCore.prototype = {
 
     let originCoreContract = await oThis._deployCoreOnOrigin();
 
-    let configFileContent = JSON.parse(fs.readFileSync(oThis.configJsonFilePath, 'utf8'));
+    let config = oThis.config;
 
     await oThis._setCoCoreAddress(
       auxiliaryCoreContract.instance,
       originCoreContract.receipt.contractAddress,
-      configFileContent.auxiliaryOpsAddress,
+      config.auxiliaryOpsAddress,
       oThis.auxiliaryWeb3,
       originPassphrase
     );
@@ -47,7 +49,7 @@ InitCore.prototype = {
     await oThis._setCoCoreAddress(
       originCoreContract.instance,
       auxiliaryCoreContract.receipt.contractAddress,
-      configFileContent.originOpsAddress,
+      config.originOpsAddress,
       oThis.originWeb3,
       auxiliaryPassphrase
     );
@@ -56,16 +58,17 @@ InitCore.prototype = {
   _initVars: function() {
     const oThis = this;
 
-    let configFileContent = JSON.parse(fs.readFileSync(oThis.configJsonFilePath, 'utf8'));
+    let config = oThis.config;
+    console.log('config', config);
 
-    oThis.auxiliaryWeb3 = new Web3(configFileContent.auxiliaryGethRpcEndPoint);
-    oThis.originWeb3 = new Web3(configFileContent.originGethRpcEndPoint);
+    oThis.auxiliaryWeb3 = new Web3(config.auxiliaryGethRpcEndPoint);
+    oThis.originWeb3 = new Web3(config.originGethRpcEndPoint);
   },
 
   _deployWorkerOnAuxiliary: async function() {
     const oThis = this;
 
-    let configFileContent = JSON.parse(fs.readFileSync(oThis.configJsonFilePath, 'utf8'));
+    let configFileContent = oThis.config;
 
     console.log('Deploy worker contract on auxiliary chain START.');
 
@@ -132,7 +135,7 @@ InitCore.prototype = {
   _deployCoreOnAuxiliary: async function() {
     const oThis = this;
 
-    let configFileContent = JSON.parse(fs.readFileSync(oThis.configJsonFilePath, 'utf8'));
+    let configFileContent = oThis.config;
 
     // getting the latest block information from auxiliary GETH
     let latestBlock = await oThis.auxiliaryWeb3.eth.getBlock('latest');
@@ -182,7 +185,7 @@ InitCore.prototype = {
   _deployWorkerOnOrigin: async function() {
     const oThis = this;
 
-    let configFileContent = JSON.parse(fs.readFileSync(oThis.configJsonFilePath, 'utf8'));
+    let configFileContent = oThis.config;
 
     console.log('Deploy worker contract on origin chain START.');
 
@@ -244,7 +247,7 @@ InitCore.prototype = {
   _deployCoreOnOrigin: async function() {
     const oThis = this;
 
-    let configFileContent = JSON.parse(fs.readFileSync(oThis.configJsonFilePath, 'utf8'));
+    let configFileContent = oThis.config;
 
     // getting the latest block information from origin GETH
     let latestBlock = await oThis.originWeb3.eth.getBlock('latest');
@@ -303,13 +306,13 @@ InitCore.prototype = {
   _addConfig: function(params) {
     const oThis = this;
 
-    let fileContent = JSON.parse(fs.readFileSync(oThis.configJsonFilePath, 'utf8'));
+    let config = oThis.config;
 
     for (var i in params) {
-      fileContent[i] = params[i];
+      config[i] = params[i];
     }
 
-    oThis._executeInShell("echo '" + JSON.stringify(fileContent) + "' > " + oThis.configJsonFilePath);
+    oThis._executeInShell("echo '" + JSON.stringify(config, null, 2) + "' > " + oThis.configJsonFilePath);
   },
 
   _executeInShell: function(cmd) {
