@@ -422,26 +422,26 @@
       "type": "event"
     },
     {
-      "constant": true,
-      "inputs": [],
-      "name": "getMessageStatus",
-      "outputs": [
+      "anonymous": false,
+      "inputs": [
         {
-          "name": "",
-          "type": "uint8"
+          "indexed": false,
+          "name": "blockHeight",
+          "type": "uint256"
         },
         {
-          "name": "",
-          "type": "uint8"
+          "indexed": false,
+          "name": "storageRoot",
+          "type": "bytes32"
         },
         {
-          "name": "",
+          "indexed": false,
+          "name": "wasAlreadyProved",
           "type": "bool"
         }
       ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
+      "name": "GatewayProven",
+      "type": "event"
     },
     {
       "constant": false,
@@ -802,6 +802,33 @@
         {
           "name": "rewardAmount_",
           "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_blockHeight",
+          "type": "uint256"
+        },
+        {
+          "name": "_rlpEncodedAccount",
+          "type": "bytes"
+        },
+        {
+          "name": "_rlpParentNodes",
+          "type": "bytes"
+        }
+      ],
+      "name": "proveGateway",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
         }
       ],
       "payable": false,
