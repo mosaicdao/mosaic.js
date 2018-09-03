@@ -27,36 +27,33 @@ const GatewayDeployer = function(config, configOutputPath) {
   };
 
   oThis.mosaic = new Mosaic('', mosaicConfig);
+  //oThis.setSigner();
 };
 
 GatewayDeployer.prototype = {
+  setSigner: function() {
+    //We will use the geth Signer here.
+    let oThis = this,
+      mosaic = oThis.mosaic,
+      config = oThis.config;
+
+    let originGethSigner = new mosaic.utils.GethSignerService(mosaic.origin());
+    originGethSigner.addAccount(config.originDeployerAddress, originPassphrase);
+
+    mosaic.signers.setOriginSignerService(originGethSigner);
+
+    let auxiliaryGethSigner = new mosaic.utils.GethSignerService(mosaic.core(config.originCoreContractAddress));
+    auxiliaryGethSigner.addAccount(config.auxiliaryDeployerAddress, auxiliaryPassphrase);
+
+    mosaic.signers.setAuxiliarySignerService(auxiliaryGethSigner, config.originCoreContractAddress);
+  },
   deploy: async function() {
     const oThis = this;
     let config = oThis.config;
 
-    let originConfig = {
-        coreAddress: config.originCoreContractAddress,
-        deployerAddress: config.originDeployerAddress,
-        deployerPassPhrase: originPassphrase,
-        gasPrice: config.originGasPrice,
-        gasLimit: config.originGasLimit,
-        token: config.erc20TokenContractAddress,
-        bounty: 0,
-        organisationAddress: config.originOrganizationAddress,
-        messageBusAddress: config.originMessageBusContractAddress
-      },
+    let originConfig = this._originConfig(config),
       //auxiliary
-      auxiliaryConfig = {
-        coreAddress: config.auxiliaryCoreContractAddress,
-        deployerAddress: config.auxiliaryDeployerAddress,
-        deployerPassPhrase: auxiliaryPassphrase,
-        gasPrice: config.auxiliaryGasPrice,
-        gasLimit: config.auxiliaryGasLimit,
-        token: config.stPrimeContractAddress,
-        bounty: 0,
-        organisationAddress: config.auxiliaryOrganizationAddress,
-        messageBusAddress: config.auxiliaryMessageBusContractAddress
-      };
+      auxiliaryConfig = this._auxiliaryConfig(config);
 
     let deployResult = await oThis.mosaic.setup.deployGateway(originConfig, auxiliaryConfig);
     let gatewayAddress = deployResult.gateway.receipt.contractAddress;
@@ -85,6 +82,33 @@ GatewayDeployer.prototype = {
     }
 
     return res;
+  },
+
+  _originConfig: function(config) {
+    return {
+      coreAddress: config.originCoreContractAddress,
+      deployerAddress: config.originDeployerAddress,
+      deployerPassPhrase: originPassphrase,
+      gasPrice: config.originGasPrice,
+      gasLimit: config.originGasLimit,
+      token: config.erc20TokenContractAddress,
+      bounty: 0,
+      organisationAddress: config.originOrganizationAddress,
+      messageBusAddress: config.originMessageBusContractAddress
+    };
+  },
+  _auxiliaryConfig: function(config) {
+    return {
+      coreAddress: config.auxiliaryCoreContractAddress,
+      deployerAddress: config.auxiliaryDeployerAddress,
+      deployerPassPhrase: auxiliaryPassphrase,
+      gasPrice: config.auxiliaryGasPrice,
+      gasLimit: config.auxiliaryGasLimit,
+      token: config.stPrimeContractAddress,
+      bounty: 0,
+      organisationAddress: config.auxiliaryOrganizationAddress,
+      messageBusAddress: config.auxiliaryMessageBusContractAddress
+    };
   }
 };
 
