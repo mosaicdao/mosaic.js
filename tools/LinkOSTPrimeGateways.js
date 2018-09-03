@@ -63,8 +63,8 @@ LinkOSTPrimeGateways.prototype = {
         coGatewayAddress: configs.coGatewayAddress
       },
       token: {
-        name: 'SimpleTokenPrime',
-        symbol: 'STP',
+        name: 'Mock Token',
+        symbol: 'MOCK',
         decimal: 18
       }
     };
