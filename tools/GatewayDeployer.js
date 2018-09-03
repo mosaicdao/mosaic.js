@@ -91,7 +91,7 @@ GatewayDeployer.prototype = {
       deployerPassPhrase: originPassphrase,
       gasPrice: config.originGasPrice,
       gasLimit: config.originGasLimit,
-      token: config.erc20TokenContractAddress,
+      token: config.originERC20TokenContractAddress,
       bounty: 0,
       organisationAddress: config.originOrganizationAddress,
       messageBusAddress: config.originMessageBusContractAddress
@@ -104,7 +104,7 @@ GatewayDeployer.prototype = {
       deployerPassPhrase: auxiliaryPassphrase,
       gasPrice: config.auxiliaryGasPrice,
       gasLimit: config.auxiliaryGasLimit,
-      token: config.stPrimeContractAddress,
+      token: config.auxiliaryERC20TokenContractAddress,
       bounty: 0,
       organisationAddress: config.auxiliaryOrganizationAddress,
       messageBusAddress: config.auxiliaryMessageBusContractAddress

@@ -23,7 +23,7 @@ ERC20TokenDeployer.prototype = {
   deployERC20TokenOnOrigin: async function() {
     const oThis = this;
 
-    console.log('Deploy ERC20Token contract on origin chain START.');
+    console.log('Deploy ERC20Token contract on chain START.');
 
     await oThis.web3Provider.eth.personal.unlockAccount(oThis.deployerAddress, oThis.deployerPassphrase);
     let contractName = 'MockToken',

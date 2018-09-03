@@ -70,13 +70,16 @@ InitDevEnv.prototype = {
     // Deploy ERC20 Token contract
     let contractDeploymentResponse = await oThis._deployERC20Token();
 
-    let erc20TokenContractAddress = contractDeploymentResponse.receipt.contractAddress;
+    let originERC20TokenContractAddress = contractDeploymentResponse.originERC20.receipt.contractAddress,
+      auxiliaryERC20TokenContractAddress = contractDeploymentResponse.auxiliaryERC20.receipt.contractAddress;
+    console.log('ERC 20  ', originERC20TokenContractAddress, '  ', auxiliaryERC20TokenContractAddress);
     oThis._addConfig({
-      erc20TokenContractAddress: erc20TokenContractAddress
+      originERC20TokenContractAddress: originERC20TokenContractAddress,
+      auxiliaryERC20TokenContractAddress: auxiliaryERC20TokenContractAddress
     });
 
     await oThis._fundERC20Token(
-      contractDeploymentResponse,
+      contractDeploymentResponse.originERC20,
       new BigNumber(1000000).mul(etherToWeiCinversion).toString(10)
     );
 
@@ -306,29 +309,40 @@ InitDevEnv.prototype = {
     }
   },
 
-  _deployERC20Token: function() {
+  _deployERC20Token: async function() {
     const oThis = this;
 
     let configFileContent = JSON.parse(fs.readFileSync(oThis.configJsonFilePath, 'utf8'));
 
-    let deployerAddress = configFileContent.originDeployerAddress,
-      web3Provider = new Web3(oThis._originRpc());
+    let originDeployerAddress = configFileContent.originDeployerAddress,
+      auxiliaryDeployerAddress = configFileContent.auxiliaryDeployerAddress,
+      originWeb3Provider = new Web3(oThis._originRpc()),
+      auxiliaryWeb3Provider = new Web3(oThis._auxiliaryRpc());
 
     let ERC20TokenDeployer = require('./ERC20TokenDeployer');
 
     console.log('* Deploying ERC20 Token');
-    return new ERC20TokenDeployer({
-      web3Provider: web3Provider,
-      deployerAddress: deployerAddress,
+    let originERC20 = new ERC20TokenDeployer({
+      web3Provider: originWeb3Provider,
+      deployerAddress: originDeployerAddress,
       deployerPassphrase: originPassphrase,
       gasPrice: setUpConfig.origin.gasprice,
       gasLimit: setUpConfig.origin.gasLimit
-    })
-      .perform()
-      .then(function(response) {
-        console.log('----- ERC20 Token has been deployed');
-        return response;
-      });
+    });
+
+    originERC20 = await originERC20.perform();
+
+    let auxiliaryERC20 = new ERC20TokenDeployer({
+      web3Provider: auxiliaryWeb3Provider,
+      deployerAddress: auxiliaryDeployerAddress,
+      deployerPassphrase: auxiliaryPassphrase,
+      gasPrice: 0,
+      gasLimit: setUpConfig.auxiliary.gasLimit
+    });
+
+    auxiliaryERC20 = await auxiliaryERC20.perform();
+
+    return { originERC20: originERC20, auxiliaryERC20: auxiliaryERC20 };
   },
 
   _fundERC20Token: function(contractDeploymentResponse, amount) {

@@ -21,12 +21,12 @@ InitChains.prototype = {
   perform: async function() {
     const oThis = this;
 
-    // deploy the core contracts on both the chains
+    //deploy the core contracts on both the chains
     console.log('\n* Deploying core contracts on both the chains');
     await oThis._initCore();
 
     console.log('\n* Deploying OSTPrime Contract');
-    await oThis._deployOSTPrimeContract();
+    // await oThis._deployOSTPrimeContract();
 
     console.log('\n* Deploying Message Bus Library');
     await oThis._messageBusLibrary();
@@ -35,7 +35,7 @@ InitChains.prototype = {
     await oThis._deployGateway();
 
     console.log('\n* Linking Gateways for OSTPrime');
-    await oThis._linkOSTPrimeGateways();
+    //await oThis._linkOSTPrimeGateways();
 
     console.log('Auxiliary chain setup is complete');
     console.log('Output config file path:', oThis.configOutputPath);
