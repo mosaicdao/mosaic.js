@@ -2,6 +2,9 @@
 const fs = require('fs'),
   Mosaic = require('../index');
 
+const ORIGIN_ORGANISATION_PASSPHRASE = 'testtest';
+const AUXILIARY_ORGANISATION_PASSPHRASE = 'testtest';
+
 const LinkOSTPrimeGateways = function(config, configOutputPath) {
   const oThis = this;
   oThis.config = config;
@@ -42,7 +45,7 @@ LinkOSTPrimeGateways.prototype = {
       origin: {
         organization: {
           address: configs.originOrganizationAddress,
-          passPhrase: configs.originOrganizationPassphrase
+          passPhrase: ORIGIN_ORGANISATION_PASSPHRASE
         },
         chainDataPath: configs.originChainDataPath,
         coreContractAddress: configs.originCoreContractAddress,
@@ -52,7 +55,7 @@ LinkOSTPrimeGateways.prototype = {
       auxiliary: {
         organization: {
           address: configs.auxiliaryOrganizationAddress,
-          passPhrase: configs.auxiliaryOrganizationPassphrase
+          passPhrase: AUXILIARY_ORGANISATION_PASSPHRASE
         },
         chainDataPath: configs.auxiliaryChainDataPath,
         coreContractAddress: configs.auxiliaryCoreContractAddress,
