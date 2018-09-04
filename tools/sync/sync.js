@@ -35,6 +35,8 @@ function SyncKlass(sourceConfig, destinationConfig) {
 
   oThis.source = oThis._formatPath(sourceConfig);
   oThis.destination = oThis._formatPath(destinationConfig);
+
+  console.log(this.destination);
 }
 
 SyncKlass.prototype = {
@@ -58,6 +60,7 @@ SyncKlass.prototype = {
     let oThis = this;
 
     oThis.rsync = new Rsync();
+    oThis.rsync.exclude(['LOG', 'LOG.old']);
     oThis.rsync
       .flags(defaultFlag)
       .source(oThis.source)

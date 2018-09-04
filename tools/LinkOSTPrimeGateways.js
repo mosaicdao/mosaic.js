@@ -60,7 +60,8 @@ LinkOSTPrimeGateways.prototype = {
         chainDataPath: configs.auxiliaryChainDataPath,
         coreContractAddress: configs.auxiliaryCoreContractAddress,
         outboxPositionIndex: configs.auxiliaryOutboxPositionIndex,
-        coGatewayAddress: configs.coGatewayAddress
+        coGatewayAddress: configs.coGatewayAddress,
+        workerAddress: configs.auxiliaryWorkerAddress
       },
       token: {
         name: 'Mock Token',
