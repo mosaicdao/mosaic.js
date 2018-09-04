@@ -13,33 +13,24 @@ const GatewayDeployer = function(config, configOutputPath) {
   oThis.configJsonFilePath = configOutputPath;
   oThis.config = config;
 
-  let mosaicConfig = oThis._mosaicConfig();
+  let mosaicConfig = {
+    origin: {
+      provider: oThis.config.originGethRpcEndPoint
+    },
+    auxiliaries: [
+      {
+        provider: oThis.config.auxiliaryGethRpcEndPoint,
+        originCoreContractAddress: oThis.config.originCoreContractAddress
+      }
+    ]
+  };
 
   oThis.mosaic = new Mosaic('', mosaicConfig);
-  oThis._setSigner();
+  oThis.setSigner();
 };
 
 GatewayDeployer.prototype = {
-  deploy: async function() {
-    const oThis = this;
-    let config = oThis.config;
-
-    let originConfig = this._originConfig(config),
-      auxiliaryConfig = this._auxiliaryConfig(config);
-
-    let deployResult = await oThis.mosaic.setup.deployGateway(originConfig, auxiliaryConfig),
-      gatewayAddress = deployResult.gateway.receipt.contractAddress,
-      coGatewayAddress = deployResult.cogateway.receipt.contractAddress;
-
-    oThis._addConfig({
-      gatewayAddress: gatewayAddress,
-      coGatewayAddress: coGatewayAddress
-    });
-
-    console.log(` gateway ${gatewayAddress} , co-gateway ${coGatewayAddress}`);
-  },
-
-  _setSigner: function() {
+  setSigner: function() {
     //We will use the geth Signer here.
     let oThis = this,
       mosaic = oThis.mosaic,
@@ -54,6 +45,23 @@ GatewayDeployer.prototype = {
     auxiliaryGethSigner.addAccount(config.auxiliaryDeployerAddress, auxiliaryPassphrase);
 
     mosaic.signers.setAuxiliarySignerService(auxiliaryGethSigner, config.originCoreContractAddress);
+  },
+  deploy: async function() {
+    const oThis = this;
+    let config = oThis.config;
+
+    let originConfig = this._originConfig(config),
+      //auxiliary
+      auxiliaryConfig = this._auxiliaryConfig(config);
+
+    let deployResult = await oThis.mosaic.setup.deployGateway(originConfig, auxiliaryConfig);
+    let gatewayAddress = deployResult.gateway.receipt.contractAddress;
+    let coGatewayAddress = deployResult.cogateway.receipt.contractAddress;
+    console.log(` gateway ${gatewayAddress} , co-gateway ${coGatewayAddress}`);
+    oThis._addConfig({
+      gatewayAddress: gatewayAddress,
+      coGatewayAddress: coGatewayAddress
+    });
   },
 
   _addConfig: function(params) {
@@ -88,7 +96,6 @@ GatewayDeployer.prototype = {
       messageBusAddress: config.originMessageBusContractAddress
     };
   },
-
   _auxiliaryConfig: function(config) {
     return {
       coreAddress: config.auxiliaryCoreContractAddress,
@@ -102,20 +109,7 @@ GatewayDeployer.prototype = {
       messageBusAddress: config.auxiliaryMessageBusContractAddress
     };
   },
-
-  _mosaicConfig: function() {
-    return {
-      origin: {
-        provider: oThis.config.originGethRpcEndPoint
-      },
-      auxiliaries: [
-        {
-          provider: oThis.config.auxiliaryGethRpcEndPoint,
-          originCoreContractAddress: oThis.config.originCoreContractAddress
-        }
-      ]
-    };
-  }
+  _mosaicConfig: function() {}
 };
 
 module.exports = GatewayDeployer;
