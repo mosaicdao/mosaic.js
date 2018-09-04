@@ -78,7 +78,7 @@ const Signer = function(web3Provider) {
       return Promise.reject('Unknown Address', _from);
     }
 
-    if (!transactionData.gasPrice) {
+    if (!transactionData.hasOwnProperty('gasPrice')) {
       return Promise.reject('Invalid gasPrice');
     }
 

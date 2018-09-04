@@ -70,7 +70,7 @@ Game.prototype = {
       await this.core.auxiliary.commitStateRoot(originBlockNumber, originBlock.stateRoot).send(
         {
           from: this.auxiliaryWorkers.address,
-          gasPrice: 1000000,
+          gasPrice: '0x0',
           gas: 4700000
         },
         function(err, response) {
