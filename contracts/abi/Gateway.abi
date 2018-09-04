@@ -165,10 +165,6 @@
           "type": "address"
         },
         {
-          "name": "_coGateway",
-          "type": "address"
-        },
-        {
           "name": "_core",
           "type": "address"
         },
@@ -446,6 +442,10 @@
     {
       "constant": false,
       "inputs": [
+        {
+          "name": "_coGateway",
+          "type": "address"
+        },
         {
           "name": "_intentHash",
           "type": "bytes32"

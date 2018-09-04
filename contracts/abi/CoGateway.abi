@@ -189,6 +189,10 @@
         {
           "name": "_organisation",
           "type": "address"
+        },
+        {
+          "name": "_gateway",
+          "type": "address"
         }
       ],
       "payable": false,
@@ -456,10 +460,6 @@
     {
       "constant": false,
       "inputs": [
-        {
-          "name": "_gateway",
-          "type": "address"
-        },
         {
           "name": "_intentHash",
           "type": "bytes32"
