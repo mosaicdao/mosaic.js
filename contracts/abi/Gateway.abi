@@ -440,6 +440,33 @@
       "type": "event"
     },
     {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "messageHash",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "name": "gateway",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "cogateway",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "token",
+          "type": "address"
+        }
+      ],
+      "name": "GatewayLinkProcessed",
+      "type": "event"
+    },
+    {
       "constant": false,
       "inputs": [
         {
