@@ -54,13 +54,13 @@ DeployContract.prototype = {
       });
 
     // checking if the contract was deployed at all.
-    const code = await oThis.web3.eth.getCode(instance.options.address);
+    const code = await oThis.web3.eth.getCode(instance.contractAddress);
 
     if (code.length <= 2) {
       return Promise.reject('Contract deployment failed. oThis.web3.eth.getCode returned empty code.');
     }
 
-    console.log('Address  : ' + instance.options.address);
+    console.log('Address  : ' + instance.contractAddress);
     console.log('Gas used : ' + receipt.gasUsed);
 
     return Promise.resolve({

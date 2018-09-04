@@ -86,9 +86,9 @@ const Signer = function(web3Provider) {
       return Promise.reject('Invalid gas');
     }
 
-    if (!transactionData.to) {
-      return Promise.reject('Invalid to address');
-    }
+    // if (!transactionData.to) {
+    //   return Promise.reject('Invalid to address');
+    // }
 
     if (!transactionData.hasOwnProperty('value')) {
       transactionData.value = 0;
