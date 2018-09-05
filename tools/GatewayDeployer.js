@@ -13,17 +13,7 @@ const GatewayDeployer = function(config, configOutputPath) {
   oThis.configJsonFilePath = configOutputPath;
   oThis.config = config;
 
-  let mosaicConfig = {
-    origin: {
-      provider: oThis.config.originGethRpcEndPoint
-    },
-    auxiliaries: [
-      {
-        provider: oThis.config.auxiliaryGethRpcEndPoint,
-        originCoreContractAddress: oThis.config.originCoreContractAddress
-      }
-    ]
-  };
+  let mosaicConfig = oThis._mosaicConfig();
 
   oThis.mosaic = new Mosaic('', mosaicConfig);
   oThis.setSigner();
@@ -109,7 +99,21 @@ GatewayDeployer.prototype = {
       messageBusAddress: config.auxiliaryMessageBusContractAddress
     };
   },
-  _mosaicConfig: function() {}
+  _mosaicConfig: function() {
+    let oThis = this;
+
+    return {
+      origin: {
+        provider: oThis.config.originGethRpcEndPoint
+      },
+      auxiliaries: [
+        {
+          provider: oThis.config.auxiliaryGethRpcEndPoint,
+          originCoreContractAddress: oThis.config.originCoreContractAddress
+        }
+      ]
+    };
+  }
 };
 
 module.exports = GatewayDeployer;
