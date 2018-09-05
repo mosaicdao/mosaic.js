@@ -52,16 +52,13 @@ DeployContract.prototype = {
       .on('error', function(error) {
         return Promise.reject(error);
       });
-    // checking if the contract was deployed at all.
-    //console.log(receipt);
-    //todo Add check for codehash
-    // const code = await oThis.web3.eth.getCode(receipt.contractAddress);
-    // console.log("code  ",code);
-    // if (code.length <= 2) {
-    //   return Promise.reject('Contract deployment failed. oThis.web3.eth.getCode returned empty code.');
-    // }
 
-    console.log('Address  : ' + receipt.contractAddresss);
+    const code = await oThis.web3.eth.getCode(receipt.contractAddress);
+
+    if (code.length <= 2) {
+      return Promise.reject('Contract deployment failed. oThis.web3.eth.getCode returned empty code.');
+    }
+    console.log('Address  : ' + receipt.contractAddress);
     console.log('Gas used : ' + receipt.gasUsed);
 
     return Promise.resolve({
