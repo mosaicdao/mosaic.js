@@ -7,7 +7,7 @@ const originPassphrase = 'testtest',
 
 const Mosaic = require('../index');
 
-const GatewayDeployer = function(config, configOutputPath) {
+const OSTPrimeGatewayDeployer = function(config, configOutputPath) {
   const oThis = this;
 
   oThis.configJsonFilePath = configOutputPath;
@@ -19,19 +19,19 @@ const GatewayDeployer = function(config, configOutputPath) {
   oThis.setSigner();
 };
 
-GatewayDeployer.prototype = {
+OSTPrimeGatewayDeployer.prototype = {
   setSigner: function() {
     //We will use the geth Signer here.
     let oThis = this,
       mosaic = oThis.mosaic,
       config = oThis.config;
 
-    let originGethSigner = new mosaic.utils.GethSignerService(mosaic.origin());
+    let originGethSigner = new mosaic.utils.GethSignerService(config.originGethRpcEndPoint);
     originGethSigner.addAccount(config.originDeployerAddress, originPassphrase);
 
     mosaic.signers.setOriginSignerService(originGethSigner);
 
-    let auxiliaryGethSigner = new mosaic.utils.GethSignerService(mosaic.core(config.originCoreContractAddress));
+    let auxiliaryGethSigner = new mosaic.utils.GethSignerService(config.auxiliaryGethRpcEndPoint);
     auxiliaryGethSigner.addAccount(config.auxiliaryDeployerAddress, auxiliaryPassphrase);
 
     mosaic.signers.setAuxiliarySignerService(auxiliaryGethSigner, config.originCoreContractAddress);
@@ -44,9 +44,10 @@ GatewayDeployer.prototype = {
       //auxiliary
       auxiliaryConfig = this._auxiliaryConfig(config);
 
-    let deployResult = await oThis.mosaic.setup.deployGateway(originConfig, auxiliaryConfig);
-    let gatewayAddress = deployResult.gateway.receipt.contractAddress;
-    let coGatewayAddress = deployResult.cogateway.receipt.contractAddress;
+    let deployResult = await oThis.mosaic.setup.deployGateway(originConfig, auxiliaryConfig),
+      gatewayAddress = deployResult.gateway.receipt.contractAddress,
+      coGatewayAddress = deployResult.cogateway.receipt.contractAddress;
+
     console.log(` gateway ${gatewayAddress} , co-gateway ${coGatewayAddress}`);
     oThis._addConfig({
       gatewayAddress: gatewayAddress,
@@ -116,4 +117,4 @@ GatewayDeployer.prototype = {
   }
 };
 
-module.exports = GatewayDeployer;
+module.exports = OSTPrimeGatewayDeployer;

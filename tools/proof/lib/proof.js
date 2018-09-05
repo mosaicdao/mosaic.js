@@ -20,8 +20,8 @@ Proof.prototype = {
         let parentNodes = rootToLeafPath.map((node) => node.raw),
           proof = {
             address: address,
-            parentNodes: ethUtils.rlp.encode(parentNodes).toString('hex'),
-            value: accountNode.value.toString('hex')
+            parentNodes: '0x' + ethUtils.rlp.encode(parentNodes).toString('hex'),
+            value: '0x' + accountNode.value.toString('hex')
           };
         return resolve(proof);
       });
@@ -42,8 +42,8 @@ Proof.prototype = {
         }
         let parentNodes = rootToLeafPath.map((node) => node.raw),
           proof = {
-            parentNodes: ethUtils.rlp.encode(parentNodes).toString('hex'),
-            value: storageNode.value.toString('hex')
+            parentNodes: '0x' + ethUtils.rlp.encode(parentNodes).toString('hex'),
+            value: '0x' + storageNode.value.toString('hex')
           };
         return resolve(proof);
       });

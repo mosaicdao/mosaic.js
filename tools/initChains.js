@@ -8,9 +8,9 @@ const shell = require('shelljs'),
 
 const OSTPrimeDeployer = require('./OSTPrimeDeployer.js'),
   InitCore = require('./InitCore.js'),
-  GatewayDeployer = require('./GatewayDeployer'),
+  GatewayDeployer = require('./OSTPrimeGatewayDeployer'),
   MessageBusDeployer = require('./MessageBusDeployer'),
-  LinkOSTPrimeGateways = require('./LinkOSTPrimeGateways');
+  LinkOSTPrimeGateways = require('./OSTPrimeGatewaysLinker');
 
 const InitChains = function(params) {
   const oThis = this;
@@ -25,8 +25,8 @@ InitChains.prototype = {
     console.log('\n* Deploying core contracts on both the chains');
     await oThis._initCore();
 
-    console.log('\n* Deploying OSTPrime Contract');
-    // await oThis._deployOSTPrimeContract();
+    //console.log('\n* Deploying OSTPrime Contract');
+    //await oThis._deployOSTPrimeContract();
 
     console.log('\n* Deploying Message Bus Library');
     await oThis._messageBusLibrary();

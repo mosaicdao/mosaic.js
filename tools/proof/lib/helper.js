@@ -50,7 +50,7 @@ ProofHelperKlass.prototype = {
     let accountProofInstance = new AccountProof(stateRoot, db),
       accountProof = await accountProofInstance.perform(contractAddress),
       accountValue = accountProof.value, //;accountProof.toHash().data.value
-      decodedValue = ethUtils.rlp.decode('0x' + accountValue);
+      decodedValue = ethUtils.rlp.decode(accountValue);
 
     console.log('rlp encoded account  value  ', accountValue);
     return '0x' + decodedValue[2].toString('hex');

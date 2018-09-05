@@ -5,7 +5,7 @@ const fs = require('fs'),
 const ORIGIN_ORGANISATION_PASSPHRASE = 'testtest';
 const AUXILIARY_ORGANISATION_PASSPHRASE = 'testtest';
 
-const LinkOSTPrimeGateways = function(config, configOutputPath) {
+const OSTPrimeGatewaysLinker = function(config, configOutputPath) {
   const oThis = this;
   oThis.config = config;
 
@@ -14,10 +14,10 @@ const LinkOSTPrimeGateways = function(config, configOutputPath) {
   oThis.config = JSON.parse(fs.readFileSync(configOutputPath, 'utf8'));
   let mosiacConfig = oThis._getMosaicConfig(oThis.config);
   oThis.mosaic = new Mosaic('', mosiacConfig);
-  oThis._setSigner();
+  //oThis._setSigner();
 };
 
-LinkOSTPrimeGateways.prototype = {
+OSTPrimeGatewaysLinker.prototype = {
   perform: async function() {
     let oThis = this;
     let linkConfig = oThis._getLinkConfig(oThis.config);
@@ -48,7 +48,10 @@ LinkOSTPrimeGateways.prototype = {
         chainDataPath: configs.originChainDataPath,
         coreContractAddress: configs.originCoreContractAddress,
         outboxPositionIndex: configs.originOutboxPositionIndex,
-        gatewayAddress: configs.gatewayAddress
+        gatewayAddress: configs.gatewayAddress,
+        originChainDataSyncPath: configs.originChainDataSyncPath,
+        gasLimit: configs.originGasLimit,
+        gasPrice: configs.originGasPrice
       },
       auxiliary: {
         organization: {
@@ -59,7 +62,9 @@ LinkOSTPrimeGateways.prototype = {
         coreContractAddress: configs.auxiliaryCoreContractAddress,
         outboxPositionIndex: configs.auxiliaryOutboxPositionIndex,
         coGatewayAddress: configs.coGatewayAddress,
-        workerAddress: configs.auxiliaryWorkerAddress
+        workerAddress: configs.auxiliaryWorkerAddress,
+        gasLimit: configs.auxiliaryGasLimit,
+        gasPrice: '0x0' //Setup will happen with zero gas price
       },
       token: {
         name: 'Mock Token',
@@ -75,13 +80,13 @@ LinkOSTPrimeGateways.prototype = {
       config = oThis.config,
       mosaic = oThis.mosaic;
 
-    let originGethSigner = new mosaic.utils.GethSignerService(mosaic.origin());
+    let originGethSigner = new mosaic.utils.GethSignerService(config.originGethRpcEndPoint);
     originGethSigner.addAccount(config.originOrganizationAddress, ORIGIN_ORGANISATION_PASSPHRASE);
     originGethSigner.addAccount(config.originWorkerAddress, ORIGIN_ORGANISATION_PASSPHRASE);
 
     mosaic.signers.setOriginSignerService(originGethSigner);
 
-    let auxiliaryGethSigner = new mosaic.utils.GethSignerService(mosaic.core(config.originCoreContractAddress));
+    let auxiliaryGethSigner = new mosaic.utils.GethSignerService(config.auxiliaryGethRpcEndPoint);
     auxiliaryGethSigner.addAccount(config.auxiliaryOrganizationAddress, AUXILIARY_ORGANISATION_PASSPHRASE);
     auxiliaryGethSigner.addAccount(config.auxiliaryWorkerAddress, AUXILIARY_ORGANISATION_PASSPHRASE);
 
@@ -89,4 +94,4 @@ LinkOSTPrimeGateways.prototype = {
   }
 };
 
-module.exports = LinkOSTPrimeGateways;
+module.exports = OSTPrimeGatewaysLinker;

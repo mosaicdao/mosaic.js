@@ -45,6 +45,9 @@ InitDevEnv.prototype = {
     // create logs folder
     oThis._executeInShell('mkdir -p ' + oThis.setupRoot + '/logs');
 
+    // create origin geth chain data folder for rsync
+    oThis._executeInShell('mkdir -p ' + oThis.setupRoot + '/originChainData');
+
     // create config file with default content
     oThis._executeInShell('echo {} > ' + oThis.configJsonFilePath);
 
@@ -106,7 +109,8 @@ InitDevEnv.prototype = {
       originGethWsEndPoint: oThis._originWs(),
       auxiliaryGethWsEndPoint: oThis._auxiliaryWs(),
       originChainDataPath: path.resolve(originGethFolder, './geth/chaindata'),
-      auxiliaryChainDataPath: path.resolve(auxiliaryGethFolder, './geth/chaindata')
+      auxiliaryChainDataPath: path.resolve(auxiliaryGethFolder, './geth/chaindata'),
+      originChainDataSyncPath: path.resolve(originChainData)
     });
   },
 
@@ -489,6 +493,7 @@ InitDevEnv.prototype = {
 
   global.originGethFolder = path.resolve(setupRoot, './' + setUpConfig.origin.gethFolder);
   global.auxiliaryGethFolder = path.resolve(setupRoot, './' + setUpConfig.auxiliary.gethFolder);
+  global.originChainData = path.resolve(setupRoot, './originChainData');
   global.originPassphrase = 'testtest';
   global.auxiliaryPassphrase = 'testtest';
   global.originPasswordFilePath = path.resolve(originGethFolder, './pwd');
