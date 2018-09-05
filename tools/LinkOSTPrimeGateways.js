@@ -14,13 +14,14 @@ const LinkOSTPrimeGateways = function(config, configOutputPath) {
   oThis.config = JSON.parse(fs.readFileSync(configOutputPath, 'utf8'));
   let mosiacConfig = oThis._getMosaicConfig(oThis.config);
   oThis.mosaic = new Mosaic('', mosiacConfig);
+  oThis._setSigner();
 };
 
 LinkOSTPrimeGateways.prototype = {
   perform: async function() {
     let oThis = this;
     let linkConfig = oThis._getLinkConfig(oThis.config);
-    await oThis.mosaic.setup.linkGateways(linkConfig);
+    await oThis.mosaic.setup.linkGateways(linkConfig).catch((error) => console.log(error));
   },
 
   _getMosaicConfig: function(configs) {
@@ -71,15 +72,18 @@ LinkOSTPrimeGateways.prototype = {
   _setSigner: function() {
     //We will use the geth Signer here.
     let oThis = this,
-      config = oThis.config;
+      config = oThis.config,
+      mosaic = oThis.mosaic;
 
     let originGethSigner = new mosaic.utils.GethSignerService(mosaic.origin());
-    originGethSigner.addAccount(config.originDeployerAddress, originPassphrase);
+    originGethSigner.addAccount(config.originOrganizationAddress, ORIGIN_ORGANISATION_PASSPHRASE);
+    originGethSigner.addAccount(config.originWorkerAddress, ORIGIN_ORGANISATION_PASSPHRASE);
 
     mosaic.signers.setOriginSignerService(originGethSigner);
 
     let auxiliaryGethSigner = new mosaic.utils.GethSignerService(mosaic.core(config.originCoreContractAddress));
-    auxiliaryGethSigner.addAccount(config.auxiliaryDeployerAddress, auxiliaryPassphrase);
+    auxiliaryGethSigner.addAccount(config.auxiliaryOrganizationAddress, AUXILIARY_ORGANISATION_PASSPHRASE);
+    auxiliaryGethSigner.addAccount(config.auxiliaryWorkerAddress, AUXILIARY_ORGANISATION_PASSPHRASE);
 
     mosaic.signers.setAuxiliarySignerService(auxiliaryGethSigner, config.originCoreContractAddress);
   }
