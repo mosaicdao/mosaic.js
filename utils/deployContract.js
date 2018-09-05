@@ -51,6 +51,11 @@ DeployContract.prototype = {
       })
       .on('error', function(error) {
         return Promise.reject(error);
+      })
+      .then(function(deployResponse) {
+        // This then is just for debug purpose.
+        // console.log("deployResponse", deployResponse);
+        return deployResponse;
       });
 
     const code = await oThis.web3.eth.getCode(receipt.contractAddress);
