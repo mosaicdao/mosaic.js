@@ -160,6 +160,37 @@
     },
     {
       "constant": true,
+      "inputs": [
+        {
+          "name": "_amount",
+          "type": "uint256"
+        },
+        {
+          "name": "_beneficiary",
+          "type": "address"
+        },
+        {
+          "name": "_staker",
+          "type": "address"
+        },
+        {
+          "name": "_gasPrice",
+          "type": "uint256"
+        }
+      ],
+      "name": "hashStakingIntent",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "constant": true,
       "inputs": [],
       "name": "core",
       "outputs": [
@@ -433,33 +464,6 @@
         }
       ],
       "name": "GatewayLinkConfirmed",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": false,
-          "name": "messageHash",
-          "type": "bytes32"
-        },
-        {
-          "indexed": false,
-          "name": "gateway",
-          "type": "address"
-        },
-        {
-          "indexed": false,
-          "name": "cogateway",
-          "type": "address"
-        },
-        {
-          "indexed": false,
-          "name": "token",
-          "type": "address"
-        }
-      ],
-      "name": "GatewayLinkProcessed",
       "type": "event"
     },
     {

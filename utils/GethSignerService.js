@@ -7,10 +7,10 @@ const Signer = function(web3Provider) {
 
   let web3;
   if (web3Provider instanceof Web3) {
-    web3 = web3Provider;
-  } else {
-    web3 = new Web3(web3Provider);
+    web3Provider = web3Provider.currentProvider.host;
   }
+
+  web3 = new Web3(web3Provider);
 
   web3.extend({
     methods: [
