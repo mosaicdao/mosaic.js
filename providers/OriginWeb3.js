@@ -1,6 +1,6 @@
 'use strict';
 const Web3 = require('web3');
-const signerServiceBinder = require("../providers/signerServiceBinder");
+const signerServiceBinder = require('../providers/signerServiceBinder');
 
 const InstanceComposer = require('../instance_composer');
 
@@ -15,7 +15,7 @@ const OriginWeb3 = function() {
   Web3.call(oThis, provider);
 
   // Bind send method with signer.
-  oThis.bindSigner();
+  oThis.bindSignerService();
 };
 
 if (Web3.prototype) {
@@ -25,15 +25,14 @@ if (Web3.prototype) {
 }
 OriginWeb3.prototype.constructor = OriginWeb3;
 
-OriginWeb3.prototype.signerServiceInteract = function () {
+OriginWeb3.prototype.signerServiceInteract = function() {
   const oThis = this;
 
   let signers = oThis.ic().Signers();
   return signers.getOriginSignerService();
 };
 
-
-signerServiceBinder( OriginWeb3.prototype );
+signerServiceBinder(OriginWeb3.prototype);
 InstanceComposer.registerShadowableClass(OriginWeb3, 'OriginWeb3');
 
 module.exports = OriginWeb3;

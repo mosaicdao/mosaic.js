@@ -1,6 +1,6 @@
 'use strict';
 const Web3 = require('web3');
-const signerServiceBinder = require("../providers/signerServiceBinder");
+const signerServiceBinder = require('../providers/signerServiceBinder');
 
 const InstanceComposer = require('../instance_composer');
 
@@ -32,7 +32,7 @@ const AuxiliaryWeb3 = function(originCoreContractAddress) {
   oThis.coreId = originCoreContractAddress;
 
   // Bind send method with signer.
-  oThis.bindSigner();
+  oThis.bindSignerService();
 };
 
 if (Web3.prototype) {
@@ -45,15 +45,14 @@ AuxiliaryWeb3.prototype.constructor = AuxiliaryWeb3;
 
 AuxiliaryWeb3.prototype.coreId = null;
 
-AuxiliaryWeb3.prototype.signerServiceInteract = function () {
+AuxiliaryWeb3.prototype.signerServiceInteract = function() {
   const oThis = this;
 
   let signers = oThis.ic().Signers();
   return signers.getAuxiliarySignerService(oThis.coreId);
 };
 
-signerServiceBinder( AuxiliaryWeb3.prototype );
-
+signerServiceBinder(AuxiliaryWeb3.prototype);
 
 InstanceComposer.registerShadowableClass(AuxiliaryWeb3, 'AuxiliaryWeb3');
 

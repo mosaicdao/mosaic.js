@@ -7,8 +7,9 @@ module.exports = function(MosaicWeb3Prototype) {
     throw err;
   }
 
-  MosaicWeb3Prototype.bindSigner = function() {
+  MosaicWeb3Prototype.bindSignerService = function() {
     const oThis = this;
+    oThis._bindSigner();
     oThis._bindSignerToContractSend();
     oThis._bindSignerToSendTransaction();
   };
@@ -24,7 +25,7 @@ module.exports = function(MosaicWeb3Prototype) {
       .then(function(nonce) {
         txToBeSigned.nonce = nonce;
         //Lets sign the transaction
-        return signerService.sign(txToBeSigned);
+        return signerService.signTransaction(txToBeSigned, txToBeSigned.from);
       })
       .then(function(signedTxPayload) {
         if (signedTxPayload && typeof signedTxPayload === 'object') {
@@ -163,5 +164,33 @@ module.exports = function(MosaicWeb3Prototype) {
     oWeb3.eth.sendTransaction._isOst = true;
   };
 
-  //Something here.
+  MosaicWeb3Prototype._bindSigner = function() {
+    const oWeb3 = this;
+    let org_sign = oWeb3.eth.sign;
+    oWeb3.eth.sign = function(dataToSign, address, callback) {
+      let oEth = this;
+      //Check if signerService is available.
+      let signerInteract = oWeb3.signerServiceInteract();
+
+      if (!signerInteract) {
+        console.log('signerInteract not found');
+        //Lets execute the original send method.
+        return org_sign.apply(oEth, arguments);
+      }
+
+      let signerService = signerInteract.service();
+      console.log('signerService', signerService);
+
+      return signerService
+        .sign(dataToSign, address)
+        .catch(function(reason) {
+          callback && callback(reason);
+          throw reason;
+        })
+        .then(function(signedData) {
+          callback && callback(null, signedData);
+          return signedData;
+        });
+    };
+  };
 };
