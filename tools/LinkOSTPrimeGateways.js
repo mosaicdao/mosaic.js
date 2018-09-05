@@ -12,18 +12,15 @@ const LinkOSTPrimeGateways = function(config, configOutputPath) {
   //Temp Code. ToDo: Assign oThis.config & use oThis.config object instead of configFileContent.
   oThis.configJsonFilePath = configOutputPath;
   oThis.config = JSON.parse(fs.readFileSync(configOutputPath, 'utf8'));
+  let mosiacConfig = oThis._getMosaicConfig(oThis.config);
+  oThis.mosaic = new Mosaic('', mosiacConfig);
 };
 
 LinkOSTPrimeGateways.prototype = {
   perform: async function() {
     let oThis = this;
-
-    let mosiacConfig = oThis._getMosaicConfig(oThis.config);
-    let mosaic = new Mosaic('', mosiacConfig);
-
     let linkConfig = oThis._getLinkConfig(oThis.config);
-
-    await mosaic.setup.linkGateways(linkConfig);
+    await oThis.mosaic.setup.linkGateways(linkConfig);
   },
 
   _getMosaicConfig: function(configs) {
@@ -69,6 +66,22 @@ LinkOSTPrimeGateways.prototype = {
         decimal: 18
       }
     };
+  },
+
+  _setSigner: function() {
+    //We will use the geth Signer here.
+    let oThis = this,
+      config = oThis.config;
+
+    let originGethSigner = new mosaic.utils.GethSignerService(mosaic.origin());
+    originGethSigner.addAccount(config.originDeployerAddress, originPassphrase);
+
+    mosaic.signers.setOriginSignerService(originGethSigner);
+
+    let auxiliaryGethSigner = new mosaic.utils.GethSignerService(mosaic.core(config.originCoreContractAddress));
+    auxiliaryGethSigner.addAccount(config.auxiliaryDeployerAddress, auxiliaryPassphrase);
+
+    mosaic.signers.setAuxiliarySignerService(auxiliaryGethSigner, config.originCoreContractAddress);
   }
 };
 

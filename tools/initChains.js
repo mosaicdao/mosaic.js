@@ -35,7 +35,7 @@ InitChains.prototype = {
     await oThis._deployGateway();
 
     console.log('\n* Linking Gateways for OSTPrime');
-    //await oThis._linkOSTPrimeGateways();
+    await oThis._linkOSTPrimeGateways();
 
     console.log('Auxiliary chain setup is complete');
     console.log('Output config file path:', oThis.configOutputPath);
