@@ -336,7 +336,9 @@ InitDevEnv.prototype = {
 
     originERC20 = await originERC20.perform();
 
-    let auxiliaryERC20 = new ERC20TokenDeployer({
+    let UtilityTokenDeployer = require('./UtilityTokenDeployer');
+
+    let auxiliaryERC20 = new UtilityTokenDeployer({
       web3Provider: auxiliaryWeb3Provider,
       deployerAddress: auxiliaryDeployerAddress,
       deployerPassphrase: auxiliaryPassphrase,
