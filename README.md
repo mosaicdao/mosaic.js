@@ -49,3 +49,52 @@ mosaic.setup.initCore(originConfig, auxliaryConfig).then(console.log);
 // deploying message bus
 mosaic.setup.initMessageBus(originConfig, auxliaryConfig).then(console.log);
 ```
+
+###Run the sampe scripts
+Please note that this will be updated
+
+Enviornment setup on local machine
+```
+npm run init-dev-env
+npm run init-chains ./mosaic-setup/config.json 
+```
+
+
+###Stake and Mint
+
+
+```javascript
+
+
+let fs = require('fs');
+let configPath = 'mosaic-setup/config.json'
+let config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+let getMosaicConfig = function(configs) {
+    return {
+        origin: {
+            provider: configs.originGethRpcEndPoint
+        },
+        auxiliaries: [
+            {
+                provider: configs.auxiliaryGethRpcEndPoint,
+                originCoreContractAddress: configs.originCoreContractAddress
+            }
+        ]
+    };
+}
+
+let Mosaic = require('./index');
+let mosiacConfig = getMosaicConfig(config);
+let mosaic = new Mosaic('', mosiacConfig);
+
+
+let originGethSigner = new mosaic.utils.GethSignerService(mosaic.origin());
+    
+originGethSigner.addAccount(config.originDeployerAddress, 'testtest');
+originGethSigner.addAccount(config.auxiliaryWorkerAddress, 'testtest');
+mosaic.signers.setOriginSignerService(originGethSigner);
+
+
+stakeAndMint =  new mosaic.contracts.StakeAndMint(config)
+stakeAndMint.perform();
+```
