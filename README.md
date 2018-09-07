@@ -50,7 +50,7 @@ mosaic.setup.initCore(originConfig, auxliaryConfig).then(console.log);
 mosaic.setup.initMessageBus(originConfig, auxliaryConfig).then(console.log);
 ```
 
-###Run the sampe scripts
+### Run the sample scripts
 Please note that this will be updated
 
 Enviornment setup on local machine
@@ -60,7 +60,7 @@ npm run init-chains ./mosaic-setup/config.json
 ```
 
 
-###Stake and Mint
+### Stake and Mint
 
 
 ```javascript
@@ -69,22 +69,19 @@ npm run init-chains ./mosaic-setup/config.json
 let fs = require('fs');
 let configPath = 'mosaic-setup/config.json'
 let config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-let getMosaicConfig = function(configs) {
-    return {
-        origin: {
-            provider: configs.originGethRpcEndPoint
-        },
-        auxiliaries: [
-            {
-                provider: configs.auxiliaryGethRpcEndPoint,
-                originCoreContractAddress: configs.originCoreContractAddress
-            }
-        ]
-    };
-}
+let mosiacConfig = {
+            origin: {
+                provider: config.originGethRpcEndPoint
+            },
+            auxiliaries: [
+                {
+                    provider: config.auxiliaryGethRpcEndPoint,
+                    originCoreContractAddress: config.originCoreContractAddress
+                }
+            ]
+        };
 
 let Mosaic = require('./index');
-let mosiacConfig = getMosaicConfig(config);
 let mosaic = new Mosaic('', mosiacConfig);
 
 
