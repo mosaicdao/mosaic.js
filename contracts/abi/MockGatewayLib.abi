@@ -1,0 +1,1 @@
+[{"constant":true,"inputs":[{"name":"","type":"bytes"},{"name":"","type":"bytes"},{"name":"","type":"bytes"},{"name":"","type":"bytes32"}],"name":"proveAccount","outputs":[{"name":"storageRoot_","type":"bytes32"}],"payable":false,"stateMutability":"pure","type":"function"}]
