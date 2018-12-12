@@ -17,6 +17,7 @@ const sampleOriginConfig = {
 const Web3 = require('web3');
 const AbiBinProvider = require('./AbiBinProvider');
 const OrganizationHelper = require('./helpers/OrganizationHelper');
+const SafeCoreHelper = require('./helpers/SafeCoreHelper');
 
 const defaultAuxiliaryConfig = {
   organisationOwner: null
@@ -41,19 +42,22 @@ class ChainSetup {
     oThis.abiBinProvider = new AbiBinProvider();
 
     oThis.origin = {
-      organization: new OrganizationHelper(originWeb3)
+      organization: new OrganizationHelper(originWeb3),
+      safeCore: new SafeCoreHelper(originWeb3)
     };
 
     oThis.auxiliary = {
-      organization: new OrganizationHelper(auxiliaryWeb3)
+      organization: new OrganizationHelper(auxiliaryWeb3),
+      safeCore: new SafeCoreHelper(auxiliaryWeb3)
     };
   }
 
-  static OrganizationHelper(web3, address) {
-    if (typeof web3 === 'string') {
-      web3 = new Web3(web3);
-    }
-    return new OrganizationHelper(web3, address);
+  static get OrganizationHelper() {
+    return OrganizationHelper;
+  }
+
+  static get SafeCoreHelper() {
+    return SafeCoreHelper;
   }
 }
 
