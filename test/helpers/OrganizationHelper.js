@@ -11,8 +11,8 @@ const web3 = new Web3(config.gethRpcEndPoint);
 let web3WalletHelper = new Web3WalletHelper(web3);
 
 //Organisation Contract Address. TBD: Do not forget to set caOrganisation = null below.
-let caOrganisation = '0x53DaB9024abF6B24219Ee6126525735ee4E6C043';
-// let caOrganisation = null;
+// let caOrganisation = '0x53DaB9024abF6B24219Ee6126525735ee4E6C043';
+let caOrganisation = null;
 
 let validateReceipt = (receipt) => {
   assert.isNotNull(receipt, 'Transaction Receipt is null');
@@ -28,28 +28,18 @@ let validateDeploymentReceipt = (receipt) => {
   assert.isTrue(web3.utils.isAddress(contractAddress), 'Invalid contractAddress in Receipt');
   return receipt;
 };
-describe('test/chainSetup', function() {
+describe('test/helpers/OrganizationHelper', function() {
   let deployParams = {
     from: config.deployerAddress,
     gasPrice: config.gasPrice
   };
 
-  const originConfig = {
-    deployer: deployParams,
-    organization: {
-      owner: config.organizationOwner,
-      admin: config.organizationAdmin,
-      worker: config.organizationWorker
-    }
-  };
-
-  const auxConfig = {
-    deployer: deployParams,
-    organization: {
-      owner: config.organizationOwner,
-      admin: config.organizationAdmin,
-      worker: config.organizationWorker
-    }
+  const orgConfig = {
+    deployer: config.deployerAddress,
+    owner: config.organizationOwner,
+    admin: config.organizationAdmin,
+    worker: config.organizationWorker,
+    shouldCompleteOwnershipTransfer: true
   };
 
   let helper = new OrganizationHelper(web3, caOrganisation);
@@ -61,7 +51,7 @@ describe('test/chainSetup', function() {
   if (!caOrganisation) {
     it('should deploy new organization contract', function() {
       return helper
-        .deployOrganization(null, deployParams)
+        .deploy(deployParams)
         .then(validateDeploymentReceipt)
         .then((receipt) => {
           caOrganisation = receipt.contractAddress;
@@ -70,19 +60,19 @@ describe('test/chainSetup', function() {
   }
 
   //Admin Key Address
-  let kaAdmin = originConfig.organization.admin;
+  let kaAdmin = orgConfig.admin;
   it('should set admin address', function() {
     return helper.setAdmin(kaAdmin, deployParams).then(validateReceipt);
   });
 
   //Worker Key Address
-  let kaWorker = originConfig.organization.worker;
+  let kaWorker = orgConfig.worker;
   it('should set worker address', function() {
-    return helper.setWorker(kaWorker, deployParams).then(validateReceipt);
+    return helper.setWorker(kaWorker, '10000000', deployParams).then(validateReceipt);
   });
 
   //Owner Key Address
-  let kaOwner = originConfig.organization.owner;
+  let kaOwner = orgConfig.owner;
   it('should initiate Ownership Transfer', function() {
     return helper.initiateOwnershipTransfer(kaOwner, deployParams).then(validateReceipt);
   });
@@ -91,8 +81,11 @@ describe('test/chainSetup', function() {
     let ownerParams = Object.assign({}, deployParams, {
       from: kaOwner
     });
-    console.log('ownerParams', ownerParams);
     return helper.completeOwnershipTransfer(ownerParams).then(validateReceipt);
+  });
+
+  it('should do complete organization setup', function() {
+    return helper.setup(orgConfig);
   });
 });
 
