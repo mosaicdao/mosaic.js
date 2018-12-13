@@ -53,8 +53,6 @@ class OSTPrimeHelper {
     deployParams.from = config.deployer;
     deployParams.gasPrice = 0;
 
-    console.log('deployParams', deployParams);
-
     //1. Deploy the Contract
     let promiseChain = oThis.deploy(config.valueToken, deployParams);
 
