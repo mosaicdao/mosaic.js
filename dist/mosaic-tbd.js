@@ -27065,7 +27065,7 @@ function () {
         txOptions = txOptions || {};
       }
 
-      if (!txOptions.gasPrice) {
+      if (typeof txOptions.gasPrice === 'undefined') {
         txOptions.gasPrice = '0x5B9ACA00';
       }
 
@@ -67398,7 +67398,7 @@ function () {
         txOptions = txOptions || {};
       }
 
-      if (!txOptions.gasPrice) {
+      if (typeof txOptions.gasPrice === 'undefined') {
         txOptions.gasPrice = '0x5B9ACA00';
       }
 
