@@ -36,15 +36,6 @@ describe('test/helpers/SafeCore', function() {
     gasPrice: config.gasPrice
   };
 
-  const orgConfig = {
-    deployer: config.deployerAddress,
-    worker: config.organizationWorker
-  };
-  const coreConfig = {
-    deployer: config.deployerAddress,
-    organization: caOrganization
-  };
-
   let helper = new SafeCoreHelper(web3, caSafeCore);
 
   let coreChainId = '123456';
@@ -60,14 +51,14 @@ describe('test/helpers/SafeCore', function() {
         if (!caOrganization) {
           console.log('* Setting up Organization');
           let orgHelper = new OrganizationHelper(web3, caOrganization);
+          const orgConfig = {
+            deployer: config.deployerAddress,
+            worker: config.organizationWorker
+          };
           return orgHelper.setup(orgConfig).then(function() {
             caOrganization = orgHelper.address;
           });
         }
-        return _out;
-      })
-      .then(function(_out) {
-        coreConfig.organization = caOrganization;
         return _out;
       })
       .then(function(_out) {
