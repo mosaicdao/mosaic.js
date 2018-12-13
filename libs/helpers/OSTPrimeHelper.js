@@ -1,7 +1,8 @@
+'use strict';
+
 const Web3 = require('web3');
 const BN = require('bn.js');
 const AbiBinProvider = require('../../libs/AbiBinProvider');
-const OrganizationHelper = require('../../libs/helpers/OrganizationHelper');
 
 const ContractName = 'OSTPrime';
 
@@ -75,7 +76,7 @@ class OSTPrimeHelper {
     const bin = abiBinProvider.getBIN(ContractName);
 
     let defaultOptions = {
-      gas: '5000000',
+      gas: '2500000',
       gasPrice: 0
     };
 

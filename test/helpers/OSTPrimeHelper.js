@@ -1,3 +1,5 @@
+'use strict';
+
 // Load external packages
 const chai = require('chai'),
   Web3 = require('web3'),

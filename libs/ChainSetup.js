@@ -1,3 +1,5 @@
+'use strict';
+
 const sampleOriginConfig = {
   deployer: {
     address: '0x...',
