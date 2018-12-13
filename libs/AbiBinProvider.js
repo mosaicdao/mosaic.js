@@ -5,6 +5,8 @@ const fs = require('fs'),
   path = require('path');
 //__NOT_FOR_WEB__END__
 
+const Linker = require('../libs/utils/linker');
+
 class AbiBinProvider {
   constructor(abiFolderPath, binFolderPath) {
     const oThis = this;
@@ -105,20 +107,15 @@ class AbiBinProvider {
     const libs = Array.from(arguments);
     libs.shift();
     let len = libs.length;
+    let libraries = {};
     while (len--) {
       let libInfo = libs[len];
       if (typeof libInfo !== 'object' || !libInfo.name || !libInfo.address) {
         throw new Error('Invalid contract info argument at index ' + (len + 1));
       }
-
-      bin = oThis._linkBin(bin, libInfo.name, libInfo.address);
+      libraries[libInfo.name] = libInfo.address;
     }
-    return bin;
-  }
-
-  _linkBin(bytecode, libName, libAddress) {
-    let symbol = '__' + libName + '_'.repeat(40 - libName.length - 2);
-    return bytecode.split(symbol).join(libAddress.toLowerCase().substr(2));
+    return Linker.linkBytecode(bin, libraries);
   }
 
   _read(filePath) {
@@ -126,6 +123,10 @@ class AbiBinProvider {
     filePath = path.join(__dirname, '/' + filePath);
     return fs.readFileSync(filePath, 'utf8');
     //__NOT_FOR_WEB__END__
+  }
+
+  static get Linker() {
+    return Linker;
   }
 }
 
