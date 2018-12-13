@@ -22,6 +22,7 @@ const OrganizationHelper = require('./helpers/OrganizationHelper');
 const SafeCoreHelper = require('./helpers/SafeCoreHelper');
 const OSTPrimeHelper = require('./helpers/OSTPrimeHelper');
 const LibsHelper = require('./helpers/LibsHelper');
+const GatewayHelper = require('./helpers/GatewayHelper');
 
 const defaultAuxiliaryConfig = {
   organisationOwner: null
@@ -48,7 +49,8 @@ class ChainSetup {
     oThis.origin = {
       libs: new LibsHelper(originWeb3),
       organization: new OrganizationHelper(originWeb3),
-      safeCore: new SafeCoreHelper(originWeb3)
+      safeCore: new SafeCoreHelper(originWeb3),
+      gateway: new GatewayHelper(originWeb3)
     };
 
     oThis.auxiliary = {
