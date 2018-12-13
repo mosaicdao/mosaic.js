@@ -90,8 +90,8 @@ describe('test/helpers/SafeCore', function() {
   }
 
   //Set Co-Core Address.
-  let caCoCore = caSafeCore;
   it('should set co-core address', function() {
+    let caCoCore = caSafeCore;
     return helper.setCoCoreAddress(caSafeCore, deployParams).then(validateReceipt);
   });
 
