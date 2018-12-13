@@ -18,6 +18,7 @@ const Web3 = require('web3');
 const AbiBinProvider = require('./AbiBinProvider');
 const OrganizationHelper = require('./helpers/OrganizationHelper');
 const SafeCoreHelper = require('./helpers/SafeCoreHelper');
+const OSTPrimeHelper = require('./helpers/OSTPrimeHelper');
 
 const defaultAuxiliaryConfig = {
   organisationOwner: null
@@ -47,6 +48,7 @@ class ChainSetup {
     };
 
     oThis.auxiliary = {
+      ostPrimeHelper: new OSTPrimeHelper(auxiliaryWeb3),
       organization: new OrganizationHelper(auxiliaryWeb3),
       safeCore: new SafeCoreHelper(auxiliaryWeb3)
     };
@@ -58,6 +60,10 @@ class ChainSetup {
 
   static get SafeCoreHelper() {
     return SafeCoreHelper;
+  }
+
+  static get OSTPrimeHelper() {
+    return OSTPrimeHelper;
   }
 }
 

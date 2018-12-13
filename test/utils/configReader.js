@@ -7,6 +7,7 @@ const ConfigReader = function() {};
 
 ConfigReader.prototype = {
   deployerAddress: devEnvConfig.deployerAddress,
+  chainOwner: devEnvConfig.chainOwnerAddress,
   organizationOwner: devEnvConfig.organizationAddress,
   organizationAdmin: devEnvConfig.wallet1,
   organizationWorker: devEnvConfig.facilitator,
