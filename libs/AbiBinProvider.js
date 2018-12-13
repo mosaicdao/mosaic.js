@@ -85,6 +85,42 @@ class AbiBinProvider {
     //__NOT_FOR_WEB__END__
   }
 
+  //Note
+  //links is an array of
+  //Send as many libInfo as needed.
+  //libInfo format:
+  /* 
+  {
+    "name": "NAME_OF_LIB",
+    "address": "ADDRESS_OF_DEPLOYED_LIB"
+  }
+  */
+  getLinkedBIN(contractName) {
+    const oThis = this;
+    let bin = oThis.getBIN(contractName);
+    if (!bin) {
+      return bin;
+    }
+
+    const libs = Array.from(arguments);
+    libs.shift();
+    let len = libs.length;
+    while (len--) {
+      let libInfo = libs[len];
+      if (typeof libInfo !== 'object' || !libInfo.name || !libInfo.address) {
+        throw new Error('Invalid contract info argument at index ' + (len + 1));
+      }
+
+      bin = oThis._linkBin(bin, libInfo.name, libInfo.address);
+    }
+    return bin;
+  }
+
+  _linkBin(bytecode, libName, libAddress) {
+    let symbol = '__' + libName + '_'.repeat(40 - libName.length - 2);
+    return bytecode.split(symbol).join(libAddress.toLowerCase().substr(2));
+  }
+
   _read(filePath) {
     //__NOT_FOR_WEB__BEGIN__
     filePath = path.join(__dirname, '/' + filePath);
