@@ -4,7 +4,7 @@
 const chai = require('chai'),
   Web3 = require('web3'),
   OrganizationHelper = require('../../libs/helpers/OrganizationHelper'),
-  GatewayHelper = require('../../libs/helpers/GatewayHelper'),
+  CoGatewayHelper = require('../../libs/helpers/CoGatewayHelper'),
   LibsHelper = require('../../libs/helpers/LibsHelper'),
   assert = chai.assert;
 
@@ -14,8 +14,8 @@ const config = require('../../test/utils/configReader'),
 const web3 = new Web3(config.gethRpcEndPoint);
 let web3WalletHelper = new Web3WalletHelper(web3);
 
-//Contract Address. TBD: Do not forget to set caOrganization && caGateway = null below.
-let caGateway = null;
+//Contract Address. TBD: Do not forget to set caOrganization && caCoGateway = null below.
+let caCoGateway = null;
 let caOrganization = null;
 let caMessageBusAddress = null;
 let caGatewayLibAddress = null;
@@ -35,13 +35,13 @@ let validateDeploymentReceipt = (receipt) => {
   assert.isTrue(web3.utils.isAddress(contractAddress), 'Invalid contractAddress in Receipt');
   return receipt;
 };
-describe('test/helpers/GatewayHelper', function() {
+describe('test/helpers/CoGatewayHelper', function() {
   let deployParams = {
     from: config.deployerAddress,
     gasPrice: config.gasPrice
   };
 
-  let helper = new GatewayHelper(web3, caGateway);
+  let helper = new CoGatewayHelper(web3, caCoGateway);
 
   before(function() {
     //This hook could take long time.
@@ -80,12 +80,13 @@ describe('test/helpers/GatewayHelper', function() {
   });
 
   const someValidAddress = '0x2c4e8f2d746113d0696ce89b35f0d8bf88e0aeca';
-  if (!caGateway) {
+  if (!caCoGateway) {
     it('should deploy new Gateway contract', function() {
       let _token = someValidAddress;
       let _baseToken = someValidAddress;
       let _core = someValidAddress;
       let _bounty = 1000;
+      let _gateway = someValidAddress;
 
       return helper
         .deploy(
@@ -93,6 +94,7 @@ describe('test/helpers/GatewayHelper', function() {
           _baseToken,
           _core,
           _bounty,
+          _gateway,
           caOrganization,
           caMessageBusAddress,
           caGatewayLibAddress,
@@ -100,43 +102,10 @@ describe('test/helpers/GatewayHelper', function() {
         )
         .then(validateDeploymentReceipt)
         .then((receipt) => {
-          caGateway = receipt.contractAddress;
+          caCoGateway = receipt.contractAddress;
         });
     });
   }
-
-  //Set Co-Core Address.
-  it('should set activate gateway', function() {
-    let caCoGateway = caGateway;
-    //Note: Remember, deployer is still the owner of organization here.
-    return helper.activateGateway(caCoGateway, deployParams).then(validateReceipt);
-  });
-
-  //Test Setup
-  it('should setup Gateway and CoGateway', function() {
-    this.timeout(5 * 60 * 1000);
-    let gatewayConfig = {
-      deployer: config.deployerAddress,
-      organization: caOrganization,
-      organizationOwner: organizationOwner,
-      safeCore: someValidAddress,
-      bounty: '123456',
-      messageBus: caMessageBusAddress,
-      gatewayLib: caGatewayLibAddress,
-      simpleToken: someValidAddress
-    };
-
-    let coGatewayConfig = {
-      deployer: config.deployerAddress,
-      organization: caOrganization,
-      safeCore: someValidAddress,
-      bounty: '123456',
-      messageBus: caMessageBusAddress,
-      gatewayLib: caGatewayLibAddress,
-      ostPrime: someValidAddress
-    };
-    return helper.setup(gatewayConfig, coGatewayConfig, deployParams, deployParams, web3, web3);
-  });
 });
 
 // Go easy on RPC Client (Geth)
