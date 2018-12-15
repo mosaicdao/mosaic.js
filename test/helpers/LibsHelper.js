@@ -13,9 +13,9 @@ const web3 = new Web3(config.gethRpcEndPoint);
 let web3WalletHelper = new Web3WalletHelper(web3);
 
 //Organisation Contract Address. TBD: Do not forget to set addresses = null below.
-let caMerklePatriciaProofAddress = null;
-let caMessageBusAddress = null;
-let caGatewayLibAddress = null;
+let caMerklePatriciaProof = null;
+let caMessageBus = null;
+let caGatewayLib = null;
 
 let validateReceipt = (receipt) => {
   assert.isNotNull(receipt, 'Transaction Receipt is null');
@@ -37,41 +37,41 @@ describe('test/helpers/LibsHelper', function() {
     gasPrice: config.gasPrice
   };
 
-  let helper = new LibsHelper(web3, caMerklePatriciaProofAddress, caMessageBusAddress, caGatewayLibAddress);
+  let helper = new LibsHelper(web3, caMerklePatriciaProof, caMessageBus, caGatewayLib);
 
   before(function() {
     return web3WalletHelper.init(web3);
   });
 
-  if (!caMerklePatriciaProofAddress) {
+  if (!caMerklePatriciaProof) {
     it('should deploy new MerklePatriciaProof Library', function() {
       return helper
         .deployMerklePatriciaProof(deployParams)
         .then(validateDeploymentReceipt)
         .then((receipt) => {
-          caMerklePatriciaProofAddress = receipt.contractAddress;
+          caMerklePatriciaProof = receipt.contractAddress;
         });
     });
   }
 
-  if (!caMessageBusAddress) {
+  if (!caMessageBus) {
     it('should deploy new MessageBus Library', function() {
       return helper
-        .deployMessageBus(caMerklePatriciaProofAddress, deployParams)
+        .deployMessageBus(caMerklePatriciaProof, deployParams)
         .then(validateDeploymentReceipt)
         .then((receipt) => {
-          caMessageBusAddress = receipt.contractAddress;
+          caMessageBus = receipt.contractAddress;
         });
     });
   }
 
-  if (!caGatewayLibAddress) {
+  if (!caGatewayLib) {
     it('should deploy new GatewayLib Library', function() {
       return helper
-        .deployGatewayLib(caMerklePatriciaProofAddress, deployParams)
+        .deployGatewayLib(caMerklePatriciaProof, deployParams)
         .then(validateDeploymentReceipt)
         .then((receipt) => {
-          caGatewayLibAddress = receipt.contractAddress;
+          caGatewayLib = receipt.contractAddress;
         });
     });
   }
@@ -81,21 +81,21 @@ describe('test/helpers/LibsHelper', function() {
       deployer: config.deployerAddress
     };
     return helper.setup(libsHelperConfig, deployParams).then(function() {
-      caMerklePatriciaProofAddress = helper.merklePatriciaProofAddress;
-      caMessageBusAddress = helper.messageBusAddress;
-      caGatewayLibAddress = helper.gatewayLibAddress;
+      caMerklePatriciaProof = helper.merklePatriciaProof;
+      caMessageBus = helper.messageBus;
+      caGatewayLib = helper.gatewayLib;
       console.log(
         'Validating Lib Addresses:',
-        '\n\t merklePatriciaProofAddress',
-        caMerklePatriciaProofAddress,
-        '\n\t messageBusAddress',
-        caMessageBusAddress,
-        '\n\t gatewayLibAddress',
-        caGatewayLibAddress
+        '\n\t merklePatriciaProof',
+        caMerklePatriciaProof,
+        '\n\t messageBus',
+        caMessageBus,
+        '\n\t gatewayLib',
+        caGatewayLib
       );
-      assert.isTrue(Web3.utils.isAddress(caMerklePatriciaProofAddress));
-      assert.isTrue(Web3.utils.isAddress(caMessageBusAddress));
-      assert.isTrue(Web3.utils.isAddress(caGatewayLibAddress));
+      assert.isTrue(Web3.utils.isAddress(caMerklePatriciaProof));
+      assert.isTrue(Web3.utils.isAddress(caMessageBus));
+      assert.isTrue(Web3.utils.isAddress(caGatewayLib));
     });
   });
 });

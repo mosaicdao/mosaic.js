@@ -21,7 +21,7 @@ class OrganizationHelper {
     "admin": config.organizationAdmin, 
     "worker": config.organizationWorker,
     "workerExpirationHeight": 10000000, 
-    "shouldCompleteOwnershipTransfer": true
+    "completeOwnershipTransfer": true
   };
   //deployer and worker are mandetory.
 */
@@ -30,17 +30,7 @@ class OrganizationHelper {
     const oThis = this;
     web3 = web3 || oThis.web3;
 
-    if (!config) {
-      throw new Error('Mandatory parameter "config" missing. ');
-    }
-
-    if (!config.deployer) {
-      throw new Error('Mandatory configuration "deployer" missing. Set config.deployer address');
-    }
-
-    if (!config.worker) {
-      throw new Error('Mandatory configuration "worker" missing. Set config.worker address');
-    }
+    OrganizationHelper.validateSetupConfig(config);
 
     if (!txOptions) {
       txOptions = txOptions || {};
@@ -78,7 +68,7 @@ class OrganizationHelper {
     }
 
     //Claim OwnerShip
-    if (config.owner && config.shouldCompleteOwnershipTransfer) {
+    if (config.owner && config.completeOwnershipTransfer) {
       promiseChain = promiseChain.then(function() {
         let cTxOptions = Object.assign({}, deployParams);
         cTxOptions.from = config.owner;
@@ -87,6 +77,22 @@ class OrganizationHelper {
     }
 
     return promiseChain;
+  }
+
+  static validateSetupConfig(config) {
+    console.log('* Validating Organization Setup Config.');
+    if (!config) {
+      throw new Error('Mandatory parameter "config" missing. ');
+    }
+
+    if (!config.deployer) {
+      throw new Error('Mandatory configuration "deployer" missing. Set config.deployer address');
+    }
+
+    if (!config.worker) {
+      throw new Error('Mandatory configuration "worker" missing. Set config.worker address');
+    }
+    return true;
   }
 
   deploy(txOptions, web3) {

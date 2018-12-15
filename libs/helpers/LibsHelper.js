@@ -4,12 +4,12 @@ const Web3 = require('web3');
 const AbiBinProvider = require('../../libs/AbiBinProvider');
 
 class LibsHelper {
-  constructor(web3, merklePatriciaProofAddress, messageBusAddress, gatewayLibAddress) {
+  constructor(web3, merklePatriciaProof, messageBus, gatewayLib) {
     const oThis = this;
     oThis.web3 = web3;
-    oThis.merklePatriciaProofAddress = merklePatriciaProofAddress;
-    oThis.messageBusAddress = messageBusAddress;
-    oThis.gatewayLibAddress = gatewayLibAddress;
+    oThis.merklePatriciaProof = merklePatriciaProof;
+    oThis.messageBus = messageBus;
+    oThis.gatewayLib = gatewayLib;
     oThis.abiBinProvider = new AbiBinProvider();
   }
 
@@ -25,25 +25,19 @@ class LibsHelper {
     const oThis = this;
     web3 = web3 || oThis.web3;
 
-    if (!config) {
-      throw new Error('Mandatory parameter "config" missing. ');
-    }
-
-    if (!config.deployer) {
-      throw new Error('Mandatory configuration "deployer" missing. Set config.deployer address');
-    }
+    LibsHelper.validateSetupConfig(config);
 
     if (!txOptions) {
       txOptions = txOptions || {};
     }
 
     if (typeof txOptions.gasPrice === 'undefined') {
-      txOptions.gasPrice = '0x5B9ACA00';
+      txOptions.gasPrice = '0';
     }
 
     let deployParams = Object.assign({}, txOptions);
     deployParams.from = config.deployer;
-    deployParams.gasPrice = 0;
+    deployParams.gasPrice = deployParams.gasPrice || '0';
 
     //1. Deploy MerklePatriciaProof
     let promiseChain = oThis.deployMerklePatriciaProof(deployParams);
@@ -59,6 +53,18 @@ class LibsHelper {
     });
 
     return promiseChain;
+  }
+
+  static validateSetupConfig(config) {
+    console.log('* Validating Libs Setup Config.');
+    if (!config) {
+      throw new Error('Mandatory parameter "config" missing. ');
+    }
+
+    if (!config.deployer) {
+      throw new Error('Mandatory configuration "deployer" missing. Set config.deployer address');
+    }
+    return true;
   }
 
   deployMerklePatriciaProof(txOptions, web3) {
@@ -105,21 +111,21 @@ class LibsHelper {
         console.log('\t - Receipt:\n\x1b[2m', JSON.stringify(receipt), '\x1b[0m\n');
       })
       .then(function(instace) {
-        oThis.merklePatriciaProofAddress = instace.options.address;
-        console.log(`\t - ${LibName} Contract Address:`, oThis.merklePatriciaProofAddress);
+        oThis.merklePatriciaProof = instace.options.address;
+        console.log(`\t - ${LibName} Contract Address:`, oThis.merklePatriciaProof);
         return txReceipt;
       });
   }
 
-  deployMessageBus(merklePatriciaProofAddress, txOptions, web3) {
+  deployMessageBus(merklePatriciaProof, txOptions, web3) {
     const oThis = this;
     const LibName = 'MessageBus';
     web3 = web3 || oThis.web3;
 
-    merklePatriciaProofAddress = merklePatriciaProofAddress || oThis.merklePatriciaProofAddress;
+    merklePatriciaProof = merklePatriciaProof || oThis.merklePatriciaProof;
     let merklePatriciaProofInfo = {
       name: 'MerklePatriciaProof',
-      address: merklePatriciaProofAddress
+      address: merklePatriciaProof
     };
 
     const abiBinProvider = oThis.abiBinProvider;
@@ -161,21 +167,21 @@ class LibsHelper {
         console.log('\t - Receipt:\n\x1b[2m', JSON.stringify(receipt), '\x1b[0m\n');
       })
       .then(function(instace) {
-        oThis.messageBusAddress = instace.options.address;
-        console.log(`\t - ${LibName} Contract Address:`, oThis.messageBusAddress);
+        oThis.messageBus = instace.options.address;
+        console.log(`\t - ${LibName} Contract Address:`, oThis.messageBus);
         return txReceipt;
       });
   }
 
-  deployGatewayLib(merklePatriciaProofAddress, txOptions, web3) {
+  deployGatewayLib(merklePatriciaProof, txOptions, web3) {
     const oThis = this;
     web3 = web3 || oThis.web3;
     const LibName = 'GatewayLib';
 
-    merklePatriciaProofAddress = merklePatriciaProofAddress || oThis.merklePatriciaProofAddress;
+    merklePatriciaProof = merklePatriciaProof || oThis.merklePatriciaProof;
     let merklePatriciaProofInfo = {
       name: 'MerklePatriciaProof',
-      address: merklePatriciaProofAddress
+      address: merklePatriciaProof
     };
 
     const abiBinProvider = oThis.abiBinProvider;
@@ -217,8 +223,8 @@ class LibsHelper {
         console.log('\t - Receipt:\n\x1b[2m', JSON.stringify(receipt), '\x1b[0m\n');
       })
       .then(function(instace) {
-        oThis.gatewayLibAddress = instace.options.address;
-        console.log(`\t - ${LibName} Contract Address:`, oThis.gatewayLibAddress);
+        oThis.gatewayLib = instace.options.address;
+        console.log(`\t - ${LibName} Contract Address:`, oThis.gatewayLib);
         return txReceipt;
       });
   }

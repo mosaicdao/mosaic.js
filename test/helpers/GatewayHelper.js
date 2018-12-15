@@ -73,8 +73,8 @@ describe('test/helpers/GatewayHelper', function() {
           deployer: config.deployerAddress
         };
         return libsHelper.setup(libsConfig).then(function() {
-          caMessageBusAddress = libsHelper.messageBusAddress;
-          caGatewayLibAddress = libsHelper.gatewayLibAddress;
+          caMessageBusAddress = libsHelper.messageBus;
+          caGatewayLibAddress = libsHelper.gatewayLib;
         });
       });
   });
@@ -122,8 +122,7 @@ describe('test/helpers/GatewayHelper', function() {
       safeCore: someValidAddress,
       bounty: '123456',
       messageBus: caMessageBusAddress,
-      gatewayLib: caGatewayLibAddress,
-      simpleToken: someValidAddress
+      gatewayLib: caGatewayLibAddress
     };
 
     let coGatewayConfig = {
@@ -132,10 +131,12 @@ describe('test/helpers/GatewayHelper', function() {
       safeCore: someValidAddress,
       bounty: '123456',
       messageBus: caMessageBusAddress,
-      gatewayLib: caGatewayLibAddress,
-      ostPrime: someValidAddress
+      gatewayLib: caGatewayLibAddress
     };
-    return helper.setup(gatewayConfig, coGatewayConfig, deployParams, deployParams, web3, web3);
+
+    let simpleToken = someValidAddress;
+    let ostPrime = someValidAddress;
+    return helper.setup(simpleToken, ostPrime, gatewayConfig, coGatewayConfig, deployParams, deployParams, web3, web3);
   });
 });
 

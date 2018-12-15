@@ -13,7 +13,6 @@ const web3 = new Web3(config.gethRpcEndPoint);
 let web3WalletHelper = new Web3WalletHelper(web3);
 
 //Organisation Contract Address. TBD: Do not forget to set caOrganisation = null below.
-// let caOrganisation = '0x53DaB9024abF6B24219Ee6126525735ee4E6C043';
 let caOrganisation = null;
 
 let validateReceipt = (receipt) => {
@@ -41,7 +40,7 @@ describe('test/helpers/OrganizationHelper', function() {
     owner: config.organizationOwner,
     admin: config.organizationAdmin,
     worker: config.organizationWorker,
-    shouldCompleteOwnershipTransfer: true
+    completeOwnershipTransfer: true
   };
 
   let helper = new OrganizationHelper(web3, caOrganisation);

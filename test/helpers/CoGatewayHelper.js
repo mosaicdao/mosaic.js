@@ -73,8 +73,8 @@ describe('test/helpers/CoGatewayHelper', function() {
           deployer: config.deployerAddress
         };
         return libsHelper.setup(libsConfig).then(function() {
-          caMessageBusAddress = libsHelper.messageBusAddress;
-          caGatewayLibAddress = libsHelper.gatewayLibAddress;
+          caMessageBusAddress = libsHelper.messageBus;
+          caGatewayLibAddress = libsHelper.gatewayLib;
         });
       });
   });

@@ -27037,7 +27037,7 @@ function () {
     "admin": config.organizationAdmin, 
     "worker": config.organizationWorker,
     "workerExpirationHeight": 10000000, 
-    "shouldCompleteOwnershipTransfer": true
+    "completeOwnershipTransfer": true
   };
   //deployer and worker are mandetory.
   */
@@ -27048,18 +27048,7 @@ function () {
     value: function setup(config, txOptions, web3) {
       var oThis = this;
       web3 = web3 || oThis.web3;
-
-      if (!config) {
-        throw new Error('Mandatory parameter "config" missing. ');
-      }
-
-      if (!config.deployer) {
-        throw new Error('Mandatory configuration "deployer" missing. Set config.deployer address');
-      }
-
-      if (!config.worker) {
-        throw new Error('Mandatory configuration "worker" missing. Set config.worker address');
-      }
+      OrganizationHelper.validateSetupConfig(config);
 
       if (!txOptions) {
         txOptions = txOptions || {};
@@ -27095,7 +27084,7 @@ function () {
       } //Claim OwnerShip
 
 
-      if (config.owner && config.shouldCompleteOwnershipTransfer) {
+      if (config.owner && config.completeOwnershipTransfer) {
         promiseChain = promiseChain.then(function () {
           var cTxOptions = Object.assign({}, deployParams);
           cTxOptions.from = config.owner;
@@ -27262,6 +27251,25 @@ function () {
       });
     }
   }], [{
+    key: "validateSetupConfig",
+    value: function validateSetupConfig(config) {
+      console.log("* Validating Organization Setup Config.");
+
+      if (!config) {
+        throw new Error('Mandatory parameter "config" missing. ');
+      }
+
+      if (!config.deployer) {
+        throw new Error('Mandatory configuration "deployer" missing. Set config.deployer address');
+      }
+
+      if (!config.worker) {
+        throw new Error('Mandatory configuration "worker" missing. Set config.worker address');
+      }
+
+      return true;
+    }
+  }, {
     key: "contract",
     value: function contract(web3, contractAddress) {
       var oThis = this;
@@ -27307,38 +27315,38 @@ function () {
     var oThis = this;
     oThis.web3 = web3;
     oThis.address = address;
-    oThis.messageBusAddress = messageBusAddress;
-    oThis.gatewayLibAddress = gatewayLibAddress;
+    oThis.messageBus = messageBusAddress;
+    oThis.gatewayLib = gatewayLibAddress;
     oThis.abiBinProvider = new AbiBinProvider();
   }
   /*
-    //gatewayConfig
-    {
-      "deployer": "0x...",
-      "organization": "0x...",
-      "safeCore": "0x....",
-      "bounty": "123456",
-      "messageBus": "0x....",
-      "gatewayLib": "0x....",
-      "simpleToken": "0x....",
-      "organizationOwner": "0x....",
-    }
-    //coGatewayConfig
-    {
-      "deployer": "0x...",
-      "organization": "0x...",
-      "safeCore": "0x....",
-      "bounty": "123456",
-      "messageBus": "0x....",
-      "gatewayLib": "0x....",
-      "ostPrime": "0x...."
-    }
+  //gatewayConfig
+  {
+    "deployer": "0x...",
+    "organization": "0x...",
+    "safeCore": "0x....",
+    "bounty": "123456",
+    "messageBus": "0x....",
+    "gatewayLib": "0x....",
+    "simpleToken": "0x....",
+    "organizationOwner": "0x....",
+  }
+  //coGatewayConfig
+  {
+    "deployer": "0x...",
+    "organization": "0x...",
+    "safeCore": "0x....",
+    "bounty": "123456",
+    "messageBus": "0x....",
+    "gatewayLib": "0x....",
+    "ostPrime": "0x...."
+  }
   */
 
 
   _createClass(GatewayHelper, [{
     key: "setup",
-    value: function setup(gatewayConfig, coGatewayConfig, gatewayTxOptions, coGatewayTxOptions, originWeb3, auxiliaryWeb3) {
+    value: function setup(valueToken, baseToken, gatewayConfig, coGatewayConfig, gatewayTxOptions, coGatewayTxOptions, originWeb3, auxiliaryWeb3) {
       var oThis = this;
       originWeb3 = originWeb3 || oThis.web3;
 
@@ -27351,8 +27359,14 @@ function () {
       }
 
       gatewayConfig = gatewayConfig || {};
-      gatewayConfig.messageBus = gatewayConfig.messageBus || oThis.messageBusAddress;
-      gatewayConfig.gatewayLib = gatewayConfig.gatewayLib || oThis.gatewayLibAddress;
+      gatewayConfig.messageBus = gatewayConfig.messageBus || oThis.messageBus;
+      gatewayConfig.gatewayLib = gatewayConfig.gatewayLib || oThis.gatewayLib; //For chain setup this should be SimpleToken Contract address.
+
+      gatewayConfig.valueToken = valueToken;
+      coGatewayConfig.valueToken = valueToken; //For chain setup this should be OSTPrime Contract address.
+
+      gatewayConfig.baseToken = baseToken;
+      coGatewayConfig.baseToken = baseToken;
 
       if (!originWeb3) {
         throw new Error('Mandatory parameter "originWeb3" missing.');
@@ -27362,65 +27376,8 @@ function () {
         throw new Error('Mandatory parameter "auxiliaryWeb3" missing.');
       }
 
-      if (!gatewayConfig.deployer) {
-        throw new Error('Mandatory configuration "deployer" missing. Set gatewayConfig.deployer address');
-      }
-
-      if (!coGatewayConfig.deployer) {
-        throw new Error('Mandatory configuration "deployer" missing. Set coGatewayConfig.deployer address');
-      }
-
-      if (!gatewayConfig.organization) {
-        throw new Error('Mandatory configuration "organization" missing. Set gatewayConfig.organization address');
-      }
-
-      if (!coGatewayConfig.organization) {
-        throw new Error('Mandatory configuration "organization" missing. Set coGatewayConfig.organization address');
-      }
-
-      if (!gatewayConfig.safeCore) {
-        throw new Error('Mandatory configuration "safeCore" missing. Set gatewayConfig.safeCore address');
-      }
-
-      if (!coGatewayConfig.safeCore) {
-        throw new Error('Mandatory configuration "safeCore" missing. Set coGatewayConfig.safeCore address');
-      }
-
-      if (!gatewayConfig.bounty) {
-        throw new Error('Mandatory configuration "bounty" missing. Set gatewayConfig.bounty address');
-      }
-
-      if (!coGatewayConfig.bounty) {
-        throw new Error('Mandatory configuration "bounty" missing. Set coGatewayConfig.bounty address');
-      }
-
-      if (!gatewayConfig.messageBus) {
-        throw new Error('Mandatory configuration "messageBus" missing. Set gatewayConfig.messageBus address');
-      }
-
-      if (!coGatewayConfig.messageBus) {
-        throw new Error('Mandatory configuration "messageBus" missing. Set coGatewayConfig.messageBus address');
-      }
-
-      if (!gatewayConfig.gatewayLib) {
-        throw new Error('Mandatory configuration "gatewayLib" missing. Set gatewayConfig.gatewayLib address');
-      }
-
-      if (!coGatewayConfig.gatewayLib) {
-        throw new Error('Mandatory configuration "gatewayLib" missing. Set coGatewayConfig.gatewayLib address');
-      }
-
-      if (!gatewayConfig.simpleToken) {
-        throw new Error('Mandatory configuration "simpleToken" missing. Set gatewayConfig.simpleToken address');
-      }
-
-      if (!coGatewayConfig.ostPrime) {
-        throw new Error('Mandatory configuration "ostPrime" missing. Set coGatewayConfig.ostPrime address');
-      }
-
-      if (!gatewayConfig.organizationOwner) {
-        throw new Error('Mandatory configuration "organizationOwner" missing. Set gatewayConfig.organizationOwner address');
-      }
+      GatewayHelper.validateSetupConfig(gatewayConfig);
+      CoGatewayHelper.validateSetupConfig(coGatewayConfig);
 
       if (!gatewayTxOptions) {
         gatewayTxOptions = gatewayTxOptions || {};
@@ -27444,16 +27401,17 @@ function () {
       var coGatewayDeployParams = Object.assign({}, coGatewayTxOptions);
       coGatewayDeployParams.from = coGatewayConfig.deployer;
       var coGatewayHelper = new CoGatewayHelper(auxiliaryWeb3);
-      var promiseChain = oThis.deploy(gatewayConfig.simpleToken, gatewayConfig.simpleToken, gatewayConfig.safeCore, gatewayConfig.bounty, gatewayConfig.organization, gatewayConfig.messageBus, gatewayConfig.gatewayLib, gatewayDeployParams, originWeb3);
+      var promiseChain = oThis.deploy(gatewayConfig.valueToken, gatewayConfig.baseToken, gatewayConfig.safeCore, gatewayConfig.bounty, gatewayConfig.organization, gatewayConfig.messageBus, gatewayConfig.gatewayLib, gatewayDeployParams, originWeb3);
       promiseChain = promiseChain.then(function () {
         var gatewayAddress = oThis.address;
-        return coGatewayHelper.deploy(coGatewayConfig.ostPrime, coGatewayConfig.ostPrime, coGatewayConfig.safeCore, coGatewayConfig.bounty, gatewayAddress, coGatewayConfig.organization, coGatewayConfig.messageBus, coGatewayConfig.gatewayLib, coGatewayDeployParams, auxiliaryWeb3);
+        return coGatewayHelper.deploy(coGatewayConfig.valueToken, coGatewayConfig.baseToken, coGatewayConfig.safeCore, coGatewayConfig.bounty, gatewayAddress, coGatewayConfig.organization, coGatewayConfig.messageBus, coGatewayConfig.gatewayLib, coGatewayDeployParams, auxiliaryWeb3);
       });
       promiseChain = promiseChain.then(function () {
         var ownerTxParams = Object.assign({}, gatewayDeployParams);
         ownerTxParams.from = gatewayConfig.organizationOwner;
         var coGatewayAddress = coGatewayHelper.address;
         var gatewayAddress = oThis.address;
+        oThis.cogateway = coGatewayAddress;
         return oThis.activateGateway(coGatewayAddress, ownerTxParams, gatewayAddress, originWeb3);
       });
       return promiseChain;
@@ -27463,8 +27421,8 @@ function () {
     value: function deploy(_token, _baseToken, _core, _bounty, _membersManager, messageBusAddress, gatewayLibAddress, txOptions, web3) {
       var oThis = this;
       web3 = web3 || oThis.web3;
-      messageBusAddress = messageBusAddress || oThis.messageBusAddress;
-      gatewayLibAddress = gatewayLibAddress || oThis.gatewayLibAddress;
+      messageBusAddress = messageBusAddress || oThis.messageBus;
+      gatewayLibAddress = gatewayLibAddress || oThis.gatewayLib;
       var messageBusLibInfo = {
         address: messageBusAddress,
         name: 'MessageBus'
@@ -27535,6 +27493,47 @@ function () {
         console.log('\t !! Error !!', error, '\n\t !! ERROR !!\n');
         return Promise.reject(error);
       });
+    }
+  }], [{
+    key: "validateSetupConfig",
+    value: function validateSetupConfig(gatewayConfig) {
+      console.log("* Validating ".concat(ContractName, " Setup Config."));
+
+      if (!gatewayConfig.deployer) {
+        throw new Error('Mandatory configuration "deployer" missing. Set gatewayConfig.deployer address');
+      }
+
+      if (!gatewayConfig.organization) {
+        throw new Error('Mandatory configuration "organization" missing. Set gatewayConfig.organization address');
+      }
+
+      if (!gatewayConfig.safeCore) {
+        throw new Error('Mandatory configuration "safeCore" missing. Set gatewayConfig.safeCore address');
+      }
+
+      if (!gatewayConfig.bounty) {
+        throw new Error('Mandatory configuration "bounty" missing. Set gatewayConfig.bounty address');
+      }
+
+      if (!gatewayConfig.messageBus) {
+        throw new Error('Mandatory configuration "messageBus" missing. Set gatewayConfig.messageBus address');
+      }
+
+      if (!gatewayConfig.gatewayLib) {
+        throw new Error('Mandatory configuration "gatewayLib" missing. Set gatewayConfig.gatewayLib address');
+      }
+
+      if (!gatewayConfig.valueToken) {
+        throw new Error('Mandatory configuration "valueToken" missing. Set gatewayConfig.valueToken address');
+      }
+
+      if (!gatewayConfig.baseToken) {
+        throw new Error('Mandatory configuration "baseToken" missing. Set gatewayConfig.baseToken address');
+      }
+
+      if (!gatewayConfig.organizationOwner) {
+        throw new Error('Mandatory configuration "organizationOwner" missing. Set gatewayConfig.organizationOwner address');
+      }
     }
   }]);
 
@@ -33447,27 +33446,13 @@ exports.p1600 = function (s) {
 "use strict";
 
 
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-var sampleOriginConfig = {
-  deployer: {
-    address: '0x...',
-    gasPrice: '0x12A05F200'
-  },
-  organization: {
-    address: null,
-    owner: '0x...',
-    admin: '0x...',
-    worker: {
-      address: '0x...',
-      expirationHeight: '1234567890'
-    }
-  }
-};
 
 var Web3 = __webpack_require__(53);
 
@@ -33485,47 +33470,405 @@ var GatewayHelper = __webpack_require__(219);
 
 var CoGatewayHelper = __webpack_require__(219);
 
-var defaultAuxiliaryConfig = {
-  organisationOwner: null
-};
-
 var ChainSetup =
 /*#__PURE__*/
 function () {
-  function ChainSetup(originWeb3, originConfig, auxiliaryWeb3, auxiliaryConfig) {
+  function ChainSetup(originWeb3, auxiliaryWeb3) {
     _classCallCheck(this, ChainSetup);
 
-    var oThis = this;
-
-    if (typeof originWeb3 === 'string') {
-      originWeb3 = new Web3(originWeb3);
-    }
-
-    if (typeof auxiliaryWeb3 === 'string') {
-      auxiliaryWeb3 = new Web3(auxiliaryWeb3);
-    }
-
-    originConfig = originConfig || {};
-    oThis.originConfig = Object.assign({}, originConfig);
-    oThis.originWeb3 = originWeb3;
-    oThis.auxiliaryWeb3 = auxiliaryWeb3;
-    oThis.abiBinProvider = new AbiBinProvider();
-    oThis.origin = {
-      libs: new LibsHelper(originWeb3),
-      organization: new OrganizationHelper(originWeb3),
-      safeCore: new SafeCoreHelper(originWeb3),
-      gateway: new GatewayHelper(originWeb3)
-    };
-    oThis.auxiliary = {
-      libs: new LibsHelper(auxiliaryWeb3),
-      ostPrimeHelper: new OSTPrimeHelper(auxiliaryWeb3),
-      organization: new OrganizationHelper(auxiliaryWeb3),
-      safeCore: new SafeCoreHelper(auxiliaryWeb3),
-      coGateway: new CoGatewayHelper(originWeb3)
-    };
+    this.originWeb3 = originWeb3;
+    this.auxiliaryWeb3 = auxiliaryWeb3;
   }
 
-  _createClass(ChainSetup, null, [{
+  _createClass(ChainSetup, [{
+    key: "setup",
+    value: function setup(simpleTokenAddress, originConfig, auxiliaryConfig, originWeb3, auxiliaryWeb3) {
+      var oThis = this;
+
+      if (typeof simpleTokenAddress !== 'string') {
+        throw new Error('Mandatory parameter "simpleTokenAddress" address missing.');
+      } //Validate Auxiliary
+
+
+      auxiliaryWeb3 = auxiliaryWeb3 || oThis.auxiliaryWeb3;
+
+      if (_typeof(auxiliaryWeb3) !== 'object') {
+        throw new Error('Mandatory parameter "auxiliaryWeb3" missing. ');
+      }
+
+      oThis.validateAuxiliaryConfig(auxiliaryConfig); //Validate Origin
+
+      originWeb3 = originWeb3 || oThis.originWeb3;
+
+      if (_typeof(originWeb3) !== 'object') {
+        throw new Error('Mandatory parameter "originWeb3" missing.');
+      }
+
+      oThis.validateOriginConfig(originConfig);
+      var outAddresses = {
+        origin: {
+          "simpleToken": simpleTokenAddress
+        },
+        auxiliary: {}
+      }; //Start Deployments.
+
+      var aAddresses = outAddresses.auxiliary;
+      var auxiliaryTxOptions = {
+        "gasPrice": auxiliaryConfig.gasPrice
+      };
+      var aOPrimeHelper = new OSTPrimeHelper(auxiliaryWeb3);
+      var aLibsHelper = new LibsHelper(auxiliaryWeb3);
+      var aOrgHelper = new OrganizationHelper(auxiliaryWeb3);
+      var aSCHelper = new SafeCoreHelper(auxiliaryWeb3);
+      var ostPrimeAddress;
+      console.log("\x1b[4m\n" + "Deploying OSTPrime on auxiliary" + "\x1b[0m");
+      var promiseChain = aOPrimeHelper.setup(simpleTokenAddress, auxiliaryConfig.ostPrime, auxiliaryTxOptions);
+      promiseChain = promiseChain.then(function (_out) {
+        //Add contract addresses to config as needed.
+        var cogatewayConfig = auxiliaryConfig.cogateway;
+        console.log("auxiliaryConfig", auxiliaryConfig);
+        ostPrimeAddress = aOPrimeHelper.address;
+        aAddresses.ostPrime = aOPrimeHelper.address;
+        console.log("\x1b[32m" + "OSTPrime deployed on auxiliary" + "\x1b[0m\n");
+        return _out;
+      });
+      /*--------------------------- Mirrored Code Begins ---------------------------*/
+
+      promiseChain = promiseChain.then(function () {
+        console.log("\x1b[4m\n" + "Deploying libs on auxiliary" + "\x1b[0m");
+        return aLibsHelper.setup(auxiliaryConfig.libs, auxiliaryTxOptions);
+      }).then(function (_out) {
+        //Add contract addresses to config as needed.
+        var cogatewayConfig = auxiliaryConfig.cogateway;
+        cogatewayConfig.messageBus = aLibsHelper.messageBus;
+        cogatewayConfig.gatewayLib = aLibsHelper.gatewayLib;
+        cogatewayConfig.merklePatriciaProof = aLibsHelper.merklePatriciaProof;
+        aAddresses.messageBus = aLibsHelper.messageBus;
+        aAddresses.gatewayLib = aLibsHelper.gatewayLib;
+        aAddresses.merklePatriciaProof = aLibsHelper.merklePatriciaProof;
+        console.log("\x1b[32m" + "Libs deployed on auxiliary" + "\x1b[0m\n");
+        return _out;
+      });
+      promiseChain = promiseChain.then(function () {
+        console.log("\x1b[4m\n" + "Deploying organization on auxiliary" + "\x1b[0m");
+        return aOrgHelper.setup(auxiliaryConfig.organization, auxiliaryTxOptions);
+      }).then(function (_out) {
+        //Add contract addresses to config as needed.
+        var cogatewayConfig = auxiliaryConfig.cogateway;
+        cogatewayConfig.organization = aOrgHelper.address;
+        var orgConfig = auxiliaryConfig.organization;
+
+        if (orgConfig.owner && orgConfig.completeOwnershipTransfer) {
+          cogatewayConfig.organizationOwner = orgConfig.owner;
+        } else {
+          cogatewayConfig.organizationOwner = orgConfig.deployer;
+        }
+
+        var safeCoreConfig = auxiliaryConfig.safeCore;
+        safeCoreConfig.organization = aOrgHelper.address;
+        aAddresses.organization = aOrgHelper.address;
+        console.log("\x1b[32m" + "Organization deployed on auxiliary" + "\x1b[0m\n");
+        return _out;
+      });
+      promiseChain = promiseChain.then(function () {
+        console.log("\x1b[4m\n" + "Deploying safeCore on auxiliary" + "\x1b[0m");
+        return aSCHelper.setup(auxiliaryConfig.safeCore, auxiliaryTxOptions);
+      }).then(function (_out) {
+        //Add contract addresses to config as needed.
+        var cogatewayConfig = auxiliaryConfig.cogateway;
+        cogatewayConfig.safeCore = aSCHelper.address;
+        auxiliaryConfig.safeCore.address = aSCHelper.address;
+        aAddresses.safeCore = aSCHelper.address;
+        console.log("\x1b[32m" + "SafeCore deployed on auxiliary" + "\x1b[0m\n");
+        return _out;
+      });
+      /*--------------------------- Mirrored Code Ends -----------------------------*/
+
+      var oAddresses = outAddresses.origin;
+      var originTxOptions = {
+        "gasPrice": originConfig.gasPrice
+      };
+      var oLibsHelper = new LibsHelper(originWeb3);
+      var oOrgHelper = new OrganizationHelper(originWeb3);
+      var oSCHelper = new SafeCoreHelper(originWeb3);
+      var oGateway = new GatewayHelper(originWeb3);
+      /*--------------------------- Mirrored Code Begins ---------------------------*/
+
+      promiseChain = promiseChain.then(function () {
+        console.log("\x1b[4m\n" + "Deploying libs on origin" + "\x1b[0m");
+        return oLibsHelper.setup(originConfig.libs, originTxOptions);
+      }).then(function (_out) {
+        //Add contract addresses to config as needed.
+        var gatewayConfig = originConfig.gateway;
+        gatewayConfig.messageBus = oLibsHelper.messageBus;
+        gatewayConfig.gatewayLib = oLibsHelper.gatewayLib;
+        gatewayConfig.merklePatriciaProof = oLibsHelper.merklePatriciaProof;
+        oAddresses.messageBus = oLibsHelper.messageBus;
+        oAddresses.gatewayLib = oLibsHelper.gatewayLib;
+        oAddresses.merklePatriciaProof = oLibsHelper.merklePatriciaProof;
+        console.log("\x1b[32m" + "Libs deployed on origin" + "\x1b[0m\n");
+        return _out;
+      });
+      promiseChain = promiseChain.then(function () {
+        console.log("\x1b[4m\n" + "Deploying organization on origin" + "\x1b[0m");
+        return oOrgHelper.setup(originConfig.organization, originTxOptions);
+      }).then(function (_out) {
+        //Add contract addresses to config as needed.
+        var gatewayConfig = originConfig.gateway;
+        gatewayConfig.organization = oOrgHelper.address;
+        var orgConfig = originConfig.organization;
+
+        if (orgConfig.owner && orgConfig.completeOwnershipTransfer) {
+          gatewayConfig.organizationOwner = orgConfig.owner;
+        } else {
+          gatewayConfig.organizationOwner = orgConfig.deployer;
+        }
+
+        var safeCoreConfig = originConfig.safeCore;
+        safeCoreConfig.organization = oOrgHelper.address;
+        oAddresses.organization = oOrgHelper.address;
+        console.log("\x1b[32m" + "Organization deployed on origin" + "\x1b[0m\n");
+        return _out;
+      });
+      promiseChain = promiseChain.then(function () {
+        console.log("\x1b[4m\n" + "Deploying safeCore on origin" + "\x1b[0m");
+        return oSCHelper.setup(originConfig.safeCore, originTxOptions);
+      }).then(function (_out) {
+        //Add contract addresses to config as needed.
+        var gatewayConfig = originConfig.gateway;
+        gatewayConfig.safeCore = oSCHelper.address;
+        originConfig.safeCore.address = oSCHelper.address;
+        oAddresses.safeCore = oSCHelper.address;
+        console.log("\x1b[32m" + "SafeCore deployed on origin" + "\x1b[0m\n");
+        return _out;
+      });
+      /*--------------------------- Mirrored Code Ends ---------------------------*/
+
+      /*--------------------------- *** Link Cores *** ---------------------------*/
+
+      promiseChain = promiseChain.then(function () {
+        console.log("\x1b[4m\n" + "Setting coCore of safeCore on auxiliary" + "\x1b[0m"); //Link on auxiliary
+
+        var txParams = Object.assign({}, auxiliaryTxOptions);
+        var config = auxiliaryConfig;
+        var coConfig = originConfig;
+        var coCore = coConfig.safeCore.address; //Determine the owner.
+
+        if (config.organization.owner && config.organization.completeOwnershipTransfer) {
+          txParams.from = config.organization.owner;
+        } else {
+          txParams.from = config.organization.deployer;
+        }
+
+        return aSCHelper.setCoCoreAddress(coCore, txParams).then(function (_out) {
+          aAddresses.coCore = coCore;
+          console.log("\x1b[32m" + "coCore of safeCore on auxiliary set successfully" + "\x1b[0m\n");
+          return _out;
+        });
+      });
+      promiseChain = promiseChain.then(function () {
+        console.log("\x1b[4m\n" + "Setting coCore of safeCore on origin" + "\x1b[0m"); //Link on origin
+
+        var txParams = Object.assign({}, originTxOptions);
+        var config = originConfig;
+        var coConfig = auxiliaryConfig;
+        var coCore = coConfig.safeCore.address; //Determine the owner.
+
+        if (config.organization.owner && config.organization.completeOwnershipTransfer) {
+          txParams.from = config.organization.owner;
+        } else {
+          txParams.from = config.organization.deployer;
+        }
+
+        oAddresses.coCore = coCore;
+        return oSCHelper.setCoCoreAddress(coCore, txParams).then(function (_out) {
+          oAddresses.coCore = coCore;
+          console.log("\x1b[32m" + "coCore of safeCore on origin set successfully" + "\x1b[0m\n");
+          return _out;
+        });
+      });
+      /*--------------------------- Temp Code ---------------------------*/
+
+      promiseChain = promiseChain.then(function () {
+        console.log("\x1b[32m" + "Setup Completed successfully" + "\x1b[0m\n");
+        console.log("\x1b[1m" + "Origing Config:" + "\x1b[0m");
+        console.log("\x1b[2m" + JSON.stringify(originConfig, null, 2) + "\x1b[0m");
+        console.log("\x1b[1m" + "Auxiliary Config:" + "\x1b[0m");
+        console.log("\x1b[2m" + JSON.stringify(auxiliaryConfig, null, 2) + "\x1b[0m");
+        console.log("\x1b[34m" + "Addresses:" + "\x1b[0m");
+        console.log("\x1b[33m" + JSON.stringify(outAddresses, null, 2) + "\x1b[0m");
+      });
+      /*--------------------------- Deploy Gateways ---------------------------*/
+
+      promiseChain = promiseChain.then(function (_out) {
+        return oGateway.setup(simpleTokenAddress, ostPrimeAddress, originConfig.gateway, auxiliaryConfig.cogateway, originTxOptions, auxiliaryTxOptions, originWeb3, auxiliaryWeb3);
+      }).then(function (_out) {
+        oAddresses.gateway = oGateway.address;
+        aAddresses.cogateway = oGateway.cogateway;
+        console.log("\x1b[32m" + "coCore of safeCore on origin set successfully" + "\x1b[0m\n");
+        return _out;
+      });
+      promiseChain = promiseChain.then(function () {
+        console.log("\x1b[32m" + "Setup Completed successfully" + "\x1b[0m\n");
+        console.log("\x1b[1m" + "Origing Config:" + "\x1b[0m");
+        console.log("\x1b[2m" + JSON.stringify(originConfig, null, 2) + "\x1b[0m");
+        console.log("\x1b[1m" + "Auxiliary Config:" + "\x1b[0m");
+        console.log("\x1b[2m" + JSON.stringify(auxiliaryConfig, null, 2) + "\x1b[0m");
+        console.log("\x1b[34m" + "Addresses:" + "\x1b[0m");
+        console.log("\x1b[33m" + JSON.stringify(outAddresses, null, 2) + "\x1b[0m");
+      });
+      return promiseChain.then(function () {
+        return {
+          "address": outAddresses,
+          "config": {
+            "origin": originConfig,
+            "auxiliary": auxiliaryConfig
+          }
+        };
+      });
+    }
+  }, {
+    key: "validateAuxiliaryConfig",
+    value: function validateAuxiliaryConfig(config) {
+      var oThis = this;
+      console.log("\x1b[4m\n" + "Validating auxiliaryConfig" + "\x1b[0m");
+      oThis.validateConfig(config);
+      oThis.validateOSTPrimeConfig(config); //Prepare cogatewayConfig
+
+      config.cogateway = config.cogateway || {};
+      oThis.validateCoGatewayConfig(config);
+      config.gasPrice = config.gasPrice || "0x0";
+      console.log("\x1b[32m" + "auxiliaryConfig Validated" + "\x1b[0m\n");
+      return true;
+    }
+  }, {
+    key: "validateOriginConfig",
+    value: function validateOriginConfig(config) {
+      var oThis = this;
+      console.log("\x1b[4m\n" + "Validating originConfig" + "\x1b[0m");
+      oThis.validateConfig(config); //Prepare gatewayConfig
+
+      config.gateway = config.gateway || {};
+      oThis.validateGatewayConfig(config);
+      config.gasPrice = config.gasPrice || "0x5B9ACA00";
+      console.log("\x1b[32m" + "originConfig Validated" + "\x1b[0m\n");
+      return true;
+    }
+  }, {
+    key: "validateConfig",
+    value: function validateConfig(config) {
+      var oThis = this;
+
+      if (_typeof(config) !== 'object') {
+        throw new Error('Mandatory parameter "originConfig" missing. ');
+      }
+
+      if (typeof config.deployer !== 'string') {
+        throw new Error('Mandatory parameter "deployer" missing. Set auxiliaryConfig.deployer address.');
+      }
+
+      oThis.validateLibsConfig(config);
+      oThis.validateOrganizationConfig(config);
+      oThis.validateSafeCoreConfig(config);
+      return true;
+    }
+  }, {
+    key: "validateLibsConfig",
+    value: function validateLibsConfig(config) {
+      var oThis = this;
+      var gConfig = {
+        "deployer": config.deployer
+      };
+
+      if (config.libs) {
+        Object.assign(gConfig, config.libs);
+      }
+
+      LibsHelper.validateSetupConfig(gConfig);
+      config.libs = gConfig;
+      return true;
+    }
+  }, {
+    key: "validateOrganizationConfig",
+    value: function validateOrganizationConfig(config) {
+      var oThis = this;
+      var gConfig = {
+        "deployer": config.deployer
+      };
+
+      if (config.organization) {
+        Object.assign(gConfig, config.organization);
+      }
+
+      OrganizationHelper.validateSetupConfig(gConfig);
+      config.organization = gConfig;
+      return true;
+    }
+  }, {
+    key: "validateCoGatewayConfig",
+    value: function validateCoGatewayConfig(config) {
+      var oThis = this;
+      var gConfig = {
+        "deployer": config.deployer,
+        "bounty": "0"
+      };
+
+      if (config.gateway) {
+        Object.assign(gConfig, config.cogateway);
+      }
+
+      config.cogateway = gConfig;
+      return true;
+    }
+  }, {
+    key: "validateGatewayConfig",
+    value: function validateGatewayConfig(config) {
+      var oThis = this;
+      var gConfig = {
+        "deployer": config.deployer,
+        "bounty": "0"
+      };
+
+      if (config.gateway) {
+        Object.assign(gConfig, config.gateway);
+      }
+
+      config.gateway = gConfig;
+      return true;
+    } //SafeCoreHelper.validateSetupConfig(config);
+
+  }, {
+    key: "validateSafeCoreConfig",
+    value: function validateSafeCoreConfig(config) {
+      var oThis = this;
+      var gConfig = {
+        "deployer": config.deployer
+      };
+
+      if (config.safeCore) {
+        Object.assign(gConfig, config.safeCore);
+      }
+
+      SafeCoreHelper.validateSetupConfig(gConfig);
+      config.safeCore = gConfig;
+      return true;
+    }
+  }, {
+    key: "validateOSTPrimeConfig",
+    value: function validateOSTPrimeConfig(config) {
+      var gConfig = {
+        "deployer": config.deployer
+      };
+
+      if (config.ostPrime) {
+        Object.assign(gConfig, config.ostPrime);
+      }
+
+      OSTPrimeHelper.validateSetupConfig(gConfig);
+      config.ostPrime = gConfig;
+      return true;
+    }
+  }], [{
     key: "OrganizationHelper",
     get: function get() {
       return OrganizationHelper;
@@ -68249,25 +68592,10 @@ function () {
     value: function setup(config, txOptions, web3) {
       var oThis = this;
       web3 = web3 || oThis.web3;
-
-      if (!config) {
-        throw new Error('Mandatory parameter "config" missing. ');
-      }
-
-      if (!config.deployer) {
-        throw new Error('Mandatory configuration "deployer" missing. Set config.deployer address');
-      }
-
-      if (!config.remoteChainId) {
-        throw new Error('Mandatory configuration "remoteChainId" missing. Set config.remoteChainId.');
-      }
+      SafeCoreHelper.validateSetupConfig(config);
 
       if (!config.organization) {
         throw new Error('Mandatory configuration "organization" missing. Set config.organization contract address.');
-      }
-
-      if (config.coCoreAddress && !config.organizationOwner) {
-        throw new Error('Mandatory configuration "organizationOwner" missing. Set config.organizationOwner address. organizationOwner is mandatory when using coCoreAddress config option');
       }
 
       if (!txOptions) {
@@ -68371,6 +68699,27 @@ function () {
         return Promise.reject(error);
       });
     }
+  }], [{
+    key: "validateSetupConfig",
+    value: function validateSetupConfig(config) {
+      console.log("* Validating ".concat(ContractName, " Setup Config."));
+
+      if (!config) {
+        throw new Error('Mandatory parameter "config" missing. ');
+      }
+
+      if (!config.deployer) {
+        throw new Error('Mandatory configuration "deployer" missing. Set config.deployer address');
+      }
+
+      if (!config.remoteChainId) {
+        throw new Error('Mandatory configuration "remoteChainId" missing. Set config.remoteChainId.');
+      }
+
+      if (config.coCoreAddress && !config.organizationOwner) {
+        throw new Error('Mandatory configuration "organizationOwner" missing. Set config.organizationOwner address. organizationOwner is mandatory when using coCoreAddress config option');
+      }
+    }
   }]);
 
   return SafeCoreHelper;
@@ -68423,25 +68772,15 @@ function () {
 
   _createClass(OSTPrimeHelper, [{
     key: "setup",
-    value: function setup(config, txOptions, web3) {
+    value: function setup(simpleToken, config, txOptions, web3) {
       var oThis = this;
       web3 = web3 || oThis.web3;
 
-      if (!config) {
-        throw new Error('Mandatory parameter "config" missing. ');
+      if (!simpleToken) {
+        throw new Error('Mandatory configuration "simpleToken" missing. Provide SimpleToken contract address.');
       }
 
-      if (!config.deployer) {
-        throw new Error('Mandatory configuration "deployer" missing. Set config.deployer address');
-      }
-
-      if (!config.chainOwner) {
-        throw new Error('Mandatory configuration "chainOwner" missing. Set config.chainOwner.');
-      }
-
-      if (!config.valueToken) {
-        throw new Error('Mandatory configuration "valueToken" missing. Set config.valueToken.');
-      }
+      OSTPrimeHelper.validateSetupConfig(config);
 
       if (!txOptions) {
         txOptions = txOptions || {};
@@ -68452,7 +68791,7 @@ function () {
       deployParams.from = config.deployer;
       deployParams.gasPrice = 0; //1. Deploy the Contract
 
-      var promiseChain = oThis.deploy(config.valueToken, deployParams); //2. Initialize.
+      var promiseChain = oThis.deploy(simpleToken, deployParams); //2. Initialize.
 
       promiseChain = promiseChain.then(function () {
         var ownerParams = Object.assign({}, deployParams);
@@ -68533,6 +68872,25 @@ function () {
         return Promise.reject(error);
       });
     }
+  }], [{
+    key: "validateSetupConfig",
+    value: function validateSetupConfig(config) {
+      console.log("* Validating ".concat(ContractName, " Setup Config."));
+
+      if (!config) {
+        throw new Error('Mandatory parameter "config" missing. ');
+      }
+
+      if (!config.deployer) {
+        throw new Error('Mandatory configuration "deployer" missing. Set config.deployer address');
+      }
+
+      if (!config.chainOwner) {
+        throw new Error('Mandatory configuration "chainOwner" missing. Set config.chainOwner.');
+      }
+
+      return true;
+    }
   }]);
 
   return OSTPrimeHelper;
@@ -68560,14 +68918,14 @@ var AbiBinProvider = __webpack_require__(40);
 var LibsHelper =
 /*#__PURE__*/
 function () {
-  function LibsHelper(web3, merklePatriciaProofAddress, messageBusAddress, gatewayLibAddress) {
+  function LibsHelper(web3, merklePatriciaProof, messageBus, gatewayLib) {
     _classCallCheck(this, LibsHelper);
 
     var oThis = this;
     oThis.web3 = web3;
-    oThis.merklePatriciaProofAddress = merklePatriciaProofAddress;
-    oThis.messageBusAddress = messageBusAddress;
-    oThis.gatewayLibAddress = gatewayLibAddress;
+    oThis.merklePatriciaProof = merklePatriciaProof;
+    oThis.messageBus = messageBus;
+    oThis.gatewayLib = gatewayLib;
     oThis.abiBinProvider = new AbiBinProvider();
   }
   /*
@@ -68584,26 +68942,19 @@ function () {
     value: function setup(config, txOptions, web3) {
       var oThis = this;
       web3 = web3 || oThis.web3;
-
-      if (!config) {
-        throw new Error('Mandatory parameter "config" missing. ');
-      }
-
-      if (!config.deployer) {
-        throw new Error('Mandatory configuration "deployer" missing. Set config.deployer address');
-      }
+      LibsHelper.validateSetupConfig(config);
 
       if (!txOptions) {
         txOptions = txOptions || {};
       }
 
       if (typeof txOptions.gasPrice === 'undefined') {
-        txOptions.gasPrice = '0x5B9ACA00';
+        txOptions.gasPrice = '0';
       }
 
       var deployParams = Object.assign({}, txOptions);
       deployParams.from = config.deployer;
-      deployParams.gasPrice = 0; //1. Deploy MerklePatriciaProof
+      deployParams.gasPrice = deployParams.gasPrice || '0'; //1. Deploy MerklePatriciaProof
 
       var promiseChain = oThis.deployMerklePatriciaProof(deployParams); //2. deploy MessageBus
 
@@ -68651,21 +69002,21 @@ function () {
         txReceipt = receipt;
         console.log('\t - Receipt:\n\x1b[2m', JSON.stringify(receipt), '\x1b[0m\n');
       }).then(function (instace) {
-        oThis.merklePatriciaProofAddress = instace.options.address;
-        console.log("\t - ".concat(LibName, " Contract Address:"), oThis.merklePatriciaProofAddress);
+        oThis.merklePatriciaProof = instace.options.address;
+        console.log("\t - ".concat(LibName, " Contract Address:"), oThis.merklePatriciaProof);
         return txReceipt;
       });
     }
   }, {
     key: "deployMessageBus",
-    value: function deployMessageBus(merklePatriciaProofAddress, txOptions, web3) {
+    value: function deployMessageBus(merklePatriciaProof, txOptions, web3) {
       var oThis = this;
       var LibName = 'MessageBus';
       web3 = web3 || oThis.web3;
-      merklePatriciaProofAddress = merklePatriciaProofAddress || oThis.merklePatriciaProofAddress;
+      merklePatriciaProof = merklePatriciaProof || oThis.merklePatriciaProof;
       var merklePatriciaProofInfo = {
         name: 'MerklePatriciaProof',
-        address: merklePatriciaProofAddress
+        address: merklePatriciaProof
       };
       var abiBinProvider = oThis.abiBinProvider;
       var abi = abiBinProvider.getABI(LibName);
@@ -68696,21 +69047,21 @@ function () {
         txReceipt = receipt;
         console.log('\t - Receipt:\n\x1b[2m', JSON.stringify(receipt), '\x1b[0m\n');
       }).then(function (instace) {
-        oThis.messageBusAddress = instace.options.address;
-        console.log("\t - ".concat(LibName, " Contract Address:"), oThis.messageBusAddress);
+        oThis.messageBus = instace.options.address;
+        console.log("\t - ".concat(LibName, " Contract Address:"), oThis.messageBus);
         return txReceipt;
       });
     }
   }, {
     key: "deployGatewayLib",
-    value: function deployGatewayLib(merklePatriciaProofAddress, txOptions, web3) {
+    value: function deployGatewayLib(merklePatriciaProof, txOptions, web3) {
       var oThis = this;
       web3 = web3 || oThis.web3;
       var LibName = 'GatewayLib';
-      merklePatriciaProofAddress = merklePatriciaProofAddress || oThis.merklePatriciaProofAddress;
+      merklePatriciaProof = merklePatriciaProof || oThis.merklePatriciaProof;
       var merklePatriciaProofInfo = {
         name: 'MerklePatriciaProof',
-        address: merklePatriciaProofAddress
+        address: merklePatriciaProof
       };
       var abiBinProvider = oThis.abiBinProvider;
       var abi = abiBinProvider.getABI(LibName);
@@ -68741,10 +69092,25 @@ function () {
         txReceipt = receipt;
         console.log('\t - Receipt:\n\x1b[2m', JSON.stringify(receipt), '\x1b[0m\n');
       }).then(function (instace) {
-        oThis.gatewayLibAddress = instace.options.address;
-        console.log("\t - ".concat(LibName, " Contract Address:"), oThis.gatewayLibAddress);
+        oThis.gatewayLib = instace.options.address;
+        console.log("\t - ".concat(LibName, " Contract Address:"), oThis.gatewayLib);
         return txReceipt;
       });
+    }
+  }], [{
+    key: "validateSetupConfig",
+    value: function validateSetupConfig(config) {
+      console.log('* Validating Libs Setup Config.');
+
+      if (!config) {
+        throw new Error('Mandatory parameter "config" missing. ');
+      }
+
+      if (!config.deployer) {
+        throw new Error('Mandatory configuration "deployer" missing. Set config.deployer address');
+      }
+
+      return true;
     }
   }]);
 
@@ -68775,30 +69141,30 @@ var ContractName = 'EIP20CoGateway';
 var CoGatewayHelper =
 /*#__PURE__*/
 function () {
-  function CoGatewayHelper(web3, address, messageBusAddress, gatewayLibAddress) {
+  function CoGatewayHelper(web3, address, messageBus, gatewayLib) {
     _classCallCheck(this, CoGatewayHelper);
 
     var oThis = this;
     oThis.web3 = web3;
     oThis.address = address;
-    oThis.messageBusAddress = messageBusAddress;
-    oThis.gatewayLibAddress = gatewayLibAddress;
+    oThis.messageBus = messageBus;
+    oThis.gatewayLib = gatewayLib;
     oThis.abiBinProvider = new AbiBinProvider();
   }
 
   _createClass(CoGatewayHelper, [{
     key: "deploy",
-    value: function deploy(_token, _baseToken, _core, _bounty, _membersManager, _gateway, messageBusAddress, gatewayLibAddress, txOptions, web3) {
+    value: function deploy(_token, _baseToken, _core, _bounty, _membersManager, _gateway, messageBus, gatewayLib, txOptions, web3) {
       var oThis = this;
       web3 = web3 || oThis.web3;
-      messageBusAddress = messageBusAddress || oThis.messageBusAddress;
-      gatewayLibAddress = gatewayLibAddress || oThis.gatewayLibAddress;
+      messageBus = messageBus || oThis.messageBus;
+      gatewayLib = gatewayLib || oThis.gatewayLib;
       var messageBusLibInfo = {
-        address: messageBusAddress,
+        address: messageBus,
         name: 'MessageBus'
       };
       var gatewayLibInfo = {
-        address: gatewayLibAddress,
+        address: gatewayLib,
         name: 'GatewayLib'
       };
       var abiBinProvider = oThis.abiBinProvider;
@@ -68834,6 +69200,43 @@ function () {
         console.log("\t - ".concat(ContractName, " Contract Address:"), oThis.address);
         return txReceipt;
       });
+    }
+  }], [{
+    key: "validateSetupConfig",
+    value: function validateSetupConfig(coGatewayConfig) {
+      console.log("* Validating ".concat(ContractName, " Setup Config."));
+
+      if (!coGatewayConfig.deployer) {
+        throw new Error('Mandatory configuration "deployer" missing. Set coGatewayConfig.deployer address');
+      }
+
+      if (!coGatewayConfig.bounty) {
+        throw new Error('Mandatory configuration "bounty" missing. Set coGatewayConfig.bounty address');
+      }
+
+      if (!coGatewayConfig.organization) {
+        throw new Error('Mandatory configuration "organization" missing. Set coGatewayConfig.organization address');
+      }
+
+      if (!coGatewayConfig.safeCore) {
+        throw new Error('Mandatory configuration "safeCore" missing. Set coGatewayConfig.safeCore address');
+      }
+
+      if (!coGatewayConfig.messageBus) {
+        throw new Error('Mandatory configuration "messageBus" missing. Set coGatewayConfig.messageBus address');
+      }
+
+      if (!coGatewayConfig.gatewayLib) {
+        throw new Error('Mandatory configuration "gatewayLib" missing. Set coGatewayConfig.gatewayLib address');
+      }
+
+      if (!coGatewayConfig.valueToken) {
+        throw new Error('Mandatory configuration "valueToken" missing. Set coGatewayConfig.valueToken address');
+      }
+
+      if (!coGatewayConfig.baseToken) {
+        throw new Error('Mandatory configuration "baseToken" missing. Set coGatewayConfig.baseToken address');
+      }
     }
   }]);
 

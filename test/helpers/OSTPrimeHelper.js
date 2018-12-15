@@ -70,10 +70,9 @@ describe('test/helpers/OSTPrimeHelper', function() {
     this.timeout(60000);
     const ostPrimeConfig = {
       deployer: config.deployerAddress,
-      chainOwner: chainOwner,
-      valueToken: SimpleTokenAddress
+      chainOwner: chainOwner
     };
-    return helper.setup(ostPrimeConfig, deployParams);
+    return helper.setup(SimpleTokenAddress, ostPrimeConfig, deployParams);
   });
 });
 

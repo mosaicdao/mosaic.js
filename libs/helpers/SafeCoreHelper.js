@@ -25,26 +25,10 @@ class SafeCoreHelper {
     const oThis = this;
     web3 = web3 || oThis.web3;
 
-    if (!config) {
-      throw new Error('Mandatory parameter "config" missing. ');
-    }
-
-    if (!config.deployer) {
-      throw new Error('Mandatory configuration "deployer" missing. Set config.deployer address');
-    }
-
-    if (!config.remoteChainId) {
-      throw new Error('Mandatory configuration "remoteChainId" missing. Set config.remoteChainId.');
-    }
+    SafeCoreHelper.validateSetupConfig(config);
 
     if (!config.organization) {
       throw new Error('Mandatory configuration "organization" missing. Set config.organization contract address.');
-    }
-
-    if (config.coCoreAddress && !config.organizationOwner) {
-      throw new Error(
-        'Mandatory configuration "organizationOwner" missing. Set config.organizationOwner address. organizationOwner is mandatory when using coCoreAddress config option'
-      );
     }
 
     if (!txOptions) {
@@ -82,6 +66,27 @@ class SafeCoreHelper {
     }
 
     return promiseChain;
+  }
+
+  static validateSetupConfig(config) {
+    console.log(`* Validating ${ContractName} Setup Config.`);
+    if (!config) {
+      throw new Error('Mandatory parameter "config" missing. ');
+    }
+
+    if (!config.deployer) {
+      throw new Error('Mandatory configuration "deployer" missing. Set config.deployer address');
+    }
+
+    if (!config.remoteChainId) {
+      throw new Error('Mandatory configuration "remoteChainId" missing. Set config.remoteChainId.');
+    }
+
+    if (config.coCoreAddress && !config.organizationOwner) {
+      throw new Error(
+        'Mandatory configuration "organizationOwner" missing. Set config.organizationOwner address. organizationOwner is mandatory when using coCoreAddress config option'
+      );
+    }
   }
 
   deploy(_remoteChainId, _blockHeight, _stateRoot, _membersManager, txOptions, web3) {

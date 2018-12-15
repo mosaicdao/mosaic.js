@@ -24,10 +24,40 @@ class OSTPrimeHelper {
   Both deployer, chainOwner & valueToken are mandatory configurations.
 */
 
-  setup(config, txOptions, web3) {
+  setup(simpleToken, config, txOptions, web3) {
     const oThis = this;
     web3 = web3 || oThis.web3;
 
+    if (!simpleToken) {
+      throw new Error('Mandatory configuration "simpleToken" missing. Provide SimpleToken contract address.');
+    }
+
+    OSTPrimeHelper.validateSetupConfig(config);
+
+    if (!txOptions) {
+      txOptions = txOptions || {};
+    }
+    txOptions.gasPrice = 0;
+
+    let deployParams = Object.assign({}, txOptions);
+    deployParams.from = config.deployer;
+    deployParams.gasPrice = 0;
+
+    //1. Deploy the Contract
+    let promiseChain = oThis.deploy(simpleToken, deployParams);
+
+    //2. Initialize.
+    promiseChain = promiseChain.then(function() {
+      let ownerParams = Object.assign({}, deployParams);
+      ownerParams.from = config.chainOwner;
+      return oThis.initialize(ownerParams);
+    });
+
+    return promiseChain;
+  }
+
+  static validateSetupConfig(config) {
+    console.log(`* Validating ${ContractName} Setup Config.`);
     if (!config) {
       throw new Error('Mandatory parameter "config" missing. ');
     }
@@ -40,30 +70,7 @@ class OSTPrimeHelper {
       throw new Error('Mandatory configuration "chainOwner" missing. Set config.chainOwner.');
     }
 
-    if (!config.valueToken) {
-      throw new Error('Mandatory configuration "valueToken" missing. Set config.valueToken.');
-    }
-
-    if (!txOptions) {
-      txOptions = txOptions || {};
-    }
-    txOptions.gasPrice = 0;
-
-    let deployParams = Object.assign({}, txOptions);
-    deployParams.from = config.deployer;
-    deployParams.gasPrice = 0;
-
-    //1. Deploy the Contract
-    let promiseChain = oThis.deploy(config.valueToken, deployParams);
-
-    //2. Initialize.
-    promiseChain = promiseChain.then(function() {
-      let ownerParams = Object.assign({}, deployParams);
-      ownerParams.from = config.chainOwner;
-      return oThis.initialize(ownerParams);
-    });
-
-    return promiseChain;
+    return true;
   }
 
   deploy(_valueToken, txOptions, web3) {
