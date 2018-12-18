@@ -21,6 +21,10 @@ function prepareData(option) {
     dirFilePath = rootPrefix + path;
     fs.readdir(dirFilePath, function(err, items) {
       items.forEach(function(item) {
+        if (item.startsWith('Mock') || item.startsWith('Test')) {
+          //Ignore these files.
+          return;
+        }
         readFilePath = rootPrefix + path + '/' + item;
         fileContent = fs.readFileSync(readFilePath, option);
         try {

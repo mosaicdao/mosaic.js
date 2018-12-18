@@ -2,6 +2,7 @@
 
 const Web3 = require('web3');
 const AbiBinProvider = require('../../libs/AbiBinProvider');
+const OrganizationHelper = require('../../libs/helpers/OrganizationHelper');
 const ContractName = 'EIP20CoGateway';
 class CoGatewayHelper {
   constructor(web3, address, messageBus, gatewayLib) {
@@ -13,42 +14,42 @@ class CoGatewayHelper {
     oThis.abiBinProvider = new AbiBinProvider();
   }
 
-  static validateSetupConfig(coGatewayConfig) {
+  static validateSetupConfig(config) {
     console.log(`* Validating ${ContractName} Setup Config.`);
-    if (!coGatewayConfig.deployer) {
-      throw new Error('Mandatory configuration "deployer" missing. Set coGatewayConfig.deployer address');
+    if (!config.deployer) {
+      throw new Error('Mandatory configuration "deployer" missing. Set config.deployer address');
     }
 
-    if (!coGatewayConfig.bounty) {
-      throw new Error('Mandatory configuration "bounty" missing. Set coGatewayConfig.bounty address');
+    if (!config.bounty) {
+      throw new Error('Mandatory configuration "bounty" missing. Set config.bounty address');
     }
 
-    if (!coGatewayConfig.organization) {
-      throw new Error('Mandatory configuration "organization" missing. Set coGatewayConfig.organization address');
+    if (!config.organization) {
+      throw new Error('Mandatory configuration "organization" missing. Set config.organization address');
     }
 
-    if (!coGatewayConfig.safeCore) {
-      throw new Error('Mandatory configuration "safeCore" missing. Set coGatewayConfig.safeCore address');
+    if (!config.anchor) {
+      throw new Error('Mandatory configuration "anchor" missing. Set config.anchor address');
     }
 
-    if (!coGatewayConfig.messageBus) {
-      throw new Error('Mandatory configuration "messageBus" missing. Set coGatewayConfig.messageBus address');
+    if (!config.messageBus) {
+      throw new Error('Mandatory configuration "messageBus" missing. Set config.messageBus address');
     }
 
-    if (!coGatewayConfig.gatewayLib) {
-      throw new Error('Mandatory configuration "gatewayLib" missing. Set coGatewayConfig.gatewayLib address');
+    if (!config.gatewayLib) {
+      throw new Error('Mandatory configuration "gatewayLib" missing. Set config.gatewayLib address');
     }
 
-    if (!coGatewayConfig.valueToken) {
-      throw new Error('Mandatory configuration "valueToken" missing. Set coGatewayConfig.valueToken address');
+    if (!config.valueToken) {
+      throw new Error('Mandatory configuration "valueToken" missing. Set config.valueToken address');
     }
 
-    if (!coGatewayConfig.baseToken) {
-      throw new Error('Mandatory configuration "baseToken" missing. Set coGatewayConfig.baseToken address');
+    if (!config.baseToken) {
+      throw new Error('Mandatory configuration "baseToken" missing. Set config.baseToken address');
     }
   }
 
-  deploy(_token, _baseToken, _core, _bounty, _membersManager, _gateway, messageBus, gatewayLib, txOptions, web3) {
+  deploy(_token, _baseToken, _anchor, _bounty, _membersManager, _gateway, messageBus, gatewayLib, txOptions, web3) {
     const oThis = this;
 
     web3 = web3 || oThis.web3;
@@ -75,8 +76,9 @@ class CoGatewayHelper {
     }
     txOptions = defaultOptions;
 
+    const _burner = '0x0000000000000000000000000000000000000000';
     const contract = new web3.eth.Contract(abi, null, txOptions);
-    let args = [_token, _baseToken, _core, _bounty, _membersManager, _gateway];
+    let args = [_token, _baseToken, _anchor, _bounty, _membersManager, _gateway, _burner];
     let tx = contract.deploy(
       {
         data: bin,

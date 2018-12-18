@@ -37,22 +37,24 @@ describe('test/helpers/OrganizationHelper', function() {
 
   const orgConfig = {
     deployer: config.deployerAddress,
-    owner: config.organizationOwner,
+    owner: config.deployerAddress,
     admin: config.organizationAdmin,
-    worker: config.organizationWorker,
-    completeOwnershipTransfer: true
+    workers: [config.organizationWorker],
+    workerExpirationHeight: '2000000'
   };
 
   let helper = new OrganizationHelper(web3, caOrganisation);
 
   before(function() {
+    this.timeout(60 * 1000);
     return web3WalletHelper.init(web3);
   });
 
   if (!caOrganisation) {
     it('should deploy new organization contract', function() {
+      this.timeout(3 * 60 * 1000);
       return helper
-        .deploy(deployParams)
+        .deploy(orgConfig.owner, null, null, null, deployParams)
         .then(validateDeploymentReceipt)
         .then((receipt) => {
           caOrganisation = receipt.contractAddress;
@@ -63,22 +65,26 @@ describe('test/helpers/OrganizationHelper', function() {
   //Admin Key Address
   let kaAdmin = orgConfig.admin;
   it('should set admin address', function() {
+    this.timeout(3 * 60 * 1000);
     return helper.setAdmin(kaAdmin, deployParams).then(validateReceipt);
   });
 
   //Worker Key Address
-  let kaWorker = orgConfig.worker;
+  let kaWorker = config.deployerAddress;
   it('should set worker address', function() {
+    this.timeout(3 * 60 * 1000);
     return helper.setWorker(kaWorker, '10000000', deployParams).then(validateReceipt);
   });
 
   //Owner Key Address
-  let kaOwner = orgConfig.owner;
+  let kaOwner = config.organizationOwner;
   it('should initiate Ownership Transfer', function() {
+    this.timeout(3 * 60 * 1000);
     return helper.initiateOwnershipTransfer(kaOwner, deployParams).then(validateReceipt);
   });
 
   it('should complete Ownership Transfer', function() {
+    this.timeout(2 * 60 * 1000);
     let ownerParams = Object.assign({}, deployParams, {
       from: kaOwner
     });
@@ -86,6 +92,8 @@ describe('test/helpers/OrganizationHelper', function() {
   });
 
   it('should do complete organization setup', function() {
+    orgConfig.owner = config.organizationOwner;
+    this.timeout(2 * 60 * 1000);
     return helper.setup(orgConfig);
   });
 });

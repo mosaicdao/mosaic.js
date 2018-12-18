@@ -57,7 +57,7 @@ describe('test/helpers/GatewayHelper', function() {
         let orgHelper = new OrganizationHelper(web3, caOrganization);
         const orgConfig = {
           deployer: config.deployerAddress,
-          worker: config.organizationWorker
+          owner: config.deployerAddress
         };
         return orgHelper.setup(orgConfig).then(function() {
           caOrganization = orgHelper.address;
@@ -81,17 +81,18 @@ describe('test/helpers/GatewayHelper', function() {
 
   const someValidAddress = '0x2c4e8f2d746113d0696ce89b35f0d8bf88e0aeca';
   if (!caGateway) {
+    this.timeout(1 * 60 * 1000);
     it('should deploy new Gateway contract', function() {
       let _token = someValidAddress;
       let _baseToken = someValidAddress;
-      let _core = someValidAddress;
+      let _anchor = someValidAddress;
       let _bounty = 1000;
 
       return helper
         .deploy(
           _token,
           _baseToken,
-          _core,
+          _anchor,
           _bounty,
           caOrganization,
           caMessageBusAddress,
@@ -105,8 +106,9 @@ describe('test/helpers/GatewayHelper', function() {
     });
   }
 
-  //Set Co-Core Address.
+  //Set Co-Gateway Address.
   it('should set activate gateway', function() {
+    this.timeout(1 * 60 * 1000);
     let caCoGateway = caGateway;
     //Note: Remember, deployer is still the owner of organization here.
     return helper.activateGateway(caCoGateway, deployParams).then(validateReceipt);
@@ -119,7 +121,7 @@ describe('test/helpers/GatewayHelper', function() {
       deployer: config.deployerAddress,
       organization: caOrganization,
       organizationOwner: organizationOwner,
-      safeCore: someValidAddress,
+      anchor: someValidAddress,
       bounty: '123456',
       messageBus: caMessageBusAddress,
       gatewayLib: caGatewayLibAddress
@@ -128,7 +130,7 @@ describe('test/helpers/GatewayHelper', function() {
     let coGatewayConfig = {
       deployer: config.deployerAddress,
       organization: caOrganization,
-      safeCore: someValidAddress,
+      anchor: someValidAddress,
       bounty: '123456',
       messageBus: caMessageBusAddress,
       gatewayLib: caGatewayLibAddress

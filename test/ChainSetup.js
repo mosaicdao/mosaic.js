@@ -19,17 +19,22 @@ let getCompleteOriginConfig = function() {
     libs: {
       deployer: config.deployerAddress
     },
-    organization: {
+    anchorOrganization: {
       deployer: config.deployerAddress,
       owner: config.organizationOwner,
       admin: config.organizationAdmin,
-      worker: config.organizationWorker,
-      completeOwnershipTransfer: true
+      workers: [config.organizationWorker]
     },
-    safeCore: {
+    anchor: {
       remoteChainId: '12345',
       deployer: config.deployerAddress,
       organizationOwner: config.organizationOwner
+    },
+    gatewayOrganization: {
+      deployer: config.deployerAddress,
+      owner: config.organizationOwner,
+      admin: config.organizationAdmin,
+      workers: [config.organizationWorker]
     },
     gateway: {
       deployer: config.deployerAddress,
@@ -38,75 +43,54 @@ let getCompleteOriginConfig = function() {
   };
 };
 
-let getCompleteAuxiliaryConfig = function() {
+let getCompleteAuxiliaryConfig = (function() {
   return {
     deployer: config.deployerAddress,
     gasPrice: '0',
-    libs: {
-      deployer: config.deployerAddress
-    },
-    organization: {
+    ostPrimeOrganization: {
       deployer: config.deployerAddress,
       owner: config.organizationOwner,
       admin: config.organizationAdmin,
-      worker: config.organizationWorker,
-      completeOwnershipTransfer: false
-    },
-    safeCore: {
-      remoteChainId: '12345',
-      deployer: config.deployerAddress,
-      organizationOwner: config.organizationOwner
+      workers: [config.organizationWorker]
     },
     ostPrime: {
       deployer: config.deployerAddress,
       chainOwner: config.chainOwner
+    },
+    anchorOrganization: {
+      deployer: config.deployerAddress,
+      owner: config.organizationOwner,
+      admin: config.organizationAdmin,
+      workers: [config.organizationWorker]
+    },
+    anchor: {
+      remoteChainId: '12345',
+      deployer: config.deployerAddress,
+      organizationOwner: config.organizationOwner
+    },
+    libs: {
+      deployer: config.deployerAddress
+    },
+    cogatewayOrganization: {
+      deployer: config.deployerAddress,
+      owner: config.organizationOwner,
+      admin: config.organizationAdmin,
+      workers: [config.organizationWorker]
     },
     cogateway: {
       deployer: config.deployerAddress,
       bounty: '100'
     }
   };
-};
+})(
+  //To-Do: Write Test Case here.
 
-describe('test/ChainSetup', function() {
-  let deployParams = {
-    from: config.deployerAddress,
-    gasPrice: config.gasPrice
-  };
-
-  const orgConfig = {
-    deployer: config.deployerAddress,
-    owner: config.organizationOwner,
-    admin: config.organizationAdmin,
-    worker: config.organizationWorker,
-    completeOwnershipTransfer: true
-  };
-
-  before(function() {
-    //This hook may take some time.
-    this.timeout(60000);
-    //Add keys to web3 wallet.
-    return web3WalletHelper.init(web3);
-  });
-
-  let originWeb3 = web3;
-  let auxiliaryWeb3 = web3;
-  let helper = new ChainSetup(originWeb3, auxiliaryWeb3);
-
-  it('should do mosaic setup with exhaustive configurations', function() {
-    this.timeout(1 * 60 * 60 * 1000); //1 hr.
-    let originConfig = getCompleteOriginConfig();
-    let auxiliaryConfig = getCompleteAuxiliaryConfig();
-    let valueToken = '0x2c4e8f2d746113d0696ce89b35f0d8bf88e0aeca';
-    return helper.setup(valueToken, originConfig, auxiliaryConfig);
-  });
-});
-
-// Go easy on RPC Client (Geth)
-(function() {
-  let maxHttpScokets = 10;
-  let httpModule = require('http');
-  httpModule.globalAgent.keepAlive = true;
-  httpModule.globalAgent.keepAliveMsecs = 30 * 60 * 1000;
-  httpModule.globalAgent.maxSockets = maxHttpScokets;
-})();
+  // Go easy on RPC Client (Geth)
+  function() {
+    let maxHttpScokets = 10;
+    let httpModule = require('http');
+    httpModule.globalAgent.keepAlive = true;
+    httpModule.globalAgent.keepAliveMsecs = 30 * 60 * 1000;
+    httpModule.globalAgent.maxSockets = maxHttpScokets;
+  }
+)();

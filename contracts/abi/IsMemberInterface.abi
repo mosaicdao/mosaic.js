@@ -1,1 +1,0 @@
-[{"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"isOwner","outputs":[{"name":"isOwner_","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_worker","type":"address"}],"name":"isWorker","outputs":[{"name":"isWorker_","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"}]

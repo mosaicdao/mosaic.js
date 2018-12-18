@@ -4,6 +4,7 @@
 const chai = require('chai'),
   Web3 = require('web3'),
   OSTPrimeHelper = require('../../libs/helpers/OSTPrimeHelper'),
+  OrganizationHelper = require('../../libs/helpers/OrganizationHelper'),
   assert = chai.assert;
 
 const config = require('../../test/utils/configReader'),
@@ -13,7 +14,9 @@ const web3 = new Web3(config.gethRpcEndPoint);
 let web3WalletHelper = new Web3WalletHelper(web3);
 
 //Contract Address. TBD: Do not forget to set caOSTPrime = null below.
+//ca stands for contract address.
 let caOSTPrime = null;
+let caOrganization = null;
 let chainOwner = config.chainOwner;
 
 let validateReceipt = (receipt) => {
@@ -43,14 +46,29 @@ describe('test/helpers/OSTPrimeHelper', function() {
   let helper = new OSTPrimeHelper(web3, caOSTPrime);
 
   before(function() {
+    this.timeout(3 * 60000);
     //This hook could take long time.
-    return web3WalletHelper.init(web3);
+    return web3WalletHelper.init(web3).then(function(_out) {
+      if (!caOrganization) {
+        console.log('* Setting up Organization');
+        let orgHelper = new OrganizationHelper(web3, caOrganization);
+        const orgConfig = {
+          deployer: config.deployerAddress,
+          owner: config.deployerAddress
+        };
+        return orgHelper.setup(orgConfig).then(function() {
+          caOrganization = orgHelper.address;
+        });
+      }
+      return _out;
+    });
   });
 
   if (!caOSTPrime) {
     it('should deploy new OSTPrime contract', function() {
+      this.timeout(60000);
       return helper
-        .deploy(SimpleTokenAddress, deployParams)
+        .deploy(SimpleTokenAddress, caOrganization, deployParams)
         .then(validateDeploymentReceipt)
         .then((receipt) => {
           caOSTPrime = receipt.contractAddress;
@@ -60,6 +78,7 @@ describe('test/helpers/OSTPrimeHelper', function() {
 
   //Initialize OSTPrime
   it('should initialize OSTPrime', function() {
+    this.timeout(60000);
     let ownerParams = Object.assign({}, deployParams);
     ownerParams.from = config.chainOwner;
     return helper.initialize(ownerParams).then(validateReceipt);
@@ -70,6 +89,7 @@ describe('test/helpers/OSTPrimeHelper', function() {
     this.timeout(60000);
     const ostPrimeConfig = {
       deployer: config.deployerAddress,
+      organization: caOrganization,
       chainOwner: chainOwner
     };
     return helper.setup(SimpleTokenAddress, ostPrimeConfig, deployParams);

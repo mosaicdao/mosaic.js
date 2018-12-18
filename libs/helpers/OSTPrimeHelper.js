@@ -32,6 +32,10 @@ class OSTPrimeHelper {
       throw new Error('Mandatory configuration "simpleToken" missing. Provide SimpleToken contract address.');
     }
 
+    if (!config.organization) {
+      throw new Error('Mandatory configuration "organization" missing. Set config.organization address.');
+    }
+
     OSTPrimeHelper.validateSetupConfig(config);
 
     if (!txOptions) {
@@ -44,7 +48,7 @@ class OSTPrimeHelper {
     deployParams.gasPrice = 0;
 
     //1. Deploy the Contract
-    let promiseChain = oThis.deploy(simpleToken, deployParams);
+    let promiseChain = oThis.deploy(simpleToken, config.organization, deployParams);
 
     //2. Initialize.
     promiseChain = promiseChain.then(function() {
@@ -73,7 +77,7 @@ class OSTPrimeHelper {
     return true;
   }
 
-  deploy(_valueToken, txOptions, web3) {
+  deploy(_valueToken, _organization, txOptions, web3) {
     const oThis = this;
     web3 = web3 || oThis.web3;
     const abiBinProvider = oThis.abiBinProvider;
@@ -90,7 +94,7 @@ class OSTPrimeHelper {
     }
     txOptions = defaultOptions;
 
-    let args = [_valueToken];
+    let args = [_valueToken, _organization];
     const contract = new web3.eth.Contract(abi, null, txOptions);
     let tx = contract.deploy(
       {

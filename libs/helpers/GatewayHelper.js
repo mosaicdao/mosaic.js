@@ -20,7 +20,7 @@ class GatewayHelper {
   {
     "deployer": "0x...",
     "organization": "0x...",
-    "safeCore": "0x....",
+    "anchor": "0x....",
     "bounty": "123456",
     "messageBus": "0x....",
     "gatewayLib": "0x....",
@@ -31,7 +31,7 @@ class GatewayHelper {
   {
     "deployer": "0x...",
     "organization": "0x...",
-    "safeCore": "0x....",
+    "anchor": "0x....",
     "bounty": "123456",
     "messageBus": "0x....",
     "gatewayLib": "0x....",
@@ -108,7 +108,7 @@ class GatewayHelper {
     let promiseChain = oThis.deploy(
       gatewayConfig.valueToken,
       gatewayConfig.baseToken,
-      gatewayConfig.safeCore,
+      gatewayConfig.anchor,
       gatewayConfig.bounty,
       gatewayConfig.organization,
       gatewayConfig.messageBus,
@@ -122,7 +122,7 @@ class GatewayHelper {
       return coGatewayHelper.deploy(
         coGatewayConfig.valueToken,
         coGatewayConfig.baseToken,
-        coGatewayConfig.safeCore,
+        coGatewayConfig.anchor,
         coGatewayConfig.bounty,
         gatewayAddress,
         coGatewayConfig.organization,
@@ -155,8 +155,8 @@ class GatewayHelper {
       throw new Error('Mandatory configuration "organization" missing. Set gatewayConfig.organization address');
     }
 
-    if (!gatewayConfig.safeCore) {
-      throw new Error('Mandatory configuration "safeCore" missing. Set gatewayConfig.safeCore address');
+    if (!gatewayConfig.anchor) {
+      throw new Error('Mandatory configuration "anchor" missing. Set gatewayConfig.anchor address');
     }
 
     if (!gatewayConfig.bounty) {
@@ -186,7 +186,7 @@ class GatewayHelper {
     }
   }
 
-  deploy(_token, _baseToken, _core, _bounty, _membersManager, messageBusAddress, gatewayLibAddress, txOptions, web3) {
+  deploy(_token, _baseToken, _anchor, _bounty, _membersManager, messageBusAddress, gatewayLibAddress, txOptions, web3) {
     const oThis = this;
 
     web3 = web3 || oThis.web3;
@@ -214,7 +214,8 @@ class GatewayHelper {
     txOptions = defaultOptions;
 
     const contract = new web3.eth.Contract(abi, null, txOptions);
-    let args = [_token, _baseToken, _core, _bounty, _membersManager];
+    const _burner = '0x0000000000000000000000000000000000000000';
+    let args = [_token, _baseToken, _anchor, _bounty, _membersManager, _burner];
     let tx = contract.deploy(
       {
         data: bin,

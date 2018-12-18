@@ -4,12 +4,13 @@ const Web3 = require('web3');
 const AbiBinProvider = require('../../libs/AbiBinProvider');
 const OrganizationHelper = require('../../libs/helpers/OrganizationHelper');
 
-const ContractName = 'SafeCore';
+const ContractName = 'Anchor';
 
-class SafeCoreHelper {
-  constructor(web3, address) {
+class AnchorHelper {
+  constructor(web3, coWeb3, address) {
     const oThis = this;
     oThis.web3 = web3;
+    oThis.coWeb3 = coWeb3;
     oThis.address = address;
     oThis.abiBinProvider = new AbiBinProvider();
   }
@@ -17,15 +18,21 @@ class SafeCoreHelper {
   /*
     //Supported Configurations for setup
     {
-  
+      "remoteChainId": 123456,
+      "deployer": config.deployerAddress,
+      "organization": caOrganization,
+      "coAnchorAddress": caAnchor,
+      "maxStateRoots": maxStateRoots,
+      "organizationOwner": organizationOwner
     }
   */
 
-  setup(config, txOptions, web3) {
+  setup(config, txOptions, web3, coWeb3) {
     const oThis = this;
     web3 = web3 || oThis.web3;
+    coWeb3 = coWeb3 || oThis.coWeb3;
 
-    SafeCoreHelper.validateSetupConfig(config);
+    AnchorHelper.validateSetupConfig(config);
 
     if (!config.organization) {
       throw new Error('Mandatory configuration "organization" missing. Set config.organization contract address.');
@@ -46,22 +53,29 @@ class SafeCoreHelper {
     let blockHeight = config.blockHeight || 'latest';
     let stateRoot;
     console.log('* Fetching Block:', blockHeight);
-    let promiseChain = web3.eth.getBlock(blockHeight).then(function(block) {
+    let promiseChain = coWeb3.eth.getBlock(blockHeight).then(function(block) {
       blockHeight = block.number;
       stateRoot = block.stateRoot;
     });
 
     //2. Deploy the Contract
     promiseChain = promiseChain.then(function() {
-      return oThis.deploy(config.remoteChainId, blockHeight, stateRoot, config.organization, deployParams);
+      return oThis.deploy(
+        config.remoteChainId,
+        blockHeight,
+        stateRoot,
+        config.maxStateRoots,
+        config.organization,
+        deployParams
+      );
     });
 
-    //3. Set coCoreAddress.
-    if (config.coCoreAddress) {
+    //3. Set coAnchorAddress.
+    if (config.coAnchorAddress) {
       promiseChain = promiseChain.then(function() {
         let ownerParams = Object.assign({}, deployParams);
         ownerParams.from = config.organizationOwner;
-        return oThis.setCoCoreAddress(config.coCoreAddress, ownerParams);
+        return oThis.setCoAnchorAddress(config.coAnchorAddress, ownerParams);
       });
     }
 
@@ -82,14 +96,14 @@ class SafeCoreHelper {
       throw new Error('Mandatory configuration "remoteChainId" missing. Set config.remoteChainId.');
     }
 
-    if (config.coCoreAddress && !config.organizationOwner) {
+    if (config.coAnchorAddress && !config.organizationOwner) {
       throw new Error(
-        'Mandatory configuration "organizationOwner" missing. Set config.organizationOwner address. organizationOwner is mandatory when using coCoreAddress config option'
+        'Mandatory configuration "organizationOwner" missing. Set config.organizationOwner address. organizationOwner is mandatory when using coAnchorAddress config option'
       );
     }
   }
 
-  deploy(_remoteChainId, _blockHeight, _stateRoot, _membersManager, txOptions, web3) {
+  deploy(_remoteChainId, _blockHeight, _stateRoot, _maxStateRoots, _membersManager, txOptions, web3) {
     const oThis = this;
     web3 = web3 || oThis.web3;
     const abiBinProvider = oThis.abiBinProvider;
@@ -104,8 +118,9 @@ class SafeCoreHelper {
       Object.assign(defaultOptions, txOptions);
     }
     txOptions = defaultOptions;
+    _maxStateRoots = _maxStateRoots || AnchorHelper.DEFAULT_MAX_STATE_ROOTS;
 
-    let args = [_remoteChainId, _blockHeight, _stateRoot, _membersManager];
+    let args = [_remoteChainId, _blockHeight, _stateRoot, _maxStateRoots, _membersManager];
     const contract = new web3.eth.Contract(abi, null, txOptions);
     let tx = contract.deploy(
       {
@@ -137,7 +152,7 @@ class SafeCoreHelper {
       });
   }
 
-  setCoCoreAddress(coCoreAddress, txOptions, contractAddress, web3) {
+  setCoAnchorAddress(coAnchorAddress, txOptions, contractAddress, web3) {
     const oThis = this;
     web3 = web3 || oThis.web3;
     contractAddress = contractAddress || oThis.address;
@@ -154,9 +169,9 @@ class SafeCoreHelper {
     const abiBinProvider = oThis.abiBinProvider;
     const abi = abiBinProvider.getABI(ContractName);
     const contract = new web3.eth.Contract(abi, contractAddress, txOptions);
-    let tx = contract.methods.setCoCoreAddress(coCoreAddress);
+    let tx = contract.methods.setCoAnchorAddress(coAnchorAddress);
 
-    console.log(`* Setting ${ContractName} Co-Core Address`);
+    console.log(`* Setting ${ContractName} Co-${ContractName} Address`);
     return tx
       .send(txOptions)
       .on('transactionHash', function(transactionHash) {
@@ -170,6 +185,10 @@ class SafeCoreHelper {
         return Promise.reject(error);
       });
   }
+
+  static get DEFAULT_MAX_STATE_ROOTS() {
+    return 60;
+  }
 }
 
-module.exports = SafeCoreHelper;
+module.exports = AnchorHelper;

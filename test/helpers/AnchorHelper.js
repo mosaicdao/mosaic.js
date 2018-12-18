@@ -4,7 +4,7 @@
 const chai = require('chai'),
   Web3 = require('web3'),
   OrganizationHelper = require('../../libs/helpers/OrganizationHelper'),
-  SafeCoreHelper = require('../../libs/helpers/SafeCoreHelper'),
+  AnchorHelper = require('../../libs/helpers/AnchorHelper'),
   assert = chai.assert;
 
 const config = require('../../test/utils/configReader'),
@@ -13,9 +13,9 @@ const config = require('../../test/utils/configReader'),
 const web3 = new Web3(config.gethRpcEndPoint);
 let web3WalletHelper = new Web3WalletHelper(web3);
 
-//Contract Address. TBD: Do not forget to set caOrganization && caSafeCore = null below.
+//Contract Address. TBD: Do not forget to set caOrganization && caAnchor = null below.
 let caOrganization = null;
-let caSafeCore = null;
+let caAnchor = null;
 let organizationOwner = config.deployerAddress;
 
 let validateReceipt = (receipt) => {
@@ -32,20 +32,20 @@ let validateDeploymentReceipt = (receipt) => {
   assert.isTrue(web3.utils.isAddress(contractAddress), 'Invalid contractAddress in Receipt');
   return receipt;
 };
-describe('test/helpers/SafeCore', function() {
+describe('test/helpers/Anchor', function() {
   let deployParams = {
     from: config.deployerAddress,
     gasPrice: config.gasPrice
   };
 
-  let helper = new SafeCoreHelper(web3, caSafeCore);
+  let helper = new AnchorHelper(web3, web3, caAnchor);
 
-  let coreChainId = '123456';
+  let remoteChainId = '123456';
   let initialBlockHeight, initialStateRoot;
 
   before(function() {
     //This hook could take long time.
-    this.timeout(120000);
+    this.timeout(3 * 60000);
 
     return web3WalletHelper
       .init(web3)
@@ -55,7 +55,7 @@ describe('test/helpers/SafeCore', function() {
           let orgHelper = new OrganizationHelper(web3, caOrganization);
           const orgConfig = {
             deployer: config.deployerAddress,
-            worker: config.organizationWorker
+            owner: config.deployerAddress
           };
           return orgHelper.setup(orgConfig).then(function() {
             caOrganization = orgHelper.address;
@@ -64,7 +64,7 @@ describe('test/helpers/SafeCore', function() {
         return _out;
       })
       .then(function(_out) {
-        if (!caSafeCore) {
+        if (!caAnchor) {
           console.log('Getting latest block');
           //Get BlockHeight and StateRoot
           return web3.eth.getBlock('latest').then(function(block) {
@@ -77,35 +77,36 @@ describe('test/helpers/SafeCore', function() {
       });
   });
 
-  if (!caSafeCore) {
-    it('should deploy new SafeCore contract', function() {
-      console.log('caOrganization', caOrganization);
+  if (!caAnchor) {
+    it('should deploy new Anchor contract', function() {
+      this.timeout(1 * 60000);
       return helper
-        .deploy(coreChainId, initialBlockHeight, initialStateRoot, caOrganization, deployParams)
+        .deploy(remoteChainId, initialBlockHeight, initialStateRoot, 10, caOrganization, deployParams)
         .then(validateDeploymentReceipt)
         .then((receipt) => {
-          caSafeCore = receipt.contractAddress;
+          caAnchor = receipt.contractAddress;
         });
     });
   }
 
-  //Set Co-Core Address.
-  it('should set co-core address', function() {
-    let caCoCore = caSafeCore;
-    return helper.setCoCoreAddress(caSafeCore, deployParams).then(validateReceipt);
+  //Set Co-Anchor Address.
+  it('should set co-anchor address', function() {
+    this.timeout(1 * 60000);
+    return helper.setCoAnchorAddress(caAnchor, deployParams).then(validateReceipt);
   });
 
   //Test Setup
-  it('should setup SafeCore', function() {
-    this.timeout(60000);
-    let safeCoreConfig = {
+  it('should setup Anchor', function() {
+    this.timeout(3 * 60000);
+    let anchorConfig = {
       remoteChainId: 123456,
       deployer: config.deployerAddress,
       organization: caOrganization,
-      coCoreAddress: caSafeCore,
+      coAnchorAddress: caAnchor,
+      maxStateRoots: 10,
       organizationOwner: organizationOwner
     };
-    return helper.setup(safeCoreConfig, deployParams);
+    return helper.setup(anchorConfig, deployParams);
   });
 });
 

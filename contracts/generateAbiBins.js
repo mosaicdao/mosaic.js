@@ -1,7 +1,8 @@
 //1. Clone mosaic-contracts
 //2. Checkout develop or any branch of your liking.
 //3. run: npm run compile
-//4. run: node ./generateAbiBins.js
+//4. Come back to mosaic-tbd/contracts
+//5. run: node ./generateAbiBins.js
 
 const fs = require('fs');
 const path = require('path');

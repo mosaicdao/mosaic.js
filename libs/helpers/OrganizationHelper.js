@@ -4,7 +4,7 @@ const Web3 = require('web3');
 const AbiBinProvider = require('../../libs/AbiBinProvider');
 
 const ContractName = 'Organization';
-const WorkerExpirationHeight = 10000000;
+const WorkerExpirationHeight = '10000000';
 class OrganizationHelper {
   constructor(web3, address) {
     const oThis = this;
@@ -20,8 +20,7 @@ class OrganizationHelper {
     "owner": config.organizationOwner, 
     "admin": config.organizationAdmin, 
     "worker": config.organizationWorker,
-    "workerExpirationHeight": 10000000, 
-    "completeOwnershipTransfer": true
+    "workerExpirationHeight": 10000000
   };
   //deployer and worker are mandetory.
 */
@@ -44,39 +43,7 @@ class OrganizationHelper {
     deployParams.from = config.deployer;
 
     //Deploy Contract
-    let promiseChain = oThis.deploy(deployParams);
-
-    //Set Worker
-    promiseChain = promiseChain.then(function() {
-      let _expirationHeight = config.workerExpirationHeight || WorkerExpirationHeight;
-      _expirationHeight = Number(_expirationHeight);
-      return oThis.setWorker(config.worker, _expirationHeight, deployParams);
-    });
-
-    //Set Admin
-    if (config.admin) {
-      promiseChain = promiseChain.then(function() {
-        return oThis.setAdmin(config.admin, deployParams);
-      });
-    }
-
-    //Initiate Ownership Transfer
-    if (config.owner) {
-      promiseChain = promiseChain.then(function() {
-        return oThis.initiateOwnershipTransfer(config.owner, deployParams);
-      });
-    }
-
-    //Claim OwnerShip
-    if (config.owner && config.completeOwnershipTransfer) {
-      promiseChain = promiseChain.then(function() {
-        let cTxOptions = Object.assign({}, deployParams);
-        cTxOptions.from = config.owner;
-        return oThis.completeOwnershipTransfer(cTxOptions);
-      });
-    }
-
-    return promiseChain;
+    return oThis.deploy(config.owner, config.admin, config.workers, config.workerExpirationHeight, deployParams, web3);
   }
 
   static validateSetupConfig(config) {
@@ -89,13 +56,13 @@ class OrganizationHelper {
       throw new Error('Mandatory configuration "deployer" missing. Set config.deployer address');
     }
 
-    if (!config.worker) {
-      throw new Error('Mandatory configuration "worker" missing. Set config.worker address');
+    if (!config.owner) {
+      throw new Error('Mandatory configuration "owner" missing. Set config.owner address');
     }
     return true;
   }
 
-  deploy(txOptions, web3) {
+  deploy(owner, admin, workers, expirationHeight, txOptions, web3) {
     const oThis = this;
     web3 = web3 || oThis.web3;
     const abiBinProvider = oThis.abiBinProvider;
@@ -111,8 +78,20 @@ class OrganizationHelper {
     }
     txOptions = defaultOptions;
 
+    let _expirationHeight;
+    if (workers) {
+      if (!(workers instanceof Array)) {
+        workers = [workers];
+      }
+      _expirationHeight = expirationHeight || WorkerExpirationHeight;
+      _expirationHeight = String(_expirationHeight);
+    } else {
+      workers = [];
+      _expirationHeight = '0';
+    }
+
     const contract = new web3.eth.Contract(abi, null, txOptions);
-    let args = [];
+    let args = [owner, admin, workers, _expirationHeight];
     let tx = contract.deploy(
       {
         data: bin,
@@ -278,6 +257,10 @@ class OrganizationHelper {
         console.log('\t !! Error !!', error, '\n\t !! ERROR !!\n');
         return Promise.reject(error);
       });
+  }
+
+  static get DefaultWorkerExpirationHeight() {
+    return WorkerExpirationHeight;
   }
 
   static contract(web3, contractAddress) {

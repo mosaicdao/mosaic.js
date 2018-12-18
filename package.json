@@ -62,8 +62,6 @@
   },
   "pre-commit": {
     "run": [
-      "web-build",
-      "web-post-build",
       "pre-commit"
     ]
   },

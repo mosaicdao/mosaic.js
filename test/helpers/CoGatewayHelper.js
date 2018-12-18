@@ -57,7 +57,7 @@ describe('test/helpers/CoGatewayHelper', function() {
         let orgHelper = new OrganizationHelper(web3, caOrganization);
         const orgConfig = {
           deployer: config.deployerAddress,
-          worker: config.organizationWorker
+          owner: config.deployerAddress
         };
         return orgHelper.setup(orgConfig).then(function() {
           caOrganization = orgHelper.address;
@@ -81,10 +81,11 @@ describe('test/helpers/CoGatewayHelper', function() {
 
   const someValidAddress = '0x2c4e8f2d746113d0696ce89b35f0d8bf88e0aeca';
   if (!caCoGateway) {
-    it('should deploy new Gateway contract', function() {
+    it('should deploy new CoGateway contract', function() {
+      this.timeout(1 * 60 * 1000);
       let _token = someValidAddress;
       let _baseToken = someValidAddress;
-      let _core = someValidAddress;
+      let _anchor = someValidAddress;
       let _bounty = 1000;
       let _gateway = someValidAddress;
 
@@ -92,7 +93,7 @@ describe('test/helpers/CoGatewayHelper', function() {
         .deploy(
           _token,
           _baseToken,
-          _core,
+          _anchor,
           _bounty,
           _gateway,
           caOrganization,
