@@ -7,7 +7,7 @@ const AnchorHelper = require('./helpers/AnchorHelper');
 const OSTPrimeHelper = require('./helpers/OSTPrimeHelper');
 const LibsHelper = require('./helpers/LibsHelper');
 const GatewayHelper = require('./helpers/GatewayHelper');
-const CoGatewayHelper = require('./helpers/GatewayHelper');
+const CoGatewayHelper = require('./helpers/CoGatewayHelper');
 
 class ChainSetup {
   constructor(originWeb3, auxiliaryWeb3) {
@@ -37,7 +37,7 @@ class ChainSetup {
           - On Auxiliary: 
             - Set coAnchor - orig.anchor address with aux.anchor
           - On Origin:
-            - Set coAnchor - aux.anchor address with orig.anchor 
+            - Set coAnchor - aux.anchor address with orig.anchor
 
          //------------------- THE PART BELOW COMMON FOR ECONOMY SETUP -------------------//     
         - Setup Organizations & Libs:
@@ -181,6 +181,14 @@ class ChainSetup {
 
   static get LibsHelper() {
     return LibsHelper;
+  }
+
+  static get GatewayHelper() {
+    return GatewayHelper;
+  }
+
+  static get CoGatewayHelper() {
+    return CoGatewayHelper;
   }
 }
 
