@@ -14,6 +14,38 @@ class CoGatewayHelper {
     oThis.abiBinProvider = new AbiBinProvider();
   }
 
+  setup(config, txOptions, web3) {
+    const oThis = this;
+
+    CoGatewayHelper.validateSetupConfig(config);
+
+    if (!config.gateway) {
+      throw new Error('Mandatory configuration "gateway" missing. Set config.gateway address');
+    }
+
+    if (!txOptions) {
+      txOptions = txOptions || {};
+    }
+
+    if (typeof txOptions.gasPrice === 'undefined') {
+      txOptions.gasPrice = '0x5B9ACA00';
+    }
+
+    txOptions.from = txOptions.from || config.deployer;
+
+    return oThis.deploy(
+      config.valueToken,
+      config.utilityToken,
+      config.anchor,
+      config.bounty,
+      config.gateway,
+      config.organization,
+      config.messageBus,
+      config.gatewayLib,
+      txOptions,
+      web3
+    );
+  }
   static validateSetupConfig(config) {
     console.log(`* Validating ${ContractName} Setup Config.`);
     if (!config.deployer) {
@@ -44,12 +76,23 @@ class CoGatewayHelper {
       throw new Error('Mandatory configuration "valueToken" missing. Set config.valueToken address');
     }
 
-    if (!config.baseToken) {
-      throw new Error('Mandatory configuration "baseToken" missing. Set config.baseToken address');
+    if (!config.utilityToken) {
+      throw new Error('Mandatory configuration "utilityToken" missing. Set config.utilityToken address');
     }
   }
 
-  deploy(_token, _baseToken, _anchor, _bounty, _membersManager, _gateway, messageBus, gatewayLib, txOptions, web3) {
+  deploy(
+    _valueToken,
+    _utilityToken,
+    _anchor,
+    _bounty,
+    _membersManager,
+    _gateway,
+    messageBus,
+    gatewayLib,
+    txOptions,
+    web3
+  ) {
     const oThis = this;
 
     web3 = web3 || oThis.web3;
@@ -78,7 +121,7 @@ class CoGatewayHelper {
 
     const _burner = '0x0000000000000000000000000000000000000000';
     const contract = new web3.eth.Contract(abi, null, txOptions);
-    let args = [_token, _baseToken, _anchor, _bounty, _membersManager, _gateway, _burner];
+    let args = [_valueToken, _utilityToken, _anchor, _bounty, _membersManager, _gateway, _burner];
     let tx = contract.deploy(
       {
         data: bin,

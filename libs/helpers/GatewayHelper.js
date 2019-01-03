@@ -30,6 +30,8 @@ class GatewayHelper {
   //coGatewayConfig
   {
     "deployer": "0x...",
+    "token": "0x...",
+    "baseToken": "0x...",
     "organization": "0x...",
     "anchor": "0x....",
     "bounty": "123456",
@@ -38,16 +40,7 @@ class GatewayHelper {
     "ostPrime": "0x...."
   }
 */
-  setup(
-    valueToken,
-    baseToken,
-    gatewayConfig,
-    coGatewayConfig,
-    gatewayTxOptions,
-    coGatewayTxOptions,
-    originWeb3,
-    auxiliaryWeb3
-  ) {
+  setup(gatewayConfig, coGatewayConfig, gatewayTxOptions, coGatewayTxOptions, originWeb3, auxiliaryWeb3) {
     const oThis = this;
     originWeb3 = originWeb3 || oThis.web3;
 
@@ -62,20 +55,16 @@ class GatewayHelper {
     gatewayConfig.messageBus = gatewayConfig.messageBus || oThis.messageBus;
     gatewayConfig.gatewayLib = gatewayConfig.gatewayLib || oThis.gatewayLib;
 
-    //For chain setup this should be SimpleToken Contract address.
-    gatewayConfig.valueToken = valueToken;
-    coGatewayConfig.valueToken = valueToken;
-
-    //For chain setup this should be OSTPrime Contract address.
-    gatewayConfig.baseToken = baseToken;
-    coGatewayConfig.baseToken = baseToken;
-
     if (!originWeb3) {
       throw new Error('Mandatory parameter "originWeb3" missing.');
     }
 
     if (!auxiliaryWeb3) {
       throw new Error('Mandatory parameter "auxiliaryWeb3" missing.');
+    }
+
+    if (!gatewayConfig.baseToken) {
+      throw new Error('Mandatory configuration "baseToken" missing. Set gatewayConfig.baseToken address');
     }
 
     GatewayHelper.validateSetupConfig(gatewayConfig);
@@ -92,21 +81,10 @@ class GatewayHelper {
     let gatewayDeployParams = Object.assign({}, gatewayTxOptions);
     gatewayDeployParams.from = gatewayConfig.deployer;
 
-    if (!coGatewayTxOptions) {
-      coGatewayTxOptions = coGatewayTxOptions || {};
-    }
-
-    if (typeof coGatewayTxOptions.gasPrice === 'undefined') {
-      coGatewayTxOptions.gasPrice = '0x5B9ACA00';
-    }
-
-    let coGatewayDeployParams = Object.assign({}, coGatewayTxOptions);
-    coGatewayDeployParams.from = coGatewayConfig.deployer;
-
     let coGatewayHelper = new CoGatewayHelper(auxiliaryWeb3);
 
     let promiseChain = oThis.deploy(
-      gatewayConfig.valueToken,
+      gatewayConfig.token,
       gatewayConfig.baseToken,
       gatewayConfig.anchor,
       gatewayConfig.bounty,
@@ -119,18 +97,8 @@ class GatewayHelper {
 
     promiseChain = promiseChain.then(function() {
       let gatewayAddress = oThis.address;
-      return coGatewayHelper.deploy(
-        coGatewayConfig.valueToken,
-        coGatewayConfig.baseToken,
-        coGatewayConfig.anchor,
-        coGatewayConfig.bounty,
-        gatewayAddress,
-        coGatewayConfig.organization,
-        coGatewayConfig.messageBus,
-        coGatewayConfig.gatewayLib,
-        coGatewayDeployParams,
-        auxiliaryWeb3
-      );
+      coGatewayConfig.gateway = gatewayAddress;
+      return coGatewayHelper.setup(coGatewayConfig, coGatewayTxOptions, auxiliaryWeb3);
     });
 
     promiseChain = promiseChain.then(function() {
@@ -171,12 +139,8 @@ class GatewayHelper {
       throw new Error('Mandatory configuration "gatewayLib" missing. Set gatewayConfig.gatewayLib address');
     }
 
-    if (!gatewayConfig.valueToken) {
-      throw new Error('Mandatory configuration "valueToken" missing. Set gatewayConfig.valueToken address');
-    }
-
-    if (!gatewayConfig.baseToken) {
-      throw new Error('Mandatory configuration "baseToken" missing. Set gatewayConfig.baseToken address');
+    if (!gatewayConfig.token) {
+      throw new Error('Mandatory configuration "token" missing. Set gatewayConfig.token address');
     }
 
     if (!gatewayConfig.organizationOwner) {

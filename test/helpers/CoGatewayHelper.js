@@ -84,7 +84,7 @@ describe('test/helpers/CoGatewayHelper', function() {
     it('should deploy new CoGateway contract', function() {
       this.timeout(1 * 60 * 1000);
       let _token = someValidAddress;
-      let _baseToken = someValidAddress;
+      let _utilityToken = someValidAddress;
       let _anchor = someValidAddress;
       let _bounty = 1000;
       let _gateway = someValidAddress;
@@ -92,7 +92,7 @@ describe('test/helpers/CoGatewayHelper', function() {
       return helper
         .deploy(
           _token,
-          _baseToken,
+          _utilityToken,
           _anchor,
           _bounty,
           _gateway,

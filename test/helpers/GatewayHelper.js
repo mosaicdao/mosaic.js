@@ -80,45 +80,50 @@ describe('test/helpers/GatewayHelper', function() {
   });
 
   const someValidAddress = '0x2c4e8f2d746113d0696ce89b35f0d8bf88e0aeca';
-  if (!caGateway) {
-    this.timeout(1 * 60 * 1000);
-    it('should deploy new Gateway contract', function() {
-      let _token = someValidAddress;
-      let _baseToken = someValidAddress;
-      let _anchor = someValidAddress;
-      let _bounty = 1000;
+  // if (!caGateway) {
+  //   this.timeout(1 * 60 * 1000);
+  //   it('should deploy new Gateway contract', function() {
+  //     let _token = someValidAddress;
+  //     let _baseToken = someValidAddress;
+  //     let _anchor = someValidAddress;
+  //     let _bounty = 1000;
 
-      return helper
-        .deploy(
-          _token,
-          _baseToken,
-          _anchor,
-          _bounty,
-          caOrganization,
-          caMessageBusAddress,
-          caGatewayLibAddress,
-          deployParams
-        )
-        .then(validateDeploymentReceipt)
-        .then((receipt) => {
-          caGateway = receipt.contractAddress;
-        });
-    });
-  }
+  //     return helper
+  //       .deploy(
+  //         _token,
+  //         _baseToken,
+  //         _anchor,
+  //         _bounty,
+  //         caOrganization,
+  //         caMessageBusAddress,
+  //         caGatewayLibAddress,
+  //         deployParams
+  //       )
+  //       .then(validateDeploymentReceipt)
+  //       .then((receipt) => {
+  //         caGateway = receipt.contractAddress;
+  //       });
+  //   });
+  // }
 
-  //Set Co-Gateway Address.
-  it('should set activate gateway', function() {
-    this.timeout(1 * 60 * 1000);
-    let caCoGateway = caGateway;
-    //Note: Remember, deployer is still the owner of organization here.
-    return helper.activateGateway(caCoGateway, deployParams).then(validateReceipt);
-  });
+  // //Set Co-Gateway Address.
+  // it('should activate gateway', function() {
+  //   this.timeout(1 * 60 * 1000);
+  //   let caCoGateway = caGateway;
+  //   //Note: Remember, deployer is still the owner of organization here.
+  //   return helper.activateGateway(caCoGateway, deployParams).then(validateReceipt);
+  // });
 
   //Test Setup
   it('should setup Gateway and CoGateway', function() {
     this.timeout(5 * 60 * 1000);
+    let simpleToken = someValidAddress;
+    let ostPrime = someValidAddress;
+
     let gatewayConfig = {
       deployer: config.deployerAddress,
+      token: simpleToken,
+      baseToken: simpleToken,
       organization: caOrganization,
       organizationOwner: organizationOwner,
       anchor: someValidAddress,
@@ -129,6 +134,8 @@ describe('test/helpers/GatewayHelper', function() {
 
     let coGatewayConfig = {
       deployer: config.deployerAddress,
+      valueToken: simpleToken,
+      utilityToken: ostPrime,
       organization: caOrganization,
       anchor: someValidAddress,
       bounty: '123456',
@@ -136,9 +143,7 @@ describe('test/helpers/GatewayHelper', function() {
       gatewayLib: caGatewayLibAddress
     };
 
-    let simpleToken = someValidAddress;
-    let ostPrime = someValidAddress;
-    return helper.setup(simpleToken, ostPrime, gatewayConfig, coGatewayConfig, deployParams, deployParams, web3, web3);
+    return helper.setup(gatewayConfig, coGatewayConfig, deployParams, deployParams, web3, web3);
   });
 });
 
