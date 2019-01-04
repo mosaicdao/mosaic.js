@@ -14,6 +14,7 @@ class ChainSetup {
     this.originWeb3 = originWeb3;
     this.auxiliaryWeb3 = auxiliaryWeb3;
   }
+
   setup(simpleTokenAddress, originConfig, auxiliaryConfig, originWeb3, auxiliaryWeb3) {
     const oThis = this;
     originWeb3 = originWeb3 || oThis.originWeb3;
@@ -23,6 +24,7 @@ class ChainSetup {
       origin: {},
       auxiliary: {}
     };
+
     let originTxOptions = {
       gasPrice: originConfig.gasPrice || '0x5B9ACA00'
     };
@@ -43,8 +45,109 @@ class ChainSetup {
       addresses.token = simpleTokenAddress;
     });
 
-    //A.1. Deploy (Token) Organization [Orig]
-    promiseChain = promiseChain
+    //A. Deploy (Token) Organization [Orig]
+    promiseChain = oThis.setupTokenOrganizationOnOrigin(
+      promiseChain,
+      originWeb3,
+      originConfig,
+      originTxOptions,
+      outAddresses
+    );
+
+    //B. Deploy Utility Token
+    promiseChain = oThis.setupToken(
+      promiseChain,
+      auxiliaryWeb3,
+      auxiliaryConfig,
+      auxTxOptions,
+      simpleTokenAddress,
+      outAddresses
+    );
+
+    //C. Deploy and Prepare Anchors
+    promiseChain = oThis.setupAnchor(
+      promiseChain,
+      originWeb3,
+      auxiliaryWeb3,
+      originConfig,
+      auxiliaryConfig,
+      originTxOptions,
+      auxTxOptions,
+      outAddresses
+    );
+
+    //D. Deploy Libs
+    promiseChain = oThis.setupLibs(
+      promiseChain,
+      originWeb3,
+      auxiliaryWeb3,
+      originConfig,
+      auxiliaryConfig,
+      originTxOptions,
+      auxTxOptions,
+      outAddresses
+    );
+
+    //E. Deploy Gateways
+    promiseChain = oThis.setupGateways(
+      promiseChain,
+      originWeb3,
+      auxiliaryWeb3,
+      originConfig,
+      auxiliaryConfig,
+      originTxOptions,
+      auxTxOptions,
+      simpleTokenAddress,
+      outAddresses
+    );
+
+    /*
+          |---------------------------------------|---------------------------------------|
+          |            Chain-Setup                |               Economy-Setup           |
+          |---------------------------------------|---------------------------------------|
+          |                       A. Deploy and Prepare Origin EIP-20                     |
+          |---------------------------------------|---------------------------------------|
+          | 1. Deploy (Token) Organization [Orig] | 1. Deploy (Token) Organization [Orig] |
+          | 2. Deploy MockSimpleToken [Orig]      | 2. Deploy Branded Token [Orig]        |
+          | * On Mainnet SimpleToken is           |                                       |
+          |   already deployed.                   |                                       |
+          |---------------------------------------|---------------------------------------|
+          |                          B. Deploy Utility Token                              |
+          |---------------------------------------|---------------------------------------|
+          | 1. Deploy (Token) Organization [Aux]  | 1. Deploy (Token) Organization [Aux]  |
+          | 2. Deploy OSTPrime [Aux]              | 2. Deploy Utility Branded Token [Aux] |
+          |---------------------------------------|---------------------------------------|
+          |                      C. Deploy and Prepare Anchors                            |
+          |---------------------------------------|---------------------------------------|
+          | 1. Deploy (Anchor) Organization [Orig]| * Do nothing, get address of Anchors  |
+          | 2. Deploy Anchor [Orig]               |   deployed during chain-setup         |
+          | 3. Deploy (Anchor) Organization [Aux] |                                       |
+          | 4. Deploy Anchor & set co-anchor      |                                       |
+          |    address. [Aux]                     |                                       |
+          | 5. Set Co-Anchor address [Orig]       |                                       |
+          |---------------------------------------|---------------------------------------|
+          |                               D. Deploy Libs                                  |
+          |---------------------------------------|---------------------------------------|
+          | 1. Deply MerklePatriciaProof [Both]   | 1. Deply MerklePatriciaProof [Both]   |
+          | 2. Deploy MessageBus [Both]           | 2. Deploy MessageBus [Both]           |
+          | 3. Deploy GatewayLib [Both]           | 3. Deploy GatewayLib [Both]           |
+          |---------------------------------------|---------------------------------------|
+          |                             E.  Deploy Gateways                               |
+          |---------------------------------------|---------------------------------------|
+          | 1. Deploy Gateway [Orig]              | 1. Deploy Gateway [Orig]              |
+          | 2. Deploy Cogateway [Aux]             | 2. Deploy Cogateway [Aux]             |
+          | 3. Activate Gateway [Orig]            | 3. Activate Gateway [Orig]            |
+          |---------------------------------------|---------------------------------------|
+    */
+
+    promiseChain = oThis.finishSetup(promiseChain, originConfig, auxiliaryConfig, outAddresses);
+
+    return promiseChain;
+  }
+
+  setupTokenOrganizationOnOrigin(promiseChain, originWeb3, originConfig, originTxOptions, outAddresses) {
+    let oThis = this;
+    return promiseChain
       .then(function() {
         let web3 = originWeb3;
         let helper = new OrganizationHelper(web3);
@@ -62,9 +165,36 @@ class ChainSetup {
         let addresses = outAddresses.origin;
         addresses.tokenOrganization = orgAddress;
       });
+  }
+
+  setupToken(promiseChain, auxiliaryWeb3, auxiliaryConfig, auxTxOptions, simpleTokenAddress, outAddresses) {
+    let oThis = this;
 
     //B.1. Deploy (Token) Organization [Aux]
-    promiseChain = promiseChain
+    promiseChain = oThis.setupTokenOrganizationOnAux(
+      promiseChain,
+      auxiliaryWeb3,
+      auxiliaryConfig,
+      auxTxOptions,
+      outAddresses
+    );
+
+    //B.2. Deploy OSTPrime [Aux]
+    promiseChain = oThis.setupTokenOnAux(
+      promiseChain,
+      auxiliaryWeb3,
+      auxiliaryConfig,
+      auxTxOptions,
+      outAddresses,
+      simpleTokenAddress
+    );
+
+    return promiseChain;
+  }
+
+  setupTokenOrganizationOnAux(promiseChain, auxiliaryWeb3, auxiliaryConfig, auxTxOptions, outAddresses) {
+    let oThis = this;
+    return promiseChain
       .then(function() {
         let web3 = auxiliaryWeb3;
         let helper = new OrganizationHelper(web3);
@@ -82,9 +212,11 @@ class ChainSetup {
         let addresses = outAddresses.auxiliary;
         addresses.tokenOrganization = orgAddress;
       });
+  }
 
-    //B.2. Deploy OSTPrime [Aux]
-    promiseChain = promiseChain
+  setupTokenOnAux(promiseChain, auxiliaryWeb3, auxiliaryConfig, auxTxOptions, outAddresses, simpleTokenAddress) {
+    let oThis = this;
+    return promiseChain
       .then(function() {
         let web3 = auxiliaryWeb3;
         let helper = new OSTPrimeHelper(web3);
@@ -105,9 +237,75 @@ class ChainSetup {
         let addresses = outAddresses.auxiliary;
         addresses.token = ostPrimeAddress;
       });
+  }
+
+  setupAnchor(
+    promiseChain,
+    originWeb3,
+    auxiliaryWeb3,
+    originConfig,
+    auxiliaryConfig,
+    originTxOptions,
+    auxTxOptions,
+    outAddresses
+  ) {
+    let oThis = this;
 
     //C.1. Deploy (Anchor) Organization [Orig]
-    promiseChain = promiseChain
+    promiseChain = oThis.setupAnchorOrganizationOnOrigin(
+      promiseChain,
+      originWeb3,
+      originConfig,
+      originTxOptions,
+      outAddresses
+    );
+
+    //C.2. Deploy Anchor [Orig]
+    promiseChain = oThis.setupAnchorOnOrigin(
+      promiseChain,
+      originWeb3,
+      auxiliaryWeb3,
+      originConfig,
+      originTxOptions,
+      outAddresses
+    );
+
+    //C.3. Deploy (Anchor) Organization [Aux]
+    promiseChain = oThis.setupAnchorOrganizationOnAux(
+      promiseChain,
+      auxiliaryWeb3,
+      auxiliaryConfig,
+      auxTxOptions,
+      outAddresses
+    );
+
+    //C.4. Deploy Anchor & set co-anchor address. [Aux]
+    promiseChain = oThis.setupAnchorOnAux(
+      promiseChain,
+      auxiliaryWeb3,
+      originWeb3,
+      originConfig,
+      auxiliaryConfig,
+      auxTxOptions,
+      outAddresses
+    );
+
+    //C.5. Set Co-Anchor address [Orig]
+    promiseChain = oThis.setupCoAnchorAddress(
+      promiseChain,
+      originWeb3,
+      auxiliaryWeb3,
+      originConfig,
+      originTxOptions,
+      outAddresses
+    );
+
+    return promiseChain;
+  }
+
+  setupAnchorOrganizationOnOrigin(promiseChain, originWeb3, originConfig, originTxOptions, outAddresses) {
+    let oThis = this;
+    return promiseChain
       .then(function() {
         let web3 = originWeb3;
         let helper = new OrganizationHelper(web3);
@@ -125,9 +323,11 @@ class ChainSetup {
         let addresses = outAddresses.origin;
         addresses.anchorOrganization = orgAddress;
       });
+  }
 
-    //C.2. Deploy Anchor [Orig]
-    promiseChain = promiseChain
+  setupAnchorOnOrigin(promiseChain, originWeb3, auxiliaryWeb3, originConfig, originTxOptions, outAddresses) {
+    let oThis = this;
+    return promiseChain
       .then(function() {
         let web3 = originWeb3;
         let coWeb3 = auxiliaryWeb3;
@@ -135,7 +335,7 @@ class ChainSetup {
         let config = originConfig.anchor;
         let txOptions = Object.assign({}, originTxOptions);
 
-        //update config  as neded
+        //update config  as needed
         config.organization = outAddresses.origin.anchorOrganization;
         config.organizationOwner = config.organizationOwner || originConfig.anchorOrganization.owner;
 
@@ -150,9 +350,11 @@ class ChainSetup {
         let addresses = outAddresses.origin;
         addresses.anchor = orgAddress;
       });
+  }
 
-    //C.3. Deploy (Anchor) Organization [Aux]
-    promiseChain = promiseChain
+  setupAnchorOrganizationOnAux(promiseChain, auxiliaryWeb3, auxiliaryConfig, auxTxOptions, outAddresses) {
+    let oThis = this;
+    return promiseChain
       .then(function() {
         let web3 = auxiliaryWeb3;
         let helper = new OrganizationHelper(web3);
@@ -170,17 +372,19 @@ class ChainSetup {
         let addresses = outAddresses.auxiliary;
         addresses.anchorOrganization = orgAddress;
       });
+  }
 
-    //C.4. Deploy Anchor & set co-anchor address. [Aux]
-    promiseChain = promiseChain
+  setupAnchorOnAux(promiseChain, auxiliaryWeb3, originWeb3, originConfig, auxiliaryConfig, auxTxOptions, outAddresses) {
+    let oThis = this;
+    return promiseChain
       .then(function() {
         let web3 = auxiliaryWeb3;
         let coWeb3 = originWeb3;
         let helper = new AnchorHelper(web3, coWeb3);
         let config = originConfig.anchor;
-        let txOptions = Object.assign({}, auxTxOptions);
+        let txOptions = Object.assign({});
 
-        //update config  as neded
+        //update config  as needed
         config.organization = outAddresses.auxiliary.anchorOrganization;
         config.organizationOwner = config.organizationOwner || auxiliaryConfig.anchorOrganization.owner;
         config.coAnchorAddress = outAddresses.origin.anchor;
@@ -196,9 +400,11 @@ class ChainSetup {
         let addresses = outAddresses.auxiliary;
         addresses.anchor = anchorAddress;
       });
+  }
 
-    //C.5. Set Co-Anchor address [Orig]
-    promiseChain = promiseChain.then(function() {
+  setupCoAnchorAddress(promiseChain, originWeb3, auxiliaryWeb3, originConfig, originTxOptions, outAddresses) {
+    let oThis = this;
+    return promiseChain.then(function() {
       let web3 = originWeb3;
       let coWeb3 = auxiliaryWeb3;
       let helper = new AnchorHelper(web3, coWeb3);
@@ -217,15 +423,37 @@ class ChainSetup {
         return true;
       });
     });
+  }
+
+  setupLibs(
+    promiseChain,
+    originWeb3,
+    auxiliaryWeb3,
+    originConfig,
+    auxiliaryConfig,
+    originTxOptions,
+    auxTxOptions,
+    outAddresses
+  ) {
+    let oThis = this;
 
     //D.1 Deploy Libs [Aux]
-    promiseChain = promiseChain
+    promiseChain = oThis.setupLibsOnAux(promiseChain, auxiliaryWeb3, auxiliaryConfig, auxTxOptions, outAddresses);
+
+    //D.2 Deploy Libs [Orig]
+    promiseChain = oThis.setupLibsOnOrigin(promiseChain, originWeb3, originConfig, originTxOptions, outAddresses);
+
+    return promiseChain;
+  }
+
+  setupLibsOnAux(promiseChain, auxiliaryWeb3, auxiliaryConfig, auxTxOptions, outAddresses) {
+    let oThis = this;
+    return promiseChain
       .then(function() {
         let web3 = auxiliaryWeb3;
         let helper = new LibsHelper(web3);
         let config = auxiliaryConfig.libs;
         let txOptions = Object.assign({}, auxTxOptions);
-
         return helper.setup(config, txOptions).then(function() {
           return {
             merklePatriciaProof: helper.merklePatriciaProof,
@@ -239,9 +467,11 @@ class ChainSetup {
         let addresses = outAddresses.auxiliary;
         Object.assign(addresses, libAddresses);
       });
+  }
 
-    //D.2 Deploy Libs [Orig]
-    promiseChain = promiseChain
+  setupLibsOnOrigin(promiseChain, originWeb3, originConfig, originTxOptions, outAddresses) {
+    let oThis = this;
+    return promiseChain
       .then(function() {
         let web3 = originWeb3;
         let helper = new LibsHelper(web3);
@@ -261,9 +491,22 @@ class ChainSetup {
         let addresses = outAddresses.origin;
         Object.assign(addresses, libAddresses);
       });
+  }
 
-    // E.1. Deploy Gateway [Orig]
-    promiseChain = promiseChain
+  setupGateways(
+    promiseChain,
+    originWeb3,
+    auxiliaryWeb3,
+    originConfig,
+    auxiliaryConfig,
+    originTxOptions,
+    auxTxOptions,
+    simpleTokenAddress,
+    outAddresses
+  ) {
+    let oThis = this;
+
+    return promiseChain
       .then(function() {
         let helper = new GatewayHelper();
         let gatewayTxOptions = Object.assign({}, originTxOptions);
@@ -311,51 +554,14 @@ class ChainSetup {
         outAddresses.origin.gateway = addresses.gateway;
         outAddresses.auxiliary.cogateway = addresses.cogateway;
       });
+  }
 
-    /*
-          |---------------------------------------|---------------------------------------|
-          |            Chain-Setup                |               Economy-Setup           |
-          |---------------------------------------|---------------------------------------|
-          |                       A. Deploy and Prepare Origin EIP-20                     |
-          |---------------------------------------|---------------------------------------|
-          | 1. Deploy (Token) Organization [Orig] | 1. Deploy (Token) Organization [Orig] |
-          | 2. Deploy MockSimpleToken [Orig]      | 2. Deploy Branded Token [Orig]        |
-          | * On Mainnet SimpleToken is           |                                       |
-          |   already deployed.                   |                                       |
-          |---------------------------------------|---------------------------------------|
-          |                          B. Deploy Utility Token                              |
-          |---------------------------------------|---------------------------------------|
-          | 1. Deploy (Token) Organization [Aux]  | 1. Deploy (Token) Organization [Aux]  |
-          | 2. Deploy OSTPrime [Aux]              | 2. Deploy Utility Branded Token [Aux] |
-          |---------------------------------------|---------------------------------------|
-          |                      C. Deploy and Prepare Anchors                            |
-          |---------------------------------------|---------------------------------------|
-          | 1. Deploy (Anchor) Organization [Orig]| * Do nothing, get address of Anchors  |
-          | 2. Deploy Anchor [Orig]               |   deployed during chain-setup         |
-          | 3. Deploy (Anchor) Organization [Aux] |                                       |
-          | 4. Deploy Anchor & set co-anchor      |                                       |
-          |    address. [Aux]                     |                                       |
-          | 5. Set Co-Anchor address [Orig]       |                                       |
-          |---------------------------------------|---------------------------------------|
-          |                               D. Deploy Libs                                  |
-          |---------------------------------------|---------------------------------------|
-          | 1. Deply MerklePatriciaProof [Both]   | 1. Deply MerklePatriciaProof [Both]   |
-          | 2. Deploy MessageBus [Both]           | 2. Deploy MessageBus [Both]           |
-          | 3. Deploy GatewayLib [Both]           | 3. Deploy GatewayLib [Both]           |
-          |---------------------------------------|---------------------------------------|
-          |                             E.  Deploy Gateways                               |
-          |---------------------------------------|---------------------------------------|
-          | 1. Deploy Gateway [Orig]              | 1. Deploy Gateway [Orig]              |
-          | 2. Deploy Cogateway [Aux]             | 2. Deploy Cogateway [Aux]             |
-          | 3. Activate Gateway [Orig]            | 3. Activate Gateway [Orig]            |
-          |---------------------------------------|---------------------------------------|
-    */
-
-    promiseChain = promiseChain
+  finishSetup(promiseChain, originConfig, auxiliaryConfig, outAddresses) {
+    return promiseChain
       .then(function() {
         console.log('\x1b[32m' + 'Setup Completed successfully' + '\x1b[0m\n');
 
-        console.log('\x1b[1m' + 'Origing Config:' + '\x1b[0m');
+        console.log('\x1b[1m' + 'Origin Config:' + '\x1b[0m');
         console.log('\x1b[2m' + JSON.stringify(originConfig, null, 2) + '\x1b[0m');
 
         console.log('\x1b[1m' + 'Auxiliary Config:' + '\x1b[0m');
@@ -363,12 +569,17 @@ class ChainSetup {
 
         console.log('\x1b[34m' + 'Addresses:' + '\x1b[0m');
         console.log('\x1b[33m' + JSON.stringify(outAddresses, null, 2) + '\x1b[0m');
+        return {
+          originConfig: originConfig,
+          auxiliaryConfig: auxiliaryConfig,
+          addresses: outAddresses
+        };
       })
       .catch(function(error) {
         console.log('\t !! Error !!', error, '\n\t !! ERROR !!\n');
         console.log('\x1b[31m' + 'Setup Failed!' + '\x1b[0m\n');
 
-        console.log('\x1b[1m' + 'Origing Config:' + '\x1b[0m');
+        console.log('\x1b[1m' + 'Origin Config:' + '\x1b[0m');
         console.log('\x1b[2m' + JSON.stringify(originConfig, null, 2) + '\x1b[0m');
 
         console.log('\x1b[1m' + 'Auxiliary Config:' + '\x1b[0m');
@@ -378,112 +589,6 @@ class ChainSetup {
         console.log('\x1b[33m' + JSON.stringify(outAddresses, null, 2) + '\x1b[0m');
 
         throw error;
-      });
-
-    return promiseChain;
-  }
-
-  setupAnchor(orgConfig, anchorConfig, txOptions, web3, coWeb3) {
-    const oThis = this;
-    //IMPORTANT: THIS IS STUB CODE. Altough, it may work as is.
-
-    //orgConfig -> Organization setup config.
-    //anchorConfig -> Anchor setup config.
-
-    let anchorHelper = new AnchorHelper(web3, coWeb3);
-    let orgAddress, anchorAddress;
-    return oThis
-      .setupOrganization(orgConfig, txOptions, web3)
-      .then(function(address) {
-        orgAddress = address;
-        anchorConfig.organization = orgAddress;
-        return anchorHelper.setup(anchorConfig);
-      })
-      .then(function() {
-        return {
-          anchorOrganization: orgAddress,
-          anchor: anchorAddress,
-          anchorHelper: anchorHelper
-        };
-      });
-  }
-
-  setCoAnchors(originAnchorHelper, auxAnchorHelper) {
-    const oThis = this;
-    //IMPORTANT: THIS IS STUB CODE. Altough, it may work as is.
-
-    return originAnchorHelper.setCoAnchorAddress(auxAnchorHelper.address).then(function() {
-      return auxAnchorHelper.setCoAnchorAddress(originAnchorHelper.address);
-    });
-  }
-
-  setupOrganization(config, txOptions, web3) {
-    const oThis = this;
-    //IMPORTANT: THIS IS STUB CODE. Altough, it may work as is.
-
-    let orgHelper = new OrganizationHelper(web3);
-    return orgHelper.setup(config, txOptions).then(function() {
-      return orgHelper.address;
-    });
-  }
-
-  setupLibs(config, txOptions, web3) {
-    const oThis = this;
-    //IMPORTANT: THIS IS STUB CODE. Altough, it may work as is.
-
-    let libsHelper = new LibsHelper(web3);
-    return libsHelper.setup(config, txOptions, web3).then(function() {
-      return {
-        merklePatriciaProof: libsHelper.merklePatriciaProof,
-        messageBus: libsHelper.messageBus,
-        gatewayLib: libsHelper.gatewayLib
-      };
-    });
-  }
-
-  setupUtilityToken(valueToken, config, txOptions, web3) {
-    const oThis = this;
-    //IMPORTANT - Do not change the name of the method.
-    //This economy-setup script shell derive from this script and override this method to deploy UBT.
-    //Also, OSTPrime is UtilityToken.
-
-    //IMPORTANT: THIS IS STUB CODE. Altough, it may work as is.
-    let ostPrimeHelper = new OSTPrimeHelper();
-    return ostPrimeHelper.setup(valueToken, config, txOptions, web3).then(function() {
-      return ostPrimeHelper.address;
-    });
-  }
-
-  setupGateways(
-    libs,
-    valueToken,
-    baseToken,
-    gatewayConfig,
-    coGatewayConfig,
-    gatewayTxOptions,
-    coGatewayTxOptions,
-    originWeb3,
-    auxiliaryWeb3
-  ) {
-    const oThis = this;
-    //IMPORTANT: THIS IS STUB CODE.
-    let gatewayHelper = new GatewayHelper();
-    return gatewayHelper
-      .setup(
-        valueToken,
-        baseToken,
-        gatewayConfig,
-        coGatewayConfig,
-        gatewayTxOptions,
-        coGatewayTxOptions,
-        originWeb3,
-        auxiliaryWeb3
-      )
-      .then(function() {
-        return {
-          gateway: gatewayHelper.address,
-          cogateway: gatewayHelper.cogateway
-        };
       });
   }
 
