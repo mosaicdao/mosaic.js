@@ -68,3 +68,5 @@ package-lock.json
 tmp/*
 !tmp/.gitkeep
 
+.idea/*
+
