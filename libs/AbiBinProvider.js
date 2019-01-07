@@ -69,10 +69,10 @@ class AbiBinProvider {
 
     //__NOT_FOR_WEB__BEGIN__
     let fPath = path.resolve(__dirname, oThis.abiFolderPath, contractName + '.abi');
-    abiFileContent = fs.readFileSync(fPath, 'utf8');
+    let abiFileContent = fs.readFileSync(fPath, 'utf8');
     let abi = JSON.parse(abiFileContent);
-    return abi;
     //__NOT_FOR_WEB__END__
+    return abi;
   }
 
   getBIN(contractName) {
@@ -84,12 +84,12 @@ class AbiBinProvider {
 
     //__NOT_FOR_WEB__BEGIN__
     let fPath = path.resolve(__dirname, oThis.binFolderPath, contractName + '.bin');
-    bin = fs.readFileSync(fPath, 'utf8');
-    if (typeof binCode === 'string' && binCode.indexOf('0x') != 0) {
-      binCode = '0x' + binCode;
+    let bin = fs.readFileSync(fPath, 'utf8');
+    if (typeof bin === 'string' && bin.indexOf('0x') != 0) {
+      bin = '0x' + bin;
     }
-    return binCode;
     //__NOT_FOR_WEB__END__
+    return bin;
   }
 
   //Note
