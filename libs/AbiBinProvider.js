@@ -68,7 +68,8 @@ class AbiBinProvider {
     }
 
     //__NOT_FOR_WEB__BEGIN__
-    let abiFileContent = oThis._read(oThis.abiFolderPath + contractName + '.abi');
+    let fPath = path.resolve(__dirname, oThis.abiFolderPath, contractName + '.abi');
+    abiFileContent = fs.readFileSync(fPath, 'utf8');
     let abi = JSON.parse(abiFileContent);
     return abi;
     //__NOT_FOR_WEB__END__
@@ -82,7 +83,11 @@ class AbiBinProvider {
     }
 
     //__NOT_FOR_WEB__BEGIN__
-    let binCode = oThis._read(oThis.binFolderPath + contractName + '.bin');
+    let fPath = path.resolve(__dirname, oThis.binFolderPath, contractName + '.bin');
+    bin = fs.readFileSync(fPath, 'utf8');
+    if (typeof binCode === 'string' && binCode.indexOf('0x') != 0) {
+      binCode = '0x' + binCode;
+    }
     return binCode;
     //__NOT_FOR_WEB__END__
   }
