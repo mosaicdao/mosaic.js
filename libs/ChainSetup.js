@@ -101,6 +101,17 @@ class ChainSetup {
       outAddresses
     );
 
+    promiseChain = oThis.setGatewayAddresses(
+      promiseChain,
+      originWeb3,
+      auxiliaryWeb3,
+      originConfig,
+      auxiliaryConfig,
+      originTxOptions,
+      auxTxOptions,
+      outAddresses
+    );
+
     /*
           |---------------------------------------|---------------------------------------|
           |            Chain-Setup                |               Economy-Setup           |
@@ -138,6 +149,13 @@ class ChainSetup {
           | 2. Deploy Cogateway [Aux]             | 2. Deploy Cogateway [Aux]             |
           | 3. Activate Gateway [Orig]            | 3. Activate Gateway [Orig]            |
           |---------------------------------------|---------------------------------------|
+          |                        F.  Set Gateway Addresses                              |
+          |---------------------------------------|---------------------------------------|
+          | 1. Set CoGateway in OSTPrime [Aux]    | 1. Set CoGateway in UBT               |
+          |                                       | 2. Set Gateway in BT [Orig]           |
+          |                                       |    (liftRestriction)                  |
+          |---------------------------------------|---------------------------------------|
+
     */
 
     promiseChain = oThis.finishSetup(promiseChain, originConfig, auxiliaryConfig, outAddresses);
@@ -146,7 +164,8 @@ class ChainSetup {
   }
 
   setupTokenOrganizationOnOrigin(promiseChain, originWeb3, originConfig, originTxOptions, outAddresses) {
-    let oThis = this;
+    const oThis = this;
+
     return promiseChain
       .then(function() {
         let web3 = originWeb3;
@@ -168,7 +187,7 @@ class ChainSetup {
   }
 
   setupToken(promiseChain, auxiliaryWeb3, auxiliaryConfig, auxTxOptions, simpleTokenAddress, outAddresses) {
-    let oThis = this;
+    const oThis = this;
 
     //B.1. Deploy (Token) Organization [Aux]
     promiseChain = oThis.setupTokenOrganizationOnAux(
@@ -193,7 +212,8 @@ class ChainSetup {
   }
 
   setupTokenOrganizationOnAux(promiseChain, auxiliaryWeb3, auxiliaryConfig, auxTxOptions, outAddresses) {
-    let oThis = this;
+    const oThis = this;
+
     return promiseChain
       .then(function() {
         let web3 = auxiliaryWeb3;
@@ -215,7 +235,8 @@ class ChainSetup {
   }
 
   setupTokenOnAux(promiseChain, auxiliaryWeb3, auxiliaryConfig, auxTxOptions, outAddresses, simpleTokenAddress) {
-    let oThis = this;
+    const oThis = this;
+
     return promiseChain
       .then(function() {
         let web3 = auxiliaryWeb3;
@@ -249,7 +270,7 @@ class ChainSetup {
     auxTxOptions,
     outAddresses
   ) {
-    let oThis = this;
+    const oThis = this;
 
     //C.1. Deploy (Anchor) Organization [Orig]
     promiseChain = oThis.setupAnchorOrganizationOnOrigin(
@@ -304,7 +325,8 @@ class ChainSetup {
   }
 
   setupAnchorOrganizationOnOrigin(promiseChain, originWeb3, originConfig, originTxOptions, outAddresses) {
-    let oThis = this;
+    const oThis = this;
+
     return promiseChain
       .then(function() {
         let web3 = originWeb3;
@@ -326,7 +348,8 @@ class ChainSetup {
   }
 
   setupAnchorOnOrigin(promiseChain, originWeb3, auxiliaryWeb3, originConfig, originTxOptions, outAddresses) {
-    let oThis = this;
+    const oThis = this;
+
     return promiseChain
       .then(function() {
         let web3 = originWeb3;
@@ -353,7 +376,8 @@ class ChainSetup {
   }
 
   setupAnchorOrganizationOnAux(promiseChain, auxiliaryWeb3, auxiliaryConfig, auxTxOptions, outAddresses) {
-    let oThis = this;
+    const oThis = this;
+
     return promiseChain
       .then(function() {
         let web3 = auxiliaryWeb3;
@@ -375,7 +399,8 @@ class ChainSetup {
   }
 
   setupAnchorOnAux(promiseChain, auxiliaryWeb3, originWeb3, originConfig, auxiliaryConfig, auxTxOptions, outAddresses) {
-    let oThis = this;
+    const oThis = this;
+
     return promiseChain
       .then(function() {
         let web3 = auxiliaryWeb3;
@@ -403,7 +428,8 @@ class ChainSetup {
   }
 
   setupCoAnchorAddress(promiseChain, originWeb3, auxiliaryWeb3, originConfig, originTxOptions, outAddresses) {
-    let oThis = this;
+    const oThis = this;
+
     return promiseChain.then(function() {
       let web3 = originWeb3;
       let coWeb3 = auxiliaryWeb3;
@@ -435,7 +461,7 @@ class ChainSetup {
     auxTxOptions,
     outAddresses
   ) {
-    let oThis = this;
+    const oThis = this;
 
     //D.1 Deploy Libs [Aux]
     promiseChain = oThis.setupLibsOnAux(promiseChain, auxiliaryWeb3, auxiliaryConfig, auxTxOptions, outAddresses);
@@ -447,7 +473,7 @@ class ChainSetup {
   }
 
   setupLibsOnAux(promiseChain, auxiliaryWeb3, auxiliaryConfig, auxTxOptions, outAddresses) {
-    let oThis = this;
+    const oThis = this;
     return promiseChain
       .then(function() {
         let web3 = auxiliaryWeb3;
@@ -470,7 +496,7 @@ class ChainSetup {
   }
 
   setupLibsOnOrigin(promiseChain, originWeb3, originConfig, originTxOptions, outAddresses) {
-    let oThis = this;
+    const oThis = this;
     return promiseChain
       .then(function() {
         let web3 = originWeb3;
@@ -504,7 +530,7 @@ class ChainSetup {
     simpleTokenAddress,
     outAddresses
   ) {
-    let oThis = this;
+    const oThis = this;
 
     return promiseChain
       .then(function() {
@@ -531,6 +557,7 @@ class ChainSetup {
             valueToken: simpleTokenAddress,
             utilityToken: outAddresses.auxiliary.token,
             organization: outAddresses.auxiliary.tokenOrganization,
+            organizationOwner: auxiliaryConfig.tokenOrganization.owner,
             anchor: outAddresses.auxiliary.anchor,
             messageBus: outAddresses.auxiliary.messageBus,
             gatewayLib: outAddresses.auxiliary.gatewayLib
@@ -556,7 +583,36 @@ class ChainSetup {
       });
   }
 
+  setGatewayAddresses(
+    promiseChain,
+    originWeb3 /* Needed for economy setup*/,
+    auxiliaryWeb3,
+    originConfig /* Needed for economy setup*/,
+    auxiliaryConfig,
+    originTxOptions /* Needed for economy setup*/,
+    auxTxOptions,
+    outAddresses
+  ) {
+    const oThis = this;
+
+    return promiseChain.then(function() {
+      let web3 = auxiliaryWeb3;
+      let auxToken = outAddresses.auxiliary.token;
+      let cogateway = outAddresses.auxiliary.cogateway;
+      let txOptions = Object.assign({}, auxTxOptions);
+      txOptions.from = auxiliaryConfig.tokenOrganization.owner;
+
+      console.log('RRRR :: outAddresses', JSON.stringify(outAddresses));
+      console.log('RRRR :: auxToken', auxToken);
+
+      let helper = new OSTPrimeHelper(web3, auxToken);
+      return helper.setCoGateway(cogateway, txOptions);
+    });
+  }
+
   finishSetup(promiseChain, originConfig, auxiliaryConfig, outAddresses) {
+    const oThis = this;
+
     return promiseChain
       .then(function() {
         console.log('\x1b[32m' + 'Setup Completed successfully' + '\x1b[0m\n');

@@ -67,12 +67,6 @@ let auxiliaryConfig = {
   libs: {
     deployer: config.deployerAddress
   },
-  cogatewayOrganization: {
-    deployer: config.deployerAddress,
-    owner: config.organizationOwner,
-    admin: config.organizationAdmin,
-    workers: [config.organizationWorker]
-  },
   cogateway: {
     deployer: config.deployerAddress,
     bounty: '100'

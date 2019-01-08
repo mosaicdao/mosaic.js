@@ -163,6 +163,41 @@ class OSTPrimeHelper {
         return Promise.reject(error);
       });
   }
+
+  setCoGateway(cogateway, txOptions, contractAddress, web3) {
+    const oThis = this;
+    web3 = web3 || oThis.web3;
+    contractAddress = contractAddress || oThis.address;
+
+    let defaultOptions = {
+      gas: '60000',
+      gasPrice: 0
+    };
+
+    if (txOptions) {
+      Object.assign(defaultOptions, txOptions);
+    }
+    txOptions = defaultOptions;
+
+    const abiBinProvider = oThis.abiBinProvider;
+    const abi = abiBinProvider.getABI(ContractName);
+    const contract = new web3.eth.Contract(abi, contractAddress, txOptions);
+    let tx = contract.methods.setCoGateway(cogateway);
+
+    console.log(`* setCoGateway on ${ContractName}`);
+    return tx
+      .send(txOptions)
+      .on('transactionHash', function(transactionHash) {
+        console.log('\t - transaction hash:', transactionHash);
+      })
+      .on('receipt', function(receipt) {
+        console.log('\t - Receipt:\n\x1b[2m', JSON.stringify(receipt), '\x1b[0m\n');
+      })
+      .on('error', function(error) {
+        console.log('\t !! Error !!', error, '\n\t !! ERROR !!\n');
+        return Promise.reject(error);
+      });
+  }
 }
 
 module.exports = OSTPrimeHelper;

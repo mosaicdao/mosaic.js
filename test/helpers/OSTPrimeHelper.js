@@ -84,6 +84,16 @@ describe('test/helpers/OSTPrimeHelper', function() {
     return helper.initialize(ownerParams).then(validateReceipt);
   });
 
+  //NOTE: setCoGateway can not be uint tested. Need to deploy actual co-gateway for it.
+  //Set CoGateway on OSTPrime - to be done from owner.
+  // it('should set CoGateway on OSTPrime', function() {
+  //   this.timeout(60000);
+  //   let ownerParams = Object.assign({}, deployParams);
+  //   let someValidAddress = SimpleTokenAddress;
+  //   ownerParams.from = config.chainOwner;
+  //   return helper.setCoGateway(someValidAddress, ownerParams);
+  // });
+
   //Test Setup
   it('should setup OSTPrime', function() {
     this.timeout(60000);
