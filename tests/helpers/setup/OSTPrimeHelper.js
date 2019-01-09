@@ -3,12 +3,12 @@
 // Load external packages
 const chai = require('chai'),
   Web3 = require('web3'),
-  OSTPrimeHelper = require('../../libs/helpers/OSTPrimeHelper'),
-  OrganizationHelper = require('../../libs/helpers/OrganizationHelper'),
+  OSTPrimeHelper = require('../../../libs/helpers/setup/OSTPrimeHelper'),
+  OrganizationHelper = require('../../../libs/helpers/setup/OrganizationHelper'),
   assert = chai.assert;
 
-const config = require('../../test/utils/configReader'),
-  Web3WalletHelper = require('../../test/utils/Web3WalletHelper');
+const config = require('../../utils/configReader'),
+  Web3WalletHelper = require('../../utils/Web3WalletHelper');
 
 const web3 = new Web3(config.gethRpcEndPoint);
 let web3WalletHelper = new Web3WalletHelper(web3);
@@ -37,7 +37,7 @@ let validateDeploymentReceipt = (receipt) => {
 const fName = 'OSTPrimeHelper';
 const SimpleTokenAddress = '0x2c4e8f2d746113d0696ce89b35f0d8bf88e0aeca';
 
-describe('test/helpers/OSTPrimeHelper', function() {
+describe('tests/helpers/OSTPrimeHelper', function() {
   let deployParams = {
     from: config.deployerAddress,
     gasPrice: config.gasPrice

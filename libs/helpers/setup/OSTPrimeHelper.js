@@ -1,83 +1,61 @@
 'use strict';
 
 const Web3 = require('web3');
-const AbiBinProvider = require('../../libs/AbiBinProvider');
-const OrganizationHelper = require('../../libs/helpers/OrganizationHelper');
+const BN = require('bn.js');
+const AbiBinProvider = require('../../AbiBinProvider');
 
-const ContractName = 'Anchor';
+const ContractName = 'OSTPrime';
 
-class AnchorHelper {
-  constructor(web3, coWeb3, address) {
+class OSTPrimeHelper {
+  constructor(web3, address) {
     const oThis = this;
     oThis.web3 = web3;
-    oThis.coWeb3 = coWeb3;
     oThis.address = address;
     oThis.abiBinProvider = new AbiBinProvider();
   }
 
   /*
-    //Supported Configurations for setup
-    {
-      "remoteChainId": 123456,
-      "deployer": config.deployerAddress,
-      "organization": caOrganization,
-      "coAnchorAddress": caAnchor,
-      "maxStateRoots": maxStateRoots,
-      "organizationOwner": organizationOwner
-    }
-  */
+  //Supported Configurations for setup
+  {
+    deployer: config.deployerAddress,
+    chainOwner: chainOwner,
+    valueToken: config.simpleTokenContractAddress
+  }
+  Both deployer, chainOwner & valueToken are mandatory configurations.
+*/
 
-  setup(config, txOptions, web3, coWeb3) {
+  setup(simpleToken, config, txOptions, web3) {
     const oThis = this;
     web3 = web3 || oThis.web3;
-    coWeb3 = coWeb3 || oThis.coWeb3;
 
-    AnchorHelper.validateSetupConfig(config);
+    if (!simpleToken) {
+      throw new Error('Mandatory configuration "simpleToken" missing. Provide SimpleToken contract address.');
+    }
 
     if (!config.organization) {
-      throw new Error('Mandatory configuration "organization" missing. Set config.organization contract address.');
+      throw new Error('Mandatory configuration "organization" missing. Set config.organization address.');
     }
+
+    OSTPrimeHelper.validateSetupConfig(config);
 
     if (!txOptions) {
       txOptions = txOptions || {};
     }
-
-    if (typeof txOptions.gasPrice === 'undefined') {
-      txOptions.gasPrice = '0x5B9ACA00';
-    }
+    txOptions.gasPrice = 0;
 
     let deployParams = Object.assign({}, txOptions);
     deployParams.from = config.deployer;
+    deployParams.gasPrice = 0;
 
-    //1. Get block and stateRoot.
-    let blockHeight = config.blockHeight || 'latest';
-    let stateRoot;
-    console.log('* Fetching Block:', blockHeight);
-    let promiseChain = coWeb3.eth.getBlock(blockHeight).then(function(block) {
-      blockHeight = block.number;
-      stateRoot = block.stateRoot;
-    });
+    //1. Deploy the Contract
+    let promiseChain = oThis.deploy(simpleToken, config.organization, deployParams);
 
-    //2. Deploy the Contract
+    //2. Initialize.
     promiseChain = promiseChain.then(function() {
-      return oThis.deploy(
-        config.remoteChainId,
-        blockHeight,
-        stateRoot,
-        config.maxStateRoots,
-        config.organization,
-        deployParams
-      );
+      let ownerParams = Object.assign({}, deployParams);
+      ownerParams.from = config.chainOwner;
+      return oThis.initialize(ownerParams);
     });
-
-    //3. Set coAnchorAddress.
-    if (config.coAnchorAddress) {
-      promiseChain = promiseChain.then(function() {
-        let ownerParams = Object.assign({}, deployParams);
-        ownerParams.from = config.organizationOwner;
-        return oThis.setCoAnchorAddress(config.coAnchorAddress, ownerParams);
-      });
-    }
 
     return promiseChain;
   }
@@ -92,18 +70,14 @@ class AnchorHelper {
       throw new Error('Mandatory configuration "deployer" missing. Set config.deployer address');
     }
 
-    if (!config.remoteChainId) {
-      throw new Error('Mandatory configuration "remoteChainId" missing. Set config.remoteChainId.');
+    if (!config.chainOwner) {
+      throw new Error('Mandatory configuration "chainOwner" missing. Set config.chainOwner.');
     }
 
-    if (config.coAnchorAddress && !config.organizationOwner) {
-      throw new Error(
-        'Mandatory configuration "organizationOwner" missing. Set config.organizationOwner address. organizationOwner is mandatory when using coAnchorAddress config option'
-      );
-    }
+    return true;
   }
 
-  deploy(_remoteChainId, _blockHeight, _stateRoot, _maxStateRoots, _membersManager, txOptions, web3) {
+  deploy(_valueToken, _organization, txOptions, web3) {
     const oThis = this;
     web3 = web3 || oThis.web3;
     const abiBinProvider = oThis.abiBinProvider;
@@ -111,16 +85,16 @@ class AnchorHelper {
     const bin = abiBinProvider.getBIN(ContractName);
 
     let defaultOptions = {
-      gas: '1000000'
+      gas: '2500000',
+      gasPrice: 0
     };
 
     if (txOptions) {
       Object.assign(defaultOptions, txOptions);
     }
     txOptions = defaultOptions;
-    _maxStateRoots = _maxStateRoots || AnchorHelper.DEFAULT_MAX_STATE_ROOTS;
 
-    let args = [_remoteChainId, _blockHeight, _stateRoot, _maxStateRoots, _membersManager];
+    let args = [_valueToken, _organization];
     const contract = new web3.eth.Contract(abi, null, txOptions);
     let tx = contract.deploy(
       {
@@ -152,13 +126,17 @@ class AnchorHelper {
       });
   }
 
-  setCoAnchorAddress(coAnchorAddress, txOptions, contractAddress, web3) {
+  initialize(txOptions, contractAddress, web3) {
     const oThis = this;
     web3 = web3 || oThis.web3;
     contractAddress = contractAddress || oThis.address;
 
+    const valueToTransfer = Web3.utils.toWei('800000000');
+
     let defaultOptions = {
-      gas: 61000
+      gas: '60000',
+      value: valueToTransfer,
+      gasPrice: 0
     };
 
     if (txOptions) {
@@ -169,9 +147,9 @@ class AnchorHelper {
     const abiBinProvider = oThis.abiBinProvider;
     const abi = abiBinProvider.getABI(ContractName);
     const contract = new web3.eth.Contract(abi, contractAddress, txOptions);
-    let tx = contract.methods.setCoAnchorAddress(coAnchorAddress);
+    let tx = contract.methods.initialize();
 
-    console.log(`* Setting ${ContractName} Co-${ContractName} Address`);
+    console.log(`* Initializing ${ContractName}`);
     return tx
       .send(txOptions)
       .on('transactionHash', function(transactionHash) {
@@ -186,9 +164,40 @@ class AnchorHelper {
       });
   }
 
-  static get DEFAULT_MAX_STATE_ROOTS() {
-    return 60;
+  setCoGateway(cogateway, txOptions, contractAddress, web3) {
+    const oThis = this;
+    web3 = web3 || oThis.web3;
+    contractAddress = contractAddress || oThis.address;
+
+    let defaultOptions = {
+      gas: '60000',
+      gasPrice: 0
+    };
+
+    if (txOptions) {
+      Object.assign(defaultOptions, txOptions);
+    }
+    txOptions = defaultOptions;
+
+    const abiBinProvider = oThis.abiBinProvider;
+    const abi = abiBinProvider.getABI(ContractName);
+    const contract = new web3.eth.Contract(abi, contractAddress, txOptions);
+    let tx = contract.methods.setCoGateway(cogateway);
+
+    console.log(`* setCoGateway on ${ContractName}`);
+    return tx
+      .send(txOptions)
+      .on('transactionHash', function(transactionHash) {
+        console.log('\t - transaction hash:', transactionHash);
+      })
+      .on('receipt', function(receipt) {
+        console.log('\t - Receipt:\n\x1b[2m', JSON.stringify(receipt), '\x1b[0m\n');
+      })
+      .on('error', function(error) {
+        console.log('\t !! Error !!', error, '\n\t !! ERROR !!\n');
+        return Promise.reject(error);
+      });
   }
 }
 
-module.exports = AnchorHelper;
+module.exports = OSTPrimeHelper;

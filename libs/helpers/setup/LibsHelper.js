@@ -1,7 +1,7 @@
 'use strict';
 
 const Web3 = require('web3');
-const AbiBinProvider = require('../../libs/AbiBinProvider');
+const AbiBinProvider = require('../../AbiBinProvider');
 
 class LibsHelper {
   constructor(web3, merklePatriciaProof, messageBus, gatewayLib) {

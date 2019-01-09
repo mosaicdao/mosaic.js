@@ -1,8 +1,8 @@
 'use strict';
 
 const Web3 = require('web3');
-const AbiBinProvider = require('../../libs/AbiBinProvider');
-const CoGatewayHelper = require('../../libs/helpers/CoGatewayHelper');
+const AbiBinProvider = require('../../AbiBinProvider');
+const CoGatewayHelper = require('./CoGatewayHelper');
 
 const ContractName = 'EIP20Gateway';
 class GatewayHelper {

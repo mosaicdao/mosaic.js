@@ -1,13 +1,13 @@
 'use strict';
 
 const Web3 = require('web3');
-const AbiBinProvider = require('./AbiBinProvider');
-const OrganizationHelper = require('./helpers/OrganizationHelper');
-const AnchorHelper = require('./helpers/AnchorHelper');
-const OSTPrimeHelper = require('./helpers/OSTPrimeHelper');
-const LibsHelper = require('./helpers/LibsHelper');
-const GatewayHelper = require('./helpers/GatewayHelper');
-const CoGatewayHelper = require('./helpers/CoGatewayHelper');
+const AbiBinProvider = require('../libs/AbiBinProvider');
+const OrganizationHelper = require('../libs/helpers/setup/OrganizationHelper');
+const AnchorHelper = require('../libs/helpers/setup/AnchorHelper');
+const OSTPrimeHelper = require('../libs/helpers/setup/OSTPrimeHelper');
+const LibsHelper = require('../libs/helpers/setup/LibsHelper');
+const GatewayHelper = require('../libs/helpers/setup/GatewayHelper');
+const CoGatewayHelper = require('../libs/helpers/setup/CoGatewayHelper');
 
 class ChainSetup {
   constructor(originWeb3, auxiliaryWeb3) {

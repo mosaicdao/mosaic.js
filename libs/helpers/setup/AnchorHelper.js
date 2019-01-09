@@ -1,61 +1,83 @@
 'use strict';
 
 const Web3 = require('web3');
-const BN = require('bn.js');
-const AbiBinProvider = require('../../libs/AbiBinProvider');
+const AbiBinProvider = require('../../AbiBinProvider');
+const OrganizationHelper = require('./OrganizationHelper');
 
-const ContractName = 'OSTPrime';
+const ContractName = 'Anchor';
 
-class OSTPrimeHelper {
-  constructor(web3, address) {
+class AnchorHelper {
+  constructor(web3, coWeb3, address) {
     const oThis = this;
     oThis.web3 = web3;
+    oThis.coWeb3 = coWeb3;
     oThis.address = address;
     oThis.abiBinProvider = new AbiBinProvider();
   }
 
   /*
-  //Supported Configurations for setup
-  {
-    deployer: config.deployerAddress,
-    chainOwner: chainOwner,
-    valueToken: config.simpleTokenContractAddress
-  }
-  Both deployer, chainOwner & valueToken are mandatory configurations.
-*/
+    //Supported Configurations for setup
+    {
+      "remoteChainId": 123456,
+      "deployer": config.deployerAddress,
+      "organization": caOrganization,
+      "coAnchorAddress": caAnchor,
+      "maxStateRoots": maxStateRoots,
+      "organizationOwner": organizationOwner
+    }
+  */
 
-  setup(simpleToken, config, txOptions, web3) {
+  setup(config, txOptions, web3, coWeb3) {
     const oThis = this;
     web3 = web3 || oThis.web3;
+    coWeb3 = coWeb3 || oThis.coWeb3;
 
-    if (!simpleToken) {
-      throw new Error('Mandatory configuration "simpleToken" missing. Provide SimpleToken contract address.');
-    }
+    AnchorHelper.validateSetupConfig(config);
 
     if (!config.organization) {
-      throw new Error('Mandatory configuration "organization" missing. Set config.organization address.');
+      throw new Error('Mandatory configuration "organization" missing. Set config.organization contract address.');
     }
-
-    OSTPrimeHelper.validateSetupConfig(config);
 
     if (!txOptions) {
       txOptions = txOptions || {};
     }
-    txOptions.gasPrice = 0;
+
+    if (typeof txOptions.gasPrice === 'undefined') {
+      txOptions.gasPrice = '0x5B9ACA00';
+    }
 
     let deployParams = Object.assign({}, txOptions);
     deployParams.from = config.deployer;
-    deployParams.gasPrice = 0;
 
-    //1. Deploy the Contract
-    let promiseChain = oThis.deploy(simpleToken, config.organization, deployParams);
-
-    //2. Initialize.
-    promiseChain = promiseChain.then(function() {
-      let ownerParams = Object.assign({}, deployParams);
-      ownerParams.from = config.chainOwner;
-      return oThis.initialize(ownerParams);
+    //1. Get block and stateRoot.
+    let blockHeight = config.blockHeight || 'latest';
+    let stateRoot;
+    console.log('* Fetching Block:', blockHeight);
+    let promiseChain = coWeb3.eth.getBlock(blockHeight).then(function(block) {
+      blockHeight = block.number;
+      stateRoot = block.stateRoot;
     });
+
+    //2. Deploy the Contract
+    promiseChain = promiseChain.then(function() {
+      return oThis.deploy(
+        config.remoteChainId,
+        blockHeight,
+        stateRoot,
+        config.maxStateRoots,
+        config.organization,
+        deployParams
+      );
+    });
+
+    //3. Set coAnchorAddress.
+    if (config.coAnchorAddress) {
+      promiseChain = promiseChain.then(function() {
+        let ownerParams = Object.assign({}, deployParams);
+        ownerParams.from = config.organizationOwner;
+        return oThis.setCoAnchorAddress(config.coAnchorAddress, ownerParams);
+      });
+    }
 
     return promiseChain;
   }
@@ -70,14 +92,18 @@ class OSTPrimeHelper {
       throw new Error('Mandatory configuration "deployer" missing. Set config.deployer address');
     }
 
-    if (!config.chainOwner) {
-      throw new Error('Mandatory configuration "chainOwner" missing. Set config.chainOwner.');
+    if (!config.remoteChainId) {
+      throw new Error('Mandatory configuration "remoteChainId" missing. Set config.remoteChainId.');
     }
 
-    return true;
+    if (config.coAnchorAddress && !config.organizationOwner) {
+      throw new Error(
+        'Mandatory configuration "organizationOwner" missing. Set config.organizationOwner address. organizationOwner is mandatory when using coAnchorAddress config option'
+      );
+    }
   }
 
-  deploy(_valueToken, _organization, txOptions, web3) {
+  deploy(_remoteChainId, _blockHeight, _stateRoot, _maxStateRoots, _membersManager, txOptions, web3) {
     const oThis = this;
     web3 = web3 || oThis.web3;
     const abiBinProvider = oThis.abiBinProvider;
@@ -85,16 +111,16 @@ class OSTPrimeHelper {
     const bin = abiBinProvider.getBIN(ContractName);
 
     let defaultOptions = {
-      gas: '2500000',
-      gasPrice: 0
+      gas: '1000000'
     };
 
     if (txOptions) {
       Object.assign(defaultOptions, txOptions);
     }
     txOptions = defaultOptions;
+    _maxStateRoots = _maxStateRoots || AnchorHelper.DEFAULT_MAX_STATE_ROOTS;
 
-    let args = [_valueToken, _organization];
+    let args = [_remoteChainId, _blockHeight, _stateRoot, _maxStateRoots, _membersManager];
     const contract = new web3.eth.Contract(abi, null, txOptions);
     let tx = contract.deploy(
       {
@@ -126,17 +152,13 @@ class OSTPrimeHelper {
       });
   }
 
-  initialize(txOptions, contractAddress, web3) {
+  setCoAnchorAddress(coAnchorAddress, txOptions, contractAddress, web3) {
     const oThis = this;
     web3 = web3 || oThis.web3;
     contractAddress = contractAddress || oThis.address;
 
-    const valueToTransfer = Web3.utils.toWei('800000000');
-
     let defaultOptions = {
-      gas: '60000',
-      value: valueToTransfer,
-      gasPrice: 0
+      gas: 61000
     };
 
     if (txOptions) {
@@ -147,9 +169,9 @@ class OSTPrimeHelper {
     const abiBinProvider = oThis.abiBinProvider;
     const abi = abiBinProvider.getABI(ContractName);
     const contract = new web3.eth.Contract(abi, contractAddress, txOptions);
-    let tx = contract.methods.initialize();
+    let tx = contract.methods.setCoAnchorAddress(coAnchorAddress);
 
-    console.log(`* Initializing ${ContractName}`);
+    console.log(`* Setting ${ContractName} Co-${ContractName} Address`);
     return tx
       .send(txOptions)
       .on('transactionHash', function(transactionHash) {
@@ -164,40 +186,9 @@ class OSTPrimeHelper {
       });
   }
 
-  setCoGateway(cogateway, txOptions, contractAddress, web3) {
-    const oThis = this;
-    web3 = web3 || oThis.web3;
-    contractAddress = contractAddress || oThis.address;
-
-    let defaultOptions = {
-      gas: '60000',
-      gasPrice: 0
-    };
-
-    if (txOptions) {
-      Object.assign(defaultOptions, txOptions);
-    }
-    txOptions = defaultOptions;
-
-    const abiBinProvider = oThis.abiBinProvider;
-    const abi = abiBinProvider.getABI(ContractName);
-    const contract = new web3.eth.Contract(abi, contractAddress, txOptions);
-    let tx = contract.methods.setCoGateway(cogateway);
-
-    console.log(`* setCoGateway on ${ContractName}`);
-    return tx
-      .send(txOptions)
-      .on('transactionHash', function(transactionHash) {
-        console.log('\t - transaction hash:', transactionHash);
-      })
-      .on('receipt', function(receipt) {
-        console.log('\t - Receipt:\n\x1b[2m', JSON.stringify(receipt), '\x1b[0m\n');
-      })
-      .on('error', function(error) {
-        console.log('\t !! Error !!', error, '\n\t !! ERROR !!\n');
-        return Promise.reject(error);
-      });
+  static get DEFAULT_MAX_STATE_ROOTS() {
+    return 60;
   }
 }
 
-module.exports = OSTPrimeHelper;
+module.exports = AnchorHelper;
