@@ -2,7 +2,9 @@
 
 const AbiBinProvider = require('./libs/AbiBinProvider');
 const ChainSetup = require('./libs/ChainSetup');
+const Contracts = require('./libs/Contracts');
 module.exports = {
   AbiBinProvider: AbiBinProvider,
-  ChainSetup: ChainSetup
+  ChainSetup: ChainSetup,
+  Contracts: Contracts
 };
