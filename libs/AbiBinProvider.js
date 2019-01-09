@@ -5,13 +5,32 @@ const fs = require('fs'),
   path = require('path');
 //__NOT_FOR_WEB__END__
 
+let DEFAULT_ABI_FOLDER_PATH, DEFAULT_BIN_FOLDER_PATH;
+//__NOT_FOR_WEB__BEGIN__
+DEFAULT_ABI_FOLDER_PATH = path.resolve(__dirname, '../contracts/abi/');
+DEFAULT_BIN_FOLDER_PATH = path.resolve(__dirname, '../contracts/bin/');
+//__NOT_FOR_WEB__END__
+
 const Linker = require('../libs/utils/linker');
 
 class AbiBinProvider {
   constructor(abiFolderPath, binFolderPath) {
     const oThis = this;
-    oThis.abiFolderPath = abiFolderPath || '../contracts/abi/';
-    oThis.binFolderPath = binFolderPath || '../contracts/bin/';
+    abiFolderPath = abiFolderPath || DEFAULT_ABI_FOLDER_PATH;
+    binFolderPath = binFolderPath || DEFAULT_BIN_FOLDER_PATH;
+    //__NOT_FOR_WEB__BEGIN__
+    if (!path.isAbsolute(abiFolderPath)) {
+      let err = new Error('"abiFolderPath" is not Absolute. Please provide absolute path.');
+      throw err;
+    }
+    if (!path.isAbsolute(binFolderPath)) {
+      let err = new Error('"binFolderPath" is not Absolute. Please provide absolute path.');
+      throw err;
+    }
+    //__NOT_FOR_WEB__END__
+
+    oThis.abiFolderPath = abiFolderPath;
+    oThis.binFolderPath = binFolderPath;
     oThis.custom = oThis.custom || null;
   }
 
@@ -68,7 +87,7 @@ class AbiBinProvider {
     }
 
     //__NOT_FOR_WEB__BEGIN__
-    let fPath = path.resolve(__dirname, oThis.abiFolderPath, contractName + '.abi');
+    let fPath = path.resolve(oThis.abiFolderPath, contractName + '.abi');
     let abiFileContent = fs.readFileSync(fPath, 'utf8');
     let abi = JSON.parse(abiFileContent);
     //__NOT_FOR_WEB__END__
@@ -83,7 +102,7 @@ class AbiBinProvider {
     }
 
     //__NOT_FOR_WEB__BEGIN__
-    let fPath = path.resolve(__dirname, oThis.binFolderPath, contractName + '.bin');
+    let fPath = path.resolve(oThis.binFolderPath, contractName + '.bin');
     let bin = fs.readFileSync(fPath, 'utf8');
     if (typeof bin === 'string' && bin.indexOf('0x') != 0) {
       bin = '0x' + bin;
