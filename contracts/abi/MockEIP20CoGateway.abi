@@ -1,1 +1,0 @@
-[{"constant":false,"inputs":[{"name":"_utilityToken","type":"address"}],"name":"setUtilityToken","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[],"name":"utilityToken","outputs":[{"name":"utilityToken_","type":"address"}],"payable":false,"stateMutability":"nonpayable","type":"function"}]

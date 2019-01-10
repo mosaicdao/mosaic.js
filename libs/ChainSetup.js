@@ -602,9 +602,6 @@ class ChainSetup {
       let txOptions = Object.assign({}, auxTxOptions);
       txOptions.from = auxiliaryConfig.tokenOrganization.owner;
 
-      console.log('RRRR :: outAddresses', JSON.stringify(outAddresses));
-      console.log('RRRR :: auxToken', auxToken);
-
       let helper = new OSTPrimeHelper(web3, auxToken);
       return helper.setCoGateway(cogateway, txOptions);
     });

@@ -3,14 +3,19 @@
 // Load external packages
 const chai = require('chai'),
   Web3 = require('web3'),
-  ChainSetup = require('../libs/ChainSetup'),
+  Package = require('../index'),
+  ChainSetup = Package.ChainSetup,
   assert = chai.assert;
 
 const config = require('../tests/utils/configReader'),
-  Web3WalletHelper = require('../tests/utils/Web3WalletHelper');
+  Web3WalletHelper = require('../tests/utils/Web3WalletHelper'),
+  MockContractsDeployer = require('../tests/utils/MockContractsDeployer');
 
 const web3 = new Web3(config.gethRpcEndPoint);
 let web3WalletHelper = new Web3WalletHelper(web3);
+
+//Contract Address. TBD: Do not forget to set caMockToken = null below.
+let caMockToken = null;
 
 let originConfig = {
   gasPrice: '0x5B9ACA00',
@@ -76,17 +81,26 @@ let auxiliaryConfig = {
 //To-Do: Write Test Case here.
 describe('tests/ChainSetup', function() {
   before(function() {
-    this.timeout(3 * 60000);
+    this.timeout(5 * 60000);
     //This hook could take long time.
-    return web3WalletHelper.init(web3);
+    return web3WalletHelper.init(web3).then(function() {
+      let deployer = new MockContractsDeployer(config.deployerAddress, web3);
+      return deployer.deployMockToken().then(function() {
+        caMockToken = deployer.addresses.MockToken;
+      });
+    });
   });
 
-  const someValidAddress = '0x2c4e8f2d746113d0696ce89b35f0d8bf88e0aeca';
   let helper = new ChainSetup(web3, web3);
+  let chainSetupOutput;
   it('should do mosaic setup with exhaustive configurations', function() {
     this.timeout(1 * 60 * 60 * 1000); //1 hr.
-    let valueToken = someValidAddress;
-    return helper.setup(valueToken, originConfig, auxiliaryConfig);
+    let valueToken = caMockToken;
+    return helper.setup(valueToken, originConfig, auxiliaryConfig).then(function(output) {
+      chainSetupOutput = output;
+      console.log('chainSetupOutput', JSON.stringify(chainSetupOutput));
+      return chainSetupOutput;
+    });
   });
 });
 

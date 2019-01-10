@@ -15,7 +15,7 @@ class Contracts {
   SimpleToken(address, options) {
     const oThis = this;
     let web3 = oThis.originWeb3;
-    return Contracts.getEIP20Token(address, options);
+    return Contracts.getEIP20Token(web3, address, options);
   }
 
   OSTPrime(address, options) {
@@ -118,3 +118,5 @@ class Contracts {
     throw 'Invalid web3. Please provide an instanceof Web3(version: ' + Web3.version + ' )';
   }
 }
+
+module.exports = Contracts;

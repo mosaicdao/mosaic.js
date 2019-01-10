@@ -37,7 +37,6 @@ fs.readdir(contractsRepoPath, function(err, items) {
       //Do nothing
       continue;
     }
-    console.log(`Processing ${fileName}`);
 
     //Determine file Name
     let fileSplits = fileName.split('.');
@@ -46,6 +45,16 @@ fs.readdir(contractsRepoPath, function(err, items) {
     }
 
     let contractName = fileSplits[0];
+
+    if (contractName.startsWith('Mock') || contractName.startsWith('Test')) {
+      //Skip it.
+      metadata.abi.ignored.push(contractName);
+      metadata.bin.ignored.push(contractName);
+      continue;
+    }
+
+    console.log(`Processing ${fileName}`);
+
     let jsonFilePath = path.join(contractsRepoPath, fileName);
     console.log(`jsonFilePath ${jsonFilePath}`);
     let json = require(jsonFilePath);
