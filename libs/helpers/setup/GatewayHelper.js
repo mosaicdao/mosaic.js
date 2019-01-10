@@ -110,6 +110,12 @@ class GatewayHelper {
       return oThis.activateGateway(coGatewayAddress, ownerTxParams, gatewayAddress, originWeb3);
     });
 
+    promiseChain = promiseChain.then(async function() {
+      let gatewayAddress = oThis.address;
+      oThis.stakeVault = await oThis.getStakeVault(gatewayAddress, originWeb3);
+      return Promise.resolve({});
+    });
+
     return promiseChain;
   }
 
@@ -242,6 +248,20 @@ class GatewayHelper {
         console.log('\t !! Error !!', error, '\n\t !! ERROR !!\n');
         return Promise.reject(error);
       });
+  }
+
+  getStakeVault(gatewayContractAddress, web3) {
+    const oThis = this;
+    web3 = web3 || oThis.web3;
+
+    const abiBinProvider = oThis.abiBinProvider;
+    const abi = abiBinProvider.getABI(ContractName);
+    const contract = new web3.eth.Contract(abi, gatewayContractAddress);
+
+    return contract.methods.stakeVault().call(function(err, res) {
+      if (err) return Promise.reject(err);
+      return Promise.resolve(res);
+    });
   }
 }
 

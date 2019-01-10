@@ -573,7 +573,8 @@ class ChainSetup {
           .then(function() {
             return {
               gateway: helper.address,
-              cogateway: helper.cogateway
+              cogateway: helper.cogateway,
+              stakeVault: helper.stakeVault
             };
           });
       })
