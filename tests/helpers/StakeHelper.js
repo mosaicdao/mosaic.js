@@ -3,6 +3,7 @@
 // Load external packages
 const chai = require('chai'),
   Web3 = require('web3'),
+  BN = require('bn.js'),
   Package = require('../../index'),
   ChainSetup = Package.ChainSetup,
   Contracts = Package.Contracts,
@@ -17,13 +18,25 @@ const web3 = new Web3(config.gethRpcEndPoint);
 let web3WalletHelper = new Web3WalletHelper(web3);
 
 //Contract Address. TBD: Do not forget to set caMockToken && caGateway = null below.
-// let caMockToken = null;
-// let caGateway = null;
-
-let caMockToken = '0x7942c4404E7FEF78008246426C336bBA97e2f69B';
-let caGateway = '0x7A309E56c3E6E446A09a9FB70EAa715CaF546Eb5';
+let caMockToken = null;
+let caGateway = null;
 
 let staker;
+
+let validateReceipt = (receipt) => {
+  assert.isNotNull(receipt, 'Transaction Receipt is null');
+  assert.isObject(receipt, 'Transaction Receipt is not an object');
+  assert.isTrue(receipt.status, 'Transaction failed.');
+  return receipt;
+};
+
+let validateDeploymentReceipt = (receipt) => {
+  validateReceipt(receipt);
+  let contractAddress = receipt.contractAddress;
+  assert.isNotEmpty(contractAddress, 'Deployment Receipt is missing contractAddress');
+  assert.isTrue(web3.utils.isAddress(contractAddress), 'Invalid contractAddress in Receipt');
+  return receipt;
+};
 
 let originConfig = {
   gasPrice: '0x5B9ACA00',
@@ -88,10 +101,11 @@ let auxiliaryConfig = {
 
 //To-Do: Write Test Case here.
 describe('tests/ChainSetup', function() {
-  let _numAmtToStake = 20;
+  let _numAmtToStake = 1;
   let amountToStake = web3.utils.toWei(String(_numAmtToStake));
   let bountyAmount = web3.utils.toWei(String(_numAmtToStake));
-  let amountToFund = web3.utils.toWei(String(5 * _numAmtToStake));
+  let amountToFund = web3.utils.toWei(String(13 * _numAmtToStake));
+  let amountToApprove;
   before(function() {
     this.timeout(60 * 60 * 1000); //1 Hr
     //This hook could take long time.
@@ -114,7 +128,7 @@ describe('tests/ChainSetup', function() {
           return helper.setup(valueToken, originConfig, auxiliaryConfig).then(function(output) {
             let chainSetupOutput = output;
             console.log('chainSetupOutput', JSON.stringify(chainSetupOutput));
-            caGateway = chainSetupOutput.addresses.gateway;
+            caGateway = chainSetupOutput.addresses.origin.gateway;
           });
         }
         return caGateway;
@@ -153,20 +167,65 @@ describe('tests/ChainSetup', function() {
     this.timeout(3 * 60 * 1000); //3 Minutes
     let helper = new StakeHelper();
     return helper.getNonce(staker, web3, caGateway).then(function(stakerNonce) {
-      console.log('stakerNonce', stakerNonce);
+      assert.equal(1, stakerNonce, 'Staker nonce should be 1');
+    });
+  });
+
+  it('should get gateway bounty', function() {
+    this.timeout(3 * 60 * 1000); //3 Minutes
+    let helper = new StakeHelper();
+    return helper.getBounty(staker, web3, caGateway).then(function(bounty) {
+      let bnBounty = new BN(bounty);
+      let bnAmountToStkae = new BN(amountToStake);
+      amountToApprove = bnBounty.add(bnAmountToStkae).toString(10);
     });
   });
 
   it('should approve stake amount', function() {
     this.timeout(3 * 60 * 1000); //3 Minutes
     let helper = new StakeHelper();
-    return helper.approveStakeAmount(amountToStake, null, web3, caMockToken, caGateway, staker);
+    amountToApprove = amountToApprove || 2 + amountToStake; //String addition here.
+    return helper.approveStakeAmount(amountToApprove, null, web3, caMockToken, caGateway, staker).then(validateReceipt);
   });
 
-  it('should approve bounty amount', function() {
-    this.timeout(3 * 60 * 1000); //1 Minutes
-    let helper = new StakeHelper();
-    return helper.approveBountyAmount(bountyAmount, null, web3, caMockToken, caGateway, staker);
+  // @dev - As only 1 active stake is allowed per staker, below test case has been commented.
+  // helper.stake will be tested along with perform.
+  // Please do not remove this commented test-case.
+  // Please do keep it updated as need.
+  // Later, we shall create another staker key for perform.
+  /* ---------------------------------------------------------------- */
+
+  // it('should stake SimpleToken', function () {
+  //   this.timeout(3 * 60 * 1000); //3 Minutes
+
+  //   let stakeHashLockInfo = StakeHelper.createSecretHashLock();
+
+  //   let _amount = amountToStake;
+  //   let _beneficiary = staker;
+  //   let _gasPrice = "0";
+  //   let _gasLimit = "10000000";
+  //   let _nonce = 1; //New key, so shall be 1.
+  //   let _hashLock = stakeHashLockInfo.hashLock;
+
+  //   let helper = new StakeHelper();
+  //   return helper.stake(_amount, _beneficiary, _gasPrice, _gasLimit, _nonce, _hashLock, null, web3, caGateway, staker)
+  //     .then(validateReceipt);
+
+  // });
+  /* ---------------------------------------------------------------- */
+
+  it('should perform staking', function() {
+    this.timeout(30 * 60 * 1000); //30 Minutes
+    let helper = new StakeHelper(web3, caMockToken, caGateway, staker);
+    let _amount = amountToStake;
+    let _beneficiary = staker;
+    let _gasPrice = '0';
+    let _gasLimit = '10000000';
+
+    return helper.perform(_amount, _beneficiary, _gasPrice, _gasLimit).then((output) => {
+      validateReceipt(output.receipt);
+      console.log('Staking Performed. output:', JSON.stringify(output));
+    });
   });
 });
 
