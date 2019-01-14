@@ -69,6 +69,8 @@ class OrganizationHelper {
     const abi = abiBinProvider.getABI(ContractName);
     const bin = abiBinProvider.getBIN(ContractName);
 
+    admin = admin || '0x0000000000000000000000000000000000000000';
+
     let defaultOptions = {
       gas: '1600000'
     };
