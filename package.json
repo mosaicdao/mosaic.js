@@ -1,5 +1,5 @@
 {
-  "name": "mosaic-tbd",
+  "name": "@openstfoundation/mosaic-tbd",
   "version": "0.1.0",
   "description": "NPM package that provides mosaic contract abis and bins. This package also helps in mosaic chain setup.",
   "main": "index.js",
