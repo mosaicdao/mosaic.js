@@ -68,13 +68,13 @@ class LibsHelper {
   }
 
   deployMerklePatriciaProof(txOptions, web3) {
-    const oThis = this;
-
+    const oThis = this,
+      LibName = LibsHelper.MerklePatriciaProofLibName;
     web3 = web3 || oThis.web3;
 
     let tx = oThis._deployMerklePatriciaProofRawTx(txOptions, web3);
 
-    console.log(`* Deploying ${LibsHelper.MerklePatriciaProofLibName} Contract`);
+    console.log(`* Deploying ${LibName} Contract`);
 
     let txReceipt;
     return tx
