@@ -98,6 +98,56 @@ class CoGatewayHelper {
     web3 = web3 || oThis.web3;
     messageBus = messageBus || oThis.messageBus;
     gatewayLib = gatewayLib || oThis.gatewayLib;
+
+    let tx = oThis._deployRawTx(
+      _valueToken,
+      _utilityToken,
+      _anchor,
+      _bounty,
+      _membersManager,
+      _gateway,
+      messageBus,
+      gatewayLib,
+      txOptions,
+      web3
+    );
+
+    console.log(`* Deploying ${ContractName} Contract`);
+    let txReceipt;
+    return tx
+      .send(txOptions)
+      .on('transactionHash', function(transactionHash) {
+        console.log('\t - transaction hash:', transactionHash);
+      })
+      .on('error', function(error) {
+        console.log('\t !! Error !!', error, '\n\t !! ERROR !!\n');
+        return Promise.reject(error);
+      })
+      .on('receipt', function(receipt) {
+        txReceipt = receipt;
+        console.log('\t - Receipt:\n\x1b[2m', JSON.stringify(receipt), '\x1b[0m\n');
+      })
+      .then(function(instace) {
+        oThis.address = instace.options.address;
+        console.log(`\t - ${ContractName} Contract Address:`, oThis.address);
+        return txReceipt;
+      });
+  }
+
+  _deployRawTx(
+    _valueToken,
+    _utilityToken,
+    _anchor,
+    _bounty,
+    _membersManager,
+    _gateway,
+    messageBus,
+    gatewayLib,
+    txOptions,
+    web3
+  ) {
+    const oThis = this;
+
     const messageBusLibInfo = {
       address: messageBus,
       name: 'MessageBus'
@@ -122,34 +172,14 @@ class CoGatewayHelper {
     const _burner = '0x0000000000000000000000000000000000000000';
     const contract = new web3.eth.Contract(abi, null, txOptions);
     let args = [_valueToken, _utilityToken, _anchor, _bounty, _membersManager, _gateway, _burner];
-    let tx = contract.deploy(
+
+    return contract.deploy(
       {
         data: bin,
         arguments: args
       },
       txOptions
     );
-
-    console.log(`* Deploying ${ContractName} Contract`);
-    let txReceipt;
-    return tx
-      .send(txOptions)
-      .on('transactionHash', function(transactionHash) {
-        console.log('\t - transaction hash:', transactionHash);
-      })
-      .on('error', function(error) {
-        console.log('\t !! Error !!', error, '\n\t !! ERROR !!\n');
-        return Promise.reject(error);
-      })
-      .on('receipt', function(receipt) {
-        txReceipt = receipt;
-        console.log('\t - Receipt:\n\x1b[2m', JSON.stringify(receipt), '\x1b[0m\n');
-      })
-      .then(function(instace) {
-        oThis.address = instace.options.address;
-        console.log(`\t - ${ContractName} Contract Address:`, oThis.address);
-        return txReceipt;
-      });
   }
 }
 

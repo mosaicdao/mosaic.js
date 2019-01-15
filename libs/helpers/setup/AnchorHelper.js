@@ -106,31 +106,19 @@ class AnchorHelper {
   deploy(_remoteChainId, _blockHeight, _stateRoot, _maxStateRoots, _membersManager, txOptions, web3) {
     const oThis = this;
     web3 = web3 || oThis.web3;
-    const abiBinProvider = oThis.abiBinProvider;
-    const abi = abiBinProvider.getABI(ContractName);
-    const bin = abiBinProvider.getBIN(ContractName);
 
-    let defaultOptions = {
-      gas: '1000000'
-    };
-
-    if (txOptions) {
-      Object.assign(defaultOptions, txOptions);
-    }
-    txOptions = defaultOptions;
-    _maxStateRoots = _maxStateRoots || AnchorHelper.DEFAULT_MAX_STATE_ROOTS;
-
-    let args = [_remoteChainId, _blockHeight, _stateRoot, _maxStateRoots, _membersManager];
-    const contract = new web3.eth.Contract(abi, null, txOptions);
-    let tx = contract.deploy(
-      {
-        data: bin,
-        arguments: args
-      },
-      txOptions
+    let tx = oThis._deployRawTx(
+      _remoteChainId,
+      _blockHeight,
+      _stateRoot,
+      _maxStateRoots,
+      _membersManager,
+      txOptions,
+      web3
     );
 
     console.log(`* Deploying ${ContractName} Contract`);
+
     let txReceipt;
     return tx
       .send(txOptions)
@@ -152,24 +140,41 @@ class AnchorHelper {
       });
   }
 
-  setCoAnchorAddress(coAnchorAddress, txOptions, contractAddress, web3) {
+  _deployRawTx(_remoteChainId, _blockHeight, _stateRoot, _maxStateRoots, _membersManager, txOptions, web3) {
     const oThis = this;
-    web3 = web3 || oThis.web3;
-    contractAddress = contractAddress || oThis.address;
+    const abiBinProvider = oThis.abiBinProvider;
+    const abi = abiBinProvider.getABI(ContractName);
+    const bin = abiBinProvider.getBIN(ContractName);
 
     let defaultOptions = {
-      gas: 61000
+      gas: '1000000'
     };
 
     if (txOptions) {
       Object.assign(defaultOptions, txOptions);
     }
-    txOptions = defaultOptions;
 
-    const abiBinProvider = oThis.abiBinProvider;
-    const abi = abiBinProvider.getABI(ContractName);
-    const contract = new web3.eth.Contract(abi, contractAddress, txOptions);
-    let tx = contract.methods.setCoAnchorAddress(coAnchorAddress);
+    txOptions = defaultOptions;
+    _maxStateRoots = _maxStateRoots || AnchorHelper.DEFAULT_MAX_STATE_ROOTS;
+
+    let args = [_remoteChainId, _blockHeight, _stateRoot, _maxStateRoots, _membersManager];
+    const contract = new web3.eth.Contract(abi, null, txOptions);
+
+    return contract.deploy(
+      {
+        data: bin,
+        arguments: args
+      },
+      txOptions
+    );
+  }
+
+  setCoAnchorAddress(coAnchorAddress, txOptions, contractAddress, web3) {
+    const oThis = this;
+    web3 = web3 || oThis.web3;
+    contractAddress = contractAddress || oThis.address;
+
+    let tx = oThis._setCoAnchorAddressRawTx(coAnchorAddress, txOptions, contractAddress, web3);
 
     console.log(`* Setting ${ContractName} Co-${ContractName} Address`);
     return tx
@@ -184,6 +189,26 @@ class AnchorHelper {
         console.log('\t !! Error !!', error, '\n\t !! ERROR !!\n');
         return Promise.reject(error);
       });
+  }
+
+  _setCoAnchorAddressRawTx(coAnchorAddress, txOptions, contractAddress, web3) {
+    const oThis = this;
+
+    let defaultOptions = {
+      gas: 61000
+    };
+
+    if (txOptions) {
+      Object.assign(defaultOptions, txOptions);
+    }
+
+    txOptions = defaultOptions;
+
+    const abiBinProvider = oThis.abiBinProvider;
+    const abi = abiBinProvider.getABI(ContractName);
+    const contract = new web3.eth.Contract(abi, contractAddress, txOptions);
+
+    return contract.methods.setCoAnchorAddress(coAnchorAddress);
   }
 
   static get DEFAULT_MAX_STATE_ROOTS() {

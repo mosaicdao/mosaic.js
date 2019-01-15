@@ -162,36 +162,17 @@ class GatewayHelper {
     web3 = web3 || oThis.web3;
     messageBusAddress = messageBusAddress || oThis.messageBus;
     gatewayLibAddress = gatewayLibAddress || oThis.gatewayLib;
-    const messageBusLibInfo = {
-      address: messageBusAddress,
-      name: 'MessageBus'
-    };
-    const gatewayLibInfo = {
-      address: gatewayLibAddress,
-      name: 'GatewayLib'
-    };
 
-    const abiBinProvider = oThis.abiBinProvider;
-    const abi = abiBinProvider.getABI(ContractName);
-    const bin = abiBinProvider.getLinkedBIN(ContractName, messageBusLibInfo, gatewayLibInfo);
-
-    let defaultOptions = {
-      gas: '8000000'
-    };
-    if (txOptions) {
-      Object.assign(defaultOptions, txOptions);
-    }
-    txOptions = defaultOptions;
-
-    const contract = new web3.eth.Contract(abi, null, txOptions);
-    const _burner = '0x0000000000000000000000000000000000000000';
-    let args = [_token, _baseToken, _anchor, _bounty, _membersManager, _burner];
-    let tx = contract.deploy(
-      {
-        data: bin,
-        arguments: args
-      },
-      txOptions
+    let tx = oThis._deployRawTx(
+      _token,
+      _baseToken,
+      _anchor,
+      _bounty,
+      _membersManager,
+      messageBusAddress,
+      gatewayLibAddress,
+      txOptions,
+      web3
     );
 
     console.log('* Deploying EIP20Gateway Contract');
@@ -216,10 +197,79 @@ class GatewayHelper {
       });
   }
 
+  _deployRawTx(
+    _token,
+    _baseToken,
+    _anchor,
+    _bounty,
+    _membersManager,
+    messageBusAddress,
+    gatewayLibAddress,
+    txOptions,
+    web3
+  ) {
+    const oThis = this;
+
+    const messageBusLibInfo = {
+      address: messageBusAddress,
+      name: 'MessageBus'
+    };
+    const gatewayLibInfo = {
+      address: gatewayLibAddress,
+      name: 'GatewayLib'
+    };
+
+    const abiBinProvider = oThis.abiBinProvider;
+    const abi = abiBinProvider.getABI(ContractName);
+    const bin = abiBinProvider.getLinkedBIN(ContractName, messageBusLibInfo, gatewayLibInfo);
+
+    let defaultOptions = {
+      gas: '8000000'
+    };
+    if (txOptions) {
+      Object.assign(defaultOptions, txOptions);
+    }
+
+    txOptions = defaultOptions;
+
+    const contract = new web3.eth.Contract(abi, null, txOptions);
+    const _burner = '0x0000000000000000000000000000000000000000';
+    let args = [_token, _baseToken, _anchor, _bounty, _membersManager, _burner];
+
+    return contract.deploy(
+      {
+        data: bin,
+        arguments: args
+      },
+      txOptions
+    );
+  }
+
   activateGateway(_coGatewayAddress, txOptions, contractAddress, web3) {
     const oThis = this;
     web3 = web3 || oThis.web3;
     contractAddress = contractAddress || oThis.address;
+
+    let tx = oThis._activateGatewayRawTx(_coGatewayAddress, txOptions, contractAddress, web3);
+
+    console.log(`* Activating ${ContractName} with CoGateWay Address: ${_coGatewayAddress}`);
+
+    return tx
+      .send(txOptions)
+      .on('transactionHash', function(transactionHash) {
+        console.log('\t - transaction hash:', transactionHash);
+      })
+      .on('receipt', function(receipt) {
+        console.log('\t - Receipt:\n\x1b[2m', JSON.stringify(receipt), '\x1b[0m\n');
+      })
+      .on('error', function(error) {
+        console.log('\t !! Error !!', error, '\n\t !! ERROR !!\n');
+        return Promise.reject(error);
+      });
+  }
+
+  _activateGatewayRawTx(_coGatewayAddress, txOptions, contractAddress, web3) {
+    const oThis = this;
 
     let defaultOptions = {
       gas: '2000000'
@@ -233,21 +283,8 @@ class GatewayHelper {
     const abiBinProvider = oThis.abiBinProvider;
     const abi = abiBinProvider.getABI(ContractName);
     const contract = new web3.eth.Contract(abi, contractAddress, txOptions);
-    let tx = contract.methods.activateGateway(_coGatewayAddress);
 
-    console.log(`* Activating ${ContractName} with CoGateWay Address: ${_coGatewayAddress}`);
-    return tx
-      .send(txOptions)
-      .on('transactionHash', function(transactionHash) {
-        console.log('\t - transaction hash:', transactionHash);
-      })
-      .on('receipt', function(receipt) {
-        console.log('\t - Receipt:\n\x1b[2m', JSON.stringify(receipt), '\x1b[0m\n');
-      })
-      .on('error', function(error) {
-        console.log('\t !! Error !!', error, '\n\t !! ERROR !!\n');
-        return Promise.reject(error);
-      });
+    return contract.methods.activateGateway(_coGatewayAddress);
   }
 
   getStakeVault(gatewayContractAddress, web3) {

@@ -68,34 +68,14 @@ class LibsHelper {
   }
 
   deployMerklePatriciaProof(txOptions, web3) {
-    const oThis = this;
+    const oThis = this,
+      LibName = LibsHelper.MerklePatriciaProofLibName;
     web3 = web3 || oThis.web3;
-    const LibName = 'MerklePatriciaProof';
 
-    const abiBinProvider = oThis.abiBinProvider;
-    const abi = abiBinProvider.getABI(LibName);
-    const bin = abiBinProvider.getBIN(LibName);
-
-    let defaultOptions = {
-      gas: '3000000'
-    };
-
-    if (txOptions) {
-      Object.assign(defaultOptions, txOptions);
-    }
-    txOptions = defaultOptions;
-
-    let args = [];
-    const contract = new web3.eth.Contract(abi, null, txOptions);
-    let tx = contract.deploy(
-      {
-        data: bin,
-        arguments: args
-      },
-      txOptions
-    );
+    let tx = oThis._deployMerklePatriciaProofRawTx(txOptions, web3);
 
     console.log(`* Deploying ${LibName} Contract`);
+
     let txReceipt;
     return tx
       .send(txOptions)
@@ -117,23 +97,15 @@ class LibsHelper {
       });
   }
 
-  deployMessageBus(merklePatriciaProof, txOptions, web3) {
-    const oThis = this;
-    const LibName = 'MessageBus';
-    web3 = web3 || oThis.web3;
-
-    merklePatriciaProof = merklePatriciaProof || oThis.merklePatriciaProof;
-    let merklePatriciaProofInfo = {
-      name: 'MerklePatriciaProof',
-      address: merklePatriciaProof
-    };
-
+  _deployMerklePatriciaProofRawTx(txOptions, web3) {
+    const oThis = this,
+      LibName = LibsHelper.MerklePatriciaProofLibName;
     const abiBinProvider = oThis.abiBinProvider;
     const abi = abiBinProvider.getABI(LibName);
-    const bin = abiBinProvider.getLinkedBIN(LibName, merklePatriciaProofInfo);
+    const bin = abiBinProvider.getBIN(LibName);
 
     let defaultOptions = {
-      gas: '5000000'
+      gas: '3000000'
     };
 
     if (txOptions) {
@@ -143,13 +115,24 @@ class LibsHelper {
 
     let args = [];
     const contract = new web3.eth.Contract(abi, null, txOptions);
-    let tx = contract.deploy(
+
+    return contract.deploy(
       {
         data: bin,
         arguments: args
       },
       txOptions
     );
+  }
+
+  deployMessageBus(merklePatriciaProof, txOptions, web3) {
+    const oThis = this;
+    const LibName = LibsHelper.MessageBusLibName;
+
+    web3 = web3 || oThis.web3;
+    merklePatriciaProof = merklePatriciaProof || oThis.merklePatriciaProof;
+
+    let tx = oThis._deployMessageBusRwTx(merklePatriciaProof, txOptions, web3);
 
     console.log(`* Deploying ${LibName} Contract`);
     let txReceipt;
@@ -173,14 +156,12 @@ class LibsHelper {
       });
   }
 
-  deployGatewayLib(merklePatriciaProof, txOptions, web3) {
+  _deployMessageBusRwTx(merklePatriciaProof, txOptions, web3) {
     const oThis = this;
-    web3 = web3 || oThis.web3;
-    const LibName = 'GatewayLib';
+    const LibName = LibsHelper.MessageBusLibName;
 
-    merklePatriciaProof = merklePatriciaProof || oThis.merklePatriciaProof;
     let merklePatriciaProofInfo = {
-      name: 'MerklePatriciaProof',
+      name: LibsHelper.MerklePatriciaProofLibName,
       address: merklePatriciaProof
     };
 
@@ -189,7 +170,7 @@ class LibsHelper {
     const bin = abiBinProvider.getLinkedBIN(LibName, merklePatriciaProofInfo);
 
     let defaultOptions = {
-      gas: '2000000'
+      gas: '5000000'
     };
 
     if (txOptions) {
@@ -199,15 +180,26 @@ class LibsHelper {
 
     let args = [];
     const contract = new web3.eth.Contract(abi, null, txOptions);
-    let tx = contract.deploy(
+
+    return contract.deploy(
       {
         data: bin,
         arguments: args
       },
       txOptions
     );
+  }
+
+  deployGatewayLib(merklePatriciaProof, txOptions, web3) {
+    const oThis = this,
+      LibName = LibsHelper.GatewayLibName;
+    web3 = web3 || oThis.web3;
+    merklePatriciaProof = merklePatriciaProof || oThis.merklePatriciaProof;
+
+    let tx = oThis._deployGatewayLibRawTx(merklePatriciaProof, txOptions, web3);
 
     console.log(`* Deploying ${LibName} Contract`);
+
     let txReceipt;
     return tx
       .send(txOptions)
@@ -227,6 +219,51 @@ class LibsHelper {
         console.log(`\t - ${LibName} Contract Address:`, oThis.gatewayLib);
         return txReceipt;
       });
+  }
+
+  _deployGatewayLibRawTx(merklePatriciaProof, txOptions, web3) {
+    const oThis = this,
+      LibName = LibsHelper.GatewayLibName;
+    let merklePatriciaProofInfo = {
+      name: LibsHelper.MerklePatriciaProofLibName,
+      address: merklePatriciaProof
+    };
+
+    const abiBinProvider = oThis.abiBinProvider;
+    const abi = abiBinProvider.getABI(LibName);
+    const bin = abiBinProvider.getLinkedBIN(LibName, merklePatriciaProofInfo);
+
+    let defaultOptions = {
+      gas: '2000000'
+    };
+
+    if (txOptions) {
+      Object.assign(defaultOptions, txOptions);
+    }
+    txOptions = defaultOptions;
+
+    let args = [];
+    const contract = new web3.eth.Contract(abi, null, txOptions);
+
+    return contract.deploy(
+      {
+        data: bin,
+        arguments: args
+      },
+      txOptions
+    );
+  }
+
+  static get MerklePatriciaProofLibName() {
+    return 'MerklePatriciaProof';
+  }
+
+  static get MessageBusLibName() {
+    return 'MessageBus';
+  }
+
+  static get GatewayLibName() {
+    return 'GatewayLib';
   }
 }
 
