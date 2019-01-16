@@ -110,18 +110,7 @@ class StakeHelper {
     gateway = gateway || oThis.gateway;
     staker = staker || oThis.staker;
 
-    txOptions = Object.assign(
-      {
-        from: staker,
-        to: valueToken,
-        gas: '100000'
-      },
-      oThis.txOptions || {},
-      txOptions || {}
-    );
-
-    let contract = Contracts.getEIP20Token(web3, valueToken, txOptions);
-    let tx = contract.methods.approve(gateway, _value);
+    let tx = oThis._approveStakeAmountRawTx(_value, txOptions, web3, valueToken, gateway, staker);
 
     console.log(`* Approving Stake Amount`);
     return tx
@@ -138,12 +127,50 @@ class StakeHelper {
       });
   }
 
+  _approveStakeAmountRawTx(_value, txOptions, web3, valueToken, gateway, staker){
+    const oThis = this;
+
+    txOptions = Object.assign(
+      {
+        from: staker,
+        to: valueToken,
+        gas: '100000'
+      },
+      oThis.txOptions || {},
+      txOptions || {}
+    );
+
+    let contract = Contracts.getEIP20Token(web3, valueToken, txOptions);
+    let tx = contract.methods.approve(gateway, _value);
+
+    return tx;
+  }
+
   stake(_amount, _beneficiary, _gasPrice, _gasLimit, _nonce, _hashLock, txOptions, originWeb3, gateway, staker) {
     const oThis = this;
 
     let web3 = originWeb3 || oThis.web3;
     gateway = gateway || oThis.gateway;
     staker = staker || oThis.staker;
+
+    let tx = oThis._stakeRawTx(_amount, _beneficiary, _gasPrice, _gasLimit, _nonce, _hashLock, txOptions, web3, gateway, staker);
+    console.log(`* Staking SimpleToken`);
+    return tx
+      .send(txOptions)
+      .on('transactionHash', function(transactionHash) {
+        console.log('\t - transaction hash:', transactionHash);
+      })
+      .on('receipt', function(receipt) {
+        console.log('\t - Receipt:\n\x1b[2m', JSON.stringify(receipt), '\x1b[0m\n');
+      })
+      .on('error', function(error) {
+        console.log('\t !! Error !!', error, '\n\t !! ERROR !!\n');
+        return Promise.reject(error);
+      });
+  }
+
+  _stakeRawTx(_amount, _beneficiary, _gasPrice, _gasLimit, _nonce, _hashLock, txOptions, web3, gateway, staker) {
+    const oThis = this;
 
     txOptions = Object.assign(
       {
@@ -158,19 +185,7 @@ class StakeHelper {
     let contract = Contracts.getEIP20Gateway(web3, gateway, txOptions);
     let tx = contract.methods.stake(_amount, _beneficiary, _gasPrice, _gasLimit, _nonce, _hashLock);
 
-    console.log(`* Staking SimpleToken`);
-    return tx
-      .send(txOptions)
-      .on('transactionHash', function(transactionHash) {
-        console.log('\t - transaction hash:', transactionHash);
-      })
-      .on('receipt', function(receipt) {
-        console.log('\t - Receipt:\n\x1b[2m', JSON.stringify(receipt), '\x1b[0m\n');
-      })
-      .on('error', function(error) {
-        console.log('\t !! Error !!', error, '\n\t !! ERROR !!\n');
-        return Promise.reject(error);
-      });
+    return tx;
   }
 
   static createSecretHashLock() {
