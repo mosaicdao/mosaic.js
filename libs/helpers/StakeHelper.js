@@ -189,9 +189,9 @@ class StakeHelper {
   }
 
   static createSecretHashLock() {
-    const uuid = require('uuid/v4');
+    const crypto = require('crypto');
 
-    let secret = uuid();
+    let secret = crypto.randomBytes(16).toString('hex');
     return StakeHelper.toHashLock(secret);
   }
 
