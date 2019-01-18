@@ -1,7 +1,9 @@
 'use strict';
 
-const Contracts = require('../../libs/Contracts');
 const BN = require('bn.js');
+const Web3Utils = require('web3-utils');
+const Crypto = require('crypto');
+const Contracts = require('../../libs/Contracts');
 
 class StakeHelper {
   constructor(originWeb3, simpleToken, gateway, staker, txOptions) {
@@ -127,7 +129,7 @@ class StakeHelper {
       });
   }
 
-  _approveStakeAmountRawTx(_value, txOptions, web3, valueToken, gateway, staker){
+  _approveStakeAmountRawTx(_value, txOptions, web3, valueToken, gateway, staker) {
     const oThis = this;
 
     txOptions = Object.assign(
@@ -153,7 +155,18 @@ class StakeHelper {
     gateway = gateway || oThis.gateway;
     staker = staker || oThis.staker;
 
-    let tx = oThis._stakeRawTx(_amount, _beneficiary, _gasPrice, _gasLimit, _nonce, _hashLock, txOptions, web3, gateway, staker);
+    let tx = oThis._stakeRawTx(
+      _amount,
+      _beneficiary,
+      _gasPrice,
+      _gasLimit,
+      _nonce,
+      _hashLock,
+      txOptions,
+      web3,
+      gateway,
+      staker
+    );
     console.log(`* Staking SimpleToken`);
     return tx
       .send(txOptions)
@@ -189,26 +202,16 @@ class StakeHelper {
   }
 
   static createSecretHashLock() {
-    const crypto = require('crypto');
-
-    let secret = crypto.randomBytes(16).toString('hex');
+    let secret = Crypto.randomBytes(16).toString('hex');
     return StakeHelper.toHashLock(secret);
   }
 
   static toHashLock(secretString) {
-    const crypto = require('crypto'),
-      keccak256 = require('keccak');
-
     let secretBytes = Buffer.from(secretString);
-
     return {
       secret: secretString,
       unlockSecret: '0x' + secretBytes.toString('hex'),
-      hashLock:
-        '0x' +
-        keccak256('keccak256')
-          .update(secretBytes)
-          .digest('hex')
+      hashLock: Web3Utils.keccak256(secretString)
     };
   }
 }

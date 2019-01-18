@@ -163,6 +163,20 @@ describe('tests/ChainSetup', function() {
       });
   });
 
+  it('should generate valid hashLock', function() {
+    let expectedOutput = {
+      secret: '5df052eb5e447cc3eddd8e3ebbe35ab0',
+      unlockSecret: '0x3564663035326562356534343763633365646464386533656262653335616230',
+      hashLock: '0x78a9ed63184870532c41557bbd5fa535a8a30073e9518a0485ae7880c33da5d4'
+    };
+
+    let secret = expectedOutput.secret;
+
+    let stakeHashLockInfo = StakeHelper.toHashLock(secret);
+    // console.log("stakeHashLockInfo", stakeHashLockInfo, "\nsecret", secret);
+    assert.deepEqual(stakeHashLockInfo, expectedOutput, 'Invalid toHashLock output');
+  });
+
   it('should get staker nonce', function() {
     this.timeout(3 * 60 * 1000); //3 Minutes
     let helper = new StakeHelper();
