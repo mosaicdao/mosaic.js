@@ -103,6 +103,8 @@ class TypedData {
     Object.assign(oThis.types, types);
 
     if (!(oThis.types.EIP712Domain instanceof Array)) {
+      // TODO Clone DEFAULT_EIP712_DOMAIN_TYPE before assigning.
+      // Assign the cloned array.
       oThis.types.EIP712Domain = DEFAULT_EIP712_DOMAIN_TYPE;
     }
   }
