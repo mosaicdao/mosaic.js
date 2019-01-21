@@ -1,16 +1,10 @@
-var keccak = require('keccak');
-
-function keccak256(input) {
-  return keccak('keccak256')
-    .update(input)
-    .digest();
-}
+const Web3Utils = require('web3-utils');
 
 function libraryHashPlaceholder(input) {
   return (
     '$' +
-    keccak256(input)
-      .toString('hex')
+    Web3Utils.keccak256(input)
+      .replace('0x', '')
       .slice(0, 34) +
     '$'
   );
