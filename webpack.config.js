@@ -10,8 +10,8 @@ const webpackOption = {
   target: 'web',
   node: { fs: 'empty' },
   entry: {
-    'mosaic-tbd': [polyfillFile, entryFile],
-    'mosaic-tbd.min': [polyfillFile, entryFile]
+    'mosaic.js': [polyfillFile, entryFile],
+    'mosaic.js.min': [polyfillFile, entryFile]
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
@@ -55,7 +55,7 @@ const webpackOption = {
         use: [
           {
             loader: 'expose-loader',
-            options: 'MosaicTbd'
+            options: 'Mosaic'
           }
         ]
       },

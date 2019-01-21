@@ -1,11 +1,11 @@
 {
-  "name": "@openstfoundation/mosaic-tbd",
+  "name": "@openstfoundation/mosaic.js",
   "version": "0.1.0",
   "description": "NPM package that provides mosaic contract abis and bins. This package also helps in mosaic chain setup.",
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/OpenSTFoundation/mosaic-tbd.git"
+    "url": "git+https://github.com/OpenSTFoundation/mosaic.js.git"
   },
   "keywords": [
     "OpenST",
@@ -21,7 +21,7 @@
   "author": "OpenST Ltd.",
   "license": "LGPL-3.0",
   "bugs": {
-    "url": "https://github.com/OpenSTFoundation/mosaic-tbd/issues"
+    "url": "https://github.com/OpenSTFoundation/mosaic.js/issues"
   },
   "scripts": {
     "pre-commit": "lint-staged",

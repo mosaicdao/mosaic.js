@@ -3,14 +3,13 @@
 
 # Install Package
 ```js
-npm install mosaic-tbd
-//TBD: change require below.
-MosaicTbd = require('./index');
+npm install @openstfoundation/mosaic.js
+Mosaic = require('@openstfoundation/mosaic.js');
 ```
 
 # Abi Bin Provider Usage
 ```js
-abiBinProvider = new MosaicTbd.AbiBinProvider();
+abiBinProvider = new Mosaic.AbiBinProvider();
 jsonInterface = abiBinProvider.getABI('Organization');
 contractBin = abiBinProvider.getBIN('Organization');
 ```
