@@ -6,6 +6,9 @@ logs
 *.log
 log
 
+# Setup
+mosaic-setup
+
 # contracts are git submodules
 contracts/openst-protocol
 

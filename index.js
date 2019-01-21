@@ -1,29 +1,30 @@
-"use strict";
+'use strict';
 
 /**
  * Load openST Platform module
  */
 
-const Web3 = require('web3')
-    , web3Utils = require('web3-utils')
-;
+const Web3 = require('web3'),
+  web3Utils = require('web3-utils');
 const InstanceComposer = require('./instance_composer');
 const version = require('./package.json').version;
 
-require('./lib/contracts');
 require('./providers/OriginWeb3');
 require('./providers/AuxiliaryWeb3');
+require('./lib/Signers');
+require('./lib/Setup');
+require('./lib/Contracts');
 
-
-
-
-const Mosaic = function (rumNodeProvider, configurations ) {
+const Mosaic = function(rumNodeProvider, configurations) {
   const oThis = this;
-  oThis.configurations = Object.assign({}, {rumNodeProvider: rumNodeProvider}, configurations);
+
+  oThis.version = version;
+
+  oThis.configurations = Object.assign({}, { rumNodeProvider: rumNodeProvider }, configurations);
   oThis._sanitizeConfigurations();
 
-  const _instanceComposer =  new InstanceComposer(oThis.configurations);
-  oThis.ic =  function () {
+  const _instanceComposer = new InstanceComposer(oThis.configurations);
+  oThis.ic = function() {
     return _instanceComposer;
   };
 
@@ -33,61 +34,72 @@ const Mosaic = function (rumNodeProvider, configurations ) {
   //2. Define origin
   let OriginWeb3 = oThis.ic().OriginWeb3();
   let _origin = new OriginWeb3();
-  oThis.origin = function () {
+  oThis.origin = function() {
     return _origin;
   };
 
   //3. Define core
   let AuxiliaryWeb3 = oThis.ic().AuxiliaryWeb3();
-  oThis.core = function ( originCoreContractAddress ) {
-    return new AuxiliaryWeb3( originCoreContractAddress );
+  oThis.core = function(originCoreContractAddress) {
+    return new AuxiliaryWeb3(originCoreContractAddress);
   };
 
   //4. Define contracts
   oThis.contracts = oThis.ic().Contracts();
 
+  oThis.setup = oThis.ic().Setup();
+
+  //5. Provide Signers
+  oThis.signers = oThis.ic().Signers();
+
+  //Lastly, add Utils
+  oThis.utils = Mosaic.utils;
 };
 
 Mosaic.prototype = {
   constructor: Mosaic,
   configurations: null,
-  _sanitizeConfigurations: function () {
-    const oThis = this
-        , configurations = oThis.configurations
-    ;
+  _sanitizeConfigurations: function() {
+    const oThis = this,
+      configurations = oThis.configurations;
 
     let areOptionsValid = true;
 
-    if ( !configurations.hasOwnProperty('origin') || typeof configurations.origin != 'object' ) {
+    if (!configurations.hasOwnProperty('origin') || typeof configurations.origin != 'object') {
       throw "Config Missing. 'origin' configuration is missing.";
     }
 
-    if ( typeof configurations.origin.provider !== 'string' ) {
+    if (typeof configurations.origin.provider !== 'string') {
       throw "Invalid Origin Config. 'provider' configuration is missing.";
     }
 
     let auxiliaries = configurations.auxiliaries;
-    if ( !auxiliaries || !auxiliaries instanceof Array ) { 
+    if (!auxiliaries || !auxiliaries instanceof Array) {
       throw "Config Missing. 'auxiliaries' configuration is missing. auxiliaries should be an Array of auxiliary config";
     }
 
     let len = auxiliaries.length;
-    while( len-- ) {
-      let auxConfig = auxiliaries[ len ];
-      if ( !auxConfig || typeof auxConfig !== 'object' ) {
-        throw "Invalid Auxiliary Config. auxiliary config should be an object.";   
+    while (len--) {
+      let auxConfig = auxiliaries[len];
+      if (!auxConfig || typeof auxConfig !== 'object') {
+        throw 'Invalid Auxiliary Config. auxiliary config should be an object.';
       }
-      if ( typeof auxConfig.provider !== 'string' ) {
+      if (typeof auxConfig.provider !== 'string') {
         throw "Invalid Auxiliary Config. 'provider' configuration is missing.";
       }
 
-      if ( auxConfig.originCoreContractAddress && !web3Utils.isAddress( auxConfig.originCoreContractAddress ) ) {
+      if (auxConfig.originCoreContractAddress && !web3Utils.isAddress(auxConfig.originCoreContractAddress)) {
         throw "Invalid Auxiliary Config. 'originCoreContractAddress' should be a valid Address.";
       }
     }
   }
-}
+};
 
+Mosaic.utils = {
+  GethSignerService: require('./utils/GethSignerService'),
+  deployContract: require('./utils/deployContract'),
+  helper: require('./utils/helper')
+};
 
 module.exports = Mosaic;
 
@@ -145,14 +157,3 @@ mosaic.aux( origin_core_contract_address ).getBalance("0x00000000000000000000000
 //-----------------------------------------------//
 
 */
-
-
-
-
-
-
-
-
-
-
-

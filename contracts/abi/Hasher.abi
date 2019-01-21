@@ -1,1 +1,122 @@
-[{"constant":true,"inputs":[{"name":"_uuid","type":"bytes32"},{"name":"_account","type":"address"},{"name":"_accountNonce","type":"uint256"},{"name":"_beneficiary","type":"address"},{"name":"_amountUT","type":"uint256"},{"name":"_unlockHeight","type":"uint256"},{"name":"_hashLock","type":"bytes32"}],"name":"hashRedemptionIntent","outputs":[{"name":"","type":"bytes32"}],"payable":false,"stateMutability":"pure","type":"function"},{"constant":true,"inputs":[{"name":"_account","type":"address"},{"name":"_nonce","type":"uint256"}],"name":"hashIntentKey","outputs":[{"name":"","type":"bytes32"}],"payable":false,"stateMutability":"pure","type":"function"},{"constant":true,"inputs":[{"name":"_symbol","type":"string"},{"name":"_name","type":"string"},{"name":"_chainIdValue","type":"uint256"},{"name":"_chainIdUtility","type":"uint256"},{"name":"_openSTUtility","type":"address"},{"name":"_conversionRate","type":"uint256"},{"name":"_conversionRateDecimals","type":"uint8"}],"name":"hashUuid","outputs":[{"name":"","type":"bytes32"}],"payable":false,"stateMutability":"pure","type":"function"},{"constant":true,"inputs":[{"name":"_uuid","type":"bytes32"},{"name":"_account","type":"address"},{"name":"_accountNonce","type":"uint256"},{"name":"_beneficiary","type":"address"},{"name":"_amountST","type":"uint256"},{"name":"_amountUT","type":"uint256"},{"name":"_unlockHeight","type":"uint256"},{"name":"_hashLock","type":"bytes32"}],"name":"hashStakingIntent","outputs":[{"name":"","type":"bytes32"}],"payable":false,"stateMutability":"pure","type":"function"}]
+[
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "_gateway",
+          "type": "address"
+        },
+        {
+          "name": "_coGateway",
+          "type": "address"
+        },
+        {
+          "name": "_bounty",
+          "type": "uint256"
+        },
+        {
+          "name": "_tokenName",
+          "type": "string"
+        },
+        {
+          "name": "_tokenSymbol",
+          "type": "string"
+        },
+        {
+          "name": "_tokenDecimal",
+          "type": "uint8"
+        },
+        {
+          "name": "_gasPrice",
+          "type": "uint256"
+        },
+        {
+          "name": "_nonce",
+          "type": "uint256"
+        }
+      ],
+      "name": "hashLinkGateway",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "_amount",
+          "type": "uint256"
+        },
+        {
+          "name": "_beneficiary",
+          "type": "address"
+        },
+        {
+          "name": "_staker",
+          "type": "address"
+        },
+        {
+          "name": "_gasPrice",
+          "type": "uint256"
+        }
+      ],
+      "name": "hashStakingIntent",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "stakeRequestTypeHash",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "redeemRequestTypeHash",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "gatewayLinkTypeHash",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "pure",
+      "type": "function"
+    }
+  ]

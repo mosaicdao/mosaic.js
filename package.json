@@ -1,47 +1,55 @@
 {
-  "name": "@openstfoundation/openst-platform",
-  "version": "0.9.4",
-  "description": "OpenST Platform provides a web3 interface to tokenise mainstream consumer applications with crypto-assets on Ethereum",
-  "keywords": [
-    "web3",
-    "openST",
-    "OST",
-    "simpletoken",
-    "utility-token",
-    "ethereum",
-    "erc20"
-  ],
+  "name": "@openstfoundation/mosaic.js",
+  "version": "0.0.1",
+  "description": "",
   "homepage": "https://openst.org",
   "author": "OpenST Ltd.",
   "license": "LGPL-3.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/OpenSTFoundation/openst-platform.git"
+    "url": "https://github.com/OpenSTFoundation/mosaic.js.git"
   },
   "bugs": {
-    "url": "https://github.com/OpenSTFoundation/openst-platform/issues"
+    "url": "https://github.com/OpenSTFoundation/mosaic.js/issues"
+  },
+  "bin": {
+    "init-mosaic-dev-env": "./tools/initDevEnv.js"
   },
   "scripts": {
-    "start": "index.js",
-    "setup": "node tools/setup/index.js",
-    "make-docs": "node_modules/.bin/jsdoc -c .jsdoc.json"
+    "pre-commit": "lint-staged",
+    "mosaic-game": "node ./game/game",
+    "init-dev-env": "node ./tools/initDevEnv.js",
+    "init-chains": "node ./tools/initChains.js"
   },
   "dependencies": {
-    "@openstfoundation/openst-base": "0.9.1",
-    "abi-decoder": "1.0.9",
     "bignumber.js": "4.1.0",
-    "debug": "2.2.0",
-    "edit-json-file": "1.0.8",
-    "rsync": "0.6.1",
-    "merkle-patricia-tree": "2.3.1",
     "ethereumjs-util": "5.2.0",
+    "keccak": "1.4.0",
     "leveldown": "4.0.1",
-    "levelup": "3.0.1"
+    "levelup": "3.0.1",
+    "merkle-patricia-tree": "2.3.1",
+    "os": "0.1.1",
+    "path": "0.12.7",
+    "rsync": "0.6.1",
+    "web3": "1.0.0-beta.34",
+    "ethereumjs-tx": "1.3.7"
   },
   "devDependencies": {
-    "chai": "4.1.2",
-    "ink-docstrap": "1.3.2",
-    "jsdoc": "3.5.5",
-    "mocha": "5.0.0"
+    "lint-staged": "7.2.0",
+    "pre-commit": "1.2.2",
+    "prettier": "1.13.7",
+    "shelljs": "0.8.1",
+    "node-cmd": "3.0.0",
+    "edit-json-file": "1.0.8",
+    "solc": "0.4.24"
+  },
+  "pre-commit": [
+    "pre-commit"
+  ],
+  "lint-staged": {
+    "*.js": [
+      "prettier --write --config .prettierrc.json",
+      "git add"
+    ]
   }
 }
