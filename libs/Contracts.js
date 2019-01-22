@@ -114,8 +114,11 @@ class Contracts {
     }
     if (typeof web3 === 'string') {
       return new Web3(web3);
+    } else {
+      return web3;
     }
-    throw 'Invalid web3. Please provide an instanceof Web3(version: ' + Web3.version + ' )';
+    // TODO - following is a temporary commit. Please revert this commit.
+    // throw 'Invalid web3. Please provide an instanceof Web3(version: ' + Web3.version + ' )';
   }
 }
 
