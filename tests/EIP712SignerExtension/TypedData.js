@@ -13,7 +13,8 @@ const config = require('../../tests/utils/configReader'),
 const web3 = new Web3(config.gethRpcEndPoint);
 let web3WalletHelper = new Web3WalletHelper(web3);
 
-//Testing Data taken from https://github.com/ethereum/EIPs/blob/master/assets/eip-712/Example.js
+// Testing Data taken from
+// https://github.com/ethereum/EIPs/blob/master/assets/eip-712/Example.js
 const TypedDataInput = {
   types: {
     EIP712Domain: [
@@ -45,7 +46,7 @@ const TypedDataInput = {
   }
 };
 
-//Expected Outputs - as specified in https://github.com/ethereum/EIPs/blob/master/assets/eip-712/Example.js
+// Expected Outputs - as specified in https://github.com/ethereum/EIPs/blob/master/assets/eip-712/Example.js
 const EncodedMailType = 'Mail(Person from,Person to,string contents)Person(string name,address wallet)';
 const MailTypeHash = '0xa0cedeb2dc280ba39b857546d74f5549c3a1d7bdc2dd96bf881f76108e23dac2';
 const EncodedMessageData =
@@ -65,7 +66,7 @@ const ExpectedSignature = {
 
 let _types, _primaryType, _domain, _message;
 
-describe('tests/signEIP712Extension/TypedData', function() {
+describe('tests/EIP712SignerExtension/TypedData', function() {
   //Load keys
   before(function() {
     this.timeout(60 * 1000);
@@ -162,6 +163,7 @@ function commonTestCases(typedData, displayMessage) {
   it('web3 wallet should sign hash correctly', function() {
     let privateKey = web3.utils.sha3('cow');
     let account = web3.eth.accounts.privateKeyToAccount(privateKey);
+    // Why private key is missing.
     let signature = account.signEIP712TypedData(typedData);
     assert.deepEqual(signature, ExpectedSignature, 'Invalid signature (signEIP712TypedData)');
   });
