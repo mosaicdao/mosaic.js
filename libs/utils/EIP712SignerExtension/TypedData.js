@@ -73,7 +73,7 @@ class TypedData {
     return '0x01';
   }
 
-  /*
+  /**
    * Method to set Primary data.
    *
    * @param primaryType Primary data type to set. e.g. StakeRequest.
