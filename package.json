@@ -1,55 +1,78 @@
 {
   "name": "@openstfoundation/mosaic.js",
-  "version": "0.0.1",
-  "description": "",
+  "version": "0.1.0",
+  "description": "NPM package that provides mosaic contract abis and bins. This package also helps in mosaic chain setup.",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OpenSTFoundation/mosaic.js.git"
+  },
+  "keywords": [
+    "OpenST",
+    "OST",
+    "Mosaic",
+    "Simple Token",
+    "Token Economy",
+    "web3",
+    "Ethereum",
+    "EIP20"
+  ],
   "homepage": "https://openst.org",
   "author": "OpenST Ltd.",
   "license": "LGPL-3.0",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/OpenSTFoundation/mosaic.js.git"
-  },
   "bugs": {
     "url": "https://github.com/OpenSTFoundation/mosaic.js/issues"
   },
-  "bin": {
-    "init-mosaic-dev-env": "./tools/initDevEnv.js"
-  },
   "scripts": {
     "pre-commit": "lint-staged",
-    "mosaic-game": "node ./game/game",
-    "init-dev-env": "node ./tools/initDevEnv.js",
-    "init-chains": "node ./tools/initChains.js"
+    "webpack-build": "webpack --mode=production",
+    "web-pre-build": "node webPreBuild.js",
+    "web-build": "npm-run-all web-pre-build webpack-build",
+    "web-post-build": "git add dist/."
   },
   "dependencies": {
     "bignumber.js": "4.1.0",
-    "ethereumjs-util": "5.2.0",
-    "keccak": "1.4.0",
-    "leveldown": "4.0.1",
-    "levelup": "3.0.1",
-    "merkle-patricia-tree": "2.3.1",
-    "os": "0.1.1",
+    "node-cmd": "3.0.0",
     "path": "0.12.7",
-    "rsync": "0.6.1",
-    "web3": "1.0.0-beta.34",
-    "ethereumjs-tx": "1.3.7"
+    "shelljs": "0.8.1",
+    "web3": "1.0.0-beta.37"
   },
   "devDependencies": {
-    "lint-staged": "7.2.0",
-    "pre-commit": "1.2.2",
-    "prettier": "1.13.7",
-    "shelljs": "0.8.1",
-    "node-cmd": "3.0.0",
+    "@babel/core": "7.1.0",
+    "@babel/polyfill": "7.0.0",
+    "@babel/preset-env": "7.1.0",
+    "@babel/runtime": "7.0.0",
+    "babel-loader": "8.0.2",
+    "chai": "4.2.0",
+    "commander": "2.8.1",
     "edit-json-file": "1.0.8",
-    "solc": "0.4.24"
+    "expose-loader": "0.7.5",
+    "lint-staged": "8.0.3",
+    "mocha": "5.2.0",
+    "npm-run-all": "4.1.3",
+    "os": "0.1.1",
+    "pre-commit": "1.2.2",
+    "prettier": "1.15.3",
+    "string-replace-loader": "2.1.1",
+    "webpack": "4.19.1",
+    "webpack-cli": "3.1.0",
+    "webpack-uglify-js-plugin": "1.1.9",
+    "package-json-cleanup-loader": "1.0.3"
   },
-  "pre-commit": [
-    "pre-commit"
-  ],
+  "pre-commit": {
+    "run": [
+      "pre-commit"
+    ]
+  },
   "lint-staged": {
-    "*.js": [
-      "prettier --write --config .prettierrc.json",
-      "git add"
+    "linters": {
+      "*.js": [
+        "prettier --write --config .prettierrc.json",
+        "git add"
+      ]
+    },
+    "ignore": [
+      "**/dist/*.js"
     ]
   }
 }

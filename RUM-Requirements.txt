@@ -1,6 +1,0 @@
-Assumed RUM routes:
-1. '/' : Request for value chain.
-2. '/0x1234567890abcdef1234567890abcdef/' 
-  -> 0x1234567890abcdef1234567890abcdef : is address of core contract deployed on value chain.
-  -> Request is meant for Aux Chain which is registired with the given core contract.
-
