@@ -1,5 +1,3 @@
-'use strict';
-
 // Copyright 2019 OpenST Ltd.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,7 +26,7 @@ const Crypto = require('crypto');
  * @class
  * @classdesc Provides the common utility functions.
  */
-class Util {
+class Utils {
   /**
    * @typedef {Object} HashLock
    *
@@ -48,8 +46,8 @@ class Util {
    * @returns {HashLock} HashLock object.
    */
   static createSecretHashLock() {
-    let secret = Crypto.randomBytes(16).toString('hex');
-    return Util.toHashLock(secret);
+    const secret = Crypto.randomBytes(16).toString('hex');
+    return Utils.toHashLock(secret);
   }
 
   /**
@@ -62,7 +60,7 @@ class Util {
    * @returns {HashLock} HashLock object.
    */
   static toHashLock(secretString) {
-    let secretBytes = Buffer.from(secretString);
+    const secretBytes = Buffer.from(secretString);
 
     return {
       secret: secretString,
@@ -72,4 +70,4 @@ class Util {
   }
 }
 
-module.exports = Util;
+module.exports = Utils;

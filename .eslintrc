@@ -3,7 +3,7 @@
         "airbnb-base"
     ],
     "rules": {
-        "indent": ["error", 4],
+        "indent": ["error", 2],
         "no-console": "off",
         "no-underscore-dangle": "off"
     },

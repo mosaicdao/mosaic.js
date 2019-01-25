@@ -12,6 +12,18 @@ class Contracts {
     oThis.auxiliaryWeb3 = Contracts._getWeb3(auxiliaryWeb3);
   }
 
+  ValueToken(address, options) {
+    const oThis = this;
+    let web3 = oThis.originWeb3;
+    return Contracts.getEIP20Token(web3, address, options);
+  }
+
+  BaseToken(address, options) {
+    const oThis = this;
+    let web3 = oThis.originWeb3;
+    return Contracts.getEIP20Token(web3, address, options);
+  }
+
   SimpleToken(address, options) {
     const oThis = this;
     let web3 = oThis.originWeb3;

@@ -1,5 +1,3 @@
-'use strict';
-
 // Copyright 2019 OpenST Ltd.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,17 +18,8 @@
 //
 // ----------------------------------------------------------------------------
 
-/**
- * Stake helper functions
- *
- * @module libs/helpers/StakeHelper
- */
-
-const BN = require('bn.js');
-const Web3Utils = require('web3-utils');
-const Crypto = require('crypto');
 const Contracts = require('../../libs/Contracts');
-const Util = require('../../libs/utils/util.js');
+const Utils = require('../utils/Utils.js');
 
 /**
  * Class for stake helper methods
@@ -61,6 +50,35 @@ class StakeHelper {
   }
 
   /**
+   * @function getNonce
+   *
+   * Returns the nonce for the given staker account address.
+   *
+   * @param {string} staker Staker address.
+   * @param {Object} originWeb3 Origin web3 object.
+   * @param {string} gateway Gateway contract address.
+   *
+   * @returns {Promise} Promise object represents the nonce of staker address.
+   */
+  getNonce(staker, originWeb3, gateway) {
+    const web3 = originWeb3 || this.web3;
+    const gatewayAddress = gateway || this.gateway;
+    const stakerAddress = staker || this.staker;
+
+    const contract = Contracts.getEIP20Gateway(web3, gatewayAddress);
+
+    console.log('* Fetching Staker Nonce');
+
+    return contract.methods
+      .getNonce(stakerAddress)
+      .call()
+      .then((nonce) => {
+        console.log(`\t - Gateway Nonce for ${stakerAddress}:`, nonce);
+        return nonce;
+      });
+  }
+
+  /**
    * @function _approveStakeAmountRawTx
    *
    * Returns the raw transaction object for approving stake amount.
@@ -75,7 +93,7 @@ class StakeHelper {
    * @returns {Object} Raw transaction object.
    */
   _approveStakeAmountRawTx(value, txOptions, web3, valueToken, gateway, staker) {
-    txOptions = Object.assign(
+    const transactionOptions = Object.assign(
       {
         from: staker,
         to: valueToken,
@@ -85,9 +103,9 @@ class StakeHelper {
       txOptions || {}
     );
 
-    let contract = Contracts.getEIP20Token(web3, valueToken, txOptions);
+    const contract = Contracts.getEIP20Token(web3, valueToken, transactionOptions);
 
-    let tx = contract.methods.approve(gateway, value);
+    const tx = contract.methods.approve(gateway, value);
 
     return tx;
   }
@@ -111,7 +129,7 @@ class StakeHelper {
    * @returns {Object} Raw transaction object.
    */
   _stakeRawTx(amount, beneficiary, gasPrice, gasLimit, nonce, hashLock, txOptions, web3, gateway, staker) {
-    txOptions = Object.assign(
+    const transactionOptions = Object.assign(
       {
         from: staker,
         to: gateway,
@@ -121,9 +139,9 @@ class StakeHelper {
       txOptions || {}
     );
 
-    let contract = Contracts.getEIP20Gateway(web3, gateway, txOptions);
+    const contract = Contracts.getEIP20Gateway(web3, gateway, transactionOptions);
 
-    let tx = contract.methods.stake(amount, beneficiary, gasPrice, gasLimit, nonce, hashLock);
+    const tx = contract.methods.stake(amount, beneficiary, gasPrice, gasLimit, nonce, hashLock);
 
     return tx;
   }
@@ -136,7 +154,7 @@ class StakeHelper {
    * @returns {HashLock} HashLock object.
    */
   static createSecretHashLock() {
-    return Util.createSecretHashLock();
+    return Utils.createSecretHashLock();
   }
 
   /**
@@ -149,7 +167,7 @@ class StakeHelper {
    * @returns {HashLock} HashLock object.
    */
   static toHashLock(secretString) {
-    return toHashLock(secretString);
+    return Utils.toHashLock(secretString);
   }
 }
 
