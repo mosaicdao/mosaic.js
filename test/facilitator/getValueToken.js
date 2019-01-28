@@ -25,7 +25,7 @@ const Facilitator = require('../../libs/Facilitator/Facilitator');
 
 const assert = chai.assert;
 
-describe('Facilitator.getBaseToken()', () => {
+describe('Facilitator.getValueToken()', () => {
   let facilitator;
   let web3;
   let gatewayAddress;
@@ -47,7 +47,7 @@ describe('Facilitator.getBaseToken()', () => {
   it('should return correct base token', async function() {
     this.timeout(5000);
 
-    let expectedBaseTokenAddress =
+    let expectedValueTokenAddress =
       '0x4e4ea3140f3d4a07e2f054cbabfd1f8038b3b4b0';
 
     // Mock an instance of gateway contract.
@@ -56,10 +56,10 @@ describe('Facilitator.getBaseToken()', () => {
     );
     const gatewayContract = mockGatewayContract.object;
 
-    // Fake the base token call.
-    sinon.stub(gatewayContract.methods, 'baseToken').callsFake(() => {
+    // Fake the value token call.
+    sinon.stub(gatewayContract.methods, 'token').callsFake(() => {
       return function() {
-        return Promise.resolve(expectedBaseTokenAddress);
+        return Promise.resolve(expectedValueTokenAddress);
       };
     });
 
@@ -68,17 +68,17 @@ describe('Facilitator.getBaseToken()', () => {
       return gatewayContract;
     });
 
-    // Add spy on Facilitator.getBaseToken.
-    const spy = sinon.spy(facilitator, 'getBaseToken');
+    // Add spy on Facilitator.getValueToken.
+    const spy = sinon.spy(facilitator, 'getValueToken');
 
-    // Get base token address.
-    const baseToken = await facilitator.getBaseToken();
+    // Get value token address.
+    const valueToken = await facilitator.getValueToken();
 
     // Assert the returned value.
     assert.strictEqual(
-      baseToken,
-      expectedBaseTokenAddress,
-      'Base token address must not be different.'
+      valueToken,
+      expectedValueTokenAddress,
+      'Value token address must not be different.'
     );
 
     // Assert if the function was called with correct argument.
