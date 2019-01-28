@@ -19,7 +19,6 @@
 // ----------------------------------------------------------------------------
 
 const BN = require('bn.js');
-const Web3Utils = require('web3-utils');
 const Contracts = require('../../libs/Contracts');
 const Utils = require('../utils/Utils.js');
 
@@ -60,7 +59,15 @@ class Facilitator {
    *
    * @returns {Promise} Promise object.
    */
-  async stake(staker, amount, beneficiary, gasPrice, gasLimit, unlockSecret, facilitator) {
+  async stake(
+    staker,
+    amount,
+    beneficiary,
+    gasPrice,
+    gasLimit,
+    unlockSecret,
+    facilitator
+  ) {
     this.stakerAddress = staker;
     this.facilitatorAddress = facilitator || staker;
 
@@ -79,7 +86,10 @@ class Facilitator {
     this.baseTokenAddress = await this.getBaseToken();
     console.log('baseTokenAddress: ', this.baseTokenAddress);
 
-    if (this.valueToken === this.baseToken && this.stakerAddress === this.facilitatorAddress) {
+    if (
+      this.valueToken === this.baseToken &&
+      this.stakerAddress === this.facilitatorAddress
+    ) {
       const amountToApprove = this.stakeAmount.add(this.bounty);
       await this.approveStakeAmount(amountToApprove);
     } else {
@@ -89,7 +99,13 @@ class Facilitator {
 
     const gatewayContract = this.contracts.Gateway(this.gatewayAddress);
 
-    let tx = gatewayContract.methods.stake(
+    const transactionOptions = {
+      from: this.stakerAddress,
+      to: this.gatewayAddress,
+      gas: '7000000'
+    };
+
+    const tx = gatewayContract.methods.stake(
       amount,
       beneficiary,
       gasPrice,
@@ -97,6 +113,8 @@ class Facilitator {
       this.stakerNonce.toString(10),
       this.hashLock.hashLock
     );
+
+    return Facilitator.sendTransaction(tx, transactionOptions);
   }
 
   /**
@@ -191,9 +209,15 @@ class Facilitator {
       gas: '7000000'
     };
 
-    const baseToken = Contracts.BaseToken(this.baseTokenAddress, transactionOptions);
+    const baseToken = Contracts.BaseToken(
+      this.baseTokenAddress,
+      transactionOptions
+    );
 
-    const tx = baseToken.methods.approve(this.gatewayAddress, this.bounty.toString(10));
+    const tx = baseToken.methods.approve(
+      this.gatewayAddress,
+      this.bounty.toString(10)
+    );
 
     console.log('* Approving gateway for bounty amount');
 
@@ -216,9 +240,15 @@ class Facilitator {
       gas: '7000000'
     };
 
-    const valueToken = Contracts.ValueToken(this.valueTokenAddress, transactionOptions);
+    const valueToken = Contracts.ValueToken(
+      this.valueTokenAddress,
+      transactionOptions
+    );
 
-    const tx = valueToken.methods.approve(this.gatewayAddress, stakeAmount.toString(10));
+    const tx = valueToken.methods.approve(
+      this.gatewayAddress,
+      stakeAmount.toString(10)
+    );
 
     console.log('* Approving gateway for stake amount');
 
@@ -265,60 +295,16 @@ class Facilitator {
         console.log('\t - transaction hash:', transactionHash);
       })
       .on('receipt', (receipt) => {
-        console.log('\t - Receipt:\n\x1b[2m', JSON.stringify(receipt), '\x1b[0m\n');
+        console.log(
+          '\t - Receipt:\n\x1b[2m',
+          JSON.stringify(receipt),
+          '\x1b[0m\n'
+        );
       })
       .on('error', (error) => {
         console.log('\t !! Error !!', error, '\n\t !! ERROR !!\n');
         return Promise.reject(error);
       });
-  }
-
-  perform(_amount, _beneficiary, _gasPrice, _gasLimit) {
-    const oThis = this;
-
-    let _nonce, amountToApprove, _hashLock;
-
-    let haslockInfo = StakeHelper.createSecretHashLock();
-    _hashLock = haslockInfo.hashLock;
-
-    let promiseChain = oThis.getBounty();
-
-    _amount = String(_amount);
-
-    promiseChain = promiseChain.then((_bounty) => {
-      let bnBounty = new BN(_bounty);
-      let bnAmount = new BN(_amount);
-      let bnAmountToApprove = bnBounty.add(bnAmount);
-      amountToApprove = bnAmountToApprove.toString(10);
-
-      console.log('\t - Amount to approve:', amountToApprove);
-      return _bounty;
-    });
-
-    promiseChain = promiseChain
-      .then(() => {
-        return oThis.getNonce();
-      })
-      .then((nonce) => {
-        _nonce = nonce;
-      });
-
-    promiseChain = promiseChain.then(() => {
-      return oThis.approveStakeAmount(amountToApprove);
-    });
-
-    promiseChain = promiseChain
-      .then(() => {
-        return oThis.stake(_amount, _beneficiary, _gasPrice, _gasLimit, _nonce, _hashLock);
-      })
-      .then((stakeReceipt) => {
-        return {
-          receipt: stakeReceipt,
-          haslockInfo: haslockInfo
-        };
-      });
-
-    return promiseChain;
   }
 }
 
