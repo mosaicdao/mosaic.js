@@ -75,7 +75,7 @@ describe('Facilitator.getGatewayNonce()', () => {
 
     // Mock an instance of gateway contract.
     const mockGatewayContract = sinon.mock(
-      facilitator.contracts.Gateway(this.gatewayAddress)
+      facilitator.contracts.Gateway(gatewayAddress)
     );
     const gatewayContract = mockGatewayContract.object;
 
