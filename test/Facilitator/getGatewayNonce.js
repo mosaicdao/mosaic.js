@@ -44,6 +44,30 @@ describe('Facilitator.getGatewayNonce()', () => {
     );
   });
 
+  it('should throw error when account address is not string', async function() {
+    this.timeout(5000);
+
+    const accountAddress = 0x79376dc1925ba1e0276473244802287394216a39;
+    const expectedErrorMessage = 'Invalid account address.';
+    // Call getGatewayNonce.
+    await facilitator.getGatewayNonce(accountAddress).catch((exception) => {
+      assert.strictEqual(
+        exception.message,
+        expectedErrorMessage,
+        `Exception reason must be "${expectedErrorMessage}"`
+      );
+    });
+
+    // Call with undefined account address.
+    await facilitator.getGatewayNonce().catch((exception) => {
+      assert.strictEqual(
+        exception.message,
+        expectedErrorMessage,
+        `Exception reason must be "${expectedErrorMessage}"`
+      );
+    });
+  });
+
   it('should return correct nonce value', async function() {
     this.timeout(5000);
 

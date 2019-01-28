@@ -19,6 +19,7 @@
 // ----------------------------------------------------------------------------
 
 const BN = require('bn.js');
+const web3 = require('web3');
 const Contracts = require('../../libs/Contracts');
 const Utils = require('../utils/Utils.js');
 
@@ -38,6 +39,22 @@ class Facilitator {
    * @param {Object} CoGateway contract address.
    */
   constructor(originWeb3, auxiliaryWeb3, gatewayAddress, coGatewayAddress) {
+    if (originWeb3 === undefined) {
+      throw new Error('Invalid origin web3 object.');
+    }
+
+    if (auxiliaryWeb3 === undefined) {
+      throw new Error('Invalid auxiliary web3 object.');
+    }
+
+    if (!web3.utils.isAddress(gatewayAddress)) {
+      throw new Error('Invalid Gateway address.');
+    }
+
+    if (!web3.utils.isAddress(coGatewayAddress)) {
+      throw new Error('Invalid Cogateway address.');
+    }
+
     this.originWeb3 = originWeb3;
     this.auxiliaryWeb3 = auxiliaryWeb3;
     this.contracts = new Contracts(originWeb3, auxiliaryWeb3);
@@ -126,7 +143,11 @@ class Facilitator {
    *
    * @returns {Promise} Promise object represents the nonce of account address.
    */
-  getGatewayNonce(accountAddress) {
+  async getGatewayNonce(accountAddress) {
+    if (!web3.utils.isAddress(accountAddress)) {
+      throw new Error('Invalid account address.');
+    }
+
     const gatewayContract = this.contracts.Gateway(this.gatewayAddress);
 
     return gatewayContract.methods
