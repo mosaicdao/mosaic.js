@@ -29,7 +29,7 @@
     "web-pre-build": "node webPreBuild.js",
     "web-build": "npm-run-all web-pre-build webpack-build",
     "web-post-build": "git add dist/.",
-    "test": "mocha"
+    "test": "mocha --recursive"
   },
   "dependencies": {
     "bignumber.js": "4.1.0",

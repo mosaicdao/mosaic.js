@@ -21,7 +21,8 @@
 const chai = require('chai');
 const sinon = require('sinon');
 const Web3 = require('web3');
-const Facilitator = require('../libs/Facilitator/Facilitator');
+const Facilitator = require('../../libs/Facilitator/Facilitator');
+
 const assert = chai.assert;
 
 describe('Facilitator.getGatewayNonce()', () => {
