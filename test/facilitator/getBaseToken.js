@@ -25,7 +25,7 @@ const Facilitator = require('../../libs/Facilitator/Facilitator');
 
 const assert = chai.assert;
 
-describe('Facilitator.getBounty()', () => {
+describe('Facilitator.getBaseToken()', () => {
   let facilitator;
   let web3;
   let gatewayAddress;
@@ -44,10 +44,11 @@ describe('Facilitator.getBounty()', () => {
     );
   });
 
-  it('should return correct bounty value', async function() {
+  it('should return correct base token', async function() {
     this.timeout(5000);
 
-    const mockedBountyAmount = 100;
+    let expectedBaseTokenAddress =
+      '0x4e4ea3140f3d4a07e2f054cbabfd1f8038b3b4b0';
 
     // Mock an instance of gateway contract.
     const mockGatewayContract = sinon.mock(
@@ -56,9 +57,9 @@ describe('Facilitator.getBounty()', () => {
     const gatewayContract = mockGatewayContract.object;
 
     // Fake the bounty call.
-    sinon.stub(gatewayContract.methods, 'bounty').callsFake(() => {
+    sinon.stub(gatewayContract.methods, 'baseToken').callsFake(() => {
       return function() {
-        return Promise.resolve(mockedBountyAmount);
+        return Promise.resolve(expectedBaseTokenAddress);
       };
     });
 
@@ -68,16 +69,16 @@ describe('Facilitator.getBounty()', () => {
     });
 
     // Add spy on Facilitator.getBounty.
-    const spy = sinon.spy(facilitator, 'getBounty');
+    const spy = sinon.spy(facilitator, 'getBaseToken');
 
-    // Call getBounty.
-    const bounty = await facilitator.getBounty();
+    // Get base token address.
+    const baseToken = await facilitator.getBaseToken();
 
     // Assert the returned value.
     assert.strictEqual(
-      bounty,
-      mockedBountyAmount,
-      'Bounty amount must be equal.'
+      baseToken,
+      expectedBaseTokenAddress,
+      'Base token address must not be different.'
     );
 
     // Assert if the function was called with correct argument.
