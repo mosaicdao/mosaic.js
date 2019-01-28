@@ -47,6 +47,7 @@ describe('Facilitator.getGatewayNonce()', () => {
     this.timeout(5000);
 
     const accountAddress = '0x79376dc1925ba1e0276473244802287394216a39';
+
     // Get an instance of gateway contract.
     const gatewayContract = facilitator.contracts.Gateway(this.gatewayAddress);
 
@@ -62,8 +63,30 @@ describe('Facilitator.getGatewayNonce()', () => {
       return gatewayContract;
     });
 
+    // Add spy on Facilitator.getGatewayNonce.
+    const spy = sinon.spy(facilitator, 'getGatewayNonce');
+
+    // Call getGatewayNonce.
     const nonce = await facilitator.getGatewayNonce(accountAddress);
 
-    assert.strictEqual(nonce, 1, 'Nonce must be equal');
+    // Assert the returned value.
+    assert.strictEqual(nonce, 1, 'Nonce must be equal.');
+
+    // Assert if the function was called with correct argument.
+    assert.strictEqual(
+      spy.calledWith(accountAddress),
+      true,
+      'Function not called with correct argument.'
+    );
+
+    // Assert if the function was called only once.
+    assert.strictEqual(
+      spy.withArgs(accountAddress).calledOnce,
+      true,
+      'Function must be called once'
+    );
+
+    // Restore
+    spy.restore();
   });
 });
