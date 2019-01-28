@@ -25,57 +25,51 @@ const Facilitator = require('../../libs/Facilitator/Facilitator');
 
 const assert = chai.assert;
 
-describe('Facilitator.approveBountyAmount()', () => {
+describe('Facilitator.approveStakeAmount()', () => {
   let facilitator;
   let web3;
   let gatewayAddress;
   let coGatewayAddress;
-  let baseTokenAddress;
-  let facilitatorAddress;
-  let bountyAmount;
+  let valueTokenAddress;
+  let stakerAddress;
+  let stakeAmount;
 
-  let mockBaseTokenContract;
+  let mockValueTokenContract;
   let mockTx;
   let spy;
 
   const setup = function() {
-    // Mock facilitator.getBounty method to return expected bounty amount.
-    sinon.stub(facilitator, 'getBounty').callsFake(() => {
-      return bountyAmount;
+    // Mock facilitator.getValueToken method to return expected value token address.
+    sinon.stub(facilitator, 'getValueToken').callsFake(() => {
+      return valueTokenAddress;
     });
 
-    // Mock facilitator.getBaseToken method to return expected base token address.
-    sinon.stub(facilitator, 'getBaseToken').callsFake(() => {
-      return baseTokenAddress;
-    });
-
-    // Mock an instance of BaseToken contract.
-    mockBaseTokenContract = sinon.mock(
-      facilitator.contracts.BaseToken(baseTokenAddress)
+    // Mock an instance of ValueToken contract.
+    mockValueTokenContract = sinon.mock(
+      facilitator.contracts.ValueToken(valueTokenAddress)
     );
-    const baseTokenContract = mockBaseTokenContract.object;
+    const valueTokenContract = mockValueTokenContract.object;
 
     // Mock approve transaction object.
     mockTx = sinon.mock(
-      baseTokenContract.methods.approve(gatewayAddress, bountyAmount)
+      valueTokenContract.methods.approve(gatewayAddress, stakeAmount)
     );
     sinon.stub(mockTx.object, 'send').callsFake(() => {
       return Promise.resolve({
         account: gatewayAddress,
-        amount: bountyAmount
+        amount: stakeAmount
       });
     });
 
     // Fake the approve call.
-    sinon.stub(baseTokenContract.methods, 'approve').callsFake(() => {
+    sinon.stub(valueTokenContract.methods, 'approve').callsFake(() => {
       return mockTx.object;
     });
 
-    // Fake the Gateway call to return gatewayContract object;
-    sinon.stub(facilitator.contracts, 'BaseToken').callsFake(() => {
-      return baseTokenContract;
+    // Fake value token contract instance;
+    sinon.stub(facilitator.contracts, 'ValueToken').callsFake(() => {
+      return valueTokenContract;
     });
-    //
 
     sinon.stub(facilitator, 'sendTransaction').callsFake((tx, txOptions) => {
       return new Promise(async function(resolve, reject) {
@@ -84,13 +78,13 @@ describe('Facilitator.approveBountyAmount()', () => {
       });
     });
 
-    // Add spy on Facilitator.approveBountyAmount.
-    spy = sinon.spy(facilitator, 'approveBountyAmount');
+    // Add spy on Facilitator.approveStakeAmount.
+    spy = sinon.spy(facilitator, 'approveStakeAmount');
   };
 
   const tearDown = function() {
     // Restore all mocked and spy objects.
-    mockBaseTokenContract.restore();
+    mockValueTokenContract.restore();
     mockTx.restore();
     spy.restore();
   };
@@ -107,15 +101,15 @@ describe('Facilitator.approveBountyAmount()', () => {
       coGatewayAddress
     );
 
-    baseTokenAddress = '0x79376dc1925ba1e0276473244802287394216a39';
-    facilitatorAddress = '0x4e4ea3140f3d4a07e2f054cbabfd1f8038b3b4b0';
-    bountyAmount = 100;
+    valueTokenAddress = '0x79376dc1925ba1e0276473244802287394216a39';
+    stakerAddress = '0x4e4ea3140f3d4a07e2f054cbabfd1f8038b3b4b0';
+    stakeAmount = 100;
   });
 
   it('should approve bounty amount with default gas value', async function() {
     this.timeout(5000);
-    const expectedErrorMessage = 'Invalid facilitator address.';
-    await facilitator.approveBountyAmount().catch((exception) => {
+    const expectedErrorMessage = 'Invalid staker address.';
+    await facilitator.approveStakeAmount().catch((exception) => {
       assert.strictEqual(
         exception.message,
         expectedErrorMessage,
@@ -124,13 +118,16 @@ describe('Facilitator.approveBountyAmount()', () => {
     });
   });
 
-  it('should approve bounty amount with default gas value', async function() {
+  it('should approve stake amount with default gas value', async function() {
     this.timeout(5000);
 
     setup();
 
     // Call approve.
-    const result = await facilitator.approveBountyAmount(facilitatorAddress);
+    const result = await facilitator.approveStakeAmount(
+      stakerAddress,
+      stakeAmount
+    );
 
     assert.strictEqual(
       result.txResult.account,
@@ -139,18 +136,18 @@ describe('Facilitator.approveBountyAmount()', () => {
     );
     assert.strictEqual(
       result.txResult.amount,
-      bountyAmount,
-      'Bounty amount must be equal to expected bounty amount.'
+      stakeAmount,
+      'Stake amount must be equal to expected stake amount.'
     );
     assert.strictEqual(
       result.txOptions.from,
-      facilitatorAddress,
-      'From address must be facilitator address.'
+      stakerAddress,
+      'From address must be staker address.'
     );
     assert.strictEqual(
       result.txOptions.to,
-      baseTokenAddress,
-      'To address must be base token address.'
+      valueTokenAddress,
+      'To address must be value token address.'
     );
     assert.strictEqual(
       result.txOptions.gas,
@@ -160,14 +157,14 @@ describe('Facilitator.approveBountyAmount()', () => {
 
     // Assert if the function was called with correct argument.
     assert.strictEqual(
-      spy.calledWith(facilitatorAddress),
+      spy.calledWith(stakerAddress),
       true,
       'Function not called with correct argument.'
     );
 
     // Assert if the function was called only once.
     assert.strictEqual(
-      spy.withArgs(facilitatorAddress).calledOnce,
+      spy.withArgs(stakerAddress).calledOnce,
       true,
       'Function must be called once.'
     );
@@ -175,17 +172,18 @@ describe('Facilitator.approveBountyAmount()', () => {
     tearDown();
   });
 
-  it('should approve bounty amount when gas amount is provided in argument', async function() {
+  it('should approve stake amount when gas amount is provided in argument', async function() {
     this.timeout(5000);
 
-    bountyAmount = 50000;
+    stakeAmount = 50000;
     const gas = 100000;
 
     setup();
 
     // Call approve.
-    const result = await facilitator.approveBountyAmount(
-      facilitatorAddress,
+    const result = await facilitator.approveStakeAmount(
+      stakerAddress,
+      stakeAmount,
       gas
     );
 
@@ -196,17 +194,17 @@ describe('Facilitator.approveBountyAmount()', () => {
     );
     assert.strictEqual(
       result.txResult.amount,
-      bountyAmount,
-      'Bounty amount must be equal to expected bounty amount.'
+      stakeAmount,
+      'Stake amount must be equal to expected stake amount.'
     );
     assert.strictEqual(
       result.txOptions.from,
-      facilitatorAddress,
-      'From address must be facilitator address.'
+      stakerAddress,
+      'From address must be staker address.'
     );
     assert.strictEqual(
       result.txOptions.to,
-      baseTokenAddress,
+      valueTokenAddress,
       'To address must be base token address.'
     );
     assert.strictEqual(
@@ -217,14 +215,14 @@ describe('Facilitator.approveBountyAmount()', () => {
 
     // Assert if the function was called with correct argument.
     assert.strictEqual(
-      spy.calledWith(facilitatorAddress),
+      spy.calledWith(stakerAddress),
       true,
       'Function not called with correct argument.'
     );
 
     // Assert if the function was called only once.
     assert.strictEqual(
-      spy.withArgs(facilitatorAddress).calledOnce,
+      spy.withArgs(stakerAddress).calledOnce,
       true,
       'Function must be called once.'
     );

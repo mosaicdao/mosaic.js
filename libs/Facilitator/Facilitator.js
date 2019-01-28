@@ -110,10 +110,10 @@ class Facilitator {
       this.stakerAddress === this.facilitatorAddress
     ) {
       const amountToApprove = this.stakeAmount.add(this.bounty);
-      await this.approveStakeAmount(amountToApprove);
+      await this.approveStakeAmount(this.stakerAddress, amountToApprove, gas);
     } else {
       await this.approveBountyAmount(facilitator, gas);
-      await this.approveStakeAmount(this.stakeAmount);
+      await this.approveStakeAmount(this.stakerAddress, this.stakeAmount, gas);
     }
 
     const gatewayContract = this.contracts.Gateway(this.gatewayAddress);
@@ -269,26 +269,31 @@ class Facilitator {
    *
    * Approves gateway address for the stake amount transfer.
    *
-   * @param {BN} stakeAmount Stake amount.
+   * @param {string} stakerAddress Staker account address.
+   * @param {string} stakeAmount Stake amount.
+   * @param {string} gas The gas provided for the transaction execution
    *
    * @returns {Promise} Promise object.
    */
-  approveStakeAmount(stakeAmount) {
+  async approveStakeAmount(stakerAddress, stakeAmount, gas = '7000000') {
+    if (!web3.utils.isAddress(stakerAddress)) {
+      throw new Error('Invalid staker address.');
+    }
+
+    const valueTokenAddress = await this.getValueToken();
+
     const transactionOptions = {
-      from: this.stakerAddress,
-      to: this.valueTokenAddress,
-      gas: '7000000'
+      from: stakerAddress,
+      to: valueTokenAddress,
+      gas: gas
     };
 
-    const valueToken = Contracts.ValueToken(
-      this.valueTokenAddress,
+    const valueToken = this.contracts.ValueToken(
+      valueTokenAddress,
       transactionOptions
     );
 
-    const tx = valueToken.methods.approve(
-      this.gatewayAddress,
-      stakeAmount.toString(10)
-    );
+    const tx = valueToken.methods.approve(this.gatewayAddress, stakeAmount);
 
     console.log('* Approving gateway for stake amount');
 
