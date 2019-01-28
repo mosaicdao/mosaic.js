@@ -49,8 +49,11 @@ describe('Facilitator.getGatewayNonce()', () => {
 
     const accountAddress = '0x79376dc1925ba1e0276473244802287394216a39';
 
-    // Get an instance of gateway contract.
-    const gatewayContract = facilitator.contracts.Gateway(this.gatewayAddress);
+    // Mock an instance of gateway contract.
+    const mockGatewayContract = sinon.mock(
+      facilitator.contracts.Gateway(this.gatewayAddress)
+    );
+    const gatewayContract = mockGatewayContract.object;
 
     // Fake the getNonce call.
     sinon.stub(gatewayContract.methods, 'getNonce').callsFake(() => {
@@ -87,7 +90,8 @@ describe('Facilitator.getGatewayNonce()', () => {
       'Function must be called once'
     );
 
-    // Restore
+    // Restore all mocked and spy objects.
+    mockGatewayContract.restore();
     spy.restore();
   });
 });
