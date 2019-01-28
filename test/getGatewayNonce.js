@@ -18,10 +18,11 @@
 //
 // ----------------------------------------------------------------------------
 
+const chai = require('chai');
 const sinon = require('sinon');
 const Web3 = require('web3');
-const web3Provider = require('web3-providers-http');
 const Facilitator = require('../libs/Facilitator/Facilitator');
+const assert = chai.assert;
 
 describe('Facilitator.getGatewayNonce()', () => {
   let facilitator;
@@ -42,20 +43,27 @@ describe('Facilitator.getGatewayNonce()', () => {
     );
   });
 
-  it('should fake a jQuery ajax request', async function() {
+  it('should return correct nonce value', async function() {
     this.timeout(5000);
 
-    const fake = sinon.fake.yields(
-      JSON.parse(
-        '{"jsonrpc":"2.0","id":1,"method":"eth_call","result":"0x01"}'
-      )
-    );
+    const accountAddress = '0x79376dc1925ba1e0276473244802287394216a39';
+    // Get an instance of gateway contract.
+    const gatewayContract = facilitator.contracts.Gateway(this.gatewayAddress);
 
-    sinon.replace(web3Provider.prototype, 'send', fake);
+    // Fake the getNonce call.
+    sinon.stub(gatewayContract.methods, 'getNonce').callsFake(() => {
+      return function() {
+        return Promise.resolve(1);
+      };
+    });
 
-    const nonce = await facilitator.getGatewayNonce(
-      '0x52c50cC9bBa156C65756abd71b172B6408Dde006'
-    );
-    console.log('nonce: ', nonce);
+    // Fake the Gateway call to return gatewayContract object;
+    sinon.stub(facilitator.contracts, 'Gateway').callsFake(() => {
+      return gatewayContract;
+    });
+
+    const nonce = await facilitator.getGatewayNonce(accountAddress);
+
+    assert.strictEqual(nonce, 1, 'Nonce must be equal');
   });
 });
