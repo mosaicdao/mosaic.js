@@ -73,6 +73,7 @@ class Facilitator {
    * @param {string} gasPrice Gas price for reward calculation.
    * @param {string} gasLimit Mas gas for reward calculation.
    * @param {string} unlockSecret Unlock secret that will be used for progress stake.
+   * @param {string} gas The gas provided for the transaction execution
    *
    * @returns {Promise} Promise object.
    */
@@ -83,7 +84,8 @@ class Facilitator {
     gasPrice,
     gasLimit,
     unlockSecret,
-    facilitator
+    facilitator,
+    gas = '7000000'
   ) {
     this.stakerAddress = staker;
     this.facilitatorAddress = facilitator || staker;
@@ -97,10 +99,10 @@ class Facilitator {
     this.bounty = new BN(await this.getBounty());
     console.log('bounty: ', this.bounty);
 
-    this.valueTokenAddress = await this.getValueToken();
+    await this.getValueToken();
     console.log('valueTokenAddress: ', this.valueTokenAddress);
 
-    this.baseTokenAddress = await this.getBaseToken();
+    await this.getBaseToken();
     console.log('baseTokenAddress: ', this.baseTokenAddress);
 
     if (
@@ -110,7 +112,7 @@ class Facilitator {
       const amountToApprove = this.stakeAmount.add(this.bounty);
       await this.approveStakeAmount(amountToApprove);
     } else {
-      await this.approveBountyAmount();
+      await this.approveBountyAmount(facilitator, gas);
       await this.approveStakeAmount(this.stakeAmount);
     }
 
@@ -119,7 +121,7 @@ class Facilitator {
     const transactionOptions = {
       from: this.stakerAddress,
       to: this.gatewayAddress,
-      gas: '7000000'
+      gas: gas
     };
 
     const tx = gatewayContract.methods.stake(
@@ -131,7 +133,7 @@ class Facilitator {
       this.hashLock.hashLock
     );
 
-    return Facilitator.sendTransaction(tx, transactionOptions);
+    return this.sendTransaction(tx, transactionOptions);
   }
 
   /**
@@ -186,6 +188,10 @@ class Facilitator {
    * @returns {Promise} Promise object represents ERC20 base token address.
    */
   getBaseToken() {
+    const oThis = this;
+    if (oThis.baseTokenAddress) {
+      return oThis.baseTokenAddress;
+    }
     const gatewayContract = this.contracts.Gateway(this.gatewayAddress);
 
     return gatewayContract.methods
@@ -193,6 +199,7 @@ class Facilitator {
       .call()
       .then((baseToken) => {
         console.log('\t - Gateway baseToken:', baseToken);
+        oThis.baseTokenAddress = baseToken;
         return baseToken;
       });
   }
@@ -205,6 +212,10 @@ class Facilitator {
    * @returns {Promise} Promise object represents EIP20 token address.
    */
   getValueToken() {
+    const oThis = this;
+    if (oThis.valueTokenAddress) {
+      return oThis.valueTokenAddress;
+    }
     const gatewayContract = this.contracts.Gateway(this.gatewayAddress);
 
     return gatewayContract.methods
@@ -212,6 +223,7 @@ class Facilitator {
       .call()
       .then((token) => {
         console.log('\t - Gateway token:', token);
+        oThis.valueTokenAddress = token;
         return token;
       });
   }
@@ -221,28 +233,35 @@ class Facilitator {
    *
    * Approves gateway address for the bounty amount transfer.
    *
+   * @param {string} facilitator Facilitator address.
+   * @param {string} gas The gas provided for the transaction execution
+   *
    * @returns {Promise} Promise object.
    */
-  approveBountyAmount() {
+  async approveBountyAmount(facilitator, gas = '7000000') {
+    if (!web3.utils.isAddress(facilitator)) {
+      throw new Error('Invalid facilitator address.');
+    }
+
+    const baseTokenAddress = await this.getBaseToken();
+
     const transactionOptions = {
-      from: this.facilitatorAddress,
-      to: this.baseTokenAddress,
-      gas: '7000000'
+      from: facilitator,
+      to: baseTokenAddress,
+      gas: gas
     };
 
-    const baseToken = Contracts.BaseToken(
-      this.baseTokenAddress,
+    const baseToken = this.contracts.BaseToken(
+      baseTokenAddress,
       transactionOptions
     );
 
-    const tx = baseToken.methods.approve(
-      this.gatewayAddress,
-      this.bounty.toString(10)
-    );
+    const bountyAmount = await this.getBounty();
+    const tx = baseToken.methods.approve(this.gatewayAddress, bountyAmount);
 
     console.log('* Approving gateway for bounty amount');
 
-    return Facilitator.sendTransaction(tx, transactionOptions);
+    return this.sendTransaction(tx, transactionOptions);
   }
 
   /**
@@ -273,7 +292,7 @@ class Facilitator {
 
     console.log('* Approving gateway for stake amount');
 
-    return Facilitator.sendTransaction(tx, transactionOptions);
+    return this.sendTransaction(tx, transactionOptions);
   }
 
   /**
@@ -309,7 +328,7 @@ class Facilitator {
    *
    * @returns {Promise} Promise object.
    */
-  static sendTransaction(tx, txOption) {
+  sendTransaction(tx, txOption) {
     return tx
       .send(txOption)
       .on('transactionHash', (transactionHash) => {
