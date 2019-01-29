@@ -22,6 +22,7 @@ const chai = require('chai');
 const sinon = require('sinon');
 const Web3 = require('web3');
 const Facilitator = require('../../libs/Facilitator/Facilitator');
+const SpyAssert = require('../../test_utils/SpyAssert');
 
 const assert = chai.assert;
 
@@ -36,13 +37,19 @@ describe('Facilitator.approveStakeAmount()', () => {
 
   let mockValueTokenContract;
   let mockTx;
-  let spy;
+
+  let spyApproveStakeAmount;
+  let spyGetValueToken;
+  let spyTxSend;
+  let spyValueTokenApprove;
 
   const setup = function() {
     // Mock facilitator.getValueToken method to return expected value token address.
-    sinon.stub(facilitator, 'getValueToken').callsFake(() => {
-      return valueTokenAddress;
-    });
+    spyGetValueToken = sinon.replace(
+      facilitator,
+      'getValueToken',
+      sinon.fake.returns(valueTokenAddress)
+    );
 
     // Mock an instance of ValueToken contract.
     mockValueTokenContract = sinon.mock(
@@ -54,22 +61,29 @@ describe('Facilitator.approveStakeAmount()', () => {
     mockTx = sinon.mock(
       valueTokenContract.methods.approve(gatewayAddress, stakeAmount)
     );
-    sinon.stub(mockTx.object, 'send').callsFake(() => {
-      return Promise.resolve({
+
+    spyTxSend = sinon.replace(
+      mockTx.object,
+      'send',
+      sinon.fake.resolves({
         account: gatewayAddress,
         amount: stakeAmount
-      });
-    });
+      })
+    );
 
     // Fake the approve call.
-    sinon.stub(valueTokenContract.methods, 'approve').callsFake(() => {
-      return mockTx.object;
-    });
+    spyValueTokenApprove = sinon.replace(
+      valueTokenContract.methods,
+      'approve',
+      sinon.fake.returns(mockTx.object)
+    );
 
     // Fake value token contract instance;
-    sinon.stub(facilitator.contracts, 'ValueToken').callsFake(() => {
-      return valueTokenContract;
-    });
+    sinon.replace(
+      facilitator.contracts,
+      'ValueToken',
+      sinon.fake.returns(valueTokenContract)
+    );
 
     sinon.stub(facilitator, 'sendTransaction').callsFake((tx, txOptions) => {
       return new Promise(async function(resolve, reject) {
@@ -79,14 +93,15 @@ describe('Facilitator.approveStakeAmount()', () => {
     });
 
     // Add spy on Facilitator.approveStakeAmount.
-    spy = sinon.spy(facilitator, 'approveStakeAmount');
+    spyApproveStakeAmount = sinon.spy(facilitator, 'approveStakeAmount');
   };
 
   const tearDown = function() {
     // Restore all mocked and spy objects.
     mockValueTokenContract.restore();
     mockTx.restore();
-    spy.restore();
+    spyApproveStakeAmount.restore();
+    sinon.restore();
   };
 
   beforeEach(() => {
@@ -106,7 +121,7 @@ describe('Facilitator.approveStakeAmount()', () => {
     stakeAmount = 100;
   });
 
-  it('should approve bounty amount with default gas value', async function() {
+  it('should fail when staker address is invalid', async function() {
     this.timeout(5000);
     const expectedErrorMessage = 'Invalid staker address.';
     await facilitator.approveStakeAmount().catch((exception) => {
@@ -155,19 +170,10 @@ describe('Facilitator.approveStakeAmount()', () => {
       'Gas value must be equal to default value.'
     );
 
-    // Assert if the function was called with correct argument.
-    assert.strictEqual(
-      spy.calledWith(stakerAddress),
-      true,
-      'Function not called with correct argument.'
-    );
-
-    // Assert if the function was called only once.
-    assert.strictEqual(
-      spy.withArgs(stakerAddress).calledOnce,
-      true,
-      'Function must be called once.'
-    );
+    SpyAssert.assert(spyApproveStakeAmount, 1, [[stakerAddress, stakeAmount]]);
+    SpyAssert.assert(spyGetValueToken, 1, [[]]);
+    SpyAssert.assert(spyTxSend, 1, [[]]);
+    SpyAssert.assert(spyValueTokenApprove, 1, [[gatewayAddress, stakeAmount]]);
 
     tearDown();
   });
@@ -213,19 +219,12 @@ describe('Facilitator.approveStakeAmount()', () => {
       'Gas value must be equal to default value.'
     );
 
-    // Assert if the function was called with correct argument.
-    assert.strictEqual(
-      spy.calledWith(stakerAddress),
-      true,
-      'Function not called with correct argument.'
-    );
-
-    // Assert if the function was called only once.
-    assert.strictEqual(
-      spy.withArgs(stakerAddress).calledOnce,
-      true,
-      'Function must be called once.'
-    );
+    SpyAssert.assert(spyApproveStakeAmount, 1, [
+      [stakerAddress, stakeAmount, gas]
+    ]);
+    SpyAssert.assert(spyGetValueToken, 1, [[]]);
+    SpyAssert.assert(spyTxSend, 1, [[]]);
+    SpyAssert.assert(spyValueTokenApprove, 1, [[gatewayAddress, stakeAmount]]);
 
     tearDown();
   });

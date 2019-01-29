@@ -188,7 +188,6 @@ class Facilitator {
       .getNonce(accountAddress)
       .call()
       .then((nonce) => {
-        console.log(`\t - Gateway Nonce for ${accountAddress}:`, nonce);
         return nonce;
       });
   }
@@ -207,7 +206,6 @@ class Facilitator {
       .bounty()
       .call()
       .then((bounty) => {
-        console.log('\t - Gateway Bounty:', bounty);
         return bounty;
       });
   }
@@ -219,7 +217,7 @@ class Facilitator {
    *
    * @returns {Promise} Promise object represents ERC20 base token address.
    */
-  getBaseToken() {
+  async getBaseToken() {
     const oThis = this;
     if (oThis.baseTokenAddress) {
       return oThis.baseTokenAddress;
@@ -230,7 +228,6 @@ class Facilitator {
       .baseToken()
       .call()
       .then((baseToken) => {
-        console.log('\t - Gateway baseToken:', baseToken);
         oThis.baseTokenAddress = baseToken;
         return baseToken;
       });
@@ -243,7 +240,7 @@ class Facilitator {
    *
    * @returns {Promise} Promise object represents EIP20 token address.
    */
-  getValueToken() {
+  async getValueToken() {
     const oThis = this;
     if (oThis.valueTokenAddress) {
       return oThis.valueTokenAddress;
@@ -254,7 +251,6 @@ class Facilitator {
       .token()
       .call()
       .then((token) => {
-        console.log('\t - Gateway token:', token);
         oThis.valueTokenAddress = token;
         return token;
       });
@@ -291,8 +287,6 @@ class Facilitator {
     const bountyAmount = await this.getBounty();
     const tx = baseToken.methods.approve(this.gatewayAddress, bountyAmount);
 
-    console.log('* Approving gateway for bounty amount');
-
     return this.sendTransaction(tx, transactionOptions);
   }
 
@@ -326,8 +320,6 @@ class Facilitator {
     );
 
     const tx = valueToken.methods.approve(this.gatewayAddress, stakeAmount);
-
-    console.log('* Approving gateway for stake amount');
 
     return this.sendTransaction(tx, transactionOptions);
   }
@@ -367,20 +359,9 @@ class Facilitator {
   sendTransaction(tx, txOption) {
     return tx
       .send(txOption)
-      .on('transactionHash', (transactionHash) => {
-        console.log('\t - transaction hash:', transactionHash);
-      })
-      .on('receipt', (receipt) => {
-        console.log(
-          '\t - Receipt:\n\x1b[2m',
-          JSON.stringify(receipt),
-          '\x1b[0m\n'
-        );
-      })
-      .on('error', (error) => {
-        console.log('\t !! Error !!', error, '\n\t !! ERROR !!\n');
-        return Promise.reject(error);
-      });
+      .on('transactionHash', (transactionHash) => {})
+      .on('receipt', (receipt) => {})
+      .on('error', (error) => {});
   }
 }
 

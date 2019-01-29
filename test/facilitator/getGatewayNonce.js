@@ -22,6 +22,7 @@ const chai = require('chai');
 const sinon = require('sinon');
 const Web3 = require('web3');
 const Facilitator = require('../../libs/Facilitator/Facilitator');
+const SpyAssert = require('../../test_utils/SpyAssert');
 
 const assert = chai.assert;
 
@@ -80,16 +81,20 @@ describe('Facilitator.getGatewayNonce()', () => {
     const gatewayContract = mockGatewayContract.object;
 
     // Fake the getNonce call.
-    sinon.stub(gatewayContract.methods, 'getNonce').callsFake(() => {
-      return function() {
+    const spyGetNonce = sinon.replace(
+      gatewayContract.methods,
+      'getNonce',
+      sinon.fake.returns(function() {
         return Promise.resolve(1);
-      };
-    });
+      })
+    );
 
     // Fake the Gateway call to return gatewayContract object;
-    sinon.stub(facilitator.contracts, 'Gateway').callsFake(() => {
-      return gatewayContract;
-    });
+    const spyGateway = sinon.replace(
+      facilitator.contracts,
+      'Gateway',
+      sinon.fake.returns(gatewayContract)
+    );
 
     // Add spy on Facilitator.getGatewayNonce.
     const spy = sinon.spy(facilitator, 'getGatewayNonce');
@@ -100,22 +105,13 @@ describe('Facilitator.getGatewayNonce()', () => {
     // Assert the returned value.
     assert.strictEqual(nonce, 1, 'Nonce must be equal.');
 
-    // Assert if the function was called with correct argument.
-    assert.strictEqual(
-      spy.calledWith(accountAddress),
-      true,
-      'Function not called with correct argument.'
-    );
-
-    // Assert if the function was called only once.
-    assert.strictEqual(
-      spy.withArgs(accountAddress).calledOnce,
-      true,
-      'Function must be called once'
-    );
+    SpyAssert.assert(spyGetNonce, 1, [[accountAddress]]);
+    SpyAssert.assert(spyGateway, 1, [[gatewayAddress]]);
+    SpyAssert.assert(spy, 1, [[accountAddress]]);
 
     // Restore all mocked and spy objects.
     mockGatewayContract.restore();
     spy.restore();
+    sinon.restore();
   });
 });

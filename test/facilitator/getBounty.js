@@ -22,6 +22,7 @@ const chai = require('chai');
 const sinon = require('sinon');
 const Web3 = require('web3');
 const Facilitator = require('../../libs/Facilitator/Facilitator');
+const SpyAssert = require('../../test_utils/SpyAssert');
 
 const assert = chai.assert;
 
@@ -56,16 +57,20 @@ describe('Facilitator.getBounty()', () => {
     const gatewayContract = mockGatewayContract.object;
 
     // Fake the bounty call.
-    sinon.stub(gatewayContract.methods, 'bounty').callsFake(() => {
-      return function() {
+    const spyBounty = sinon.replace(
+      gatewayContract.methods,
+      'bounty',
+      sinon.fake.returns(function() {
         return Promise.resolve(mockedBountyAmount);
-      };
-    });
+      })
+    );
 
     // Fake the Gateway call to return gatewayContract object;
-    sinon.stub(facilitator.contracts, 'Gateway').callsFake(() => {
-      return gatewayContract;
-    });
+    const spyGateway = sinon.replace(
+      facilitator.contracts,
+      'Gateway',
+      sinon.fake.returns(gatewayContract)
+    );
 
     // Add spy on Facilitator.getBounty.
     const spy = sinon.spy(facilitator, 'getBounty');
@@ -80,22 +85,13 @@ describe('Facilitator.getBounty()', () => {
       'Bounty amount must be equal.'
     );
 
-    // Assert if the function was called with correct argument.
-    assert.strictEqual(
-      spy.calledWith(),
-      true,
-      'Function not called with correct argument.'
-    );
-
-    // Assert if the function was called only once.
-    assert.strictEqual(
-      spy.withArgs().calledOnce,
-      true,
-      'Function must be called once'
-    );
+    SpyAssert.assert(spyBounty, 1, [[]]);
+    SpyAssert.assert(spyGateway, 1, [[gatewayAddress]]);
+    SpyAssert.assert(spy, 1, [[]]);
 
     // Restore all mocked and spy objects.
     mockGatewayContract.restore();
     spy.restore();
+    sinon.restore();
   });
 });

@@ -22,6 +22,7 @@ const chai = require('chai');
 const sinon = require('sinon');
 const Web3 = require('web3');
 const Facilitator = require('../../libs/Facilitator/Facilitator');
+const SpyAssert = require('../../test_utils/SpyAssert');
 
 const assert = chai.assert;
 
@@ -47,7 +48,7 @@ describe('Facilitator.getBaseToken()', () => {
   it('should return correct base token', async function() {
     this.timeout(5000);
 
-    let expectedBaseTokenAddress =
+    const expectedBaseTokenAddress =
       '0x4e4ea3140f3d4a07e2f054cbabfd1f8038b3b4b0';
 
     // Mock an instance of gateway contract.
@@ -57,16 +58,20 @@ describe('Facilitator.getBaseToken()', () => {
     const gatewayContract = mockGatewayContract.object;
 
     // Fake the base token call.
-    sinon.stub(gatewayContract.methods, 'baseToken').callsFake(() => {
-      return function() {
+    const spyBaseToken = sinon.replace(
+      gatewayContract.methods,
+      'baseToken',
+      sinon.fake.returns(function() {
         return Promise.resolve(expectedBaseTokenAddress);
-      };
-    });
+      })
+    );
 
     // Fake the Gateway call to return gatewayContract object;
-    sinon.stub(facilitator.contracts, 'Gateway').callsFake(() => {
-      return gatewayContract;
-    });
+    const spyGateway = sinon.replace(
+      facilitator.contracts,
+      'Gateway',
+      sinon.fake.returns(gatewayContract)
+    );
 
     // Add spy on Facilitator.getBaseToken.
     const spy = sinon.spy(facilitator, 'getBaseToken');
@@ -81,22 +86,13 @@ describe('Facilitator.getBaseToken()', () => {
       'Base token address must not be different.'
     );
 
-    // Assert if the function was called with correct argument.
-    assert.strictEqual(
-      spy.calledWith(),
-      true,
-      'Function not called with correct argument.'
-    );
-
-    // Assert if the function was called only once.
-    assert.strictEqual(
-      spy.withArgs().calledOnce,
-      true,
-      'Function must be called once'
-    );
+    SpyAssert.assert(spyBaseToken, 1, [[gatewayAddress]]);
+    SpyAssert.assert(spyGateway, 1, [[gatewayAddress]]);
+    SpyAssert.assert(spy, 1, [[]]);
 
     // Restore all mocked and spy objects.
     mockGatewayContract.restore();
     spy.restore();
+    sinon.restore();
   });
 });

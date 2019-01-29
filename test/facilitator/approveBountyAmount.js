@@ -22,6 +22,7 @@ const chai = require('chai');
 const sinon = require('sinon');
 const Web3 = require('web3');
 const Facilitator = require('../../libs/Facilitator/Facilitator');
+const SpyAssert = require('../../test_utils/SpyAssert');
 
 const assert = chai.assert;
 
@@ -36,18 +37,27 @@ describe('Facilitator.approveBountyAmount()', () => {
 
   let mockBaseTokenContract;
   let mockTx;
-  let spy;
+
+  let spyApproveBountyAmount;
+  let spyGetBounty;
+  let spyGetBaseToken;
+  let spyTxSend;
+  let spyBaseTokenApprove;
 
   const setup = function() {
     // Mock facilitator.getBounty method to return expected bounty amount.
-    sinon.stub(facilitator, 'getBounty').callsFake(() => {
-      return bountyAmount;
-    });
+    spyGetBounty = sinon.replace(
+      facilitator,
+      'getBounty',
+      sinon.fake.returns(bountyAmount)
+    );
 
     // Mock facilitator.getBaseToken method to return expected base token address.
-    sinon.stub(facilitator, 'getBaseToken').callsFake(() => {
-      return baseTokenAddress;
-    });
+    spyGetBaseToken = sinon.replace(
+      facilitator,
+      'getBaseToken',
+      sinon.fake.returns(baseTokenAddress)
+    );
 
     // Mock an instance of BaseToken contract.
     mockBaseTokenContract = sinon.mock(
@@ -59,23 +69,29 @@ describe('Facilitator.approveBountyAmount()', () => {
     mockTx = sinon.mock(
       baseTokenContract.methods.approve(gatewayAddress, bountyAmount)
     );
-    sinon.stub(mockTx.object, 'send').callsFake(() => {
-      return Promise.resolve({
+
+    spyTxSend = sinon.replace(
+      mockTx.object,
+      'send',
+      sinon.fake.resolves({
         account: gatewayAddress,
         amount: bountyAmount
-      });
-    });
+      })
+    );
 
     // Fake the approve call.
-    sinon.stub(baseTokenContract.methods, 'approve').callsFake(() => {
-      return mockTx.object;
-    });
+    spyBaseTokenApprove = sinon.replace(
+      baseTokenContract.methods,
+      'approve',
+      sinon.fake.returns(mockTx.object)
+    );
 
-    // Fake the Gateway call to return gatewayContract object;
-    sinon.stub(facilitator.contracts, 'BaseToken').callsFake(() => {
-      return baseTokenContract;
-    });
-    //
+    // Fake the Base token contract;
+    sinon.replace(
+      facilitator.contracts,
+      'BaseToken',
+      sinon.fake.returns(baseTokenContract)
+    );
 
     sinon.stub(facilitator, 'sendTransaction').callsFake((tx, txOptions) => {
       return new Promise(async function(resolve, reject) {
@@ -85,14 +101,15 @@ describe('Facilitator.approveBountyAmount()', () => {
     });
 
     // Add spy on Facilitator.approveBountyAmount.
-    spy = sinon.spy(facilitator, 'approveBountyAmount');
+    spyApproveBountyAmount = sinon.spy(facilitator, 'approveBountyAmount');
   };
 
   const tearDown = function() {
     // Restore all mocked and spy objects.
     mockBaseTokenContract.restore();
     mockTx.restore();
-    spy.restore();
+    spyApproveBountyAmount.restore();
+    sinon.restore();
   };
 
   beforeEach(() => {
@@ -112,7 +129,7 @@ describe('Facilitator.approveBountyAmount()', () => {
     bountyAmount = 100;
   });
 
-  it('should approve bounty amount with default gas value', async function() {
+  it('should fail when facilitator address is invalid', async function() {
     this.timeout(5000);
     const expectedErrorMessage = 'Invalid facilitator address.';
     await facilitator.approveBountyAmount().catch((exception) => {
@@ -158,19 +175,11 @@ describe('Facilitator.approveBountyAmount()', () => {
       'Gas value must be equal to default value.'
     );
 
-    // Assert if the function was called with correct argument.
-    assert.strictEqual(
-      spy.calledWith(facilitatorAddress),
-      true,
-      'Function not called with correct argument.'
-    );
-
-    // Assert if the function was called only once.
-    assert.strictEqual(
-      spy.withArgs(facilitatorAddress).calledOnce,
-      true,
-      'Function must be called once.'
-    );
+    SpyAssert.assert(spyApproveBountyAmount, 1, [[facilitatorAddress]]);
+    SpyAssert.assert(spyGetBounty, 1, [[]]);
+    SpyAssert.assert(spyGetBaseToken, 1, [[]]);
+    SpyAssert.assert(spyTxSend, 1, [[]]);
+    SpyAssert.assert(spyBaseTokenApprove, 1, [[gatewayAddress, bountyAmount]]);
 
     tearDown();
   });
@@ -215,19 +224,11 @@ describe('Facilitator.approveBountyAmount()', () => {
       'Gas value must be equal to default value.'
     );
 
-    // Assert if the function was called with correct argument.
-    assert.strictEqual(
-      spy.calledWith(facilitatorAddress),
-      true,
-      'Function not called with correct argument.'
-    );
-
-    // Assert if the function was called only once.
-    assert.strictEqual(
-      spy.withArgs(facilitatorAddress).calledOnce,
-      true,
-      'Function must be called once.'
-    );
+    SpyAssert.assert(spyApproveBountyAmount, 1, [[facilitatorAddress, gas]]);
+    SpyAssert.assert(spyGetBounty, 1, [[]]);
+    SpyAssert.assert(spyGetBaseToken, 1, [[]]);
+    SpyAssert.assert(spyTxSend, 1, [[]]);
+    SpyAssert.assert(spyBaseTokenApprove, 1, [[gatewayAddress, bountyAmount]]);
 
     tearDown();
   });
