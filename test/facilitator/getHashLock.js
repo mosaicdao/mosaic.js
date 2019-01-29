@@ -22,10 +22,23 @@ const chai = require('chai');
 const Web3 = require('web3');
 const Facilitator = require('../../libs/Facilitator/Facilitator');
 
-const web3 = new Web3();
 const assert = chai.assert;
 
-describe('Facilitator.getHashLock()', () => {
+describe('facilitator.getHashLock()', () => {
+  let facilitator, web3;
+  beforeEach(() => {
+    // runs before each test in this block
+    const gatewayAddress = '0x52c50cC9bBa156C65756abd71b172B6408Dde006';
+    const coGatewayAddress = '0xbF03E1680258c70B86D38A7e510F559A6440D06e';
+    web3 = new Web3(new Web3.providers.HttpProvider('http://127.0.0.1:9546'));
+    facilitator = new Facilitator(
+      web3,
+      web3,
+      gatewayAddress,
+      coGatewayAddress
+    );
+  });
+
   it('should return correct hash lock when secret is provided', async function() {
     this.timeout(5000);
 
@@ -33,7 +46,7 @@ describe('Facilitator.getHashLock()', () => {
     const unlockSecret = `0x${Buffer.from(secretString).toString('hex')}`;
     const expectedHashLock = web3.utils.sha3(secretString);
 
-    const hashObj = Facilitator.getHashLock(secretString);
+    const hashObj = facilitator.getHashLock(secretString);
 
     assert.strictEqual(
       hashObj.secret,
@@ -55,7 +68,7 @@ describe('Facilitator.getHashLock()', () => {
   it('should return hash lock and secret when called without any arguments', async function() {
     this.timeout(5000);
 
-    const hashObj = Facilitator.getHashLock();
+    const hashObj = facilitator.getHashLock();
 
     assert.isDefined(hashObj.secret, 'Secret must not be undefined.');
     assert.isDefined(

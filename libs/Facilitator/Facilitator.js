@@ -81,45 +81,77 @@ class Facilitator {
     staker,
     amount,
     beneficiary,
-    gasPrice,
-    gasLimit,
+    gasPrice = '0',
+    gasLimit = '0',
     unlockSecret,
     facilitator,
     gas = '7000000'
   ) {
+    if (!web3.utils.isAddress(staker)) {
+      throw new Error('Invalid staker address.');
+    }
+
+    this.stakeAmount = new BN(amount);
+    if (this.stakeAmount.eqn(0)) {
+      throw new Error('Stake amount must not be zero.');
+    }
+
+    if (!web3.utils.isAddress(beneficiary)) {
+      throw new Error('Invalid beneficiary address.');
+    }
+
     this.stakerAddress = staker;
     this.facilitatorAddress = facilitator || staker;
+    this.hashLockObj = await this.getHashLock(unlockSecret);
 
-    this.hashLock = await Facilitator.getHashLock(unlockSecret);
-    console.log('hashLock: ', this.hashLock);
-
+    // Get staker nonce.
     this.stakerNonce = new BN(await this.getGatewayNonce(staker));
-    console.log('stakerNonce: ', this.stakerNonce);
 
+    // Get Value token address.
+    const valueTokenAddress = await this.getValueToken();
+
+    // Get bounty amount.
     this.bounty = new BN(await this.getBounty());
-    console.log('bounty: ', this.bounty);
 
-    await this.getValueToken();
-    console.log('valueTokenAddress: ', this.valueTokenAddress);
+    if (this.bounty.gtn(0)) {
+      // If bounty amount is not zero then get base token address.
+      const baseTokenAddress = await this.getBaseToken();
 
-    await this.getBaseToken();
-    console.log('baseTokenAddress: ', this.baseTokenAddress);
-
-    if (
-      this.valueToken === this.baseToken &&
-      this.stakerAddress === this.facilitatorAddress
-    ) {
-      const amountToApprove = this.stakeAmount.add(this.bounty);
-      await this.approveStakeAmount(this.stakerAddress, amountToApprove, gas);
+      // If value and base token are same and if staker itself is facilitator,
+      // then we just have one approval. This will save some gas.
+      if (
+        valueTokenAddress === baseTokenAddress &&
+        this.stakerAddress === this.facilitatorAddress
+      ) {
+        const amountToApprove = this.stakeAmount.add(this.bounty);
+        await this.approveStakeAmount(
+          this.stakerAddress,
+          amountToApprove.toString(10),
+          gas
+        );
+      } else {
+        await this.approveBountyAmount(
+          this.facilitatorAddress,
+          this.bounty.toString(10)
+        );
+        await this.approveStakeAmount(
+          this.stakerAddress,
+          this.stakeAmount.toString(10),
+          gas
+        );
+      }
     } else {
-      await this.approveBountyAmount(facilitator, gas);
-      await this.approveStakeAmount(this.stakerAddress, this.stakeAmount, gas);
+      await this.approveStakeAmount(
+        this.stakerAddress,
+        this.stakeAmount.toString(10),
+        gas
+      );
     }
 
     const gatewayContract = this.contracts.Gateway(this.gatewayAddress);
 
     const transactionOptions = {
-      from: this.stakerAddress,
+      from: this.facilitatorAddress,
       to: this.gatewayAddress,
       gas: gas
     };
@@ -127,10 +159,10 @@ class Facilitator {
     const tx = gatewayContract.methods.stake(
       amount,
       beneficiary,
-      gasPrice,
-      gasLimit,
+      gasPrice.toString(10),
+      gasLimit.toString(10),
       this.stakerNonce.toString(10),
-      this.hashLock.hashLock
+      this.hashLockObj.hashLock
     );
 
     return this.sendTransaction(tx, transactionOptions);
@@ -310,7 +342,7 @@ class Facilitator {
    *
    * @returns {Object} An object containing hash lock and unlock secret.
    */
-  static getHashLock(unlockSecret) {
+  getHashLock(unlockSecret) {
     let hashLock = {};
 
     if (unlockSecret === undefined) {
