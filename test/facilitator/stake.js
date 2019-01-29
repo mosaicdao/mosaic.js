@@ -23,6 +23,7 @@ const chai = require('chai');
 const sinon = require('sinon');
 const Web3 = require('web3');
 const Facilitator = require('../../libs/Facilitator/Facilitator');
+const SpyAssert = require('../../test_utils/SpyAssert');
 
 const assert = chai.assert;
 
@@ -154,28 +155,6 @@ describe('Facilitator.stake()', () => {
     mockGatewayContract.restore();
     sinon.restore();
     spyStakeCall.restore();
-  };
-
-  const assertSpy = function(spy, callCount, args) {
-    assert.strictEqual(
-      spy.callCount,
-      callCount,
-      'Call count must match with the expected value.'
-    );
-
-    if (args) {
-      for (let i = 0; i < callCount; i += 1) {
-        const expectedArguments = args[i];
-        const actualArguments = spy.args[i];
-        for (let params = 0; params < actualArguments.length; params += 1) {
-          assert.strictEqual(
-            actualArguments[params],
-            expectedArguments[params],
-            'Input params must match with the expected value.'
-          );
-        }
-      }
-    }
   };
 
   beforeEach(() => {
@@ -325,7 +304,7 @@ describe('Facilitator.stake()', () => {
     );
 
     // Assert if the mocked functions were called correctly.
-    assertSpy(spyStakeCall, 1, [
+    SpyAssert.assert(spyStakeCall, 1, [
       [
         stakeParams.staker,
         stakeParams.amount,
@@ -337,8 +316,8 @@ describe('Facilitator.stake()', () => {
         stakeParams.gas
       ]
     ]);
-    assertSpy(spyGetValueToken, 1, [[]]);
-    assertSpy(spyStake, 1, [
+    SpyAssert.assert(spyGetValueToken, 1, [[]]);
+    SpyAssert.assert(spyStake, 1, [
       [
         stakeParams.amount,
         stakeParams.beneficiary,
@@ -349,18 +328,18 @@ describe('Facilitator.stake()', () => {
       ]
     ]);
 
-    assertSpy(spyGetBaseToken, 1, [[]]);
-    assertSpy(spyGetGatewayNonce, 1, [[stakeParams.staker]]);
-    assertSpy(spyGetHashLock, 1, [[hashLockObj.secret]]);
-    assertSpy(spyGetBounty, 1, [[]]);
-    assertSpy(spyApproveStakeAmount, 1, [
+    SpyAssert.assert(spyGetBaseToken, 1, [[]]);
+    SpyAssert.assert(spyGetGatewayNonce, 1, [[stakeParams.staker]]);
+    SpyAssert.assert(spyGetHashLock, 1, [[hashLockObj.secret]]);
+    SpyAssert.assert(spyGetBounty, 1, [[]]);
+    SpyAssert.assert(spyApproveStakeAmount, 1, [
       [stakeParams.staker, stakeParams.amount, stakeParams.gas]
     ]);
-    assertSpy(spyApproveBountyAmount, 1, [
+    SpyAssert.assert(spyApproveBountyAmount, 1, [
       [stakeParams.facilitator, bountyAmount]
     ]);
-    assertSpy(spyGateway, 1, [[gatewayAddress]]);
-    assertSpy(spySend, 1, [[]]);
+    SpyAssert.assert(spyGateway, 1, [[gatewayAddress]]);
+    SpyAssert.assert(spySend, 1, [[]]);
 
     tearDown();
   });
@@ -404,7 +383,7 @@ describe('Facilitator.stake()', () => {
     );
 
     // Assert if the mocked functions were called correctly.
-    assertSpy(spyStakeCall, 1, [
+    SpyAssert.assert(spyStakeCall, 1, [
       [
         stakeParams.staker,
         stakeParams.amount,
@@ -416,8 +395,8 @@ describe('Facilitator.stake()', () => {
         stakeParams.gas
       ]
     ]);
-    assertSpy(spyGetValueToken, 1, [[]]);
-    assertSpy(spyStake, 1, [
+    SpyAssert.assert(spyGetValueToken, 1, [[]]);
+    SpyAssert.assert(spyStake, 1, [
       [
         stakeParams.amount,
         stakeParams.beneficiary,
@@ -428,18 +407,18 @@ describe('Facilitator.stake()', () => {
       ]
     ]);
 
-    assertSpy(spyGetBaseToken, 1, [[]]);
-    assertSpy(spyGetGatewayNonce, 1, [[stakeParams.staker]]);
-    assertSpy(spyGetHashLock, 1, [[hashLockObj.secret]]);
-    assertSpy(spyGetBounty, 1, [[]]);
-    assertSpy(spyApproveStakeAmount, 1, [
+    SpyAssert.assert(spyGetBaseToken, 1, [[]]);
+    SpyAssert.assert(spyGetGatewayNonce, 1, [[stakeParams.staker]]);
+    SpyAssert.assert(spyGetHashLock, 1, [[hashLockObj.secret]]);
+    SpyAssert.assert(spyGetBounty, 1, [[]]);
+    SpyAssert.assert(spyApproveStakeAmount, 1, [
       [stakeParams.staker, stakeParams.amount, stakeParams.gas]
     ]);
-    assertSpy(spyApproveBountyAmount, 1, [
+    SpyAssert.assert(spyApproveBountyAmount, 1, [
       [stakeParams.facilitator, bountyAmount]
     ]);
-    assertSpy(spyGateway, 1, [[gatewayAddress]]);
-    assertSpy(spySend, 1, [[]]);
+    SpyAssert.assert(spyGateway, 1, [[gatewayAddress]]);
+    SpyAssert.assert(spySend, 1, [[]]);
 
     tearDown();
   });
@@ -483,7 +462,7 @@ describe('Facilitator.stake()', () => {
     );
 
     // Assert if the mocked functions were called correctly.
-    assertSpy(spyStakeCall, 1, [
+    SpyAssert.assert(spyStakeCall, 1, [
       [
         stakeParams.staker,
         stakeParams.amount,
@@ -495,8 +474,8 @@ describe('Facilitator.stake()', () => {
         stakeParams.gas
       ]
     ]);
-    assertSpy(spyGetValueToken, 1, [[]]);
-    assertSpy(spyStake, 1, [
+    SpyAssert.assert(spyGetValueToken, 1, [[]]);
+    SpyAssert.assert(spyStake, 1, [
       [
         stakeParams.amount,
         stakeParams.beneficiary,
@@ -507,18 +486,18 @@ describe('Facilitator.stake()', () => {
       ]
     ]);
 
-    assertSpy(spyGetBaseToken, 1, [[]]);
-    assertSpy(spyGetGatewayNonce, 1, [[stakeParams.staker]]);
-    assertSpy(spyGetHashLock, 1, [[]]);
-    assertSpy(spyGetBounty, 1, [[]]);
-    assertSpy(spyApproveStakeAmount, 1, [
+    SpyAssert.assert(spyGetBaseToken, 1, [[]]);
+    SpyAssert.assert(spyGetGatewayNonce, 1, [[stakeParams.staker]]);
+    SpyAssert.assert(spyGetHashLock, 1, [[]]);
+    SpyAssert.assert(spyGetBounty, 1, [[]]);
+    SpyAssert.assert(spyApproveStakeAmount, 1, [
       [stakeParams.staker, stakeParams.amount, stakeParams.gas]
     ]);
-    assertSpy(spyApproveBountyAmount, 1, [
+    SpyAssert.assert(spyApproveBountyAmount, 1, [
       [stakeParams.facilitator, bountyAmount]
     ]);
-    assertSpy(spyGateway, 1, [[gatewayAddress]]);
-    assertSpy(spySend, 1, [[]]);
+    SpyAssert.assert(spyGateway, 1, [[gatewayAddress]]);
+    SpyAssert.assert(spySend, 1, [[]]);
 
     tearDown();
   });
@@ -562,7 +541,7 @@ describe('Facilitator.stake()', () => {
     );
 
     // Assert if the mocked functions were called correctly.
-    assertSpy(spyStakeCall, 1, [
+    SpyAssert.assert(spyStakeCall, 1, [
       [
         stakeParams.staker,
         stakeParams.amount,
@@ -574,8 +553,8 @@ describe('Facilitator.stake()', () => {
         stakeParams.gas
       ]
     ]);
-    assertSpy(spyGetValueToken, 1, [[]]);
-    assertSpy(spyStake, 1, [
+    SpyAssert.assert(spyGetValueToken, 1, [[]]);
+    SpyAssert.assert(spyStake, 1, [
       [
         stakeParams.amount,
         stakeParams.beneficiary,
@@ -586,16 +565,18 @@ describe('Facilitator.stake()', () => {
       ]
     ]);
 
-    assertSpy(spyGetBaseToken, 1, [[]]);
-    assertSpy(spyGetGatewayNonce, 1, [[stakeParams.staker]]);
-    assertSpy(spyGetHashLock, 1, [[hashLockObj.secret]]);
-    assertSpy(spyGetBounty, 1, [[]]);
-    assertSpy(spyApproveStakeAmount, 1, [
+    SpyAssert.assert(spyGetBaseToken, 1, [[]]);
+    SpyAssert.assert(spyGetGatewayNonce, 1, [[stakeParams.staker]]);
+    SpyAssert.assert(spyGetHashLock, 1, [[hashLockObj.secret]]);
+    SpyAssert.assert(spyGetBounty, 1, [[]]);
+    SpyAssert.assert(spyApproveStakeAmount, 1, [
       [stakeParams.staker, stakeParams.amount, stakeParams.gas]
     ]);
-    assertSpy(spyApproveBountyAmount, 1, [[stakeParams.staker, bountyAmount]]);
-    assertSpy(spyGateway, 1, [[gatewayAddress]]);
-    assertSpy(spySend, 1, [[]]);
+    SpyAssert.assert(spyApproveBountyAmount, 1, [
+      [stakeParams.staker, bountyAmount]
+    ]);
+    SpyAssert.assert(spyGateway, 1, [[gatewayAddress]]);
+    SpyAssert.assert(spySend, 1, [[]]);
 
     tearDown();
   });
@@ -638,7 +619,7 @@ describe('Facilitator.stake()', () => {
     );
 
     // Assert if the mocked functions were called correctly.
-    assertSpy(spyStakeCall, 1, [
+    SpyAssert.assert(spyStakeCall, 1, [
       [
         stakeParams.staker,
         stakeParams.amount,
@@ -650,8 +631,8 @@ describe('Facilitator.stake()', () => {
         stakeParams.gas
       ]
     ]);
-    assertSpy(spyGetValueToken, 1, [[]]);
-    assertSpy(spyStake, 1, [
+    SpyAssert.assert(spyGetValueToken, 1, [[]]);
+    SpyAssert.assert(spyStake, 1, [
       [
         stakeParams.amount,
         stakeParams.beneficiary,
@@ -662,18 +643,18 @@ describe('Facilitator.stake()', () => {
       ]
     ]);
 
-    assertSpy(spyGetBaseToken, 1, [[]]);
-    assertSpy(spyGetGatewayNonce, 1, [[stakeParams.staker]]);
-    assertSpy(spyGetHashLock, 1, [[hashLockObj.secret]]);
-    assertSpy(spyGetBounty, 1, [[]]);
-    assertSpy(spyApproveStakeAmount, 1, [
+    SpyAssert.assert(spyGetBaseToken, 1, [[]]);
+    SpyAssert.assert(spyGetGatewayNonce, 1, [[stakeParams.staker]]);
+    SpyAssert.assert(spyGetHashLock, 1, [[hashLockObj.secret]]);
+    SpyAssert.assert(spyGetBounty, 1, [[]]);
+    SpyAssert.assert(spyApproveStakeAmount, 1, [
       [stakeParams.staker, stakeParams.amount, stakeParams.gas]
     ]);
-    assertSpy(spyApproveBountyAmount, 1, [
+    SpyAssert.assert(spyApproveBountyAmount, 1, [
       [stakeParams.facilitator, bountyAmount]
     ]);
-    assertSpy(spyGateway, 1, [[gatewayAddress]]);
-    assertSpy(spySend, 1, [[]]);
+    SpyAssert.assert(spyGateway, 1, [[gatewayAddress]]);
+    SpyAssert.assert(spySend, 1, [[]]);
 
     tearDown();
   });
@@ -717,7 +698,7 @@ describe('Facilitator.stake()', () => {
     );
 
     // Assert if the mocked functions were called correctly.
-    assertSpy(spyStakeCall, 1, [
+    SpyAssert.assert(spyStakeCall, 1, [
       [
         stakeParams.staker,
         stakeParams.amount,
@@ -729,8 +710,8 @@ describe('Facilitator.stake()', () => {
         undefined
       ]
     ]);
-    assertSpy(spyGetValueToken, 1, [[]]);
-    assertSpy(spyStake, 1, [
+    SpyAssert.assert(spyGetValueToken, 1, [[]]);
+    SpyAssert.assert(spyStake, 1, [
       [
         stakeParams.amount,
         stakeParams.beneficiary,
@@ -741,18 +722,18 @@ describe('Facilitator.stake()', () => {
       ]
     ]);
 
-    assertSpy(spyGetBaseToken, 1, [[]]);
-    assertSpy(spyGetGatewayNonce, 1, [[stakeParams.staker]]);
-    assertSpy(spyGetHashLock, 1, [[hashLockObj.secret]]);
-    assertSpy(spyGetBounty, 1, [[]]);
-    assertSpy(spyApproveStakeAmount, 1, [
+    SpyAssert.assert(spyGetBaseToken, 1, [[]]);
+    SpyAssert.assert(spyGetGatewayNonce, 1, [[stakeParams.staker]]);
+    SpyAssert.assert(spyGetHashLock, 1, [[hashLockObj.secret]]);
+    SpyAssert.assert(spyGetBounty, 1, [[]]);
+    SpyAssert.assert(spyApproveStakeAmount, 1, [
       [stakeParams.staker, stakeParams.amount, '7000000']
     ]);
-    assertSpy(spyApproveBountyAmount, 1, [
+    SpyAssert.assert(spyApproveBountyAmount, 1, [
       [stakeParams.facilitator, bountyAmount]
     ]);
-    assertSpy(spyGateway, 1, [[gatewayAddress]]);
-    assertSpy(spySend, 1, [[]]);
+    SpyAssert.assert(spyGateway, 1, [[gatewayAddress]]);
+    SpyAssert.assert(spySend, 1, [[]]);
 
     tearDown();
   });
@@ -797,7 +778,7 @@ describe('Facilitator.stake()', () => {
     );
 
     // Assert if the mocked functions were called correctly.
-    assertSpy(spyStakeCall, 1, [
+    SpyAssert.assert(spyStakeCall, 1, [
       [
         stakeParams.staker,
         stakeParams.amount,
@@ -809,8 +790,8 @@ describe('Facilitator.stake()', () => {
         stakeParams.gas
       ]
     ]);
-    assertSpy(spyGetValueToken, 1, [[]]);
-    assertSpy(spyStake, 1, [
+    SpyAssert.assert(spyGetValueToken, 1, [[]]);
+    SpyAssert.assert(spyStake, 1, [
       [
         stakeParams.amount,
         stakeParams.beneficiary,
@@ -821,17 +802,17 @@ describe('Facilitator.stake()', () => {
       ]
     ]);
 
-    assertSpy(spyGetBaseToken, 1, [[]]);
-    assertSpy(spyGetGatewayNonce, 1, [[stakeParams.staker]]);
-    assertSpy(spyGetHashLock, 1, [[hashLockObj.secret]]);
-    assertSpy(spyGetBounty, 1, [[]]);
+    SpyAssert.assert(spyGetBaseToken, 1, [[]]);
+    SpyAssert.assert(spyGetGatewayNonce, 1, [[stakeParams.staker]]);
+    SpyAssert.assert(spyGetHashLock, 1, [[hashLockObj.secret]]);
+    SpyAssert.assert(spyGetBounty, 1, [[]]);
     const totalAmount = new BN(stakeParams.amount).add(new BN(bountyAmount));
-    assertSpy(spyApproveStakeAmount, 1, [
+    SpyAssert.assert(spyApproveStakeAmount, 1, [
       [stakeParams.staker, totalAmount.toString(10), stakeParams.gas]
     ]);
-    assertSpy(spyApproveBountyAmount, 0, [[]]);
-    assertSpy(spyGateway, 1, [[gatewayAddress]]);
-    assertSpy(spySend, 1, [[]]);
+    SpyAssert.assert(spyApproveBountyAmount, 0, [[]]);
+    SpyAssert.assert(spyGateway, 1, [[gatewayAddress]]);
+    SpyAssert.assert(spySend, 1, [[]]);
 
     tearDown();
   });
@@ -875,7 +856,7 @@ describe('Facilitator.stake()', () => {
     );
 
     // Assert if the mocked functions were called correctly.
-    assertSpy(spyStakeCall, 1, [
+    SpyAssert.assert(spyStakeCall, 1, [
       [
         stakeParams.staker,
         stakeParams.amount,
@@ -887,8 +868,8 @@ describe('Facilitator.stake()', () => {
         stakeParams.gas
       ]
     ]);
-    assertSpy(spyGetValueToken, 1, [[]]);
-    assertSpy(spyStake, 1, [
+    SpyAssert.assert(spyGetValueToken, 1, [[]]);
+    SpyAssert.assert(spyStake, 1, [
       [
         stakeParams.amount,
         stakeParams.beneficiary,
@@ -899,16 +880,16 @@ describe('Facilitator.stake()', () => {
       ]
     ]);
 
-    assertSpy(spyGetBaseToken, 0, [[]]);
-    assertSpy(spyGetGatewayNonce, 1, [[stakeParams.staker]]);
-    assertSpy(spyGetHashLock, 1, [[hashLockObj.secret]]);
-    assertSpy(spyGetBounty, 1, [[]]);
-    assertSpy(spyApproveStakeAmount, 1, [
+    SpyAssert.assert(spyGetBaseToken, 0, [[]]);
+    SpyAssert.assert(spyGetGatewayNonce, 1, [[stakeParams.staker]]);
+    SpyAssert.assert(spyGetHashLock, 1, [[hashLockObj.secret]]);
+    SpyAssert.assert(spyGetBounty, 1, [[]]);
+    SpyAssert.assert(spyApproveStakeAmount, 1, [
       [stakeParams.staker, stakeParams.amount, stakeParams.gas]
     ]);
-    assertSpy(spyApproveBountyAmount, 0);
-    assertSpy(spyGateway, 1, [[gatewayAddress]]);
-    assertSpy(spySend, 1, [[]]);
+    SpyAssert.assert(spyApproveBountyAmount, 0);
+    SpyAssert.assert(spyGateway, 1, [[gatewayAddress]]);
+    SpyAssert.assert(spySend, 1, [[]]);
 
     tearDown();
   });
