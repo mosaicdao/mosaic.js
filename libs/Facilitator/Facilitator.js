@@ -90,7 +90,7 @@ class Facilitator {
     this.stakerAddress = staker;
     this.facilitatorAddress = facilitator || staker;
 
-    this.hashLock = await this.getHashLock(unlockSecret);
+    this.hashLock = await Facilitator.getHashLock(unlockSecret);
     console.log('hashLock: ', this.hashLock);
 
     this.stakerNonce = new BN(await this.getGatewayNonce(staker));
@@ -316,8 +316,7 @@ class Facilitator {
     if (unlockSecret === undefined) {
       hashLock = Utils.createSecretHashLock();
     } else {
-      hashLock.hashLock = Utils.toHashLock(unlockSecret);
-      hashLock.unlockSecret = unlockSecret;
+      hashLock = Utils.toHashLock(unlockSecret);
     }
 
     return hashLock;
