@@ -46,6 +46,7 @@ class CoGatewayHelper {
       web3
     );
   }
+
   static validateSetupConfig(config) {
     console.log(`* Validating ${ContractName} Setup Config.`);
     if (!config.deployer) {
@@ -162,7 +163,7 @@ class CoGatewayHelper {
     const bin = abiBinProvider.getLinkedBIN(ContractName, messageBusLibInfo, gatewayLibInfo);
 
     let defaultOptions = {
-      gas: '8000000'
+      gas: '7500000'
     };
     if (txOptions) {
       Object.assign(defaultOptions, txOptions);
