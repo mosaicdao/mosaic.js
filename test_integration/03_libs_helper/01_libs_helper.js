@@ -29,6 +29,24 @@ describe('LibsHelper', () => {
 
   let helper = new LibsHelper(shared.origin.web3, addressMerklePatriciaProof, addressMessageBus, addressGatewayLib);
 
+  after(() => {
+    const auxiliaryHelper = new LibsHelper(shared.auxiliary.web3);
+
+    const deployParams = {
+      from: shared.setupConfig.deployerAddress,
+      gasPrice: shared.setupConfig.gasPrice
+    };
+    const libsHelperConfig = {
+      deployer: shared.setupConfig.deployerAddress
+    };
+    return auxiliaryHelper.setup(libsHelperConfig, deployParams).then(() => {
+      // set addresses for following tests
+      shared.auxiliary.addresses.MerklePatriciaProof = auxiliaryHelper.merklePatriciaProof;
+      shared.auxiliary.addresses.MessageBus = auxiliaryHelper.messageBus;
+      shared.auxiliary.addresses.GatewayLib = auxiliaryHelper.gatewayLib;
+    });
+  });
+
   it('should deploy new MerklePatriciaProof Library', () => {
     let deployParams = {
       from: shared.setupConfig.deployerAddress,
@@ -99,6 +117,11 @@ describe('LibsHelper', () => {
       );
       assert.isTrue(Web3.utils.isAddress(addressMessageBus), 'MessageBus contract was not deployed correctly.');
       assert.isTrue(Web3.utils.isAddress(addressGatewayLib), 'GatewayLib contract was not deployed correctly.');
+
+      // set addresses for following tests
+      shared.origin.addresses.MerklePatriciaProof = helper.merklePatriciaProof;
+      shared.origin.addresses.MessageBus = helper.messageBus;
+      shared.origin.addresses.GatewayLib = helper.gatewayLib;
     });
   });
 });

@@ -23,7 +23,7 @@ const assertDeploymentReceipt = (receipt) => {
 };
 
 describe('OrganizationHelper', () => {
-  let addressOrganisation;
+  let addressOrganization;
 
   let deployParams;
   let orgConfig;
@@ -43,14 +43,21 @@ describe('OrganizationHelper', () => {
     };
   });
 
-  let helper = new OrganizationHelper(shared.origin.web3, addressOrganisation);
+  after(() => {
+    const auxiliaryHelper = new OrganizationHelper(shared.auxiliary.web3);
+    return auxiliaryHelper.setup(orgConfig).then(() => {
+      shared.auxiliary.addresses.Organization = auxiliaryHelper.address;
+    });
+  });
+
+  let helper = new OrganizationHelper(shared.origin.web3, addressOrganization);
 
   it('should deploy new organization contract', () => {
     return helper
       .deploy(orgConfig.owner, null, null, null, deployParams)
       .then(assertDeploymentReceipt)
       .then((receipt) => {
-        addressOrganisation = receipt.contractAddress;
+        addressOrganization = receipt.contractAddress;
       });
   });
 
@@ -84,6 +91,8 @@ describe('OrganizationHelper', () => {
   it('should do complete organization setup', () => {
     const _orgConfig = orgConfig;
     _orgConfig.owner = shared.setupConfig.organizationOwner;
-    return helper.setup(_orgConfig);
+    return helper.setup(_orgConfig).then(() => {
+      shared.origin.addresses.Organization = helper.address;
+    });
   });
 });
