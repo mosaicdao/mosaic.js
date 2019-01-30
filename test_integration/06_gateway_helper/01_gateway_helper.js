@@ -38,7 +38,7 @@ describe('GatewayHelper', () => {
     organizationOwner = shared.setupConfig.deployerAddress;
   });
 
-  const someValidAddress = '0x2c4e8f2d746113d0696ce89b35f0d8bf88e0aeca';
+  const someValidAddress = '0x1111111111111111111111111111111111111111';
   it('should deploy new Gateway contract', () => {
     let _token = someValidAddress;
     let _baseToken = someValidAddress;
