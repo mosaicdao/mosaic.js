@@ -45,6 +45,4 @@ const runTests = async () => {
   });
 };
 
-// module.exports = (callback) => {
 runTests();
-// };
