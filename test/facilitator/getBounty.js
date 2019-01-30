@@ -27,71 +27,56 @@ const SpyAssert = require('../../test_utils/SpyAssert');
 const assert = chai.assert;
 
 describe('Facilitator.getBounty()', () => {
-  let facilitator;
-  let web3;
-  let gatewayAddress;
-  let coGatewayAddress;
+    let facilitator;
+    let web3;
+    let gatewayAddress;
+    let coGatewayAddress;
 
-  beforeEach(() => {
-    // runs before each test in this block
-    web3 = new Web3(new Web3.providers.HttpProvider('http://127.0.0.1:9546'));
-    gatewayAddress = '0x52c50cC9bBa156C65756abd71b172B6408Dde006';
-    coGatewayAddress = '0xbF03E1680258c70B86D38A7e510F559A6440D06e';
-    facilitator = new Facilitator(
-      web3,
-      web3,
-      gatewayAddress,
-      coGatewayAddress
-    );
-  });
+    beforeEach(() => {
+        // runs before each test in this block
+        web3 = new Web3();
+        gatewayAddress = '0x0000000000000000000000000000000000000001';
+        coGatewayAddress = '0x0000000000000000000000000000000000000002';
+        facilitator = new Facilitator(web3, web3, gatewayAddress, coGatewayAddress);
+    });
 
-  it('should return correct bounty value', async function() {
-    this.timeout(5000);
+    it('should return correct bounty value', async function() {
+        this.timeout(5000);
 
-    const mockedBountyAmount = 100;
+        const mockedBountyAmount = 100;
 
-    // Mock an instance of gateway contract.
-    const mockGatewayContract = sinon.mock(
-      facilitator.contracts.Gateway(gatewayAddress)
-    );
-    const gatewayContract = mockGatewayContract.object;
+        // Mock an instance of gateway contract.
+        const mockGatewayContract = sinon.mock(facilitator.contracts.Gateway(gatewayAddress));
+        const gatewayContract = mockGatewayContract.object;
 
-    // Fake the bounty call.
-    const spyBounty = sinon.replace(
-      gatewayContract.methods,
-      'bounty',
-      sinon.fake.returns(function() {
-        return Promise.resolve(mockedBountyAmount);
-      })
-    );
+        // Fake the bounty call.
+        const spyBounty = sinon.replace(
+            gatewayContract.methods,
+            'bounty',
+            sinon.fake.returns(function() {
+                return Promise.resolve(mockedBountyAmount);
+            }),
+        );
 
-    // Fake the Gateway call to return gatewayContract object;
-    const spyGateway = sinon.replace(
-      facilitator.contracts,
-      'Gateway',
-      sinon.fake.returns(gatewayContract)
-    );
+        // Fake the Gateway call to return gatewayContract object;
+        const spyGateway = sinon.replace(facilitator.contracts, 'Gateway', sinon.fake.returns(gatewayContract));
 
-    // Add spy on Facilitator.getBounty.
-    const spy = sinon.spy(facilitator, 'getBounty');
+        // Add spy on Facilitator.getBounty.
+        const spy = sinon.spy(facilitator, 'getBounty');
 
-    // Call getBounty.
-    const bounty = await facilitator.getBounty();
+        // Call getBounty.
+        const bounty = await facilitator.getBounty();
 
-    // Assert the returned value.
-    assert.strictEqual(
-      bounty,
-      mockedBountyAmount,
-      'Bounty amount must be equal.'
-    );
+        // Assert the returned value.
+        assert.strictEqual(bounty, mockedBountyAmount, 'Bounty amount must be equal.');
 
-    SpyAssert.assert(spyBounty, 1, [[]]);
-    SpyAssert.assert(spyGateway, 1, [[gatewayAddress]]);
-    SpyAssert.assert(spy, 1, [[]]);
+        SpyAssert.assert(spyBounty, 1, [[]]);
+        SpyAssert.assert(spyGateway, 1, [[gatewayAddress]]);
+        SpyAssert.assert(spy, 1, [[]]);
 
-    // Restore all mocked and spy objects.
-    mockGatewayContract.restore();
-    spy.restore();
-    sinon.restore();
-  });
+        // Restore all mocked and spy objects.
+        mockGatewayContract.restore();
+        spy.restore();
+        sinon.restore();
+    });
 });

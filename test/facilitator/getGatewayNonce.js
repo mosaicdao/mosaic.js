@@ -27,91 +27,80 @@ const SpyAssert = require('../../test_utils/SpyAssert');
 const assert = chai.assert;
 
 describe('Facilitator.getGatewayNonce()', () => {
-  let facilitator;
-  let web3;
-  let gatewayAddress;
-  let coGatewayAddress;
+    let facilitator;
+    let web3;
+    let gatewayAddress;
+    let coGatewayAddress;
 
-  beforeEach(() => {
-    // runs before each test in this block
-    web3 = new Web3(new Web3.providers.HttpProvider('http://127.0.0.1:9546'));
-    gatewayAddress = '0x52c50cC9bBa156C65756abd71b172B6408Dde006';
-    coGatewayAddress = '0xbF03E1680258c70B86D38A7e510F559A6440D06e';
-    facilitator = new Facilitator(
-      web3,
-      web3,
-      gatewayAddress,
-      coGatewayAddress
-    );
-  });
-
-  it('should throw error when account address is not string', async function() {
-    this.timeout(5000);
-
-    const accountAddress = 0x79376dc1925ba1e0276473244802287394216a39;
-    const expectedErrorMessage = 'Invalid account address.';
-    // Call getGatewayNonce.
-    await facilitator.getGatewayNonce(accountAddress).catch((exception) => {
-      assert.strictEqual(
-        exception.message,
-        expectedErrorMessage,
-        `Exception reason must be "${expectedErrorMessage}"`
-      );
+    beforeEach(() => {
+        // runs before each test in this block
+        web3 = new Web3();
+        gatewayAddress = '0x0000000000000000000000000000000000000001';
+        coGatewayAddress = '0x0000000000000000000000000000000000000002';
+        facilitator = new Facilitator(web3, web3, gatewayAddress, coGatewayAddress);
     });
 
-    // Call with undefined account address.
-    await facilitator.getGatewayNonce().catch((exception) => {
-      assert.strictEqual(
-        exception.message,
-        expectedErrorMessage,
-        `Exception reason must be "${expectedErrorMessage}"`
-      );
+    it('should throw error when account address is not string', async function() {
+        this.timeout(5000);
+
+        const accountAddress = 0x0000000000000000000000000000000000000003;
+        const expectedErrorMessage = 'Invalid account address.';
+        // Call getGatewayNonce.
+        await facilitator.getGatewayNonce(accountAddress).catch((exception) => {
+            assert.strictEqual(
+                exception.message,
+                expectedErrorMessage,
+                `Exception reason must be "${expectedErrorMessage}"`,
+            );
+        });
+
+        // Call with undefined account address.
+        await facilitator.getGatewayNonce().catch((exception) => {
+            assert.strictEqual(
+                exception.message,
+                expectedErrorMessage,
+                `Exception reason must be "${expectedErrorMessage}"`,
+            );
+        });
     });
-  });
 
-  it('should return correct nonce value', async function() {
-    this.timeout(5000);
+    it('should return correct nonce value', async function() {
+        this.timeout(5000);
 
-    const accountAddress = '0x79376dc1925ba1e0276473244802287394216a39';
+        const accountAddress = '0x79376dc1925ba1e0276473244802287394216a39';
 
-    // Mock an instance of gateway contract.
-    const mockGatewayContract = sinon.mock(
-      facilitator.contracts.Gateway(gatewayAddress)
-    );
-    const gatewayContract = mockGatewayContract.object;
+        // Mock an instance of gateway contract.
+        const mockGatewayContract = sinon.mock(facilitator.contracts.Gateway(gatewayAddress));
+        const gatewayContract = mockGatewayContract.object;
 
-    // Fake the getNonce call.
-    const spyGetNonce = sinon.replace(
-      gatewayContract.methods,
-      'getNonce',
-      sinon.fake.returns(function() {
-        return Promise.resolve(1);
-      })
-    );
+        // Fake the getNonce call.
+        const spyGetNonce = sinon.replace(
+            gatewayContract.methods,
+            'getNonce',
+            sinon.fake.returns(function() {
+                return Promise.resolve(1);
+            }),
+        );
 
-    // Fake the Gateway call to return gatewayContract object;
-    const spyGateway = sinon.replace(
-      facilitator.contracts,
-      'Gateway',
-      sinon.fake.returns(gatewayContract)
-    );
+        // Fake the Gateway call to return gatewayContract object;
+        const spyGateway = sinon.replace(facilitator.contracts, 'Gateway', sinon.fake.returns(gatewayContract));
 
-    // Add spy on Facilitator.getGatewayNonce.
-    const spy = sinon.spy(facilitator, 'getGatewayNonce');
+        // Add spy on Facilitator.getGatewayNonce.
+        const spy = sinon.spy(facilitator, 'getGatewayNonce');
 
-    // Call getGatewayNonce.
-    const nonce = await facilitator.getGatewayNonce(accountAddress);
+        // Call getGatewayNonce.
+        const nonce = await facilitator.getGatewayNonce(accountAddress);
 
-    // Assert the returned value.
-    assert.strictEqual(nonce, 1, 'Nonce must be equal.');
+        // Assert the returned value.
+        assert.strictEqual(nonce, 1, 'Nonce must be equal.');
 
-    SpyAssert.assert(spyGetNonce, 1, [[accountAddress]]);
-    SpyAssert.assert(spyGateway, 1, [[gatewayAddress]]);
-    SpyAssert.assert(spy, 1, [[accountAddress]]);
+        SpyAssert.assert(spyGetNonce, 1, [[accountAddress]]);
+        SpyAssert.assert(spyGateway, 1, [[gatewayAddress]]);
+        SpyAssert.assert(spy, 1, [[accountAddress]]);
 
-    // Restore all mocked and spy objects.
-    mockGatewayContract.restore();
-    spy.restore();
-    sinon.restore();
-  });
+        // Restore all mocked and spy objects.
+        mockGatewayContract.restore();
+        spy.restore();
+        sinon.restore();
+    });
 });

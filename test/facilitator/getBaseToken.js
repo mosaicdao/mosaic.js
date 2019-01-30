@@ -27,72 +27,56 @@ const SpyAssert = require('../../test_utils/SpyAssert');
 const assert = chai.assert;
 
 describe('Facilitator.getBaseToken()', () => {
-  let facilitator;
-  let web3;
-  let gatewayAddress;
-  let coGatewayAddress;
+    let facilitator;
+    let web3;
+    let gatewayAddress;
+    let coGatewayAddress;
 
-  beforeEach(() => {
-    // runs before each test in this block
-    web3 = new Web3(new Web3.providers.HttpProvider('http://127.0.0.1:9546'));
-    gatewayAddress = '0x52c50cC9bBa156C65756abd71b172B6408Dde006';
-    coGatewayAddress = '0xbF03E1680258c70B86D38A7e510F559A6440D06e';
-    facilitator = new Facilitator(
-      web3,
-      web3,
-      gatewayAddress,
-      coGatewayAddress
-    );
-  });
+    beforeEach(() => {
+        // runs before each test in this block
+        web3 = new Web3();
+        gatewayAddress = '0x0000000000000000000000000000000000000001';
+        coGatewayAddress = '0x0000000000000000000000000000000000000002';
+        facilitator = new Facilitator(web3, web3, gatewayAddress, coGatewayAddress);
+    });
 
-  it('should return correct base token', async function() {
-    this.timeout(5000);
+    it('should return correct base token', async function() {
+        this.timeout(5000);
 
-    const expectedBaseTokenAddress =
-      '0x4e4ea3140f3d4a07e2f054cbabfd1f8038b3b4b0';
+        const expectedBaseTokenAddress = '0x0000000000000000000000000000000000000003';
 
-    // Mock an instance of gateway contract.
-    const mockGatewayContract = sinon.mock(
-      facilitator.contracts.Gateway(gatewayAddress)
-    );
-    const gatewayContract = mockGatewayContract.object;
+        // Mock an instance of gateway contract.
+        const mockGatewayContract = sinon.mock(facilitator.contracts.Gateway(gatewayAddress));
+        const gatewayContract = mockGatewayContract.object;
 
-    // Fake the base token call.
-    const spyBaseToken = sinon.replace(
-      gatewayContract.methods,
-      'baseToken',
-      sinon.fake.returns(function() {
-        return Promise.resolve(expectedBaseTokenAddress);
-      })
-    );
+        // Fake the base token call.
+        const spyBaseToken = sinon.replace(
+            gatewayContract.methods,
+            'baseToken',
+            sinon.fake.returns(function() {
+                return Promise.resolve(expectedBaseTokenAddress);
+            }),
+        );
 
-    // Fake the Gateway call to return gatewayContract object;
-    const spyGateway = sinon.replace(
-      facilitator.contracts,
-      'Gateway',
-      sinon.fake.returns(gatewayContract)
-    );
+        // Fake the Gateway call to return gatewayContract object;
+        const spyGateway = sinon.replace(facilitator.contracts, 'Gateway', sinon.fake.returns(gatewayContract));
 
-    // Add spy on Facilitator.getBaseToken.
-    const spy = sinon.spy(facilitator, 'getBaseToken');
+        // Add spy on Facilitator.getBaseToken.
+        const spy = sinon.spy(facilitator, 'getBaseToken');
 
-    // Get base token address.
-    const baseToken = await facilitator.getBaseToken();
+        // Get base token address.
+        const baseToken = await facilitator.getBaseToken();
 
-    // Assert the returned value.
-    assert.strictEqual(
-      baseToken,
-      expectedBaseTokenAddress,
-      'Base token address must not be different.'
-    );
+        // Assert the returned value.
+        assert.strictEqual(baseToken, expectedBaseTokenAddress, 'Base token address must not be different.');
 
-    SpyAssert.assert(spyBaseToken, 1, [[gatewayAddress]]);
-    SpyAssert.assert(spyGateway, 1, [[gatewayAddress]]);
-    SpyAssert.assert(spy, 1, [[]]);
+        SpyAssert.assert(spyBaseToken, 1, [[gatewayAddress]]);
+        SpyAssert.assert(spyGateway, 1, [[gatewayAddress]]);
+        SpyAssert.assert(spy, 1, [[]]);
 
-    // Restore all mocked and spy objects.
-    mockGatewayContract.restore();
-    spy.restore();
-    sinon.restore();
-  });
+        // Restore all mocked and spy objects.
+        mockGatewayContract.restore();
+        spy.restore();
+        sinon.restore();
+    });
 });
