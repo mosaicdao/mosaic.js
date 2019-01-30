@@ -20,6 +20,7 @@
 
 const Contracts = require('../../libs/Contracts');
 const Utils = require('../utils/Utils.js');
+const Web3 = require('web3');
 
 /**
  * Class for stake helper methods
@@ -29,46 +30,157 @@ class StakeHelper {
      * Constructor for stake helper.
      *
      * @param {Object} originWeb3 Origin chain web3 object.
-     * @param {string} valueToken Value token contract address.
-     * @param {string} baseToken Base token contract address.
-     * @param {string} gateway Gateway contract address.
-     * @param {string} staker Stake account address.
-     * @param {Object} txOptions Transaction options.
+     * @param {string} gatewayAddress Gateway contract address.
      */
-    constructor(originWeb3, valueToken, baseToken, gateway, staker, txOptions) {
+    constructor(originWeb3, gatewayAddress) {
+        if (originWeb3 === undefined) {
+            throw new Error('Invalid origin web3 object.');
+        }
+        if (!Web3.utils.isAddress(gatewayAddress)) {
+            throw new Error('Invalid Gateway address.');
+        }
+
         this.web3 = originWeb3;
-        this.valueToken = valueToken;
-        this.simpleToken = baseToken;
-        this.gateway = gateway;
-        this.staker = staker;
-        this.txOptions = txOptions || {
-            gasPrice: '0x5B9ACA00',
-        };
+        this.gatewayAddress = gatewayAddress;
+    }
+
+    /**
+     * Returns the bounty amount from EIP20Gateway contract.
+     *
+     * @returns {Promise} Promise object represents the bounty.
+     */
+    getBounty() {
+        if (this.bountyAmount) {
+            return Promise.resolve(this.bountyAmount);
+        }
+
+        const gatewayContract = Contracts.getEIP20Gateway(this.web3, this.gatewayAddress);
+
+        return gatewayContract.methods
+            .bounty()
+            .call()
+            .then((bounty) => {
+                this.bountyAmount = bounty;
+                return bounty;
+            });
+    }
+
+    /**
+     * Returns the ERC20 base token address.
+     *
+     * @returns {Promise} Promise object represents ERC20 base token address.
+     */
+    async getBaseToken() {
+        if (this.baseTokenAddress) {
+            return Promise.resolve(this.baseTokenAddress);
+        }
+
+        const gatewayContract = Contracts.getEIP20Gateway(this.web3, this.gatewayAddress);
+
+        return gatewayContract.methods
+            .baseToken()
+            .call()
+            .then((baseToken) => {
+                this.baseTokenAddress = baseToken;
+                return baseToken;
+            });
+    }
+
+    /**
+     * Returns the EIP20 token address.
+     *
+     * @returns {Promise} Promise object represents EIP20 token address.
+     */
+    async getValueToken() {
+        if (this.valueTokenAddress) {
+            return Promise.resolve(this.valueTokenAddress);
+        }
+
+        const gatewayContract = Contracts.getEIP20Gateway(this.web3, this.gatewayAddress);
+
+        return gatewayContract.methods
+            .token()
+            .call()
+            .then((token) => {
+                this.valueTokenAddress = token;
+                return token;
+            });
+    }
+
+    /**
+     * Returns the gateway nonce for the given account address.
+     *
+     * @param {string} accountAddress Account address for which the nonce is to be fetched.
+     *
+     * @returns {Promise} Promise object represents the nonce of account address.
+     */
+    async getNonce(staker) {
+        if (!Web3.utils.isAddress(staker)) {
+            throw new Error('Invalid account address.');
+        }
+        return this._getNonce(staker, this.web3, this.gatewayAddress);
+    }
+
+    /**
+     * Approves gateway address for the bounty amount transfer.
+     *
+     * @param {string} facilitator Facilitator address.
+     * @param {Object} txOption Transaction options.
+     *
+     * @returns {Promise} Promise object.
+     */
+    async approveBountyAmount(facilitator, txOption) {
+        if (!Web3.utils.isAddress(facilitator)) {
+            throw new Error('Invalid facilitator address.');
+        }
+        if (!txOption) {
+            throw new Error('Invalid transaction options.');
+        }
+        const baseTokenAddress = await this.getBaseToken();
+        const baseToken = Contracts.getEIP20Token(this.web3, baseTokenAddress);
+        const bountyAmount = await this.getBounty();
+        const tx = baseToken.methods.approve(this.gatewayAddress, bountyAmount);
+        return StakeHelper.sendTransaction(tx, txOption);
+    }
+
+    /**
+     * Approves gateway address for the stake amount transfer.
+     *
+     * @param {string} stakeAmount Stake amount.
+     * @param {string} txOption Transaction options.
+     *
+     * @returns {Promise} Promise object.
+     */
+    async approveStakeAmount(stakeAmount, txOption) {
+        if (!Web3.utils.isAddress(txOption.from)) {
+            throw new Error('Invalid staker address.');
+        }
+        if (!txOption) {
+            throw new Error('Invalid transaction options.');
+        }
+        const valueTokenAddress = await this.getValueToken();
+        const valueToken = Contracts.getEIP20Token(this.web3, valueTokenAddress);
+        const tx = valueToken.methods.approve(this.gatewayAddress, stakeAmount);
+        return StakeHelper.sendTransaction(tx, txOption);
     }
 
     /**
      * Returns the nonce for the given staker account address.
      *
-     * @param {string} staker Staker address.
+     * @param {string} stakerAddress Staker address.
      * @param {Object} originWeb3 Origin web3 object.
      * @param {string} gateway Gateway contract address.
      *
      * @returns {Promise} Promise object represents the nonce of staker address.
      */
-    getNonce(staker, originWeb3, gateway) {
+    _getNonce(stakerAddress, originWeb3, gateway) {
         const web3 = originWeb3 || this.web3;
-        const gatewayAddress = gateway || this.gateway;
-        const stakerAddress = staker || this.staker;
-
+        const gatewayAddress = gateway || this.gatewayAddress;
         const contract = Contracts.getEIP20Gateway(web3, gatewayAddress);
-
-        console.log('* Fetching Staker Nonce');
-
         return contract.methods
             .getNonce(stakerAddress)
             .call()
             .then((nonce) => {
-                console.log(`\t - Gateway Nonce for ${stakerAddress}:`, nonce);
                 return nonce;
             });
     }
@@ -92,7 +204,6 @@ class StakeHelper {
                 to: valueToken,
                 gas: '100000',
             },
-            this.txOptions || {},
             txOptions || {},
         );
 
@@ -126,7 +237,6 @@ class StakeHelper {
                 to: gateway,
                 gas: '7000000',
             },
-            this.txOptions || {},
             txOptions || {},
         );
 
@@ -155,6 +265,22 @@ class StakeHelper {
      */
     static toHashLock(secretString) {
         return Utils.toHashLock(secretString);
+    }
+
+    /**
+     * Helper function to send ethereum transaction.
+     *
+     * @param {Object} tx Transaction object.
+     * @param {Object} tx Transaction options.
+     *
+     * @returns {Promise} Promise object.
+     */
+    static sendTransaction(tx, txOption) {
+        return tx
+            .send(txOption)
+            .on('transactionHash', (transactionHash) => {})
+            .on('receipt', (receipt) => {})
+            .on('error', (error) => {});
     }
 }
 
