@@ -76,16 +76,9 @@ describe('GatewayHelper', () => {
       )
       .then(assertDeploymentReceipt)
       .then((receipt) => {
-        addressGateway = receipt.contractAddress;
+        shared.origin.addresses.Gateway = receipt.contractAddress;
       });
   });
-
-  // TODO: Set Co-Gateway Address.; Move to activation step of integration tests
-  // it('should activate gateway', () => {
-  //   let addressCoGateway = addressGateway;
-  //   //Note: Remember, deployer is still the owner of organization here.
-  //   return helper.activateGateway(addressCoGateway, deployParams).then(assertReceipt);
-  // });
 
   // Test Setup
   it('should setup Gateway and CoGateway', () => {

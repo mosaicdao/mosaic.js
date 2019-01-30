@@ -45,10 +45,9 @@ const assertDeploymentReceipt = (receipt) => {
 describe('CoGatewayHelper', () => {
   let deployParams;
 
-  let addressCoGateway;
   let organizationOwner;
 
-  let helper = new CoGatewayHelper(shared.auxiliary.web3, addressCoGateway);
+  let helper = new CoGatewayHelper(shared.auxiliary.web3);
 
   before(() => {
     deployParams = {
@@ -60,11 +59,11 @@ describe('CoGatewayHelper', () => {
 
   const someValidAddress = '0x2222222222222222222222222222222222222222';
   it('should deploy new CoGateway contract', () => {
-    let _token = someValidAddress;
-    let _utilityToken = someValidAddress;
-    let _anchor = someValidAddress;
-    let _bounty = 1000;
-    let _gateway = someValidAddress;
+    const _token = someValidAddress;
+    const _utilityToken = shared.auxiliary.addresses.OSTPrime;
+    const _anchor = shared.auxiliary.addresses.Anchor;
+    const _bounty = 1000;
+    const _gateway = shared.origin.addresses.Gateway;
 
     return helper
       .deploy(
@@ -80,7 +79,7 @@ describe('CoGatewayHelper', () => {
       )
       .then(assertDeploymentReceipt)
       .then((receipt) => {
-        addressCoGateway = receipt.contractAddress;
+        shared.auxiliary.addresses.CoGateway = receipt.contractAddress;
       });
   });
 });

@@ -81,16 +81,6 @@ describe('OSTPrimeHelper', () => {
     return helper.initialize(ownerParams).then(assertReceipt);
   });
 
-  // FIXME: setCoGateway can not be uint tested. Need to deploy actual co-gateway for it.
-  // ; move to activation tests
-  //Set CoGateway on OSTPrime - to be done from owner.
-  // it('should set CoGateway on OSTPrime', () => {
-  //   let ownerParams = Object.assign({}, deployParams);
-  //   let someValidAddress = SimpleTokenAddress;
-  //   ownerParams.from = shared.setupConfig.chainOwner;
-  //   return helper.setCoGateway(someValidAddress, ownerParams);
-  // });
-
   // Test Setup
   it('should setup OSTPrime', () => {
     const ostPrimeConfig = {
