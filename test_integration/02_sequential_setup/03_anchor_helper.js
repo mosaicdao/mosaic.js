@@ -22,7 +22,7 @@
 
 const { assert } = require('chai');
 const Web3 = require('web3');
-const OrganizationHelper = require('../../libs/helpers/setup/OrganizationHelper');
+
 const AnchorHelper = require('../../libs/helpers/setup/AnchorHelper');
 
 const shared = require('../shared');
@@ -55,20 +55,51 @@ describe('AnchorHelper', () => {
   before(async () => {
     const config = shared.setupConfig;
 
-    let orgHelper = new OrganizationHelper(shared.origin.web3, addressOrganization);
-    const orgConfig = {
-      deployer: config.deployerAddress,
-      owner: config.deployerAddress
-    };
-    await orgHelper.setup(orgConfig).then(() => {
-      addressOrganization = orgHelper.address;
-    });
+    addressOrganization = shared.origin.addresses.Organization;
 
     // Get BlockHeight and StateRoot
     await shared.auxiliary.web3.eth.getBlock('latest').then((block) => {
       initialBlockHeight = block.number;
       initialStateRoot = block.stateRoot;
     });
+  });
+
+  after(async () => {
+    let deployParams = {
+      from: shared.setupConfig.deployerAddress,
+      gasPrice: shared.setupConfig.gasPrice
+    };
+
+    // use a new helper on origin, as we have already called `setCoAnchorAddress`
+    // on the helper we use in the tests here
+    const originHelper = new AnchorHelper(shared.origin.web3, shared.auxiliary.web3);
+    await originHelper
+      .deploy(remoteChainId, initialBlockHeight, initialStateRoot, 10, addressOrganization, deployParams)
+      .then((receipt) => {
+        shared.origin.addresses.Anchor = receipt.contractAddress;
+      });
+
+    const originChainId = await shared.origin.web3.eth.net.getId();
+    const { originInitialBlockHeight, originInitialStateRoot } = await shared.auxiliary.web3.eth
+      .getBlock('latest')
+      .then((block) => ({
+        originInitialBlockHeight: block.number,
+        originInitialStateRoot: block.stateRoot
+      }));
+
+    const auxiliaryHelper = new AnchorHelper(shared.auxiliary.web3, shared.origin.web3);
+    await auxiliaryHelper
+      .deploy(
+        originChainId,
+        originInitialBlockHeight,
+        originInitialStateRoot,
+        10,
+        shared.auxiliary.addresses.Organization,
+        deployParams
+      )
+      .then((receipt) => {
+        shared.auxiliary.addresses.Anchor = receipt.contractAddress;
+      });
   });
 
   it('should deploy new Anchor contract', () => {
@@ -87,7 +118,7 @@ describe('AnchorHelper', () => {
   // Set Co-Anchor Address.
   it('should set co-anchor address', () => {
     let deployParams = {
-      from: shared.setupConfig.deployerAddress,
+      from: shared.setupConfig.organizationOwner,
       gasPrice: shared.setupConfig.gasPrice
     };
     return helper.setCoAnchorAddress(addressAnchor, deployParams).then(assertReceipt);
@@ -105,7 +136,7 @@ describe('AnchorHelper', () => {
       organization: addressOrganization,
       coAnchorAddress: addressAnchor,
       maxStateRoots: 10,
-      organizationOwner: shared.setupConfig.deployerAddress
+      organizationOwner: shared.setupConfig.organizationOwner
     };
     return helper.setup(anchorConfig, deployParams);
   });

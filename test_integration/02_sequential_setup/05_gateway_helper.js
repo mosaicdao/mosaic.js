@@ -46,7 +46,6 @@ describe('GatewayHelper', () => {
   let deployParams;
 
   let addressGateway;
-  let organizationOwner;
 
   let helper = new GatewayHelper(shared.origin.web3, addressGateway);
 
@@ -55,7 +54,6 @@ describe('GatewayHelper', () => {
       from: shared.setupConfig.deployerAddress,
       gasPrice: shared.setupConfig.gasPrice
     };
-    organizationOwner = shared.setupConfig.deployerAddress;
   });
 
   const someValidAddress = '0x1111111111111111111111111111111111111111';
@@ -90,17 +88,16 @@ describe('GatewayHelper', () => {
   // });
 
   // Test Setup
-  it.skip('should setup Gateway and CoGateway', () => {
+  it('should setup Gateway and CoGateway', () => {
     let simpleToken = someValidAddress;
-    let ostPrime = someValidAddress;
 
     let gatewayConfig = {
       deployer: shared.setupConfig.deployerAddress,
       token: simpleToken,
       baseToken: simpleToken,
       organization: shared.origin.addresses.Organization,
-      organizationOwner: organizationOwner,
-      anchor: someValidAddress,
+      organizationOwner: shared.setupConfig.organizationOwner,
+      anchor: shared.origin.addresses.Anchor,
       bounty: '123456',
       messageBus: shared.origin.addresses.MessageBus,
       gatewayLib: shared.origin.addresses.GatewayLib
@@ -109,9 +106,9 @@ describe('GatewayHelper', () => {
     let coGatewayConfig = {
       deployer: shared.setupConfig.deployerAddress,
       valueToken: simpleToken,
-      utilityToken: ostPrime,
+      utilityToken: shared.auxiliary.addresses.OSTPrime,
       organization: shared.auxiliary.addresses.Organization,
-      anchor: someValidAddress,
+      anchor: shared.auxiliary.addresses.Anchor,
       bounty: '123456',
       messageBus: shared.auxiliary.addresses.MessageBus,
       gatewayLib: shared.auxiliary.addresses.GatewayLib

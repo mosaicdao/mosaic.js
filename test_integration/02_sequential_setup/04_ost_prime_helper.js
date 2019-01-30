@@ -24,7 +24,6 @@ const { assert } = require('chai');
 const Web3 = require('web3');
 
 const OSTPrimeHelper = require('../../libs/helpers/setup/OSTPrimeHelper');
-const OrganizationHelper = require('../../libs/helpers/setup/OrganizationHelper');
 
 const shared = require('../shared');
 
@@ -52,7 +51,7 @@ describe('OSTPrimeHelper', () => {
   let addressOSTPrime;
   let addressOrganization;
 
-  let helper = new OSTPrimeHelper(shared.origin.web3, addressOSTPrime);
+  let helper = new OSTPrimeHelper(shared.auxiliary.web3, addressOSTPrime);
 
   before(() => {
     chainOwner = shared.setupConfig.chainOwner;
@@ -62,14 +61,7 @@ describe('OSTPrimeHelper', () => {
       gasPrice: shared.setupConfig.gasPrice
     };
 
-    let orgHelper = new OrganizationHelper(shared.origin.web3, addressOrganization);
-    const orgConfig = {
-      deployer: shared.setupConfig.deployerAddress,
-      owner: shared.setupConfig.deployerAddress
-    };
-    return orgHelper.setup(orgConfig).then(() => {
-      addressOrganization = orgHelper.address;
-    });
+    addressOrganization = shared.auxiliary.addresses.Organization;
   });
 
   it('should deploy new OSTPrime contract', () => {
@@ -89,7 +81,8 @@ describe('OSTPrimeHelper', () => {
     return helper.initialize(ownerParams).then(assertReceipt);
   });
 
-  // NOTE: setCoGateway can not be uint tested. Need to deploy actual co-gateway for it.
+  // FIXME: setCoGateway can not be uint tested. Need to deploy actual co-gateway for it.
+  // ; move to activation tests
   //Set CoGateway on OSTPrime - to be done from owner.
   // it('should set CoGateway on OSTPrime', () => {
   //   let ownerParams = Object.assign({}, deployParams);
@@ -105,6 +98,8 @@ describe('OSTPrimeHelper', () => {
       organization: addressOrganization,
       chainOwner: chainOwner
     };
-    return helper.setup(SimpleTokenAddress, ostPrimeConfig, deployParams);
+    return helper.setup(SimpleTokenAddress, ostPrimeConfig, deployParams).then(() => {
+      shared.auxiliary.addresses.OSTPrime = helper.address;
+    });
   });
 });
