@@ -20,307 +20,132 @@
 
 const BN = require('bn.js');
 const web3 = require('web3');
-const Contracts = require('../../libs/Contracts');
-const Utils = require('../utils/Utils.js');
+const StakeHelper = require('../helpers/StakeHelper');
 
 /**
  * Class to facilitate stake and mint.
  */
 class Facilitator {
-    /**
-     * Constructor for facilitator.
-     *
-     * @param {Object} originWeb3 Origin chain web3 object.
-     * @param {Object} auxiliaryWeb3 Auxiliary chain web3 object.
-     * @param {string} Gateway contract address.
-     * @param {string} CoGateway contract address.
-     */
-    constructor(originWeb3, auxiliaryWeb3, gatewayAddress, coGatewayAddress) {
-        if (originWeb3 === undefined) {
-            throw new Error('Invalid origin web3 object.');
-        }
-
-        if (auxiliaryWeb3 === undefined) {
-            throw new Error('Invalid auxiliary web3 object.');
-        }
-
-        if (!web3.utils.isAddress(gatewayAddress)) {
-            throw new Error('Invalid Gateway address.');
-        }
-
-        if (!web3.utils.isAddress(coGatewayAddress)) {
-            throw new Error('Invalid Cogateway address.');
-        }
-
-        this.originWeb3 = originWeb3;
-        this.auxiliaryWeb3 = auxiliaryWeb3;
-        this.contracts = new Contracts(originWeb3, auxiliaryWeb3);
-        this.gatewayAddress = gatewayAddress;
-        this.coGatewayAddress = coGatewayAddress;
+  /**
+   * Constructor for facilitator.
+   *
+   * @param {Object} originWeb3 Origin chain web3 object.
+   * @param {Object} auxiliaryWeb3 Auxiliary chain web3 object.
+   * @param {string} Gateway contract address.
+   * @param {string} CoGateway contract address.
+   */
+  constructor(originWeb3, auxiliaryWeb3, gatewayAddress, coGatewayAddress) {
+    if (originWeb3 === undefined) {
+      throw new Error('Invalid origin web3 object.');
     }
 
-    /**
-     * Performs the stake process.
-     *
-     * @param {string} staker Staker address.
-     * @param {string} amount Stake amount.
-     * @param {string} beneficiary Beneficiary address for minting tokens.
-     * @param {string} [gasPrice] Gas price for reward calculation.
-     * @param {string} [gasLimit] Maximum gas for reward calculation.
-     * @param {string} [unlockSecret] Unlock secret that will be used for progress stake.
-     * @param {string} facilitator Facilitator address.
-     * @param {string} gas The gas provided for the transaction execution
-     *
-     * @returns {Promise} Promise object.
-     */
-    async stake(
-        staker,
-        amount,
-        beneficiary,
-        gasPrice = '0',
-        gasLimit = '0',
-        unlockSecret,
-        facilitator,
-        gas = '7000000',
-    ) {
-        if (!web3.utils.isAddress(staker)) {
-            throw new Error('Invalid staker address.');
-        }
+    if (auxiliaryWeb3 === undefined) {
+      throw new Error('Invalid auxiliary web3 object.');
+    }
 
-        this.stakeAmount = new BN(amount);
-        if (this.stakeAmount.eqn(0)) {
-            throw new Error('Stake amount must not be zero.');
-        }
+    if (!web3.utils.isAddress(gatewayAddress)) {
+      throw new Error('Invalid Gateway address.');
+    }
 
-        if (!web3.utils.isAddress(beneficiary)) {
-            throw new Error('Invalid beneficiary address.');
-        }
+    if (!web3.utils.isAddress(coGatewayAddress)) {
+      throw new Error('Invalid Cogateway address.');
+    }
 
-        this.stakerAddress = staker;
-        this.facilitatorAddress = facilitator || staker;
-        this.hashLockObj = await this.getHashLock(unlockSecret);
+    this.originWeb3 = originWeb3;
+    this.auxiliaryWeb3 = auxiliaryWeb3;
+    this.gatewayAddress = gatewayAddress;
+    this.coGatewayAddress = coGatewayAddress;
+    this.stakeHelper = new StakeHelper(originWeb3, this.gatewayAddress);
+  }
 
-        // Get staker nonce.
-        this.stakerNonce = new BN(await this.getGatewayNonce(staker));
+  /**
+   * Performs the stake process.
+   *
+   * @param {string} staker Staker address.
+   * @param {string} amount Stake amount.
+   * @param {string} beneficiary Beneficiary address for minting tokens.
+   * @param {string} [gasPrice] Gas price for reward calculation.
+   * @param {string} [gasLimit] Maximum gas for reward calculation.
+   * @param {string} [unlockSecret] Unlock secret that will be used for progress stake.
+   * @param {Object} [txOption] Transaction options.
+   *
+   * @returns {Promise} Promise object.
+   */
+  async stake(
+    staker,
+    amount,
+    beneficiary,
+    gasPrice = '0',
+    gasLimit = '0',
+    unlockSecret,
+    txOption,
+  ) {
+    if (!web3.utils.isAddress(staker)) {
+      throw new Error('Invalid staker address.');
+    }
 
-        // Get Value token address.
-        const valueTokenAddress = await this.getValueToken();
+    this.stakeAmount = new BN(amount);
+    if (this.stakeAmount.eqn(0)) {
+      throw new Error('Stake amount must not be zero.');
+    }
 
-        // Get bounty amount.
-        this.bounty = new BN(await this.getBounty());
+    if (!web3.utils.isAddress(beneficiary)) {
+      throw new Error('Invalid beneficiary address.');
+    }
 
-        if (this.bounty.gtn(0)) {
-            // If bounty amount is not zero then get base token address.
-            const baseTokenAddress = await this.getBaseToken();
+    if (!txOption) {
+      throw new Error('Invalid transaction options.');
+    }
 
-            // If value and base token are same and if staker itself is facilitator,
-            // then we just have one approval. This will save some gas.
-            if (valueTokenAddress === baseTokenAddress && this.stakerAddress === this.facilitatorAddress) {
-                const amountToApprove = this.stakeAmount.add(this.bounty);
-                await this.approveStakeAmount(this.stakerAddress, amountToApprove.toString(10), gas);
-            } else {
-                await this.approveBountyAmount(this.facilitatorAddress, this.bounty.toString(10));
-                await this.approveStakeAmount(this.stakerAddress, this.stakeAmount.toString(10), gas);
-            }
-        } else {
-            await this.approveStakeAmount(this.stakerAddress, this.stakeAmount.toString(10), gas);
-        }
+    if (!web3.utils.isAddress(txOption.from)) {
+      throw new Error('Invalid facilitator address.');
+    }
 
-        const gatewayContract = this.contracts.Gateway(this.gatewayAddress);
+    this.stakerAddress = staker;
+    this.facilitatorAddress = txOption.from;
+    this.hashLockObj = await this.getHashLock(unlockSecret);
 
-        const transactionOptions = {
-            from: this.facilitatorAddress,
-            to: this.gatewayAddress,
-            gas: gas,
-        };
+    // Get staker nonce.
+    this.stakerNonce = new BN(await this.stakeHelper.getNonce(staker));
 
-        const tx = gatewayContract.methods.stake(
-            amount,
-            beneficiary,
-            gasPrice.toString(10),
-            gasLimit.toString(10),
-            this.stakerNonce.toString(10),
-            this.hashLockObj.hashLock,
+    // Get bounty amount.
+    this.bounty = new BN(await this.stakeHelper.getBounty());
+
+    const isStakeAmountApproved = await this.stakeHelper.isStakeAmountApproved(
+      this.stakerAddress,
+      this.stakeAmount.toString(10),
+    );
+    if (!isStakeAmountApproved) {
+      await this.stakeHelper.approveStakeAmount(
+        this.stakerAddress,
+        this.stakeAmount.toString(10),
+        txOption,
+      );
+    }
+
+    if (this.bounty.gtn(0)) {
+      const isBountyAmountApproved = await this.stakeHelper.isBountyAmountApproved(
+        this.facilitatorAddress,
+      );
+      if (!isBountyAmountApproved) {
+        await this.stakeHelper.approveBountyAmount(
+          this.facilitatorAddress,
+          txOption,
         );
-
-        return this.sendTransaction(tx, transactionOptions);
+      }
     }
 
-    /**
-     * Returns the gateway nonce for the given account address.
-     *
-     * @param {string} accountAddress Account address for which the nonce is to be fetched.
-     *
-     * @returns {Promise} Promise object represents the nonce of account address.
-     */
-    async getGatewayNonce(accountAddress) {
-        if (!web3.utils.isAddress(accountAddress)) {
-            throw new Error('Invalid account address.');
-        }
-
-        const gatewayContract = this.contracts.Gateway(this.gatewayAddress);
-
-        return gatewayContract.methods
-            .getNonce(accountAddress)
-            .call()
-            .then((nonce) => {
-                return nonce;
-            });
-    }
-
-    /**
-     * @function getBounty
-     *
-     * Returns the bounty amount from EIP20Gateway contract.
-     *
-     * @returns {Promise} Promise object represents the bounty.
-     */
-    getBounty() {
-        const gatewayContract = this.contracts.Gateway(this.gatewayAddress);
-
-        return gatewayContract.methods
-            .bounty()
-            .call()
-            .then((bounty) => {
-                return bounty;
-            });
-    }
-
-    /**
-     * Returns the ERC20 base token address.
-     *
-     * @returns {Promise} Promise object represents ERC20 base token address.
-     */
-    async getBaseToken() {
-        const oThis = this;
-        if (oThis.baseTokenAddress) {
-            return oThis.baseTokenAddress;
-        }
-        const gatewayContract = this.contracts.Gateway(this.gatewayAddress);
-
-        return gatewayContract.methods
-            .baseToken()
-            .call()
-            .then((baseToken) => {
-                oThis.baseTokenAddress = baseToken;
-                return baseToken;
-            });
-    }
-
-    /**
-     * Returns the EIP20 token address.
-     *
-     * @returns {Promise} Promise object represents EIP20 token address.
-     */
-    async getValueToken() {
-        const oThis = this;
-        if (oThis.valueTokenAddress) {
-            return oThis.valueTokenAddress;
-        }
-        const gatewayContract = this.contracts.Gateway(this.gatewayAddress);
-
-        return gatewayContract.methods
-            .token()
-            .call()
-            .then((token) => {
-                oThis.valueTokenAddress = token;
-                return token;
-            });
-    }
-
-    /**
-     * Approves gateway address for the bounty amount transfer.
-     *
-     * @param {string} facilitator Facilitator address.
-     * @param {string} gas The gas provided for the transaction execution
-     *
-     * @returns {Promise} Promise object.
-     */
-    async approveBountyAmount(facilitator, gas = '7000000') {
-        if (!web3.utils.isAddress(facilitator)) {
-            throw new Error('Invalid facilitator address.');
-        }
-
-        const baseTokenAddress = await this.getBaseToken();
-
-        const transactionOptions = {
-            from: facilitator,
-            to: baseTokenAddress,
-            gas: gas,
-        };
-
-        const baseToken = this.contracts.BaseToken(baseTokenAddress, transactionOptions);
-
-        const bountyAmount = await this.getBounty();
-        const tx = baseToken.methods.approve(this.gatewayAddress, bountyAmount);
-
-        return this.sendTransaction(tx, transactionOptions);
-    }
-
-    /**
-     * Approves gateway address for the stake amount transfer.
-     *
-     * @param {string} stakerAddress Staker account address.
-     * @param {string} stakeAmount Stake amount.
-     * @param {string} gas The gas provided for the transaction execution
-     *
-     * @returns {Promise} Promise object.
-     */
-    async approveStakeAmount(stakerAddress, stakeAmount, gas = '7000000') {
-        if (!web3.utils.isAddress(stakerAddress)) {
-            throw new Error('Invalid staker address.');
-        }
-
-        const valueTokenAddress = await this.getValueToken();
-
-        const transactionOptions = {
-            from: stakerAddress,
-            to: valueTokenAddress,
-            gas: gas,
-        };
-
-        const valueToken = this.contracts.ValueToken(valueTokenAddress, transactionOptions);
-
-        const tx = valueToken.methods.approve(this.gatewayAddress, stakeAmount);
-
-        return this.sendTransaction(tx, transactionOptions);
-    }
-
-    /**
-     * Helper function to generate hash lock and unlock secrete. If unlock secret
-     * is provided then it will generate the hash lock.
-     *
-     * @param {string} unlockSecret Unlock secret.
-     *
-     * @returns {Object} An object containing hash lock and unlock secret.
-     */
-    getHashLock(unlockSecret) {
-        let hashLock = {};
-
-        if (unlockSecret === undefined) {
-            hashLock = Utils.createSecretHashLock();
-        } else {
-            hashLock = Utils.toHashLock(unlockSecret);
-        }
-
-        return hashLock;
-    }
-
-    /**
-     * Helper function to send ethereum transaction.
-     *
-     * @param {Object} tx Transaction object.
-     * @param {Object} tx Transaction options.
-     *
-     * @returns {Promise} Promise object.
-     */
-    sendTransaction(tx, txOption) {
-        return tx
-            .send(txOption)
-            .on('transactionHash', (transactionHash) => {})
-            .on('receipt', (receipt) => {})
-            .on('error', (error) => {});
-    }
+    return this.stakeHelper.stake(
+      staker,
+      amount,
+      beneficiary,
+      gasPrice,
+      gasLimit,
+      this.stakerNonce.toString(10),
+      this.hashLockObj.hashLock,
+      txOption,
+    );
+  }
 }
 
 module.exports = Facilitator;
