@@ -10,8 +10,8 @@ describe('Setup Helpers - Config', () => {
     shared.setupConfig = {
       chainOwner: accountsOrigin[0],
       deployerAddress: accountsOrigin[0],
-      organizationOwner: accountsOrigin[0],
-      organizationAdmin: accountsOrigin[0],
+      organizationOwner: accountsOrigin[1],
+      organizationAdmin: accountsOrigin[2],
       organizationWorker: accountsOrigin[0]
     };
   });
