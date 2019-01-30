@@ -20,44 +20,23 @@
 
 const chai = require('chai');
 const Web3 = require('web3');
-const Facilitator = require('../../libs/Facilitator/Facilitator');
+const StakeHelper = require('../../libs/helpers/StakeHelper');
 
 const assert = chai.assert;
 
-describe('Facilitator.constructor()', () => {
-  let originWeb3, auxiliaryWeb3, gatewayAddress, coGatewayAddress;
+describe('StakeHelper.constructor()', () => {
+  let originWeb3;
+  let gatewayAddress;
 
   beforeEach(() => {
     originWeb3 = new Web3();
-    auxiliaryWeb3 = new Web3();
     gatewayAddress = '0x0000000000000000000000000000000000000001';
-    coGatewayAddress = '0x0000000000000000000000000000000000000002';
   });
 
   it('should throw an error when origin web3 object is undefined', async function() {
-    this.timeout(5000);
     const expectedErrorMessage = 'Invalid origin web3 object.';
     try {
-      new Facilitator(
-        undefined,
-        auxiliaryWeb3,
-        gatewayAddress,
-        coGatewayAddress,
-      );
-    } catch (exception) {
-      assert.strictEqual(
-        exception.message,
-        expectedErrorMessage,
-        `Exception reason must be "${expectedErrorMessage}"`,
-      );
-    }
-  });
-
-  it('should throw an error when auxiliary web3 object is undefined', async function() {
-    this.timeout(5000);
-    const expectedErrorMessage = 'Invalid auxiliary web3 object.';
-    try {
-      new Facilitator(originWeb3, undefined, gatewayAddress, coGatewayAddress);
+      new StakeHelper(undefined, gatewayAddress);
     } catch (exception) {
       assert.strictEqual(
         exception.message,
@@ -68,24 +47,9 @@ describe('Facilitator.constructor()', () => {
   });
 
   it('should throw an error when Gateway contract address is not valid', async function() {
-    this.timeout(5000);
     const expectedErrorMessage = 'Invalid Gateway address.';
     try {
-      new Facilitator(originWeb3, auxiliaryWeb3, undefined, coGatewayAddress);
-    } catch (exception) {
-      assert.strictEqual(
-        exception.message,
-        expectedErrorMessage,
-        `Exception reason must be "${expectedErrorMessage}"`,
-      );
-    }
-  });
-
-  it('should throw an error when CoGateway contract address is not valid', async function() {
-    this.timeout(5000);
-    const expectedErrorMessage = 'Invalid Cogateway address.';
-    try {
-      new Facilitator(originWeb3, auxiliaryWeb3, gatewayAddress, undefined);
+      new StakeHelper(originWeb3, '0x123');
     } catch (exception) {
       assert.strictEqual(
         exception.message,
@@ -98,35 +62,18 @@ describe('Facilitator.constructor()', () => {
   it('should pass with valid constructor arguments', async function() {
     this.timeout(5000);
 
-    const facilitator = new Facilitator(
-      originWeb3,
-      auxiliaryWeb3,
-      gatewayAddress,
-      coGatewayAddress,
-    );
+    const stakeHelper = new StakeHelper(originWeb3, gatewayAddress);
 
     assert.strictEqual(
-      facilitator.originWeb3,
+      stakeHelper.web3,
       originWeb3,
       'Origin web3 object is different than the expected object.',
     );
 
     assert.strictEqual(
-      facilitator.auxiliaryWeb3,
-      auxiliaryWeb3,
-      'Auxiliary web3 object is different than the expected object.',
-    );
-
-    assert.strictEqual(
-      facilitator.gatewayAddress,
+      stakeHelper.gatewayAddress,
       gatewayAddress,
       'Gateway contract address is different than the expected object.',
-    );
-
-    assert.strictEqual(
-      facilitator.coGatewayAddress,
-      coGatewayAddress,
-      'CoGateway contract address is different than the expected object.',
     );
   });
 });

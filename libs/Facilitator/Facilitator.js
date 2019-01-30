@@ -21,6 +21,7 @@
 const BN = require('bn.js');
 const web3 = require('web3');
 const StakeHelper = require('../helpers/StakeHelper');
+const Utils = require('../utils/Utils');
 
 /**
  * Class to facilitate stake and mint.
@@ -64,10 +65,10 @@ class Facilitator {
    * @param {string} staker Staker address.
    * @param {string} amount Stake amount.
    * @param {string} beneficiary Beneficiary address for minting tokens.
-   * @param {string} [gasPrice] Gas price for reward calculation.
-   * @param {string} [gasLimit] Maximum gas for reward calculation.
+   * @param {string} gasPrice Gas price for reward calculation.
+   * @param {string} gasLimit Maximum gas for reward calculation.
    * @param {string} [unlockSecret] Unlock secret that will be used for progress stake.
-   * @param {Object} [txOption] Transaction options.
+   * @param {Object} txOption Transaction options.
    *
    * @returns {Promise} Promise object.
    */
@@ -75,8 +76,8 @@ class Facilitator {
     staker,
     amount,
     beneficiary,
-    gasPrice = '0',
-    gasLimit = '0',
+    gasPrice,
+    gasLimit,
     unlockSecret,
     txOption,
   ) {
@@ -91,6 +92,14 @@ class Facilitator {
 
     if (!web3.utils.isAddress(beneficiary)) {
       throw new Error('Invalid beneficiary address.');
+    }
+
+    if (gasPrice === undefined) {
+      throw new Error('Invalid gas price.');
+    }
+
+    if (gasLimit === undefined) {
+      throw new Error('Invalid gas limit.');
     }
 
     if (!txOption) {
@@ -115,12 +124,17 @@ class Facilitator {
       this.stakerAddress,
       this.stakeAmount.toString(10),
     );
+
     if (!isStakeAmountApproved) {
-      await this.stakeHelper.approveStakeAmount(
-        this.stakerAddress,
-        this.stakeAmount.toString(10),
-        txOption,
-      );
+      if (this.stakerAddress === this.facilitatorAddress) {
+        await this.stakeHelper.approveStakeAmount(
+          this.stakerAddress,
+          this.stakeAmount.toString(10),
+          txOption,
+        );
+      } else {
+        throw new Error('Transfer of stake amount must be approved.');
+      }
     }
 
     if (this.bounty.gtn(0)) {
@@ -128,10 +142,7 @@ class Facilitator {
         this.facilitatorAddress,
       );
       if (!isBountyAmountApproved) {
-        await this.stakeHelper.approveBountyAmount(
-          this.facilitatorAddress,
-          txOption,
-        );
+        await this.stakeHelper.approveBountyAmount(txOption);
       }
     }
 
@@ -145,6 +156,26 @@ class Facilitator {
       this.hashLockObj.hashLock,
       txOption,
     );
+  }
+
+  /**
+   * Helper function to generate hash lock and unlock secrete. If unlock secret
+   * is provided then it will generate the hash lock.
+   *
+   * @param {string} unlockSecret Unlock secret.
+   *
+   * @returns {Object} An object containing hash lock and unlock secret.
+   */
+  getHashLock(unlockSecret) {
+    let hashLock = {};
+
+    if (unlockSecret === undefined) {
+      hashLock = Utils.createSecretHashLock();
+    } else {
+      hashLock = Utils.toHashLock(unlockSecret);
+    }
+
+    return hashLock;
   }
 }
 

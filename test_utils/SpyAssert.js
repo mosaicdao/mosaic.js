@@ -24,8 +24,6 @@ const assert = chai.assert;
 
 /**
  * This class includes the utitity functions to assert spy data.
- * @class
- * @classdesc Provides the assert functions to test.
  */
 class SpyAssert {
   /**
@@ -42,7 +40,7 @@ class SpyAssert {
     assert.strictEqual(
       spy.callCount,
       callCount,
-      'Call count must match with the expected value.'
+      'Call count must match with the expected value.',
     );
     if (inputArgs) {
       for (let i = 0; i < callCount; i += 1) {
@@ -52,11 +50,27 @@ class SpyAssert {
           assert.strictEqual(
             actualArguments[params],
             expectedArguments[params],
-            'Input params must match with the expected value.'
+            'Input params must match with the expected value.',
           );
         }
       }
     }
+  }
+
+  /**
+   * @function assertSpy
+   *
+   * Asserts the spy data.
+   *
+   * @param {Object} spy Spy object.
+   * @param {number} number of times the spy was called.
+   */
+  static assertCall(spy, callCount) {
+    assert.strictEqual(
+      spy.callCount,
+      callCount,
+      'Call count must match with the expected value.',
+    );
   }
 }
 

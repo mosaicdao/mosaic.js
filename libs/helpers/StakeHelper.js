@@ -134,17 +134,16 @@ class StakeHelper {
   /**
    * Approves gateway address for the bounty amount transfer.
    *
-   * @param {string} facilitator Facilitator address.
    * @param {Object} txOption Transaction options.
    *
    * @returns {Promise} Promise object.
    */
-  async approveBountyAmount(facilitator, txOption) {
-    if (!Web3.utils.isAddress(facilitator)) {
-      throw new Error('Invalid facilitator address.');
-    }
+  async approveBountyAmount(txOption) {
     if (!txOption) {
       throw new Error('Invalid transaction options.');
+    }
+    if (!Web3.utils.isAddress(txOption.from)) {
+      throw new Error('Invalid facilitator address.');
     }
     const baseTokenAddress = await this.getBaseToken();
     const baseToken = Contracts.getEIP20Token(this.web3, baseTokenAddress);
@@ -162,11 +161,11 @@ class StakeHelper {
    * @returns {Promise} Promise object.
    */
   async approveStakeAmount(stakeAmount, txOption) {
-    if (!Web3.utils.isAddress(txOption.from)) {
-      throw new Error('Invalid staker address.');
-    }
     if (!txOption) {
       throw new Error('Invalid transaction options.');
+    }
+    if (!Web3.utils.isAddress(txOption.from)) {
+      throw new Error('Invalid staker address.');
     }
     const valueTokenAddress = await this.getValueToken();
     const valueToken = Contracts.getEIP20Token(this.web3, valueTokenAddress);
@@ -174,6 +173,14 @@ class StakeHelper {
     return StakeHelper.sendTransaction(tx, txOption);
   }
 
+  /**
+   * Check if the staker has approved gateway contract.
+   *
+   * @param {string} stakerAddress Staker address.
+   * @param {string} stakeAmount Stake amount.
+   *
+   * @returns {bool} `true` if approved.
+   */
   async isStakeAmountApproved(stakerAddress, stakeAmount) {
     if (!Web3.utils.isAddress(stakerAddress)) {
       throw new Error('Invalid staker address.');
@@ -189,6 +196,13 @@ class StakeHelper {
     return new BN(stakeAmount).lte(new BN(approvedAllowance));
   }
 
+  /**
+   * Check if the facilitator has approved gateway contract.
+   *
+   * @param {string} facilitatorAddress Facilitator address.
+   *
+   * @returns {bool} `true` if approved.
+   */
   async isBountyAmountApproved(facilitatorAddress) {
     if (!Web3.utils.isAddress(facilitatorAddress)) {
       throw new Error('Invalid facilitator address.');
@@ -205,13 +219,27 @@ class StakeHelper {
     return new BN(bountyAmount).lte(new BN(approvedAllowance));
   }
 
+  /**
+   * Performs stake.
+   *
+   * @param {string} staker Staker address.
+   * @param {string} amount Amount to stake.
+   * @param {string} beneficiary Beneficiary address.
+   * @param {string} gasPrice Gas price that staker is willing to pay for the reward.
+   * @param {string} gasLimit Maximum gas limit for reward calculation.
+   * @param {string} nonce Staker nonce.
+   * @param {string} hashLock Hash lock.
+   * @param {Object} txOptions Transaction options.
+   *
+   * @returns {Object} Raw transaction object.
+   */
   async stake(
     staker,
     amount,
     beneficiary,
     gasPrice,
     gasLimit,
-    stakerNonce,
+    nonce,
     hashLock,
     txOption,
   ) {
@@ -252,12 +280,13 @@ class StakeHelper {
       beneficiary,
       gasPrice,
       gasLimit,
-      stakerNonce,
+      nonce,
       hashLock,
     );
 
-    return this.sendTransaction(tx, txOption);
+    return StakeHelper.sendTransaction(tx, txOption);
   }
+
   /**
    * Returns the nonce for the given staker account address.
    *
