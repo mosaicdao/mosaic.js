@@ -1,13 +1,14 @@
 'use strict';
 
 const fs = require('fs');
+const path = require('path');
 
 const testHelper = require('./helper'),
   configReader = require('./configReader');
 
 const passphrase = configReader.passphrase;
 
-const keystoreFolder = testHelper.gethDataDir + '/keystore';
+const keystoreFolder = path.join(__dirname, '/keystore');
 
 const Web3WalletHelper = function(web3Object) {
   const oThis = this;
