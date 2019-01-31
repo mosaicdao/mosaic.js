@@ -47,7 +47,7 @@ describe('LibsHelper', () => {
   let addressMessageBus;
   let addressGatewayLib;
 
-  let helper = new LibsHelper(shared.origin.web3, addressMerklePatriciaProof, addressMessageBus, addressGatewayLib);
+  const subject = new LibsHelper(shared.origin.web3);
 
   after(() => {
     const auxiliaryHelper = new LibsHelper(shared.auxiliary.web3);
@@ -72,7 +72,7 @@ describe('LibsHelper', () => {
       from: shared.setupConfig.deployerAddress,
       gasPrice: shared.setupConfig.gasPrice
     };
-    return helper
+    return subject
       .deployMerklePatriciaProof(deployParams)
       .then(assertDeploymentReceipt)
       .then((receipt) => {
@@ -91,7 +91,7 @@ describe('LibsHelper', () => {
       from: shared.setupConfig.deployerAddress,
       gasPrice: shared.setupConfig.gasPrice
     };
-    return helper
+    return subject
       .deployMessageBus(addressMerklePatriciaProof, deployParams)
       .then(assertDeploymentReceipt)
       .then((receipt) => {
@@ -107,7 +107,7 @@ describe('LibsHelper', () => {
       from: shared.setupConfig.deployerAddress,
       gasPrice: shared.setupConfig.gasPrice
     };
-    return helper
+    return subject
       .deployGatewayLib(addressMerklePatriciaProof, deployParams)
       .then(assertDeploymentReceipt)
       .then((receipt) => {
@@ -126,10 +126,10 @@ describe('LibsHelper', () => {
     let libsHelperConfig = {
       deployer: shared.setupConfig.deployerAddress
     };
-    return helper.setup(libsHelperConfig, deployParams).then(() => {
-      addressMerklePatriciaProof = helper.merklePatriciaProof;
-      addressMessageBus = helper.messageBus;
-      addressGatewayLib = helper.gatewayLib;
+    return subject.setup(libsHelperConfig, deployParams).then(() => {
+      addressMerklePatriciaProof = subject.merklePatriciaProof;
+      addressMessageBus = subject.messageBus;
+      addressGatewayLib = subject.gatewayLib;
 
       assert.isTrue(
         Web3.utils.isAddress(addressMerklePatriciaProof),
@@ -139,9 +139,9 @@ describe('LibsHelper', () => {
       assert.isTrue(Web3.utils.isAddress(addressGatewayLib), 'GatewayLib contract was not deployed correctly.');
 
       // set addresses for following tests
-      shared.origin.addresses.MerklePatriciaProof = helper.merklePatriciaProof;
-      shared.origin.addresses.MessageBus = helper.messageBus;
-      shared.origin.addresses.GatewayLib = helper.gatewayLib;
+      shared.origin.addresses.MerklePatriciaProof = subject.merklePatriciaProof;
+      shared.origin.addresses.MessageBus = subject.messageBus;
+      shared.origin.addresses.GatewayLib = subject.gatewayLib;
     });
   });
 });

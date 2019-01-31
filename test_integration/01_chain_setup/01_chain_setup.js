@@ -20,28 +20,24 @@
 
 'use strict';
 
-const { assert } = require('chai');
-const Web3 = require('web3');
-
 const shared = require('../shared');
 const { ChainSetup } = require('../../index');
 
 const MockContractsDeployer = require('../../tests/utils/MockContractsDeployer');
 
 describe('ChainSetup', () => {
-  let caMockToken;
+  let addressMockToken;
 
   before(async () => {
-    let deployer = new MockContractsDeployer(shared.setupConfig.deployerAddress, shared.origin.web3);
+    const deployer = new MockContractsDeployer(shared.setupConfig.deployerAddress, shared.origin.web3);
     return deployer.deployMockToken().then(() => {
-      caMockToken = deployer.addresses.MockToken;
+      addressMockToken = deployer.addresses.MockToken;
     });
   });
 
-  let chainSetupOutput;
   it('should do mosaic setup with exhaustive configurations', () => {
-    let valueToken = caMockToken;
-    let helper = new ChainSetup(shared.origin.web3, shared.auxiliary.web3);
+    const valueToken = addressMockToken;
+    const subject = new ChainSetup(shared.origin.web3, shared.auxiliary.web3);
 
     const config = shared.setupConfig;
     let originConfig = {
@@ -105,9 +101,6 @@ describe('ChainSetup', () => {
       }
     };
 
-    return helper.setup(valueToken, originConfig, auxiliaryConfig).then((output) => {
-      chainSetupOutput = output;
-      return chainSetupOutput;
-    });
+    return subject.setup(valueToken, originConfig, auxiliaryConfig);
   });
 });

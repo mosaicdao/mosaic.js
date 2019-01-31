@@ -36,7 +36,7 @@ const assertReceipt = (receipt) => {
 
 const assertDeploymentReceipt = (receipt) => {
   assertReceipt(receipt);
-  let contractAddress = receipt.contractAddress;
+  const contractAddress = receipt.contractAddress;
   assert.isNotEmpty(contractAddress, 'Deployment Receipt is missing contractAddress');
   assert.isTrue(Web3.utils.isAddress(contractAddress), 'Invalid contractAddress in Receipt');
   return receipt;
@@ -47,7 +47,7 @@ describe('CoGatewayHelper', () => {
 
   let organizationOwner;
 
-  let helper = new CoGatewayHelper(shared.auxiliary.web3);
+  const subject = new CoGatewayHelper(shared.auxiliary.web3);
 
   before(() => {
     deployParams = {
@@ -65,7 +65,7 @@ describe('CoGatewayHelper', () => {
     const _bounty = 1000;
     const _gateway = shared.origin.addresses.Gateway;
 
-    return helper
+    return subject
       .deploy(
         _token,
         _utilityToken,

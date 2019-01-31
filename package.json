@@ -25,12 +25,12 @@
   },
   "scripts": {
     "test": "echo \"No tests yet\"",
+    "test:integration": "node test_integration/integration_tests.js",
     "pre-commit": "lint-staged",
     "webpack-build": "webpack --mode=production",
     "web-pre-build": "node webPreBuild.js",
     "web-build": "npm-run-all web-pre-build webpack-build",
-    "web-post-build": "git add dist/.",
-    "test:integration": "node test_integration/integration_tests.js"
+    "web-post-build": "git add dist/."
   },
   "dependencies": {
     "bignumber.js": "4.1.0",

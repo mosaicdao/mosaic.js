@@ -43,8 +43,8 @@ describe('Activate deployed contracts', () => {
       from: shared.setupConfig.organizationOwner
     };
 
-    const helper = new AnchorHelper(shared.origin.web3, shared.auxiliary.web3, shared.origin.addresses.Anchor);
-    return helper.setCoAnchorAddress(addressCoAnchor, txOptions).then(assertReceipt);
+    const subject = new AnchorHelper(shared.origin.web3, shared.auxiliary.web3, shared.origin.addresses.Anchor);
+    return subject.setCoAnchorAddress(addressCoAnchor, txOptions).then(assertReceipt);
   });
 
   it('should set CoGateway on OSTPrime', () => {
@@ -53,8 +53,8 @@ describe('Activate deployed contracts', () => {
       from: shared.setupConfig.organizationOwner
     };
 
-    const helper = new OSTPrimeHelper(shared.auxiliary.web3, shared.auxiliary.addresses.OSTPrime);
-    return helper.setCoGateway(addressCoGateway, txOptions).then(assertReceipt);
+    const subject = new OSTPrimeHelper(shared.auxiliary.web3, shared.auxiliary.addresses.OSTPrime);
+    return subject.setCoGateway(addressCoGateway, txOptions).then(assertReceipt);
   });
 
   it('should activate gateway', () => {
@@ -63,7 +63,7 @@ describe('Activate deployed contracts', () => {
       from: shared.setupConfig.organizationOwner
     };
 
-    const helper = new GatewayHelper(shared.origin.web3, shared.origin.addresses.Gateway);
-    return helper.activateGateway(addressCoGateway, txOptions).then(assertReceipt);
+    const subject = new GatewayHelper(shared.origin.web3, shared.origin.addresses.Gateway);
+    return subject.activateGateway(addressCoGateway, txOptions).then(assertReceipt);
   });
 });

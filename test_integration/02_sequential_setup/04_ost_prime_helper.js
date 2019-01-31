@@ -36,7 +36,7 @@ const assertReceipt = (receipt) => {
 
 const assertDeploymentReceipt = (receipt) => {
   assertReceipt(receipt);
-  let contractAddress = receipt.contractAddress;
+  const contractAddress = receipt.contractAddress;
   assert.isNotEmpty(contractAddress, 'Deployment Receipt is missing contractAddress');
   assert.isTrue(Web3.utils.isAddress(contractAddress), 'Invalid contractAddress in Receipt');
   return receipt;
@@ -48,10 +48,9 @@ describe('OSTPrimeHelper', () => {
   let chainOwner;
   let deployParams;
 
-  let addressOSTPrime;
   let addressOrganization;
 
-  let helper = new OSTPrimeHelper(shared.auxiliary.web3, addressOSTPrime);
+  const subject = new OSTPrimeHelper(shared.auxiliary.web3);
 
   before(() => {
     chainOwner = shared.setupConfig.chainOwner;
@@ -65,20 +64,15 @@ describe('OSTPrimeHelper', () => {
   });
 
   it('should deploy new OSTPrime contract', () => {
-    return helper
-      .deploy(SimpleTokenAddress, addressOrganization, deployParams)
-      .then(assertDeploymentReceipt)
-      .then((receipt) => {
-        addressOSTPrime = receipt.contractAddress;
-      });
+    return subject.deploy(SimpleTokenAddress, addressOrganization, deployParams).then(assertDeploymentReceipt);
   });
 
   // Initialize OSTPrime
   it('should initialize OSTPrime', () => {
-    let ownerParams = Object.assign({}, deployParams, {
+    const ownerParams = Object.assign({}, deployParams, {
       from: chainOwner
     });
-    return helper.initialize(ownerParams).then(assertReceipt);
+    return subject.initialize(ownerParams).then(assertReceipt);
   });
 
   // Test Setup
@@ -88,8 +82,8 @@ describe('OSTPrimeHelper', () => {
       organization: addressOrganization,
       chainOwner: chainOwner
     };
-    return helper.setup(SimpleTokenAddress, ostPrimeConfig, deployParams).then(() => {
-      shared.auxiliary.addresses.OSTPrime = helper.address;
+    return subject.setup(SimpleTokenAddress, ostPrimeConfig, deployParams).then(() => {
+      shared.auxiliary.addresses.OSTPrime = subject.address;
     });
   });
 });

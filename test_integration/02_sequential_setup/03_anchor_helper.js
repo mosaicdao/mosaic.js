@@ -46,9 +46,9 @@ describe('AnchorHelper', () => {
   let addressOrganization;
   let addressAnchor;
 
-  let helper = new AnchorHelper(shared.origin.web3, shared.auxiliary.web3, addressAnchor);
+  const subject = new AnchorHelper(shared.origin.web3, shared.auxiliary.web3);
 
-  let remoteChainId = '123456';
+  const remoteChainId = '123456';
   let initialBlockHeight;
   let initialStateRoot;
 
@@ -57,7 +57,6 @@ describe('AnchorHelper', () => {
 
     addressOrganization = shared.origin.addresses.Organization;
 
-    // Get BlockHeight and StateRoot
     await shared.auxiliary.web3.eth.getBlock('latest').then((block) => {
       initialBlockHeight = block.number;
       initialStateRoot = block.stateRoot;
@@ -65,7 +64,7 @@ describe('AnchorHelper', () => {
   });
 
   after(async () => {
-    let deployParams = {
+    const deployParams = {
       from: shared.setupConfig.deployerAddress,
       gasPrice: shared.setupConfig.gasPrice
     };
@@ -103,11 +102,11 @@ describe('AnchorHelper', () => {
   });
 
   it('should deploy new Anchor contract', () => {
-    let deployParams = {
+    const deployParams = {
       from: shared.setupConfig.deployerAddress,
       gasPrice: shared.setupConfig.gasPrice
     };
-    return helper
+    return subject
       .deploy(remoteChainId, initialBlockHeight, initialStateRoot, 10, addressOrganization, deployParams)
       .then(assertDeploymentReceipt)
       .then((receipt) => {
@@ -115,22 +114,20 @@ describe('AnchorHelper', () => {
       });
   });
 
-  // Set Co-Anchor Address.
   it('should set co-anchor address', () => {
-    let deployParams = {
+    const deployParams = {
       from: shared.setupConfig.organizationOwner,
       gasPrice: shared.setupConfig.gasPrice
     };
-    return helper.setCoAnchorAddress(addressAnchor, deployParams).then(assertReceipt);
+    return subject.setCoAnchorAddress(addressAnchor, deployParams).then(assertReceipt);
   });
 
-  // Test Setup
   it('should setup Anchor', () => {
-    let deployParams = {
+    const deployParams = {
       from: shared.setupConfig.deployerAddress,
       gasPrice: shared.setupConfig.gasPrice
     };
-    let anchorConfig = {
+    const anchorConfig = {
       remoteChainId: 123456,
       deployer: shared.setupConfig.deployerAddress,
       organization: addressOrganization,
@@ -138,6 +135,6 @@ describe('AnchorHelper', () => {
       maxStateRoots: 10,
       organizationOwner: shared.setupConfig.organizationOwner
     };
-    return helper.setup(anchorConfig, deployParams);
+    return subject.setup(anchorConfig, deployParams);
   });
 });

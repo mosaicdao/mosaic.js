@@ -36,7 +36,7 @@ const assertReceipt = (receipt) => {
 
 const assertDeploymentReceipt = (receipt) => {
   assertReceipt(receipt);
-  let contractAddress = receipt.contractAddress;
+  const contractAddress = receipt.contractAddress;
   assert.isNotEmpty(contractAddress, 'Deployment Receipt is missing contractAddress');
   assert.isTrue(Web3.utils.isAddress(contractAddress), 'Invalid contractAddress in Receipt');
   return receipt;
@@ -45,9 +45,7 @@ const assertDeploymentReceipt = (receipt) => {
 describe('GatewayHelper', () => {
   let deployParams;
 
-  let addressGateway;
-
-  let helper = new GatewayHelper(shared.origin.web3, addressGateway);
+  const subject = new GatewayHelper(shared.origin.web3);
 
   before(() => {
     deployParams = {
@@ -58,12 +56,12 @@ describe('GatewayHelper', () => {
 
   const someValidAddress = '0x1111111111111111111111111111111111111111';
   it('should deploy new Gateway contract', () => {
-    let _token = someValidAddress;
-    let _baseToken = someValidAddress;
-    let _anchor = someValidAddress;
-    let _bounty = 1000;
+    const _token = someValidAddress;
+    const _baseToken = someValidAddress;
+    const _anchor = someValidAddress;
+    const _bounty = 1000;
 
-    return helper
+    return subject
       .deploy(
         _token,
         _baseToken,
@@ -82,9 +80,9 @@ describe('GatewayHelper', () => {
 
   // Test Setup
   it('should setup Gateway and CoGateway', () => {
-    let simpleToken = someValidAddress;
+    const simpleToken = someValidAddress;
 
-    let gatewayConfig = {
+    const gatewayConfig = {
       deployer: shared.setupConfig.deployerAddress,
       token: simpleToken,
       baseToken: simpleToken,
@@ -96,7 +94,7 @@ describe('GatewayHelper', () => {
       gatewayLib: shared.origin.addresses.GatewayLib
     };
 
-    let coGatewayConfig = {
+    const coGatewayConfig = {
       deployer: shared.setupConfig.deployerAddress,
       valueToken: simpleToken,
       utilityToken: shared.auxiliary.addresses.OSTPrime,
@@ -107,7 +105,7 @@ describe('GatewayHelper', () => {
       gatewayLib: shared.auxiliary.addresses.GatewayLib
     };
 
-    return helper.setup(
+    return subject.setup(
       gatewayConfig,
       coGatewayConfig,
       deployParams,

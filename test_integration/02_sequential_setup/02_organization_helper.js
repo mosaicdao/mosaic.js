@@ -36,15 +36,13 @@ const assertReceipt = (receipt) => {
 
 const assertDeploymentReceipt = (receipt) => {
   assertReceipt(receipt);
-  let contractAddress = receipt.contractAddress;
+  const contractAddress = receipt.contractAddress;
   assert.isNotEmpty(contractAddress, 'Deployment Receipt is missing contractAddress');
   assert.isTrue(Web3.utils.isAddress(contractAddress), 'Invalid contractAddress in Receipt');
   return receipt;
 };
 
 describe('OrganizationHelper', () => {
-  let addressOrganization;
-
   let deployParams;
   let orgConfig;
 
@@ -70,49 +68,40 @@ describe('OrganizationHelper', () => {
     });
   });
 
-  let helper = new OrganizationHelper(shared.origin.web3, addressOrganization);
+  const subject = new OrganizationHelper(shared.origin.web3);
 
   it('should deploy new organization contract', () => {
-    return helper
-      .deploy(orgConfig.owner, null, null, null, deployParams)
-      .then(assertDeploymentReceipt)
-      .then((receipt) => {
-        addressOrganization = receipt.contractAddress;
-      });
+    return subject.deploy(orgConfig.owner, null, null, null, deployParams).then(assertDeploymentReceipt);
   });
 
   it('should set admin address', () => {
-    //Admin Key Address
-    let kaAdmin = orgConfig.admin;
-    return helper.setAdmin(kaAdmin, deployParams).then(assertReceipt);
+    const adminKeyAddress = orgConfig.admin;
+    return subject.setAdmin(adminKeyAddress, deployParams).then(assertReceipt);
   });
 
   it('should set worker address', () => {
-    // Worker Key Address
-    let kaWorker = orgConfig.workers[0];
-    return helper.setWorker(kaWorker, '10000000', deployParams).then(assertReceipt);
+    const workerKeyAddress = orgConfig.workers[0];
+    return subject.setWorker(workerKeyAddress, '10000000', deployParams).then(assertReceipt);
   });
 
   it('should initiate Ownership Transfer', () => {
-    // Owner Key Address
-    let kaOwner = orgConfig.admin;
-    return helper.initiateOwnershipTransfer(kaOwner, deployParams).then(assertReceipt);
+    const ownerKeyAddress = orgConfig.admin;
+    return subject.initiateOwnershipTransfer(ownerKeyAddress, deployParams).then(assertReceipt);
   });
 
   it('should complete Ownership Transfer', () => {
-    // Owner Key Address
-    let kaOwner = orgConfig.admin;
-    let ownerParams = Object.assign({}, deployParams, {
-      from: kaOwner
+    const ownerKeyAddress = orgConfig.admin;
+    const ownerParams = Object.assign({}, deployParams, {
+      from: ownerKeyAddress
     });
-    return helper.completeOwnershipTransfer(ownerParams).then(assertReceipt);
+    return subject.completeOwnershipTransfer(ownerParams).then(assertReceipt);
   });
 
   it('should do complete organization setup', () => {
     const _orgConfig = orgConfig;
     _orgConfig.owner = shared.setupConfig.organizationOwner;
-    return helper.setup(_orgConfig).then(() => {
-      shared.origin.addresses.Organization = helper.address;
+    return subject.setup(_orgConfig).then(() => {
+      shared.origin.addresses.Organization = subject.address;
     });
   });
 });
