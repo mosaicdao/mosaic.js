@@ -1,5 +1,7 @@
 'use strict';
 
+const mosaicContracts = require('@openstfoundation/mosaic-contracts');
+
 //__NOT_FOR_WEB__BEGIN__
 const fs = require('fs'),
   path = require('path');
@@ -86,11 +88,11 @@ class AbiBinProvider {
       return oThis.custom[contractName].abi;
     }
 
-    //__NOT_FOR_WEB__BEGIN__
-    let fPath = path.resolve(oThis.abiFolderPath, contractName + '.abi');
-    let abiFileContent = fs.readFileSync(fPath, 'utf8');
-    let abi = JSON.parse(abiFileContent);
-    //__NOT_FOR_WEB__END__
+    const contract = mosaicContracts[contractName];
+    if (!contract) {
+      throw new Error(`Could not retrieve ABI for ${contractName}, because the contract doesn't exist.`);
+    }
+    const abi = contract.abi;
     return abi;
   }
 
@@ -101,13 +103,16 @@ class AbiBinProvider {
       return oThis.custom[contractName].bin;
     }
 
-    //__NOT_FOR_WEB__BEGIN__
-    let fPath = path.resolve(oThis.binFolderPath, contractName + '.bin');
-    let bin = fs.readFileSync(fPath, 'utf8');
-    if (typeof bin === 'string' && bin.indexOf('0x') != 0) {
-      bin = '0x' + bin;
+    const contract = mosaicContracts[contractName];
+    if (!contract) {
+      throw new Error(`Could not retrieve bin for ${contractName}, because the contract doesn't exist.`);
     }
-    //__NOT_FOR_WEB__END__
+    const bin = contract.bin;
+    if (!bin) {
+      throw new Error(
+        `Could not retrieve bin for ${contractName}. This means that either the contract ABI was added to the AbiBinProvider without the bin, or that the contract does not produce a bin (e.g. interface contracts).`
+      );
+    }
     return bin;
   }
 

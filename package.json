@@ -33,6 +33,7 @@
     "web-post-build": "git add dist/."
   },
   "dependencies": {
+    "@openstfoundation/mosaic-contracts": "^0.10.0-alpha.1",
     "bignumber.js": "4.1.0",
     "node-cmd": "3.0.0",
     "path": "0.12.7",

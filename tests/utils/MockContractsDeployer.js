@@ -75,7 +75,14 @@ class MockContractsDeployer {
   }
 
   static abiBinProvider() {
-    return new AbiBinProvider(mockAbiFolder, mockBinFolder);
+    const provider = new AbiBinProvider();
+
+    const MockTokenAbi = JSON.parse(fs.readFileSync(path.join(mockAbiFolder, 'MockToken.abi')));
+    const MockTokenBin = fs.readFileSync(path.join(mockBinFolder, 'MockToken.bin'), 'utf8');
+    provider.addABI('MockToken', MockTokenAbi);
+    provider.addBIN('MockToken', MockTokenBin);
+
+    return provider;
   }
 }
 
