@@ -31,12 +31,19 @@ describe('StakeHelper.getBounty()', () => {
   let stakeHelper;
   let web3;
   let gatewayAddress;
+  let coGatewayAddress;
 
   beforeEach(() => {
     // runs before each test in this block
     web3 = new Web3('http://localhost:8545');
     gatewayAddress = '0x0000000000000000000000000000000000000001';
-    stakeHelper = new StakeHelper(web3, gatewayAddress);
+    coGatewayAddress = '0x0000000000000000000000000000000000000002';
+    stakeHelper = new StakeHelper(
+      web3,
+      web3,
+      gatewayAddress,
+      coGatewayAddress,
+    );
   });
 
   it('should return correct bounty value', async function() {

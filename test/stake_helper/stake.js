@@ -31,6 +31,7 @@ const assert = chai.assert;
 describe('StakeHelper.stake()', () => {
   let web3;
   let gatewayAddress;
+  let coGatewayAddress;
   let stakeParams = {};
   let txOption;
   let stakeHelper;
@@ -93,7 +94,13 @@ describe('StakeHelper.stake()', () => {
   beforeEach(() => {
     web3 = new Web3();
     gatewayAddress = '0x0000000000000000000000000000000000000001';
-    stakeHelper = new StakeHelper(web3, gatewayAddress);
+    coGatewayAddress = '0x0000000000000000000000000000000000000012';
+    stakeHelper = new StakeHelper(
+      web3,
+      web3,
+      gatewayAddress,
+      coGatewayAddress,
+    );
 
     hashLockObj = {
       secret: 'secret',

@@ -56,7 +56,12 @@ class Facilitator {
     this.auxiliaryWeb3 = auxiliaryWeb3;
     this.gatewayAddress = gatewayAddress;
     this.coGatewayAddress = coGatewayAddress;
-    this.stakeHelper = new StakeHelper(originWeb3, this.gatewayAddress);
+    this.stakeHelper = new StakeHelper(
+      originWeb3,
+      auxiliaryWeb3,
+      gatewayAddress,
+      coGatewayAddress,
+    );
   }
 
   /**
@@ -85,8 +90,7 @@ class Facilitator {
       throw new Error('Invalid staker address.');
     }
 
-    this.stakeAmount = new BN(amount);
-    if (this.stakeAmount.eqn(0)) {
+    if (new BN(amount).eqn(0)) {
       throw new Error('Stake amount must not be zero.');
     }
 
@@ -110,28 +114,23 @@ class Facilitator {
       throw new Error('Invalid facilitator address.');
     }
 
-    this.stakerAddress = staker;
-    this.facilitatorAddress = txOption.from;
-    this.hashLockObj = await this.getHashLock(unlockSecret);
-
     // Get staker nonce.
-    this.stakerNonce = new BN(await this.stakeHelper.getNonce(staker));
+    const nonce = await this.stakeHelper.getNonce(staker);
+    const facilitatorAddress = txOption.from;
+    this.txOption = txOption;
+    this.hashLockObj = await this.getHashLock(unlockSecret);
 
     // Get bounty amount.
     this.bounty = new BN(await this.stakeHelper.getBounty());
 
     const isStakeAmountApproved = await this.stakeHelper.isStakeAmountApproved(
-      this.stakerAddress,
-      this.stakeAmount.toString(10),
+      staker,
+      amount,
     );
 
     if (!isStakeAmountApproved) {
-      if (this.stakerAddress === this.facilitatorAddress) {
-        await this.stakeHelper.approveStakeAmount(
-          this.stakerAddress,
-          this.stakeAmount.toString(10),
-          txOption,
-        );
+      if (staker === facilitatorAddress) {
+        await this.stakeHelper.approveStakeAmount(staker, amount, txOption);
       } else {
         throw new Error('Transfer of stake amount must be approved.');
       }
@@ -139,12 +138,23 @@ class Facilitator {
 
     if (this.bounty.gtn(0)) {
       const isBountyAmountApproved = await this.stakeHelper.isBountyAmountApproved(
-        this.facilitatorAddress,
+        facilitatorAddress,
       );
       if (!isBountyAmountApproved) {
         await this.stakeHelper.approveBountyAmount(txOption);
       }
     }
+
+    // Save the stake params as it may be used in progress stake.
+    this.stakeParams = {
+      staker,
+      amount,
+      beneficiary,
+      gasPrice,
+      gasLimit,
+      nonce,
+      hashLock: this.hashLockObj.hashLock,
+    };
 
     return this.stakeHelper.stake(
       staker,
@@ -152,12 +162,37 @@ class Facilitator {
       beneficiary,
       gasPrice,
       gasLimit,
-      this.stakerNonce.toString(10),
+      nonce,
       this.hashLockObj.hashLock,
-      txOption,
+      this.txOption,
     );
   }
 
+  /**
+   * Performs the progress stake and progress mint.
+   *
+   * @param {Object} [stakeRequestParams] Stake params object.
+   * @param {Object} txOption Transaction options.
+   *
+   * @returns {Promise} Promise object.
+   */
+  async progressStake(stakeRequestParams, txOption) {
+    const stakeParams = stakeRequestParams || this.stakeParams;
+    if (stakeParams === undefined) {
+      throw new Error('Invalid stake parameters.');
+    }
+    if (!txOption) {
+      throw new Error('Invalid transaction options.');
+    }
+
+    // Get the latest commit height form CoGateway.anchor
+    // If not there throw error.
+    // Get the proof of message hash for the given block height.
+    // Prove gateway on CoGateway.
+    // Confirm stake intent
+    // wait for 24 block confirmations
+    // call progress stake and progress mint simultaniously
+  }
   /**
    * Helper function to generate hash lock and unlock secrete. If unlock secret
    * is provided then it will generate the hash lock.

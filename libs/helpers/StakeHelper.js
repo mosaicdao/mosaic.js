@@ -31,18 +31,31 @@ class StakeHelper {
    * Constructor for stake helper.
    *
    * @param {Object} originWeb3 Origin chain web3 object.
-   * @param {string} gatewayAddress Gateway contract address.
+   * @param {Object} auxiliaryWeb3 Auxiliary chain web3 object.
+   * @param {string} Gateway contract address.
+   * @param {string} CoGateway contract address.
    */
-  constructor(originWeb3, gatewayAddress) {
+  constructor(originWeb3, auxiliaryWeb3, gatewayAddress, coGatewayAddress) {
     if (originWeb3 === undefined) {
       throw new Error('Invalid origin web3 object.');
     }
+
+    if (auxiliaryWeb3 === undefined) {
+      throw new Error('Invalid auxiliary web3 object.');
+    }
+
     if (!Web3.utils.isAddress(gatewayAddress)) {
       throw new Error('Invalid Gateway address.');
     }
 
-    this.web3 = originWeb3;
+    if (!Web3.utils.isAddress(coGatewayAddress)) {
+      throw new Error('Invalid Cogateway address.');
+    }
+
+    this.originWeb3 = originWeb3;
+    this.auxiliaryWeb3 = auxiliaryWeb3;
     this.gatewayAddress = gatewayAddress;
+    this.coGatewayAddress = coGatewayAddress;
   }
 
   /**
@@ -56,7 +69,7 @@ class StakeHelper {
     }
 
     const gatewayContract = Contracts.getEIP20Gateway(
-      this.web3,
+      this.originWeb3,
       this.gatewayAddress,
     );
 
@@ -80,7 +93,7 @@ class StakeHelper {
     }
 
     const gatewayContract = Contracts.getEIP20Gateway(
-      this.web3,
+      this.originWeb3,
       this.gatewayAddress,
     );
 
@@ -104,7 +117,7 @@ class StakeHelper {
     }
 
     const gatewayContract = Contracts.getEIP20Gateway(
-      this.web3,
+      this.originWeb3,
       this.gatewayAddress,
     );
 
@@ -128,7 +141,31 @@ class StakeHelper {
     if (!Web3.utils.isAddress(staker)) {
       throw new Error('Invalid account address.');
     }
-    return this._getNonce(staker, this.web3, this.gatewayAddress);
+    return this._getNonce(staker, this.originWeb3, this.gatewayAddress);
+  }
+
+  /**
+   * Returns the auxiliary chain anchor contract address.
+   *
+   * @returns {Promise} Promise object represents the anchor contract address.
+   */
+  async getCoGatewayStateRootProvider() {
+    if (this.auxiliaryAnchorAddress) {
+      return Promise.resolve(this.auxiliaryAnchorAddress);
+    }
+
+    const coGatewayContract = Contracts.getEIP20CoGateway(
+      this.originWeb3,
+      this.coGatewayAddress,
+    );
+
+    return coGatewayContract.methods
+      .stateRootProvider()
+      .call()
+      .then((stateRootProviderAddress) => {
+        this.auxiliaryAnchorAddress = stateRootProviderAddress;
+        return stateRootProviderAddress;
+      });
   }
 
   /**
@@ -146,7 +183,10 @@ class StakeHelper {
       throw new Error('Invalid facilitator address.');
     }
     const baseTokenAddress = await this.getBaseToken();
-    const baseToken = Contracts.getEIP20Token(this.web3, baseTokenAddress);
+    const baseToken = Contracts.getEIP20Token(
+      this.originWeb3,
+      baseTokenAddress,
+    );
     const bountyAmount = await this.getBounty();
     const tx = baseToken.methods.approve(this.gatewayAddress, bountyAmount);
     return StakeHelper.sendTransaction(tx, txOption);
@@ -168,7 +208,10 @@ class StakeHelper {
       throw new Error('Invalid staker address.');
     }
     const valueTokenAddress = await this.getValueToken();
-    const valueToken = Contracts.getEIP20Token(this.web3, valueTokenAddress);
+    const valueToken = Contracts.getEIP20Token(
+      this.originWeb3,
+      valueTokenAddress,
+    );
     const tx = valueToken.methods.approve(this.gatewayAddress, stakeAmount);
     return StakeHelper.sendTransaction(tx, txOption);
   }
@@ -187,7 +230,10 @@ class StakeHelper {
     }
 
     const valueTokenAddress = await this.getValueToken();
-    const valueToken = Contracts.getEIP20Token(this.web3, valueTokenAddress);
+    const valueToken = Contracts.getEIP20Token(
+      this.originWeb3,
+      valueTokenAddress,
+    );
 
     const approvedAllowance = await valueToken.methods
       .allowance(stakerAddress, this.gatewayAddress)
@@ -209,7 +255,10 @@ class StakeHelper {
     }
 
     const baseTokenAddress = await this.getBaseToken();
-    const baseToken = Contracts.getEIP20Token(this.web3, baseTokenAddress);
+    const baseToken = Contracts.getEIP20Token(
+      this.originWeb3,
+      baseTokenAddress,
+    );
     const bountyAmount = await this.getBounty();
 
     const approvedAllowance = await baseToken.methods
@@ -271,7 +320,7 @@ class StakeHelper {
       throw new Error('Invalid facilitator address.');
     }
     const gatewayContract = Contracts.getEIP20Gateway(
-      this.web3,
+      this.originWeb3,
       this.gatewayAddress,
     );
 
@@ -297,7 +346,7 @@ class StakeHelper {
    * @returns {Promise} Promise object represents the nonce of staker address.
    */
   _getNonce(stakerAddress, originWeb3, gateway) {
-    const web3 = originWeb3 || this.web3;
+    const web3 = originWeb3 || this.originWeb3;
     const gatewayAddress = gateway || this.gatewayAddress;
     const contract = Contracts.getEIP20Gateway(web3, gatewayAddress);
     return contract.methods

@@ -35,7 +35,6 @@ describe('Facilitator.constructor()', () => {
   });
 
   it('should throw an error when origin web3 object is undefined', async function() {
-    this.timeout(5000);
     const expectedErrorMessage = 'Invalid origin web3 object.';
     try {
       new Facilitator(
@@ -54,7 +53,6 @@ describe('Facilitator.constructor()', () => {
   });
 
   it('should throw an error when auxiliary web3 object is undefined', async function() {
-    this.timeout(5000);
     const expectedErrorMessage = 'Invalid auxiliary web3 object.';
     try {
       new Facilitator(originWeb3, undefined, gatewayAddress, coGatewayAddress);
@@ -68,7 +66,6 @@ describe('Facilitator.constructor()', () => {
   });
 
   it('should throw an error when Gateway contract address is not valid', async function() {
-    this.timeout(5000);
     const expectedErrorMessage = 'Invalid Gateway address.';
     try {
       new Facilitator(originWeb3, auxiliaryWeb3, undefined, coGatewayAddress);
@@ -82,7 +79,6 @@ describe('Facilitator.constructor()', () => {
   });
 
   it('should throw an error when CoGateway contract address is not valid', async function() {
-    this.timeout(5000);
     const expectedErrorMessage = 'Invalid Cogateway address.';
     try {
       new Facilitator(originWeb3, auxiliaryWeb3, gatewayAddress, undefined);
@@ -96,8 +92,6 @@ describe('Facilitator.constructor()', () => {
   });
 
   it('should pass with valid constructor arguments', async function() {
-    this.timeout(5000);
-
     const facilitator = new Facilitator(
       originWeb3,
       auxiliaryWeb3,

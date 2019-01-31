@@ -26,17 +26,39 @@ const assert = chai.assert;
 
 describe('StakeHelper.constructor()', () => {
   let originWeb3;
+  let auxiliaryWeb3;
   let gatewayAddress;
+  let coGatewayAddress;
 
   beforeEach(() => {
     originWeb3 = new Web3();
+    auxiliaryWeb3 = new Web3();
     gatewayAddress = '0x0000000000000000000000000000000000000001';
+    coGatewayAddress = '0x0000000000000000000000000000000000000002';
   });
 
   it('should throw an error when origin web3 object is undefined', async function() {
     const expectedErrorMessage = 'Invalid origin web3 object.';
     try {
-      new StakeHelper(undefined, gatewayAddress);
+      new StakeHelper(
+        undefined,
+        auxiliaryWeb3,
+        gatewayAddress,
+        coGatewayAddress,
+      );
+    } catch (exception) {
+      assert.strictEqual(
+        exception.message,
+        expectedErrorMessage,
+        `Exception reason must be "${expectedErrorMessage}"`,
+      );
+    }
+  });
+
+  it('should throw an error when origin web3 object is undefined', async function() {
+    const expectedErrorMessage = 'Invalid auxiliary web3 object.';
+    try {
+      new StakeHelper(originWeb3, undefined, gatewayAddress, coGatewayAddress);
     } catch (exception) {
       assert.strictEqual(
         exception.message,
@@ -49,7 +71,20 @@ describe('StakeHelper.constructor()', () => {
   it('should throw an error when Gateway contract address is not valid', async function() {
     const expectedErrorMessage = 'Invalid Gateway address.';
     try {
-      new StakeHelper(originWeb3, '0x123');
+      new StakeHelper(originWeb3, auxiliaryWeb3, '0x123', coGatewayAddress);
+    } catch (exception) {
+      assert.strictEqual(
+        exception.message,
+        expectedErrorMessage,
+        `Exception reason must be "${expectedErrorMessage}"`,
+      );
+    }
+  });
+
+  it('should throw an error when CoGateway contract address is not valid', async function() {
+    const expectedErrorMessage = 'Invalid Cogateway address.';
+    try {
+      new StakeHelper(originWeb3, auxiliaryWeb3, gatewayAddress, '0x123');
     } catch (exception) {
       assert.strictEqual(
         exception.message,
@@ -60,20 +95,34 @@ describe('StakeHelper.constructor()', () => {
   });
 
   it('should pass with valid constructor arguments', async function() {
-    this.timeout(5000);
-
-    const stakeHelper = new StakeHelper(originWeb3, gatewayAddress);
+    const stakeHelper = new StakeHelper(
+      originWeb3,
+      auxiliaryWeb3,
+      gatewayAddress,
+      coGatewayAddress,
+    );
 
     assert.strictEqual(
-      stakeHelper.web3,
+      stakeHelper.originWeb3,
       originWeb3,
       'Origin web3 object is different than the expected object.',
+    );
+
+    assert.strictEqual(
+      stakeHelper.auxiliaryWeb3,
+      auxiliaryWeb3,
+      'Auxiliary web3 object is different than the expected object.',
     );
 
     assert.strictEqual(
       stakeHelper.gatewayAddress,
       gatewayAddress,
       'Gateway contract address is different than the expected object.',
+    );
+    assert.strictEqual(
+      stakeHelper.coGatewayAddress,
+      coGatewayAddress,
+      'CoGateway contract address is different than the expected object.',
     );
   });
 });

@@ -31,6 +31,7 @@ describe('StakeHelper.approveStakeAmount()', () => {
   let stakeHelper;
   let web3;
   let gatewayAddress;
+  let coGatewayAddress;
   let valueTokenAddress;
   let stakerAddress;
   let stakeAmount;
@@ -99,7 +100,13 @@ describe('StakeHelper.approveStakeAmount()', () => {
     // runs before each test in this block
     web3 = new Web3();
     gatewayAddress = '0x0000000000000000000000000000000000000001';
-    stakeHelper = new StakeHelper(web3, gatewayAddress);
+    coGatewayAddress = '0x0000000000000000000000000000000000000002';
+    stakeHelper = new StakeHelper(
+      web3,
+      web3,
+      gatewayAddress,
+      coGatewayAddress,
+    );
 
     valueTokenAddress = '0x0000000000000000000000000000000000000003';
     stakerAddress = '0x0000000000000000000000000000000000000004';

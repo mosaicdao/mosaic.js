@@ -31,6 +31,7 @@ describe('StakeHelper.isBountyAmountApproved()', () => {
   let stakeHelper;
   let web3;
   let gatewayAddress;
+  let coGatewayAddress;
   let accountAddress;
   let baseTokenAddress;
   let bountyAmount;
@@ -97,7 +98,13 @@ describe('StakeHelper.isBountyAmountApproved()', () => {
     // runs before each test in this block
     web3 = new Web3('http://localhost:8545');
     gatewayAddress = '0x0000000000000000000000000000000000000001';
-    stakeHelper = new StakeHelper(web3, gatewayAddress);
+    coGatewayAddress = '0x0000000000000000000000000000000000000012';
+    stakeHelper = new StakeHelper(
+      web3,
+      web3,
+      gatewayAddress,
+      coGatewayAddress,
+    );
     accountAddress = '0x0000000000000000000000000000000000000002';
     baseTokenAddress = '0x0000000000000000000000000000000000000003';
     bountyAmount = '1000';
