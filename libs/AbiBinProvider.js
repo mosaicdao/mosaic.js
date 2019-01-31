@@ -103,7 +103,16 @@ class AbiBinProvider {
       return oThis.custom[contractName].bin;
     }
 
-    const bin = mosaicContracts[contractName].bin;
+    const contract = mosaicContracts[contractName];
+    if (!contract) {
+      throw new Error(`Could not retrieve bin for ${contractName}, because the contract doesn't exist.`);
+    }
+    const bin = contract.bin;
+    if (!bin) {
+      throw new Error(
+        `Could not retrieve bin for ${contractName}. This means that either the contract ABI was added to the AbiBinProvider without the bin, or that the contract does not produce a bin (e.g. interface contracts).`
+      );
+    }
     return bin;
   }
 
