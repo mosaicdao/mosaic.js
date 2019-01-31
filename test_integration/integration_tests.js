@@ -28,6 +28,9 @@ const runTests = async () => {
     enableTimeouts: false
   });
 
+  console.warn(
+    'If this is the first time running the tests on this machine, this step might take a while, as Docker downloads a required image for the tests.'
+  );
   const { originRpcEndpoint, auxiliaryRpcEndpoint } = await dockerSetup();
   shared.origin.web3 = new Web3(originRpcEndpoint);
   shared.auxiliary.web3 = new Web3(auxiliaryRpcEndpoint);

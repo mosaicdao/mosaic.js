@@ -39,6 +39,11 @@ const dockerSetup = () => {
       process.stderr.write(data);
     });
   }
+  dockerCompose.on('close', (code) => {
+    if (code !== 0) {
+      throw new Error(`docker-compose up failed with code ${code}\nRun again with TEST_STDOUT=1 for more information.`);
+    }
+  });
 
   const originPort = 8546;
   const auxiliaryPort = 8547;
