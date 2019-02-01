@@ -758,11 +758,21 @@ class StakeHelper {
    * @returns {Promise} Promise object.
    */
   static sendTransaction(tx, txOption) {
-    return tx
-      .send(txOption)
-      .on('transactionHash', (transactionHash) => {})
-      .on('receipt', (receipt) => {})
-      .on('error', (error) => {});
+    return new Promise((resolve, reject) => {
+      const result = {};
+      tx.send(txOption)
+        .on('transactionHash', (transactionHash) => {
+          result.trasactionHash = transactionHash;
+        })
+        .on('receipt', (receipt) => {
+          result.receipt = receipt;
+          resolve(result);
+        })
+        .on('error', (error) => {
+          result.error = error;
+          reject(result);
+        });
+    });
   }
 }
 
