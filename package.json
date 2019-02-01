@@ -25,6 +25,7 @@
   },
   "scripts": {
     "test": "echo \"No tests yet\"",
+    "test:integration": "node test_integration/integration_tests.js",
     "pre-commit": "lint-staged",
     "webpack-build": "webpack --mode=production",
     "web-pre-build": "node webPreBuild.js",
@@ -33,6 +34,7 @@
     "test": "mocha --recursive --timeout 5000"
   },
   "dependencies": {
+    "@openstfoundation/mosaic-contracts": "^0.10.0-alpha.1",
     "bignumber.js": "4.1.0",
     "eslint-config-airbnb": "^17.1.0",
     "node-cmd": "3.0.0",
@@ -63,6 +65,7 @@
     "prettier": "1.15.3",
     "sinon": "7.2.3",
     "string-replace-loader": "2.1.1",
+    "wait-port": "^0.2.2",
     "webpack": "4.19.1",
     "webpack-cli": "3.1.0",
     "webpack-uglify-js-plugin": "1.1.9"

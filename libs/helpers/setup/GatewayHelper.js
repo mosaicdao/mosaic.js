@@ -224,7 +224,7 @@ class GatewayHelper {
     const bin = abiBinProvider.getLinkedBIN(ContractName, messageBusLibInfo, gatewayLibInfo);
 
     let defaultOptions = {
-      gas: '8000000'
+      gas: '7500000'
     };
     if (txOptions) {
       Object.assign(defaultOptions, txOptions);
