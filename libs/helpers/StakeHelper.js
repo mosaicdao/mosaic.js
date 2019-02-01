@@ -61,6 +61,13 @@ class StakeHelper {
     this.getBaseToken = this.getBaseToken.bind(this);
     this.getValueToken = this.getValueToken.bind(this);
     this.getNonce = this.getNonce.bind(this);
+    this.getCoGatewayStateRootProvider = this.getCoGatewayStateRootProvider.bind(
+      this,
+    );
+    this.getLatestStateRootBlockHeight = this.getLatestStateRootBlockHeight.bind(
+      this,
+    );
+    this.getMintStatus = this.getMintStatus.bind(this);
     this.approveBountyAmount = this.approveBountyAmount.bind(this);
     this.approveStakeAmount = this.approveStakeAmount.bind(this);
     this.isStakeAmountApproved = this.isStakeAmountApproved.bind(this);
@@ -216,6 +223,27 @@ class StakeHelper {
 
     return coGatewayContract.methods
       .getInboxMessageStatus(messageHash)
+      .call()
+      .then((status) => {
+        return status;
+      });
+  }
+
+  /**
+   * Returns outbox message status from gateway contract.
+   *
+   * @param {string} messageHash Message hash.
+   *
+   * @returns {Promise} Promise object.
+   */
+  async getStakeStatus(messageHash) {
+    const gatewayContract = Contracts.getEIP20Gateway(
+      this.originWeb3,
+      this.gatewayAddress,
+    );
+
+    return gatewayContract.methods
+      .getOutboxMessageStatus(messageHash)
       .call()
       .then((status) => {
         return status;
@@ -388,6 +416,31 @@ class StakeHelper {
     );
 
     return StakeHelper.sendTransaction(tx, txOption);
+  }
+
+  proveGateway(blockHeight, accountData, accountProof) {
+    // TODO
+  }
+
+  confirmStakeIntent(
+    staker,
+    nonce,
+    beneficiary,
+    amount,
+    gasPrice,
+    gasLimit,
+    hashLock,
+    blockHeight,
+    rlpParentNodes,
+    txOption,
+  ) {}
+
+  progressMint(messageHash, unlockSecret, txOption) {
+    // TODO
+  }
+
+  progressStake(messageHash, unlockSecret, txOption) {
+    // TODO
   }
 
   /**

@@ -19,7 +19,15 @@
 // ----------------------------------------------------------------------------
 
 const Web3Utils = require('web3-utils');
+const web3 = require('web3');
 const Crypto = require('crypto');
+
+const MESSAGE_TYPE_HASH = web3.utils.sha3(
+  'Message(bytes32 intentHash,uint256 nonce,uint256 gasPrice,uint256 gasLimit,address sender,bytes32 hashLock)',
+);
+const STAKE_TYPE_HASH = web3.utils.sha3(
+  'StakeIntent(uint256 amount,address beneficiary,address gateway)',
+);
 
 /**
  * This class includes the utitity functions.
@@ -65,8 +73,72 @@ class Utils {
     return {
       secret: secretString,
       unlockSecret: `0x${secretBytes.toString('hex')}`,
-      hashLock: Web3Utils.keccak256(secretString)
+      hashLock: Web3Utils.keccak256(secretString),
     };
+  }
+
+  /**
+   * Generate the message hash from the stake request params.
+   *
+   * @param {string} intentHash Intent hash.
+   * @param {nonce} nonce Nonce.
+   * @param {string} gasPrice Gas price.
+   * @param {string} gasLimit Gas limit.
+   * @param {string} sender Sender address.
+   * @param {string} hashLock Hash lock.
+   *
+   * @returns {string} message hash.
+   */
+  static getMessageHash(
+    intentHash,
+    nonce,
+    gasPrice,
+    gasLimit,
+    sender,
+    hashLock,
+  ) {
+    const messageHash = web3.utils.sha3(
+      web3.eth.abi.encodeParameters(
+        [
+          'bytes32',
+          'bytes32',
+          'uint256',
+          'uint256',
+          'uint256',
+          'address',
+          'bytes32',
+        ],
+        [
+          MESSAGE_TYPE_HASH,
+          intentHash,
+          nonce,
+          gasPrice,
+          gasLimit,
+          sender,
+          hashLock,
+        ],
+      ),
+    );
+    return messageHash;
+  }
+
+  /**
+   * Generate the stake intent hash from the stake request params.
+   *
+   * @param {string} amount Stake amount.
+   * @param {string} beneficiary Beneficiary address.
+   * @param {string} gatewayAddress Gateway contract address.
+   *
+   * @returns {string} stake intent hash.
+   */
+  static getStakeIntentHash(amount, beneficiary, gatewayAddress) {
+    const stakeIntentHash = web3.utils.sha3(
+      web3.eth.abi.encodeParameters(
+        ['bytes32', 'uint256', 'address', 'address'],
+        [STAKE_TYPE_HASH, amount, beneficiary, gatewayAddress],
+      ),
+    );
+    return stakeIntentHash;
   }
 }
 
