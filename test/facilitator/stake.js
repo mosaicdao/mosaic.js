@@ -22,7 +22,7 @@ const BN = require('bn.js');
 const chai = require('chai');
 const sinon = require('sinon');
 const Web3 = require('web3');
-const Facilitator = require('../../libs/Facilitator/Facilitator');
+const Facilitator = require('../../src/Facilitator/Facilitator');
 const SpyAssert = require('../../test_utils/SpyAssert');
 
 const assert = chai.assert;

@@ -65,7 +65,7 @@ class Utils {
     return {
       secret: secretString,
       unlockSecret: `0x${secretBytes.toString('hex')}`,
-      hashLock: Web3Utils.keccak256(secretString)
+      hashLock: Web3Utils.keccak256(secretString),
     };
   }
 }

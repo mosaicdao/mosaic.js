@@ -1,13 +1,13 @@
 'use strict';
 
 const Web3 = require('web3');
-const AbiBinProvider = require('../libs/AbiBinProvider');
-const OrganizationHelper = require('../libs/helpers/setup/OrganizationHelper');
-const AnchorHelper = require('../libs/helpers/setup/AnchorHelper');
-const OSTPrimeHelper = require('../libs/helpers/setup/OSTPrimeHelper');
-const LibsHelper = require('../libs/helpers/setup/LibsHelper');
-const GatewayHelper = require('../libs/helpers/setup/GatewayHelper');
-const CoGatewayHelper = require('../libs/helpers/setup/CoGatewayHelper');
+const AbiBinProvider = require('../src/AbiBinProvider');
+const OrganizationHelper = require('../src/helpers/setup/OrganizationHelper');
+const AnchorHelper = require('../src/helpers/setup/AnchorHelper');
+const OSTPrimeHelper = require('../src/helpers/setup/OSTPrimeHelper');
+const LibsHelper = require('../src/helpers/setup/LibsHelper');
+const GatewayHelper = require('../src/helpers/setup/GatewayHelper');
+const CoGatewayHelper = require('../src/helpers/setup/CoGatewayHelper');
 
 class ChainSetup {
   constructor(originWeb3, auxiliaryWeb3) {
@@ -15,26 +15,34 @@ class ChainSetup {
     this.auxiliaryWeb3 = auxiliaryWeb3;
   }
 
-  setup(simpleTokenAddress, originConfig, auxiliaryConfig, originWeb3, auxiliaryWeb3) {
+  setup(
+    simpleTokenAddress,
+    originConfig,
+    auxiliaryConfig,
+    originWeb3,
+    auxiliaryWeb3,
+  ) {
     const oThis = this;
     originWeb3 = originWeb3 || oThis.originWeb3;
     auxiliaryWeb3 = auxiliaryWeb3 || oThis.auxiliaryWeb3;
 
     const outAddresses = {
       origin: {},
-      auxiliary: {}
+      auxiliary: {},
     };
 
     let originTxOptions = {
-      gasPrice: originConfig.gasPrice || '0x5B9ACA00'
+      gasPrice: originConfig.gasPrice || '0x5B9ACA00',
     };
 
     let auxTxOptions = {
-      gasPrice: originConfig.gasPrice || '0x0'
+      gasPrice: originConfig.gasPrice || '0x0',
     };
 
     if (typeof simpleTokenAddress !== 'string') {
-      throw new Error('Mandatory parameter "simpleTokenAddress" address missing.');
+      throw new Error(
+        'Mandatory parameter "simpleTokenAddress" address missing.',
+      );
     }
 
     let promiseChain = new Promise(function(resolve, reject) {
@@ -51,7 +59,7 @@ class ChainSetup {
       originWeb3,
       originConfig,
       originTxOptions,
-      outAddresses
+      outAddresses,
     );
 
     //B. Deploy Utility Token
@@ -61,7 +69,7 @@ class ChainSetup {
       auxiliaryConfig,
       auxTxOptions,
       simpleTokenAddress,
-      outAddresses
+      outAddresses,
     );
 
     //C. Deploy and Prepare Anchors
@@ -73,7 +81,7 @@ class ChainSetup {
       auxiliaryConfig,
       originTxOptions,
       auxTxOptions,
-      outAddresses
+      outAddresses,
     );
 
     //D. Deploy Libs
@@ -85,7 +93,7 @@ class ChainSetup {
       auxiliaryConfig,
       originTxOptions,
       auxTxOptions,
-      outAddresses
+      outAddresses,
     );
 
     //E. Deploy Gateways
@@ -98,7 +106,7 @@ class ChainSetup {
       originTxOptions,
       auxTxOptions,
       simpleTokenAddress,
-      outAddresses
+      outAddresses,
     );
 
     promiseChain = oThis.setGatewayAddresses(
@@ -109,7 +117,7 @@ class ChainSetup {
       auxiliaryConfig,
       originTxOptions,
       auxTxOptions,
-      outAddresses
+      outAddresses,
     );
 
     /*
@@ -158,12 +166,23 @@ class ChainSetup {
 
     */
 
-    promiseChain = oThis.finishSetup(promiseChain, originConfig, auxiliaryConfig, outAddresses);
+    promiseChain = oThis.finishSetup(
+      promiseChain,
+      originConfig,
+      auxiliaryConfig,
+      outAddresses,
+    );
 
     return promiseChain;
   }
 
-  setupTokenOrganizationOnOrigin(promiseChain, originWeb3, originConfig, originTxOptions, outAddresses) {
+  setupTokenOrganizationOnOrigin(
+    promiseChain,
+    originWeb3,
+    originConfig,
+    originTxOptions,
+    outAddresses,
+  ) {
     const oThis = this;
 
     return promiseChain
@@ -186,7 +205,14 @@ class ChainSetup {
       });
   }
 
-  setupToken(promiseChain, auxiliaryWeb3, auxiliaryConfig, auxTxOptions, simpleTokenAddress, outAddresses) {
+  setupToken(
+    promiseChain,
+    auxiliaryWeb3,
+    auxiliaryConfig,
+    auxTxOptions,
+    simpleTokenAddress,
+    outAddresses,
+  ) {
     const oThis = this;
 
     //B.1. Deploy (Token) Organization [Aux]
@@ -195,7 +221,7 @@ class ChainSetup {
       auxiliaryWeb3,
       auxiliaryConfig,
       auxTxOptions,
-      outAddresses
+      outAddresses,
     );
 
     //B.2. Deploy OSTPrime [Aux]
@@ -205,13 +231,19 @@ class ChainSetup {
       auxiliaryConfig,
       auxTxOptions,
       outAddresses,
-      simpleTokenAddress
+      simpleTokenAddress,
     );
 
     return promiseChain;
   }
 
-  setupTokenOrganizationOnAux(promiseChain, auxiliaryWeb3, auxiliaryConfig, auxTxOptions, outAddresses) {
+  setupTokenOrganizationOnAux(
+    promiseChain,
+    auxiliaryWeb3,
+    auxiliaryConfig,
+    auxTxOptions,
+    outAddresses,
+  ) {
     const oThis = this;
 
     return promiseChain
@@ -234,7 +266,14 @@ class ChainSetup {
       });
   }
 
-  setupTokenOnAux(promiseChain, auxiliaryWeb3, auxiliaryConfig, auxTxOptions, outAddresses, simpleTokenAddress) {
+  setupTokenOnAux(
+    promiseChain,
+    auxiliaryWeb3,
+    auxiliaryConfig,
+    auxTxOptions,
+    outAddresses,
+    simpleTokenAddress,
+  ) {
     const oThis = this;
 
     return promiseChain
@@ -247,11 +286,13 @@ class ChainSetup {
         //Update config as needed.
         config.organization = outAddresses.auxiliary.tokenOrganization;
 
-        return helper.setup(simpleTokenAddress, config, txOptions, web3).then(function() {
-          //Figure out how to get address from helper.
-          let address = helper.address;
-          return address;
-        });
+        return helper
+          .setup(simpleTokenAddress, config, txOptions, web3)
+          .then(function() {
+            //Figure out how to get address from helper.
+            let address = helper.address;
+            return address;
+          });
       })
       .then(function(ostPrimeAddress) {
         //Update Address Book
@@ -268,7 +309,7 @@ class ChainSetup {
     auxiliaryConfig,
     originTxOptions,
     auxTxOptions,
-    outAddresses
+    outAddresses,
   ) {
     const oThis = this;
 
@@ -278,7 +319,7 @@ class ChainSetup {
       originWeb3,
       originConfig,
       originTxOptions,
-      outAddresses
+      outAddresses,
     );
 
     //C.2. Deploy Anchor [Orig]
@@ -288,7 +329,7 @@ class ChainSetup {
       auxiliaryWeb3,
       originConfig,
       originTxOptions,
-      outAddresses
+      outAddresses,
     );
 
     //C.3. Deploy (Anchor) Organization [Aux]
@@ -297,7 +338,7 @@ class ChainSetup {
       auxiliaryWeb3,
       auxiliaryConfig,
       auxTxOptions,
-      outAddresses
+      outAddresses,
     );
 
     //C.4. Deploy Anchor & set co-anchor address. [Aux]
@@ -308,7 +349,7 @@ class ChainSetup {
       originConfig,
       auxiliaryConfig,
       auxTxOptions,
-      outAddresses
+      outAddresses,
     );
 
     //C.5. Set Co-Anchor address [Orig]
@@ -318,13 +359,19 @@ class ChainSetup {
       auxiliaryWeb3,
       originConfig,
       originTxOptions,
-      outAddresses
+      outAddresses,
     );
 
     return promiseChain;
   }
 
-  setupAnchorOrganizationOnOrigin(promiseChain, originWeb3, originConfig, originTxOptions, outAddresses) {
+  setupAnchorOrganizationOnOrigin(
+    promiseChain,
+    originWeb3,
+    originConfig,
+    originTxOptions,
+    outAddresses,
+  ) {
     const oThis = this;
 
     return promiseChain
@@ -347,7 +394,14 @@ class ChainSetup {
       });
   }
 
-  setupAnchorOnOrigin(promiseChain, originWeb3, auxiliaryWeb3, originConfig, originTxOptions, outAddresses) {
+  setupAnchorOnOrigin(
+    promiseChain,
+    originWeb3,
+    auxiliaryWeb3,
+    originConfig,
+    originTxOptions,
+    outAddresses,
+  ) {
     const oThis = this;
 
     return promiseChain
@@ -360,7 +414,8 @@ class ChainSetup {
 
         //update config  as needed
         config.organization = outAddresses.origin.anchorOrganization;
-        config.organizationOwner = config.organizationOwner || originConfig.anchorOrganization.owner;
+        config.organizationOwner =
+          config.organizationOwner || originConfig.anchorOrganization.owner;
 
         return helper.setup(config, txOptions).then(function() {
           //Figure out how to get address from helper.
@@ -375,7 +430,13 @@ class ChainSetup {
       });
   }
 
-  setupAnchorOrganizationOnAux(promiseChain, auxiliaryWeb3, auxiliaryConfig, auxTxOptions, outAddresses) {
+  setupAnchorOrganizationOnAux(
+    promiseChain,
+    auxiliaryWeb3,
+    auxiliaryConfig,
+    auxTxOptions,
+    outAddresses,
+  ) {
     const oThis = this;
 
     return promiseChain
@@ -398,7 +459,15 @@ class ChainSetup {
       });
   }
 
-  setupAnchorOnAux(promiseChain, auxiliaryWeb3, originWeb3, originConfig, auxiliaryConfig, auxTxOptions, outAddresses) {
+  setupAnchorOnAux(
+    promiseChain,
+    auxiliaryWeb3,
+    originWeb3,
+    originConfig,
+    auxiliaryConfig,
+    auxTxOptions,
+    outAddresses,
+  ) {
     const oThis = this;
 
     return promiseChain
@@ -411,7 +480,8 @@ class ChainSetup {
 
         //update config  as needed
         config.organization = outAddresses.auxiliary.anchorOrganization;
-        config.organizationOwner = config.organizationOwner || auxiliaryConfig.anchorOrganization.owner;
+        config.organizationOwner =
+          config.organizationOwner || auxiliaryConfig.anchorOrganization.owner;
         config.coAnchorAddress = outAddresses.origin.anchor;
 
         return helper.setup(config, txOptions).then(function() {
@@ -427,7 +497,14 @@ class ChainSetup {
       });
   }
 
-  setupCoAnchorAddress(promiseChain, originWeb3, auxiliaryWeb3, originConfig, originTxOptions, outAddresses) {
+  setupCoAnchorAddress(
+    promiseChain,
+    originWeb3,
+    auxiliaryWeb3,
+    originConfig,
+    originTxOptions,
+    outAddresses,
+  ) {
     const oThis = this;
 
     return promiseChain.then(function() {
@@ -442,12 +519,14 @@ class ChainSetup {
 
       txOptions.from = originConfig.anchorOrganization.owner;
 
-      return helper.setCoAnchorAddress(coAnchorAddress, txOptions, anchorAddress).then(function() {
-        //Nothing to update.
-        let config = originConfig.anchor;
-        config.coAnchorAddress = coAnchorAddress;
-        return true;
-      });
+      return helper
+        .setCoAnchorAddress(coAnchorAddress, txOptions, anchorAddress)
+        .then(function() {
+          //Nothing to update.
+          let config = originConfig.anchor;
+          config.coAnchorAddress = coAnchorAddress;
+          return true;
+        });
     });
   }
 
@@ -459,20 +538,38 @@ class ChainSetup {
     auxiliaryConfig,
     originTxOptions,
     auxTxOptions,
-    outAddresses
+    outAddresses,
   ) {
     const oThis = this;
 
     //D.1 Deploy Libs [Aux]
-    promiseChain = oThis.setupLibsOnAux(promiseChain, auxiliaryWeb3, auxiliaryConfig, auxTxOptions, outAddresses);
+    promiseChain = oThis.setupLibsOnAux(
+      promiseChain,
+      auxiliaryWeb3,
+      auxiliaryConfig,
+      auxTxOptions,
+      outAddresses,
+    );
 
     //D.2 Deploy Libs [Orig]
-    promiseChain = oThis.setupLibsOnOrigin(promiseChain, originWeb3, originConfig, originTxOptions, outAddresses);
+    promiseChain = oThis.setupLibsOnOrigin(
+      promiseChain,
+      originWeb3,
+      originConfig,
+      originTxOptions,
+      outAddresses,
+    );
 
     return promiseChain;
   }
 
-  setupLibsOnAux(promiseChain, auxiliaryWeb3, auxiliaryConfig, auxTxOptions, outAddresses) {
+  setupLibsOnAux(
+    promiseChain,
+    auxiliaryWeb3,
+    auxiliaryConfig,
+    auxTxOptions,
+    outAddresses,
+  ) {
     const oThis = this;
     return promiseChain
       .then(function() {
@@ -484,7 +581,7 @@ class ChainSetup {
           return {
             merklePatriciaProof: helper.merklePatriciaProof,
             messageBus: helper.messageBus,
-            gatewayLib: helper.gatewayLib
+            gatewayLib: helper.gatewayLib,
           };
         });
       })
@@ -495,7 +592,13 @@ class ChainSetup {
       });
   }
 
-  setupLibsOnOrigin(promiseChain, originWeb3, originConfig, originTxOptions, outAddresses) {
+  setupLibsOnOrigin(
+    promiseChain,
+    originWeb3,
+    originConfig,
+    originTxOptions,
+    outAddresses,
+  ) {
     const oThis = this;
     return promiseChain
       .then(function() {
@@ -508,7 +611,7 @@ class ChainSetup {
           return {
             merklePatriciaProof: helper.merklePatriciaProof,
             messageBus: helper.messageBus,
-            gatewayLib: helper.gatewayLib
+            gatewayLib: helper.gatewayLib,
           };
         });
       })
@@ -528,7 +631,7 @@ class ChainSetup {
     originTxOptions,
     auxTxOptions,
     simpleTokenAddress,
-    outAddresses
+    outAddresses,
   ) {
     const oThis = this;
 
@@ -546,9 +649,9 @@ class ChainSetup {
             organizationOwner: originConfig.tokenOrganization.owner,
             anchor: outAddresses.origin.anchor,
             messageBus: outAddresses.origin.messageBus,
-            gatewayLib: outAddresses.origin.gatewayLib
+            gatewayLib: outAddresses.origin.gatewayLib,
           },
-          originConfig.gateway
+          originConfig.gateway,
         ));
 
         let cogatewayConfig = (auxiliaryConfig.cogateway = Object.assign(
@@ -560,21 +663,28 @@ class ChainSetup {
             organizationOwner: auxiliaryConfig.tokenOrganization.owner,
             anchor: outAddresses.auxiliary.anchor,
             messageBus: outAddresses.auxiliary.messageBus,
-            gatewayLib: outAddresses.auxiliary.gatewayLib
+            gatewayLib: outAddresses.auxiliary.gatewayLib,
           },
-          auxiliaryConfig.cogateway
+          auxiliaryConfig.cogateway,
         ));
 
         console.log('gatewayConfig', JSON.stringify(gatewayConfig));
         console.log('cogatewayConfig', JSON.stringify(cogatewayConfig));
 
         return helper
-          .setup(gatewayConfig, cogatewayConfig, gatewayTxOptions, cogatewayTxOptions, originWeb3, auxiliaryWeb3)
+          .setup(
+            gatewayConfig,
+            cogatewayConfig,
+            gatewayTxOptions,
+            cogatewayTxOptions,
+            originWeb3,
+            auxiliaryWeb3,
+          )
           .then(function() {
             return {
               gateway: helper.address,
               cogateway: helper.cogateway,
-              stakeVault: helper.stakeVault
+              stakeVault: helper.stakeVault,
             };
           });
       })
@@ -592,7 +702,7 @@ class ChainSetup {
     auxiliaryConfig,
     originTxOptions /* Needed for economy setup*/,
     auxTxOptions,
-    outAddresses
+    outAddresses,
   ) {
     const oThis = this;
 
@@ -616,17 +726,23 @@ class ChainSetup {
         console.log('\x1b[32m' + 'Setup Completed successfully' + '\x1b[0m\n');
 
         console.log('\x1b[1m' + 'Origin Config:' + '\x1b[0m');
-        console.log('\x1b[2m' + JSON.stringify(originConfig, null, 2) + '\x1b[0m');
+        console.log(
+          '\x1b[2m' + JSON.stringify(originConfig, null, 2) + '\x1b[0m',
+        );
 
         console.log('\x1b[1m' + 'Auxiliary Config:' + '\x1b[0m');
-        console.log('\x1b[2m' + JSON.stringify(auxiliaryConfig, null, 2) + '\x1b[0m');
+        console.log(
+          '\x1b[2m' + JSON.stringify(auxiliaryConfig, null, 2) + '\x1b[0m',
+        );
 
         console.log('\x1b[34m' + 'Addresses:' + '\x1b[0m');
-        console.log('\x1b[33m' + JSON.stringify(outAddresses, null, 2) + '\x1b[0m');
+        console.log(
+          '\x1b[33m' + JSON.stringify(outAddresses, null, 2) + '\x1b[0m',
+        );
         return {
           originConfig: originConfig,
           auxiliaryConfig: auxiliaryConfig,
-          addresses: outAddresses
+          addresses: outAddresses,
         };
       })
       .catch(function(error) {
@@ -634,13 +750,19 @@ class ChainSetup {
         console.log('\x1b[31m' + 'Setup Failed!' + '\x1b[0m\n');
 
         console.log('\x1b[1m' + 'Origin Config:' + '\x1b[0m');
-        console.log('\x1b[2m' + JSON.stringify(originConfig, null, 2) + '\x1b[0m');
+        console.log(
+          '\x1b[2m' + JSON.stringify(originConfig, null, 2) + '\x1b[0m',
+        );
 
         console.log('\x1b[1m' + 'Auxiliary Config:' + '\x1b[0m');
-        console.log('\x1b[2m' + JSON.stringify(auxiliaryConfig, null, 2) + '\x1b[0m');
+        console.log(
+          '\x1b[2m' + JSON.stringify(auxiliaryConfig, null, 2) + '\x1b[0m',
+        );
 
         console.log('\x1b[34m' + 'Addresses:' + '\x1b[0m');
-        console.log('\x1b[33m' + JSON.stringify(outAddresses, null, 2) + '\x1b[0m');
+        console.log(
+          '\x1b[33m' + JSON.stringify(outAddresses, null, 2) + '\x1b[0m',
+        );
 
         throw error;
       });

@@ -40,7 +40,14 @@ class GatewayHelper {
     "ostPrime": "0x...."
   }
 */
-  setup(gatewayConfig, coGatewayConfig, gatewayTxOptions, coGatewayTxOptions, originWeb3, auxiliaryWeb3) {
+  setup(
+    gatewayConfig,
+    coGatewayConfig,
+    gatewayTxOptions,
+    coGatewayTxOptions,
+    originWeb3,
+    auxiliaryWeb3,
+  ) {
     const oThis = this;
     originWeb3 = originWeb3 || oThis.web3;
 
@@ -64,7 +71,9 @@ class GatewayHelper {
     }
 
     if (!gatewayConfig.baseToken) {
-      throw new Error('Mandatory configuration "baseToken" missing. Set gatewayConfig.baseToken address');
+      throw new Error(
+        'Mandatory configuration "baseToken" missing. Set gatewayConfig.baseToken address',
+      );
     }
 
     GatewayHelper.validateSetupConfig(gatewayConfig);
@@ -92,13 +101,17 @@ class GatewayHelper {
       gatewayConfig.messageBus,
       gatewayConfig.gatewayLib,
       gatewayDeployParams,
-      originWeb3
+      originWeb3,
     );
 
     promiseChain = promiseChain.then(function() {
       let gatewayAddress = oThis.address;
       coGatewayConfig.gateway = gatewayAddress;
-      return coGatewayHelper.setup(coGatewayConfig, coGatewayTxOptions, auxiliaryWeb3);
+      return coGatewayHelper.setup(
+        coGatewayConfig,
+        coGatewayTxOptions,
+        auxiliaryWeb3,
+      );
     });
 
     promiseChain = promiseChain.then(function() {
@@ -107,7 +120,12 @@ class GatewayHelper {
       let coGatewayAddress = coGatewayHelper.address;
       let gatewayAddress = oThis.address;
       oThis.cogateway = coGatewayAddress;
-      return oThis.activateGateway(coGatewayAddress, ownerTxParams, gatewayAddress, originWeb3);
+      return oThis.activateGateway(
+        coGatewayAddress,
+        ownerTxParams,
+        gatewayAddress,
+        originWeb3,
+      );
     });
 
     promiseChain = promiseChain.then(async function() {
@@ -122,41 +140,65 @@ class GatewayHelper {
   static validateSetupConfig(gatewayConfig) {
     console.log(`* Validating ${ContractName} Setup Config.`);
     if (!gatewayConfig.deployer) {
-      throw new Error('Mandatory configuration "deployer" missing. Set gatewayConfig.deployer address');
+      throw new Error(
+        'Mandatory configuration "deployer" missing. Set gatewayConfig.deployer address',
+      );
     }
 
     if (!gatewayConfig.organization) {
-      throw new Error('Mandatory configuration "organization" missing. Set gatewayConfig.organization address');
+      throw new Error(
+        'Mandatory configuration "organization" missing. Set gatewayConfig.organization address',
+      );
     }
 
     if (!gatewayConfig.anchor) {
-      throw new Error('Mandatory configuration "anchor" missing. Set gatewayConfig.anchor address');
+      throw new Error(
+        'Mandatory configuration "anchor" missing. Set gatewayConfig.anchor address',
+      );
     }
 
     if (!gatewayConfig.bounty) {
-      throw new Error('Mandatory configuration "bounty" missing. Set gatewayConfig.bounty address');
+      throw new Error(
+        'Mandatory configuration "bounty" missing. Set gatewayConfig.bounty address',
+      );
     }
 
     if (!gatewayConfig.messageBus) {
-      throw new Error('Mandatory configuration "messageBus" missing. Set gatewayConfig.messageBus address');
+      throw new Error(
+        'Mandatory configuration "messageBus" missing. Set gatewayConfig.messageBus address',
+      );
     }
 
     if (!gatewayConfig.gatewayLib) {
-      throw new Error('Mandatory configuration "gatewayLib" missing. Set gatewayConfig.gatewayLib address');
+      throw new Error(
+        'Mandatory configuration "gatewayLib" missing. Set gatewayConfig.gatewayLib address',
+      );
     }
 
     if (!gatewayConfig.token) {
-      throw new Error('Mandatory configuration "token" missing. Set gatewayConfig.token address');
+      throw new Error(
+        'Mandatory configuration "token" missing. Set gatewayConfig.token address',
+      );
     }
 
     if (!gatewayConfig.organizationOwner) {
       throw new Error(
-        'Mandatory configuration "organizationOwner" missing. Set gatewayConfig.organizationOwner address'
+        'Mandatory configuration "organizationOwner" missing. Set gatewayConfig.organizationOwner address',
       );
     }
   }
 
-  deploy(_token, _baseToken, _anchor, _bounty, _membersManager, messageBusAddress, gatewayLibAddress, txOptions, web3) {
+  deploy(
+    _token,
+    _baseToken,
+    _anchor,
+    _bounty,
+    _membersManager,
+    messageBusAddress,
+    gatewayLibAddress,
+    txOptions,
+    web3,
+  ) {
     const oThis = this;
 
     web3 = web3 || oThis.web3;
@@ -172,7 +214,7 @@ class GatewayHelper {
       messageBusAddress,
       gatewayLibAddress,
       txOptions,
-      web3
+      web3,
     );
 
     console.log('* Deploying EIP20Gateway Contract');
@@ -188,7 +230,11 @@ class GatewayHelper {
       })
       .on('receipt', function(receipt) {
         txReceipt = receipt;
-        console.log('\t - Receipt:\n\x1b[2m', JSON.stringify(receipt), '\x1b[0m\n');
+        console.log(
+          '\t - Receipt:\n\x1b[2m',
+          JSON.stringify(receipt),
+          '\x1b[0m\n',
+        );
       })
       .then(function(instace) {
         oThis.address = instace.options.address;
@@ -206,25 +252,29 @@ class GatewayHelper {
     messageBusAddress,
     gatewayLibAddress,
     txOptions,
-    web3
+    web3,
   ) {
     const oThis = this;
 
     const messageBusLibInfo = {
       address: messageBusAddress,
-      name: 'MessageBus'
+      name: 'MessageBus',
     };
     const gatewayLibInfo = {
       address: gatewayLibAddress,
-      name: 'GatewayLib'
+      name: 'GatewayLib',
     };
 
     const abiBinProvider = oThis.abiBinProvider;
     const abi = abiBinProvider.getABI(ContractName);
-    const bin = abiBinProvider.getLinkedBIN(ContractName, messageBusLibInfo, gatewayLibInfo);
+    const bin = abiBinProvider.getLinkedBIN(
+      ContractName,
+      messageBusLibInfo,
+      gatewayLibInfo,
+    );
 
     let defaultOptions = {
-      gas: '7500000'
+      gas: '7500000',
     };
     if (txOptions) {
       Object.assign(defaultOptions, txOptions);
@@ -234,14 +284,21 @@ class GatewayHelper {
 
     const contract = new web3.eth.Contract(abi, null, txOptions);
     const _burner = '0x0000000000000000000000000000000000000000';
-    let args = [_token, _baseToken, _anchor, _bounty, _membersManager, _burner];
+    let args = [
+      _token,
+      _baseToken,
+      _anchor,
+      _bounty,
+      _membersManager,
+      _burner,
+    ];
 
     return contract.deploy(
       {
         data: bin,
-        arguments: args
+        arguments: args,
       },
-      txOptions
+      txOptions,
     );
   }
 
@@ -250,9 +307,16 @@ class GatewayHelper {
     web3 = web3 || oThis.web3;
     contractAddress = contractAddress || oThis.address;
 
-    let tx = oThis._activateGatewayRawTx(_coGatewayAddress, txOptions, contractAddress, web3);
+    let tx = oThis._activateGatewayRawTx(
+      _coGatewayAddress,
+      txOptions,
+      contractAddress,
+      web3,
+    );
 
-    console.log(`* Activating ${ContractName} with CoGateWay Address: ${_coGatewayAddress}`);
+    console.log(
+      `* Activating ${ContractName} with CoGateWay Address: ${_coGatewayAddress}`,
+    );
 
     return tx
       .send(txOptions)
@@ -260,7 +324,11 @@ class GatewayHelper {
         console.log('\t - transaction hash:', transactionHash);
       })
       .on('receipt', function(receipt) {
-        console.log('\t - Receipt:\n\x1b[2m', JSON.stringify(receipt), '\x1b[0m\n');
+        console.log(
+          '\t - Receipt:\n\x1b[2m',
+          JSON.stringify(receipt),
+          '\x1b[0m\n',
+        );
       })
       .on('error', function(error) {
         console.log('\t !! Error !!', error, '\n\t !! ERROR !!\n');
@@ -272,7 +340,7 @@ class GatewayHelper {
     const oThis = this;
 
     let defaultOptions = {
-      gas: '2000000'
+      gas: '2000000',
     };
 
     if (txOptions) {

@@ -23,7 +23,7 @@
 const { assert } = require('chai');
 const Web3 = require('web3');
 
-const OrganizationHelper = require('../../libs/helpers/setup/OrganizationHelper');
+const OrganizationHelper = require('../../src/helpers/setup/OrganizationHelper');
 
 const shared = require('../shared');
 
@@ -37,8 +37,14 @@ const assertReceipt = (receipt) => {
 const assertDeploymentReceipt = (receipt) => {
   assertReceipt(receipt);
   const contractAddress = receipt.contractAddress;
-  assert.isNotEmpty(contractAddress, 'Deployment Receipt is missing contractAddress');
-  assert.isTrue(Web3.utils.isAddress(contractAddress), 'Invalid contractAddress in Receipt');
+  assert.isNotEmpty(
+    contractAddress,
+    'Deployment Receipt is missing contractAddress',
+  );
+  assert.isTrue(
+    Web3.utils.isAddress(contractAddress),
+    'Invalid contractAddress in Receipt',
+  );
   return receipt;
 };
 
@@ -49,7 +55,7 @@ describe('OrganizationHelper', () => {
   beforeEach(() => {
     deployParams = {
       from: shared.setupConfig.deployerAddress,
-      gasPrice: shared.setupConfig.gasPrice
+      gasPrice: shared.setupConfig.gasPrice,
     };
 
     orgConfig = {
@@ -57,7 +63,7 @@ describe('OrganizationHelper', () => {
       owner: shared.setupConfig.deployerAddress,
       admin: shared.setupConfig.organizationAdmin,
       workers: [shared.setupConfig.organizationWorker],
-      workerExpirationHeight: '2000000'
+      workerExpirationHeight: '2000000',
     };
   });
 
@@ -71,7 +77,9 @@ describe('OrganizationHelper', () => {
   const subject = new OrganizationHelper(shared.origin.web3);
 
   it('should deploy new organization contract', () => {
-    return subject.deploy(orgConfig.owner, null, null, null, deployParams).then(assertDeploymentReceipt);
+    return subject
+      .deploy(orgConfig.owner, null, null, null, deployParams)
+      .then(assertDeploymentReceipt);
   });
 
   it('should set admin address', () => {
@@ -81,18 +89,22 @@ describe('OrganizationHelper', () => {
 
   it('should set worker address', () => {
     const workerKeyAddress = orgConfig.workers[0];
-    return subject.setWorker(workerKeyAddress, '10000000', deployParams).then(assertReceipt);
+    return subject
+      .setWorker(workerKeyAddress, '10000000', deployParams)
+      .then(assertReceipt);
   });
 
   it('should initiate Ownership Transfer', () => {
     const ownerKeyAddress = orgConfig.admin;
-    return subject.initiateOwnershipTransfer(ownerKeyAddress, deployParams).then(assertReceipt);
+    return subject
+      .initiateOwnershipTransfer(ownerKeyAddress, deployParams)
+      .then(assertReceipt);
   });
 
   it('should complete Ownership Transfer', () => {
     const ownerKeyAddress = orgConfig.admin;
     const ownerParams = Object.assign({}, deployParams, {
-      from: ownerKeyAddress
+      from: ownerKeyAddress,
     });
     return subject.completeOwnershipTransfer(ownerParams).then(assertReceipt);
   });

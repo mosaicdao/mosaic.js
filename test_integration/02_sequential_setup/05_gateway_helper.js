@@ -23,7 +23,7 @@
 const { assert } = require('chai');
 const Web3 = require('web3');
 
-const GatewayHelper = require('../../libs/helpers/setup/GatewayHelper');
+const GatewayHelper = require('../../src/helpers/setup/GatewayHelper');
 
 const shared = require('../shared');
 
@@ -37,8 +37,14 @@ const assertReceipt = (receipt) => {
 const assertDeploymentReceipt = (receipt) => {
   assertReceipt(receipt);
   const contractAddress = receipt.contractAddress;
-  assert.isNotEmpty(contractAddress, 'Deployment Receipt is missing contractAddress');
-  assert.isTrue(Web3.utils.isAddress(contractAddress), 'Invalid contractAddress in Receipt');
+  assert.isNotEmpty(
+    contractAddress,
+    'Deployment Receipt is missing contractAddress',
+  );
+  assert.isTrue(
+    Web3.utils.isAddress(contractAddress),
+    'Invalid contractAddress in Receipt',
+  );
   return receipt;
 };
 
@@ -50,7 +56,7 @@ describe('GatewayHelper', () => {
   before(() => {
     deployParams = {
       from: shared.setupConfig.deployerAddress,
-      gasPrice: shared.setupConfig.gasPrice
+      gasPrice: shared.setupConfig.gasPrice,
     };
   });
 
@@ -70,7 +76,7 @@ describe('GatewayHelper', () => {
         shared.origin.addresses.Organization,
         shared.origin.addresses.MessageBus,
         shared.origin.addresses.GatewayLib,
-        deployParams
+        deployParams,
       )
       .then(assertDeploymentReceipt)
       .then((receipt) => {
@@ -91,7 +97,7 @@ describe('GatewayHelper', () => {
       anchor: shared.origin.addresses.Anchor,
       bounty: '123456',
       messageBus: shared.origin.addresses.MessageBus,
-      gatewayLib: shared.origin.addresses.GatewayLib
+      gatewayLib: shared.origin.addresses.GatewayLib,
     };
 
     const coGatewayConfig = {
@@ -102,7 +108,7 @@ describe('GatewayHelper', () => {
       anchor: shared.auxiliary.addresses.Anchor,
       bounty: '123456',
       messageBus: shared.auxiliary.addresses.MessageBus,
-      gatewayLib: shared.auxiliary.addresses.GatewayLib
+      gatewayLib: shared.auxiliary.addresses.GatewayLib,
     };
 
     return subject.setup(
@@ -111,7 +117,7 @@ describe('GatewayHelper', () => {
       deployParams,
       deployParams,
       shared.origin.web3,
-      shared.auxiliary.web3
+      shared.auxiliary.web3,
     );
   });
 });

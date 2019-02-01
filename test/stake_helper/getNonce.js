@@ -21,7 +21,7 @@
 const chai = require('chai');
 const sinon = require('sinon');
 const Web3 = require('web3');
-const StakeHelper = require('../../libs/helpers/StakeHelper');
+const StakeHelper = require('../../src/helpers/StakeHelper');
 const SpyAssert = require('../../test_utils/SpyAssert');
 
 const assert = chai.assert;

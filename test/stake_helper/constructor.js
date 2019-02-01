@@ -20,7 +20,7 @@
 
 const chai = require('chai');
 const Web3 = require('web3');
-const StakeHelper = require('../../libs/helpers/StakeHelper');
+const StakeHelper = require('../../src/helpers/StakeHelper');
 
 const assert = chai.assert;
 

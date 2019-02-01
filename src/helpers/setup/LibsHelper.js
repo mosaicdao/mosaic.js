@@ -62,7 +62,9 @@ class LibsHelper {
     }
 
     if (!config.deployer) {
-      throw new Error('Mandatory configuration "deployer" missing. Set config.deployer address');
+      throw new Error(
+        'Mandatory configuration "deployer" missing. Set config.deployer address',
+      );
     }
     return true;
   }
@@ -88,11 +90,18 @@ class LibsHelper {
       })
       .on('receipt', function(receipt) {
         txReceipt = receipt;
-        console.log('\t - Receipt:\n\x1b[2m', JSON.stringify(receipt), '\x1b[0m\n');
+        console.log(
+          '\t - Receipt:\n\x1b[2m',
+          JSON.stringify(receipt),
+          '\x1b[0m\n',
+        );
       })
       .then(function(instace) {
         oThis.merklePatriciaProof = instace.options.address;
-        console.log(`\t - ${LibName} Contract Address:`, oThis.merklePatriciaProof);
+        console.log(
+          `\t - ${LibName} Contract Address:`,
+          oThis.merklePatriciaProof,
+        );
         return txReceipt;
       });
   }
@@ -105,7 +114,7 @@ class LibsHelper {
     const bin = abiBinProvider.getBIN(LibName);
 
     let defaultOptions = {
-      gas: '3000000'
+      gas: '3000000',
     };
 
     if (txOptions) {
@@ -119,9 +128,9 @@ class LibsHelper {
     return contract.deploy(
       {
         data: bin,
-        arguments: args
+        arguments: args,
       },
-      txOptions
+      txOptions,
     );
   }
 
@@ -147,7 +156,11 @@ class LibsHelper {
       })
       .on('receipt', function(receipt) {
         txReceipt = receipt;
-        console.log('\t - Receipt:\n\x1b[2m', JSON.stringify(receipt), '\x1b[0m\n');
+        console.log(
+          '\t - Receipt:\n\x1b[2m',
+          JSON.stringify(receipt),
+          '\x1b[0m\n',
+        );
       })
       .then(function(instace) {
         oThis.messageBus = instace.options.address;
@@ -162,7 +175,7 @@ class LibsHelper {
 
     let merklePatriciaProofInfo = {
       name: LibsHelper.MerklePatriciaProofLibName,
-      address: merklePatriciaProof
+      address: merklePatriciaProof,
     };
 
     const abiBinProvider = oThis.abiBinProvider;
@@ -170,7 +183,7 @@ class LibsHelper {
     const bin = abiBinProvider.getLinkedBIN(LibName, merklePatriciaProofInfo);
 
     let defaultOptions = {
-      gas: '5000000'
+      gas: '5000000',
     };
 
     if (txOptions) {
@@ -184,9 +197,9 @@ class LibsHelper {
     return contract.deploy(
       {
         data: bin,
-        arguments: args
+        arguments: args,
       },
-      txOptions
+      txOptions,
     );
   }
 
@@ -196,7 +209,11 @@ class LibsHelper {
     web3 = web3 || oThis.web3;
     merklePatriciaProof = merklePatriciaProof || oThis.merklePatriciaProof;
 
-    let tx = oThis._deployGatewayLibRawTx(merklePatriciaProof, txOptions, web3);
+    let tx = oThis._deployGatewayLibRawTx(
+      merklePatriciaProof,
+      txOptions,
+      web3,
+    );
 
     console.log(`* Deploying ${LibName} Contract`);
 
@@ -212,7 +229,11 @@ class LibsHelper {
       })
       .on('receipt', function(receipt) {
         txReceipt = receipt;
-        console.log('\t - Receipt:\n\x1b[2m', JSON.stringify(receipt), '\x1b[0m\n');
+        console.log(
+          '\t - Receipt:\n\x1b[2m',
+          JSON.stringify(receipt),
+          '\x1b[0m\n',
+        );
       })
       .then(function(instace) {
         oThis.gatewayLib = instace.options.address;
@@ -226,7 +247,7 @@ class LibsHelper {
       LibName = LibsHelper.GatewayLibName;
     let merklePatriciaProofInfo = {
       name: LibsHelper.MerklePatriciaProofLibName,
-      address: merklePatriciaProof
+      address: merklePatriciaProof,
     };
 
     const abiBinProvider = oThis.abiBinProvider;
@@ -234,7 +255,7 @@ class LibsHelper {
     const bin = abiBinProvider.getLinkedBIN(LibName, merklePatriciaProofInfo);
 
     let defaultOptions = {
-      gas: '2000000'
+      gas: '2000000',
     };
 
     if (txOptions) {
@@ -248,9 +269,9 @@ class LibsHelper {
     return contract.deploy(
       {
         data: bin,
-        arguments: args
+        arguments: args,
       },
-      txOptions
+      txOptions,
     );
   }
 
