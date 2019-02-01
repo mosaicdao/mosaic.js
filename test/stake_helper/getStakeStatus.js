@@ -27,7 +27,7 @@ const SpyAssert = require('../../test_utils/SpyAssert');
 
 const assert = chai.assert;
 
-describe('StakeHelper.getMintStatus()', () => {
+describe('StakeHelper.getStakeStatus()', () => {
   let stakeHelper;
   let web3;
   let gatewayAddress;
@@ -46,21 +46,21 @@ describe('StakeHelper.getMintStatus()', () => {
     );
   });
 
-  it('should return correct mint status', async function() {
+  it('should return correct stake status', async function() {
     const mockedMessageStatus = '1';
     const messageHash =
       '0x0000000000000000000000000000000000000000000000000000000000000001';
 
-    // Mock an instance of cogateway contract.
+    // Mock an instance of gateway contract.
     const mockContract = sinon.mock(
-      Contracts.getEIP20CoGateway(web3, coGatewayAddress),
+      Contracts.getEIP20Gateway(web3, gatewayAddress),
     );
-    const coGatewayContract = mockContract.object;
+    const gatewayContract = mockContract.object;
 
-    // Fake the getInboxMessageStatus call.
-    const spyGetInboxMessageStatus = sinon.replace(
-      coGatewayContract.methods,
-      'getInboxMessageStatus',
+    // Fake the getOutboxMessageStatus call.
+    const spyGetOutboxMessageStatus = sinon.replace(
+      gatewayContract.methods,
+      'getOutboxMessageStatus',
       sinon.fake.returns(() => {
         return Promise.resolve(mockedMessageStatus);
       }),
@@ -68,15 +68,15 @@ describe('StakeHelper.getMintStatus()', () => {
 
     const spyContract = sinon.replace(
       Contracts,
-      'getEIP20CoGateway',
-      sinon.fake.returns(coGatewayContract),
+      'getEIP20Gateway',
+      sinon.fake.returns(gatewayContract),
     );
 
-    // Add spy on stakeHelper.getMintStatus.
-    const spy = sinon.spy(stakeHelper, 'getMintStatus');
+    // Add spy on stakeHelper.getStakeStatus.
+    const spy = sinon.spy(stakeHelper, 'getStakeStatus');
 
-    // Call getMintStatus.
-    const status = await stakeHelper.getMintStatus(messageHash);
+    // Call getStakeStatus.
+    const status = await stakeHelper.getStakeStatus(messageHash);
 
     // Assert the returned value.
     assert.strictEqual(
@@ -85,8 +85,8 @@ describe('StakeHelper.getMintStatus()', () => {
       'Message status from contract amount must be equal to expected value.',
     );
 
-    SpyAssert.assert(spyGetInboxMessageStatus, 1, [[messageHash]]);
-    SpyAssert.assert(spyContract, 1, [[web3, coGatewayAddress]]);
+    SpyAssert.assert(spyGetOutboxMessageStatus, 1, [[messageHash]]);
+    SpyAssert.assert(spyContract, 1, [[web3, gatewayAddress]]);
     SpyAssert.assert(spy, 1, [[messageHash]]);
 
     // Restore all mocked and spy objects.

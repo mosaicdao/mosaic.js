@@ -83,7 +83,7 @@ class StakeHelper {
    *
    * @returns {Promise} Promise object represents the bounty.
    */
-  getBounty() {
+  async getBounty() {
     if (this.bountyAmount) {
       return Promise.resolve(this.bountyAmount);
     }
@@ -428,7 +428,7 @@ class StakeHelper {
    *
    * @returns {Promise} Promise object.
    */
-  proveGateway(blockHeight, accountData, accountProof, txOption) {
+  async proveGateway(blockHeight, accountData, accountProof, txOption) {
     if (blockHeight === undefined) {
       throw new Error('Invalid block height.');
     }
@@ -475,7 +475,7 @@ class StakeHelper {
    *
    * @returns {Object} Raw transaction object.
    */
-  confirmStakeIntent(
+  async confirmStakeIntent(
     staker,
     nonce,
     beneficiary,
@@ -552,7 +552,7 @@ class StakeHelper {
    *
    * @returns {Promise} promise object.
    */
-  progressMint(messageHash, unlockSecret, txOption) {
+  async progressMint(messageHash, unlockSecret, txOption) {
     if (typeof messageHash !== 'string') {
       throw new Error('Invalid message hash.');
     }
@@ -587,7 +587,7 @@ class StakeHelper {
    *
    * @returns {Promise} promise object.
    */
-  progressStake(messageHash, unlockSecret, txOption) {
+  async progressStake(messageHash, unlockSecret, txOption) {
     if (typeof messageHash !== 'string') {
       throw new Error('Invalid message hash.');
     }
