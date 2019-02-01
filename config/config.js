@@ -38,9 +38,8 @@ const readAnchorConfig = (configFile, target, anchorCmd) => {
   const regexp = new RegExp(`(${TARGET.ORIGIN}|${TARGET.AUXILIARY})`);
   if (target.match(regexp) === null) {
     console.log(
-      `  error: argument \`target\` must be "${TARGET.ORIGIN}" or "${
-        TARGET.AUXILIARY
-      }"`,
+      'error: argument `target` must be ' +
+        `"${TARGET.ORIGIN}" or "${TARGET.AUXILIARY}"`,
     );
     process.exit(1);
   }
