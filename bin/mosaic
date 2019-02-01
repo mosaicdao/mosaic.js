@@ -1,0 +1,56 @@
+#!/usr/bin/env node
+
+// Copyright 2019 OpenST Ltd.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// ----------------------------------------------------------------------------
+//
+// http://www.simpletoken.org/
+//
+// ----------------------------------------------------------------------------
+
+'use strict';
+
+const mosaic = require('commander');
+
+const anchor = require('../src/cli/anchor');
+const { version } = require('../package.json');
+
+mosaic
+  .version(version);
+
+mosaic
+  .command('anchor <config> <target>')
+  .option('-a, --address <string>', 'the address of the anchor')
+  .option('-d, --delay <number>', 'the number of blocks to delay anchoring', parseInt)
+  .description(
+    'Anchor a state root to a different blockchain.\n\n'
+    + '<config> must be a configuration file in JSON format.\n'
+    + '<target> must be "origin" or "auxiliary".\n\n'
+    + 'Options given on the command line override options from the config file.',
+  )
+  .action(
+    (configFile, target, anchorCmd) => anchor(configFile, target, anchorCmd),
+  );
+
+// Example how the facilitator would be added:
+// mosaic
+//   .command('facilitate <config>')
+//   .description(
+//     'Facilitate a stake or redeem process.\n' +
+//     '<config> must be a configuration file in JSON format.',
+//   )
+//   .action((configFile, facilitateCmd) => facilitate(configFile, facilitateCmd));
+
+mosaic.parse(process.argv);

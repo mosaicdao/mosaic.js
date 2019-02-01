@@ -1,0 +1,12 @@
+{
+  "anchor": {
+    "origin": {
+      "address": "0x...",
+      "delay": 24
+    },
+    "auxiliary": {
+      "address": "0x...",
+      "delay": 8
+    }
+  }
+}
