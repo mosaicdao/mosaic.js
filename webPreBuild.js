@@ -3,7 +3,7 @@
 const fs = require('fs'),
   rootPrefix = '.',
   paths = ['/contracts/abi', '/contracts/bin'],
-  readableFile = rootPrefix + '/libs/AbiBinProvider.js',
+  readableFile = rootPrefix + '/src/AbiBinProvider.js',
   writableFile = rootPrefix + '/tmp/AbiBinProvider.js',
   protoToAddData = 'AbiBinProvider.prototype',
   addAbiFuncName = 'addABI',
@@ -47,7 +47,15 @@ function createAddFun(item, fileContent) {
     closeBracket = ')',
     paramsSeparator = ' , ',
     funcName = fileType == 'abi' ? addAbiFuncName : addBinFuncName,
-    content = protoToAddData + separator + funcName + openBracket + name + paramsSeparator + fileContent + closeBracket;
+    content =
+      protoToAddData +
+      separator +
+      funcName +
+      openBracket +
+      name +
+      paramsSeparator +
+      fileContent +
+      closeBracket;
   fileInsertContents.push(content);
 }
 
@@ -68,7 +76,12 @@ function writeToFile() {
     }
 
     let fileContent =
-        startDelimiter + newline + fileInsertContents.join(semicolon + newline) + semicolon + newline + endDelimiter,
+        startDelimiter +
+        newline +
+        fileInsertContents.join(semicolon + newline) +
+        semicolon +
+        newline +
+        endDelimiter,
       result = data.replace(replaceRegex, fileContent);
 
     fs.writeFileSync(writableFile, result);
@@ -80,7 +93,8 @@ function appendToFile() {
     const newline = '\r\n';
 
     let semicolon = ';',
-      extraContent = newline + fileInsertContents.join(semicolon + newline) + semicolon,
+      extraContent =
+        newline + fileInsertContents.join(semicolon + newline) + semicolon,
       result = data + newline + extraContent;
 
     fs.writeFileSync(writableFile, result);

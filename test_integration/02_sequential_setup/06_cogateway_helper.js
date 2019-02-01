@@ -23,7 +23,7 @@
 const { assert } = require('chai');
 const Web3 = require('web3');
 
-const CoGatewayHelper = require('../../libs/helpers/setup/CoGatewayHelper');
+const CoGatewayHelper = require('../../src/helpers/setup/CoGatewayHelper');
 
 const shared = require('../shared');
 
@@ -37,8 +37,14 @@ const assertReceipt = (receipt) => {
 const assertDeploymentReceipt = (receipt) => {
   assertReceipt(receipt);
   const contractAddress = receipt.contractAddress;
-  assert.isNotEmpty(contractAddress, 'Deployment Receipt is missing contractAddress');
-  assert.isTrue(Web3.utils.isAddress(contractAddress), 'Invalid contractAddress in Receipt');
+  assert.isNotEmpty(
+    contractAddress,
+    'Deployment Receipt is missing contractAddress',
+  );
+  assert.isTrue(
+    Web3.utils.isAddress(contractAddress),
+    'Invalid contractAddress in Receipt',
+  );
   return receipt;
 };
 
@@ -52,7 +58,7 @@ describe('CoGatewayHelper', () => {
   before(() => {
     deployParams = {
       from: shared.setupConfig.deployerAddress,
-      gasPrice: shared.setupConfig.gasPrice
+      gasPrice: shared.setupConfig.gasPrice,
     };
     organizationOwner = shared.setupConfig.deployerAddress;
   });
@@ -75,7 +81,7 @@ describe('CoGatewayHelper', () => {
         shared.auxiliary.addresses.Organization,
         shared.auxiliary.addresses.MessageBus,
         shared.auxiliary.addresses.GatewayLib,
-        deployParams
+        deployParams,
       )
       .then(assertDeploymentReceipt)
       .then((receipt) => {

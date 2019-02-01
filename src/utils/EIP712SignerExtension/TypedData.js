@@ -11,7 +11,7 @@ const TYPED_DATA_JSON_SCHEMA = {
     types: {
       type: 'object',
       properties: {
-        EIP712Domain: { type: 'array' }
+        EIP712Domain: { type: 'array' },
       },
       additionalProperties: {
         type: 'array',
@@ -19,18 +19,18 @@ const TYPED_DATA_JSON_SCHEMA = {
           type: 'object',
           properties: {
             name: { type: 'string' },
-            type: { type: 'string' }
+            type: { type: 'string' },
           },
-          required: ['name', 'type']
-        }
+          required: ['name', 'type'],
+        },
       },
-      required: ['EIP712Domain']
+      required: ['EIP712Domain'],
     },
     primaryType: { type: 'string' },
     domain: { type: 'object' },
-    message: { type: 'object' }
+    message: { type: 'object' },
   },
-  required: ['types', 'primaryType', 'domain', 'message']
+  required: ['types', 'primaryType', 'domain', 'message'],
 };
 
 // Options can be passed, e.g. {allErrors: true}
@@ -39,7 +39,9 @@ const typedDataValidatorFunction = (function(schema) {
   return ajv.compile(schema);
 })(TYPED_DATA_JSON_SCHEMA);
 
-const DEFAULT_EIP712_DOMAIN_TYPE = [{ name: 'verifyingContract', type: 'address' }];
+const DEFAULT_EIP712_DOMAIN_TYPE = [
+  { name: 'verifyingContract', type: 'address' },
+];
 
 /**
  * The class sets attributes/data and signs the data as per EIP712 standard.
@@ -163,7 +165,10 @@ class TypedData {
 
     if (!(oThis.types.EIP712Domain instanceof Array)) {
       // Assign the cloned object.
-      var clonedEIP712DomainType = Object.assign({}, DEFAULT_EIP712_DOMAIN_TYPE);
+      var clonedEIP712DomainType = Object.assign(
+        {},
+        DEFAULT_EIP712_DOMAIN_TYPE,
+      );
       oThis.types.EIP712Domain = clonedEIP712DomainType;
     }
   }
@@ -255,7 +260,9 @@ class TypedData {
     let types = oThis.getTypes();
     let result = '';
     for (let type of deps) {
-      result += `${type}(${types[type].map(({ name, type }) => `${type} ${name}`).join(',')})`;
+      result += `${type}(${types[type]
+        .map(({ name, type }) => `${type} ${name}`)
+        .join(',')})`;
     }
     return result;
   }
@@ -344,7 +351,7 @@ class TypedData {
       { t: 'bytes', v: oThis.INITIAL_BYTE },
       { t: 'bytes', v: oThis.VERSION },
       { t: 'bytes32', v: domainSeparator },
-      { t: 'bytes32', v: message }
+      { t: 'bytes32', v: message },
     );
   }
 
@@ -360,7 +367,7 @@ class TypedData {
       types: oThis.getTypes(),
       primaryType: oThis.getPrimaryType(),
       domain: oThis.getDomain(),
-      message: oThis.getMessage()
+      message: oThis.getMessage(),
     };
 
     let isDataValid = TypedData.validateData(data);

@@ -20,7 +20,7 @@
 
 const Web3 = require('web3');
 const BN = require('bn.js');
-const Contracts = require('../../libs/Contracts');
+const Contracts = require('../Contracts');
 const Utils = require('../utils/Utils.js');
 
 /**

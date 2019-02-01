@@ -15,7 +15,7 @@ let extend = function() {
   }
 
   const Account = require('eth-lib/lib/account');
-  const TypedData = require('../../../libs/utils/EIP712SignerExtension/TypedData');
+  const TypedData = require('./TypedData');
 
   /**
    * Extends Accounts prototype and adds signEIP712TypedData method.
@@ -25,7 +25,11 @@ let extend = function() {
    * @param callback
    * @returns {{messageHash: String, v: *, r: *, s: *, signature: *}}
    */
-  Accounts.prototype.signEIP712TypedData = (typedData, privateKey, callback) => {
+  Accounts.prototype.signEIP712TypedData = (
+    typedData,
+    privateKey,
+    callback,
+  ) => {
     let result;
     try {
       if (!(typedData instanceof TypedData)) {
@@ -39,7 +43,7 @@ let extend = function() {
         r: vrs[1],
         s: vrs[2],
         v: vrs[0],
-        signature: signature
+        signature: signature,
       };
     } catch (error) {
       callback && callback(error);
@@ -62,9 +66,18 @@ let extend = function() {
     const oAccounts = this;
     account = orgAddAccountFunctions.apply(oAccounts, arguments);
 
-    account.signEIP712TypedData = function(typeDataInstance, callback, version) {
+    account.signEIP712TypedData = function(
+      typeDataInstance,
+      callback,
+      version,
+    ) {
       console.log('Calling signEIP712TypedData function');
-      return oAccounts.signEIP712TypedData(typeDataInstance, account.privateKey, callback, version);
+      return oAccounts.signEIP712TypedData(
+        typeDataInstance,
+        account.privateKey,
+        callback,
+        version,
+      );
     };
 
     return account;

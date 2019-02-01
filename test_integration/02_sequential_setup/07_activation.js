@@ -22,9 +22,9 @@
 
 const { assert } = require('chai');
 
-const AnchorHelper = require('../../libs/helpers/setup/AnchorHelper');
-const GatewayHelper = require('../../libs/helpers/setup/GatewayHelper');
-const OSTPrimeHelper = require('../../libs/helpers/setup/OSTPrimeHelper');
+const AnchorHelper = require('../../src/helpers/setup/AnchorHelper');
+const GatewayHelper = require('../../src/helpers/setup/GatewayHelper');
+const OSTPrimeHelper = require('../../src/helpers/setup/OSTPrimeHelper');
 
 const shared = require('../shared');
 
@@ -40,30 +40,46 @@ describe('Activate deployed contracts', () => {
   it('should set coAnchor', () => {
     const addressCoAnchor = shared.auxiliary.addresses.Anchor;
     const txOptions = {
-      from: shared.setupConfig.organizationOwner
+      from: shared.setupConfig.organizationOwner,
     };
 
-    const subject = new AnchorHelper(shared.origin.web3, shared.auxiliary.web3, shared.origin.addresses.Anchor);
-    return subject.setCoAnchorAddress(addressCoAnchor, txOptions).then(assertReceipt);
+    const subject = new AnchorHelper(
+      shared.origin.web3,
+      shared.auxiliary.web3,
+      shared.origin.addresses.Anchor,
+    );
+    return subject
+      .setCoAnchorAddress(addressCoAnchor, txOptions)
+      .then(assertReceipt);
   });
 
   it('should set CoGateway on OSTPrime', () => {
     const addressCoGateway = shared.auxiliary.addresses.CoGateway;
     const txOptions = {
-      from: shared.setupConfig.organizationOwner
+      from: shared.setupConfig.organizationOwner,
     };
 
-    const subject = new OSTPrimeHelper(shared.auxiliary.web3, shared.auxiliary.addresses.OSTPrime);
-    return subject.setCoGateway(addressCoGateway, txOptions).then(assertReceipt);
+    const subject = new OSTPrimeHelper(
+      shared.auxiliary.web3,
+      shared.auxiliary.addresses.OSTPrime,
+    );
+    return subject
+      .setCoGateway(addressCoGateway, txOptions)
+      .then(assertReceipt);
   });
 
   it('should activate gateway', () => {
     const addressCoGateway = shared.auxiliary.addresses.CoGateway;
     const txOptions = {
-      from: shared.setupConfig.organizationOwner
+      from: shared.setupConfig.organizationOwner,
     };
 
-    const subject = new GatewayHelper(shared.origin.web3, shared.origin.addresses.Gateway);
-    return subject.activateGateway(addressCoGateway, txOptions).then(assertReceipt);
+    const subject = new GatewayHelper(
+      shared.origin.web3,
+      shared.origin.addresses.Gateway,
+    );
+    return subject
+      .activateGateway(addressCoGateway, txOptions)
+      .then(assertReceipt);
   });
 });

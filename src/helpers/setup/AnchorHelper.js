@@ -35,7 +35,9 @@ class AnchorHelper {
     AnchorHelper.validateSetupConfig(config);
 
     if (!config.organization) {
-      throw new Error('Mandatory configuration "organization" missing. Set config.organization contract address.');
+      throw new Error(
+        'Mandatory configuration "organization" missing. Set config.organization contract address.',
+      );
     }
 
     if (!txOptions) {
@@ -66,7 +68,7 @@ class AnchorHelper {
         stateRoot,
         config.maxStateRoots,
         config.organization,
-        deployParams
+        deployParams,
       );
     });
 
@@ -89,21 +91,33 @@ class AnchorHelper {
     }
 
     if (!config.deployer) {
-      throw new Error('Mandatory configuration "deployer" missing. Set config.deployer address');
+      throw new Error(
+        'Mandatory configuration "deployer" missing. Set config.deployer address',
+      );
     }
 
     if (!config.remoteChainId) {
-      throw new Error('Mandatory configuration "remoteChainId" missing. Set config.remoteChainId.');
+      throw new Error(
+        'Mandatory configuration "remoteChainId" missing. Set config.remoteChainId.',
+      );
     }
 
     if (config.coAnchorAddress && !config.organizationOwner) {
       throw new Error(
-        'Mandatory configuration "organizationOwner" missing. Set config.organizationOwner address. organizationOwner is mandatory when using coAnchorAddress config option'
+        'Mandatory configuration "organizationOwner" missing. Set config.organizationOwner address. organizationOwner is mandatory when using coAnchorAddress config option',
       );
     }
   }
 
-  deploy(_remoteChainId, _blockHeight, _stateRoot, _maxStateRoots, _membersManager, txOptions, web3) {
+  deploy(
+    _remoteChainId,
+    _blockHeight,
+    _stateRoot,
+    _maxStateRoots,
+    _membersManager,
+    txOptions,
+    web3,
+  ) {
     const oThis = this;
     web3 = web3 || oThis.web3;
 
@@ -114,7 +128,7 @@ class AnchorHelper {
       _maxStateRoots,
       _membersManager,
       txOptions,
-      web3
+      web3,
     );
 
     console.log(`* Deploying ${ContractName} Contract`);
@@ -131,7 +145,11 @@ class AnchorHelper {
       })
       .on('receipt', function(receipt) {
         txReceipt = receipt;
-        console.log('\t - Receipt:\n\x1b[2m', JSON.stringify(receipt), '\x1b[0m\n');
+        console.log(
+          '\t - Receipt:\n\x1b[2m',
+          JSON.stringify(receipt),
+          '\x1b[0m\n',
+        );
       })
       .then(function(instace) {
         oThis.address = instace.options.address;
@@ -140,14 +158,22 @@ class AnchorHelper {
       });
   }
 
-  _deployRawTx(_remoteChainId, _blockHeight, _stateRoot, _maxStateRoots, _membersManager, txOptions, web3) {
+  _deployRawTx(
+    _remoteChainId,
+    _blockHeight,
+    _stateRoot,
+    _maxStateRoots,
+    _membersManager,
+    txOptions,
+    web3,
+  ) {
     const oThis = this;
     const abiBinProvider = oThis.abiBinProvider;
     const abi = abiBinProvider.getABI(ContractName);
     const bin = abiBinProvider.getBIN(ContractName);
 
     let defaultOptions = {
-      gas: '1000000'
+      gas: '1000000',
     };
 
     if (txOptions) {
@@ -157,15 +183,21 @@ class AnchorHelper {
     txOptions = defaultOptions;
     _maxStateRoots = _maxStateRoots || AnchorHelper.DEFAULT_MAX_STATE_ROOTS;
 
-    let args = [_remoteChainId, _blockHeight, _stateRoot, _maxStateRoots, _membersManager];
+    let args = [
+      _remoteChainId,
+      _blockHeight,
+      _stateRoot,
+      _maxStateRoots,
+      _membersManager,
+    ];
     const contract = new web3.eth.Contract(abi, null, txOptions);
 
     return contract.deploy(
       {
         data: bin,
-        arguments: args
+        arguments: args,
       },
-      txOptions
+      txOptions,
     );
   }
 
@@ -174,7 +206,12 @@ class AnchorHelper {
     web3 = web3 || oThis.web3;
     contractAddress = contractAddress || oThis.address;
 
-    let tx = oThis._setCoAnchorAddressRawTx(coAnchorAddress, txOptions, contractAddress, web3);
+    let tx = oThis._setCoAnchorAddressRawTx(
+      coAnchorAddress,
+      txOptions,
+      contractAddress,
+      web3,
+    );
 
     console.log(`* Setting ${ContractName} Co-${ContractName} Address`);
     return tx
@@ -183,7 +220,11 @@ class AnchorHelper {
         console.log('\t - transaction hash:', transactionHash);
       })
       .on('receipt', function(receipt) {
-        console.log('\t - Receipt:\n\x1b[2m', JSON.stringify(receipt), '\x1b[0m\n');
+        console.log(
+          '\t - Receipt:\n\x1b[2m',
+          JSON.stringify(receipt),
+          '\x1b[0m\n',
+        );
       })
       .on('error', function(error) {
         console.log('\t !! Error !!', error, '\n\t !! ERROR !!\n');
@@ -195,7 +236,7 @@ class AnchorHelper {
     const oThis = this;
 
     let defaultOptions = {
-      gas: 61000
+      gas: 61000,
     };
 
     if (txOptions) {

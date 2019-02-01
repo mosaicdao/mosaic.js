@@ -29,11 +29,15 @@ class OSTPrimeHelper {
     web3 = web3 || oThis.web3;
 
     if (!simpleToken) {
-      throw new Error('Mandatory configuration "simpleToken" missing. Provide SimpleToken contract address.');
+      throw new Error(
+        'Mandatory configuration "simpleToken" missing. Provide SimpleToken contract address.',
+      );
     }
 
     if (!config.organization) {
-      throw new Error('Mandatory configuration "organization" missing. Set config.organization address.');
+      throw new Error(
+        'Mandatory configuration "organization" missing. Set config.organization address.',
+      );
     }
 
     OSTPrimeHelper.validateSetupConfig(config);
@@ -48,7 +52,11 @@ class OSTPrimeHelper {
     deployParams.gasPrice = 0;
 
     //1. Deploy the Contract
-    let promiseChain = oThis.deploy(simpleToken, config.organization, deployParams);
+    let promiseChain = oThis.deploy(
+      simpleToken,
+      config.organization,
+      deployParams,
+    );
 
     //2. Initialize.
     promiseChain = promiseChain.then(function() {
@@ -67,11 +75,15 @@ class OSTPrimeHelper {
     }
 
     if (!config.deployer) {
-      throw new Error('Mandatory configuration "deployer" missing. Set config.deployer address');
+      throw new Error(
+        'Mandatory configuration "deployer" missing. Set config.deployer address',
+      );
     }
 
     if (!config.chainOwner) {
-      throw new Error('Mandatory configuration "chainOwner" missing. Set config.chainOwner.');
+      throw new Error(
+        'Mandatory configuration "chainOwner" missing. Set config.chainOwner.',
+      );
     }
 
     return true;
@@ -86,7 +98,7 @@ class OSTPrimeHelper {
 
     let defaultOptions = {
       gas: '2500000',
-      gasPrice: 0
+      gasPrice: 0,
     };
 
     if (txOptions) {
@@ -99,9 +111,9 @@ class OSTPrimeHelper {
     let tx = contract.deploy(
       {
         data: bin,
-        arguments: args
+        arguments: args,
       },
-      txOptions
+      txOptions,
     );
 
     console.log(`* Deploying ${ContractName} Contract`);
@@ -117,7 +129,11 @@ class OSTPrimeHelper {
       })
       .on('receipt', function(receipt) {
         txReceipt = receipt;
-        console.log('\t - Receipt:\n\x1b[2m', JSON.stringify(receipt), '\x1b[0m\n');
+        console.log(
+          '\t - Receipt:\n\x1b[2m',
+          JSON.stringify(receipt),
+          '\x1b[0m\n',
+        );
       })
       .then(function(instace) {
         oThis.address = instace.options.address;
@@ -136,7 +152,7 @@ class OSTPrimeHelper {
     let defaultOptions = {
       gas: '60000',
       value: valueToTransfer,
-      gasPrice: 0
+      gasPrice: 0,
     };
 
     if (txOptions) {
@@ -156,7 +172,11 @@ class OSTPrimeHelper {
         console.log('\t - transaction hash:', transactionHash);
       })
       .on('receipt', function(receipt) {
-        console.log('\t - Receipt:\n\x1b[2m', JSON.stringify(receipt), '\x1b[0m\n');
+        console.log(
+          '\t - Receipt:\n\x1b[2m',
+          JSON.stringify(receipt),
+          '\x1b[0m\n',
+        );
       })
       .on('error', function(error) {
         console.log('\t !! Error !!', error, '\n\t !! ERROR !!\n');
@@ -171,7 +191,7 @@ class OSTPrimeHelper {
 
     let defaultOptions = {
       gas: '60000',
-      gasPrice: 0
+      gasPrice: 0,
     };
 
     if (txOptions) {
@@ -191,7 +211,11 @@ class OSTPrimeHelper {
         console.log('\t - transaction hash:', transactionHash);
       })
       .on('receipt', function(receipt) {
-        console.log('\t - Receipt:\n\x1b[2m', JSON.stringify(receipt), '\x1b[0m\n');
+        console.log(
+          '\t - Receipt:\n\x1b[2m',
+          JSON.stringify(receipt),
+          '\x1b[0m\n',
+        );
       })
       .on('error', function(error) {
         console.log('\t !! Error !!', error, '\n\t !! ERROR !!\n');

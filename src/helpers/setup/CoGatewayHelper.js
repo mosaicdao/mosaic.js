@@ -20,7 +20,9 @@ class CoGatewayHelper {
     CoGatewayHelper.validateSetupConfig(config);
 
     if (!config.gateway) {
-      throw new Error('Mandatory configuration "gateway" missing. Set config.gateway address');
+      throw new Error(
+        'Mandatory configuration "gateway" missing. Set config.gateway address',
+      );
     }
 
     if (!txOptions) {
@@ -43,42 +45,58 @@ class CoGatewayHelper {
       config.messageBus,
       config.gatewayLib,
       txOptions,
-      web3
+      web3,
     );
   }
 
   static validateSetupConfig(config) {
     console.log(`* Validating ${ContractName} Setup Config.`);
     if (!config.deployer) {
-      throw new Error('Mandatory configuration "deployer" missing. Set config.deployer address');
+      throw new Error(
+        'Mandatory configuration "deployer" missing. Set config.deployer address',
+      );
     }
 
     if (!config.bounty) {
-      throw new Error('Mandatory configuration "bounty" missing. Set config.bounty address');
+      throw new Error(
+        'Mandatory configuration "bounty" missing. Set config.bounty address',
+      );
     }
 
     if (!config.organization) {
-      throw new Error('Mandatory configuration "organization" missing. Set config.organization address');
+      throw new Error(
+        'Mandatory configuration "organization" missing. Set config.organization address',
+      );
     }
 
     if (!config.anchor) {
-      throw new Error('Mandatory configuration "anchor" missing. Set config.anchor address');
+      throw new Error(
+        'Mandatory configuration "anchor" missing. Set config.anchor address',
+      );
     }
 
     if (!config.messageBus) {
-      throw new Error('Mandatory configuration "messageBus" missing. Set config.messageBus address');
+      throw new Error(
+        'Mandatory configuration "messageBus" missing. Set config.messageBus address',
+      );
     }
 
     if (!config.gatewayLib) {
-      throw new Error('Mandatory configuration "gatewayLib" missing. Set config.gatewayLib address');
+      throw new Error(
+        'Mandatory configuration "gatewayLib" missing. Set config.gatewayLib address',
+      );
     }
 
     if (!config.valueToken) {
-      throw new Error('Mandatory configuration "valueToken" missing. Set config.valueToken address');
+      throw new Error(
+        'Mandatory configuration "valueToken" missing. Set config.valueToken address',
+      );
     }
 
     if (!config.utilityToken) {
-      throw new Error('Mandatory configuration "utilityToken" missing. Set config.utilityToken address');
+      throw new Error(
+        'Mandatory configuration "utilityToken" missing. Set config.utilityToken address',
+      );
     }
   }
 
@@ -92,7 +110,7 @@ class CoGatewayHelper {
     messageBus,
     gatewayLib,
     txOptions,
-    web3
+    web3,
   ) {
     const oThis = this;
 
@@ -110,7 +128,7 @@ class CoGatewayHelper {
       messageBus,
       gatewayLib,
       txOptions,
-      web3
+      web3,
     );
 
     console.log(`* Deploying ${ContractName} Contract`);
@@ -126,7 +144,11 @@ class CoGatewayHelper {
       })
       .on('receipt', function(receipt) {
         txReceipt = receipt;
-        console.log('\t - Receipt:\n\x1b[2m', JSON.stringify(receipt), '\x1b[0m\n');
+        console.log(
+          '\t - Receipt:\n\x1b[2m',
+          JSON.stringify(receipt),
+          '\x1b[0m\n',
+        );
       })
       .then(function(instace) {
         oThis.address = instace.options.address;
@@ -145,25 +167,29 @@ class CoGatewayHelper {
     messageBus,
     gatewayLib,
     txOptions,
-    web3
+    web3,
   ) {
     const oThis = this;
 
     const messageBusLibInfo = {
       address: messageBus,
-      name: 'MessageBus'
+      name: 'MessageBus',
     };
     const gatewayLibInfo = {
       address: gatewayLib,
-      name: 'GatewayLib'
+      name: 'GatewayLib',
     };
 
     const abiBinProvider = oThis.abiBinProvider;
     const abi = abiBinProvider.getABI(ContractName);
-    const bin = abiBinProvider.getLinkedBIN(ContractName, messageBusLibInfo, gatewayLibInfo);
+    const bin = abiBinProvider.getLinkedBIN(
+      ContractName,
+      messageBusLibInfo,
+      gatewayLibInfo,
+    );
 
     let defaultOptions = {
-      gas: '7500000'
+      gas: '7500000',
     };
     if (txOptions) {
       Object.assign(defaultOptions, txOptions);
@@ -172,14 +198,22 @@ class CoGatewayHelper {
 
     const _burner = '0x0000000000000000000000000000000000000000';
     const contract = new web3.eth.Contract(abi, null, txOptions);
-    let args = [_valueToken, _utilityToken, _anchor, _bounty, _membersManager, _gateway, _burner];
+    let args = [
+      _valueToken,
+      _utilityToken,
+      _anchor,
+      _bounty,
+      _membersManager,
+      _gateway,
+      _burner,
+    ];
 
     return contract.deploy(
       {
         data: bin,
-        arguments: args
+        arguments: args,
       },
-      txOptions
+      txOptions,
     );
   }
 }
