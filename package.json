@@ -24,14 +24,13 @@
     "url": "https://github.com/OpenSTFoundation/mosaic.js/issues"
   },
   "scripts": {
-    "test": "echo \"No tests yet\"",
+    "test": "mocha --recursive --timeout 5000",
     "test:integration": "node test_integration/integration_tests.js",
     "pre-commit": "lint-staged",
     "webpack-build": "webpack --mode=production",
     "web-pre-build": "node webPreBuild.js",
     "web-build": "npm-run-all web-pre-build webpack-build",
-    "web-post-build": "git add dist/.",
-    "test": "mocha --recursive --timeout 5000"
+    "web-post-build": "git add dist/."
   },
   "dependencies": {
     "@openstfoundation/mosaic-contracts": "^0.10.0-alpha.1",

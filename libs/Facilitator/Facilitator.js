@@ -57,6 +57,8 @@ class Facilitator {
     this.gatewayAddress = gatewayAddress;
     this.coGatewayAddress = coGatewayAddress;
     this.stakeHelper = new StakeHelper(originWeb3, this.gatewayAddress);
+
+    this.stake = this.stake.bind(this);
   }
 
   /**
