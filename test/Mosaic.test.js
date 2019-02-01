@@ -24,11 +24,11 @@ const chai = require('chai');
 const Web3 = require('web3');
 
 const Chain = require('../src/Chain');
-const MosaicChains = require('../src/MosaicChains');
+const Mosaic = require('../src/Mosaic');
 
 const { assert } = chai;
 
-describe('MosaicChains', () => {
+describe('Mosaic', () => {
   // This is not used to actually make calls, only to assert correct parameters.
   const web3ProviderOrigin = 'http://localhost:8545';
   const web3Origin = new Web3(web3ProviderOrigin);
@@ -48,41 +48,38 @@ describe('MosaicChains', () => {
   const auxiliary = new Chain(web3Auxiliary, contractAddressesAuxiliary);
 
   it('sets the correct parameters', () => {
-    const mosaicChains = new MosaicChains(origin, auxiliary);
+    const mosaic = new Mosaic(origin, auxiliary);
 
     assert.deepEqual(
       origin,
-      mosaicChains.origin,
-      'MosaicChains did not set the correct origin chain parameter on construction.',
+      mosaic.origin,
+      'Mosaic did not set the correct origin chain parameter on construction.',
     );
     assert.deepEqual(
       auxiliary,
-      mosaicChains.auxiliary,
-      'MosaicChains did not set the correct auxiliary chain parameter on construction.',
+      mosaic.auxiliary,
+      'Mosaic did not set the correct auxiliary chain parameter on construction.',
     );
   });
 
   it('makes the parameters read-only', () => {
-    const mosaicChains = new MosaicChains(origin, auxiliary);
+    const mosaic = new Mosaic(origin, auxiliary);
 
     assert.throws(() => {
-      mosaicChains.origin = new Chain(web3Origin, contractAddressesOrigin);
+      mosaic.origin = new Chain(web3Origin, contractAddressesOrigin);
     }, /Cannot assign to read only property/);
     assert.throws(() => {
-      mosaicChains.auxiliary = new Chain(
-        web3Auxiliary,
-        contractAddressesAuxiliary,
-      );
+      mosaic.auxiliary = new Chain(web3Auxiliary, contractAddressesAuxiliary);
     }, /Cannot assign to read only property/);
   });
 
   it('checks for the correct argument types', () => {
     assert.throws(
-      () => new MosaicChains({}, auxiliary),
+      () => new Mosaic({}, auxiliary),
       'origin must be an instance of Chain.',
     );
     assert.throws(
-      () => new MosaicChains(origin, {}),
+      () => new Mosaic(origin, {}),
       'auxiliary must be an instance of Chain.',
     );
   });

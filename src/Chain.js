@@ -27,6 +27,7 @@ const Web3 = require('web3');
  * contracts.
  * @param {Web3} web3 A web3 instance with a provider to access this chain.
  * @param {Object} contractAddresses Contract addresses, indexed by identifier, e.g. Anchor or
+ *                                   Token.
  */
 class Chain {
   /**

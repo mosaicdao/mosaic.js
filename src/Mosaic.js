@@ -23,11 +23,11 @@
 const Chain = require('./Chain');
 
 /**
- * MosaicChains stores access to two chains of a mosaic set-up: origin and auxiliary.
+ * Mosaic stores access to two chains of a mosaic set-up: origin and auxiliary.
  * @param {Chain} origin The origin chain of this mosaic set-up.
  * @param {Chain} auxiliary The auxiliary chain of this mosaic set-up.
  */
-class MosaicChains {
+class Mosaic {
   /**
    * Creates a new Web3 instance.
    * @param {Chain} origin The origin chain of this mosaic set-up.
@@ -42,7 +42,7 @@ class MosaicChains {
       throw new TypeError('auxiliary must be an instance of Chain.');
     }
 
-    const mosaicChainsPropertyConfiguration = {
+    const mosaicPropertyConfiguration = {
       configurable: false,
       enumerable: true,
       writable: false,
@@ -51,14 +51,14 @@ class MosaicChains {
     Object.defineProperties(this, {
       origin: {
         value: origin,
-        ...mosaicChainsPropertyConfiguration,
+        ...mosaicPropertyConfiguration,
       },
       auxiliary: {
         value: auxiliary,
-        ...mosaicChainsPropertyConfiguration,
+        ...mosaicPropertyConfiguration,
       },
     });
   }
 }
 
-module.exports = MosaicChains;
+module.exports = Mosaic;
