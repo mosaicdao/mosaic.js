@@ -418,10 +418,63 @@ class StakeHelper {
     return StakeHelper.sendTransaction(tx, txOption);
   }
 
-  proveGateway(blockHeight, accountData, accountProof) {
-    // TODO
+  /**
+   * Performs stake.
+   *
+   * @param {string} blockHeight Block number.
+   * @param {string} accountData Encoded account data.
+   * @param {string} accountProof Account proof data.
+   * @param {Object} txOptions Transaction options.
+   *
+   * @returns {Promise} Promise object.
+   */
+  proveGateway(blockHeight, accountData, accountProof, txOption) {
+    if (blockHeight === undefined) {
+      throw new Error('Invalid block height.');
+    }
+
+    if (typeof accountData !== 'string') {
+      throw new Error('Invalid account data.');
+    }
+
+    if (typeof accountProof !== 'string') {
+      throw new Error('Invalid account proof.');
+    }
+
+    if (!txOption) {
+      throw new Error('Invalid transaction options.');
+    }
+
+    const coGatewayContract = Contracts.getEIP20CoGateway(
+      this.auxiliaryWeb3,
+      this.coGatewayAddress,
+    );
+
+    const tx = coGatewayContract.methods.proveGateway(
+      blockHeight,
+      accountData,
+      accountProof,
+    );
+
+    return StakeHelper.sendTransaction(tx, txOption);
   }
 
+  /**
+   * Performs confirm stake intent.
+   *
+   * @param {string} staker Staker address.
+   * @param {string} nonce Staker nonce.
+   * @param {string} beneficiary Beneficiary address.
+   * @param {string} amount Amount to stake.
+   * @param {string} gasPrice Gas price that staker is willing to pay for the reward.
+   * @param {string} gasLimit Maximum gas limit for reward calculation.
+   * @param {string} hashLock Hash lock.
+   * @param {string} blockHeight Block number.
+   * @param {string} storageProof Storage proof.
+   * @param {Object} txOptions Transaction options.
+   *
+   * @returns {Object} Raw transaction object.
+   */
   confirmStakeIntent(
     staker,
     nonce,
@@ -431,16 +484,133 @@ class StakeHelper {
     gasLimit,
     hashLock,
     blockHeight,
-    rlpParentNodes,
+    storageProof,
     txOption,
-  ) {}
+  ) {
+    if (!Web3.utils.isAddress(staker)) {
+      throw new Error('Invalid staker address.');
+    }
 
-  progressMint(messageHash, unlockSecret, txOption) {
-    // TODO
+    if (typeof nonce !== 'string') {
+      throw new Error('Invalid nonce.');
+    }
+
+    if (!Web3.utils.isAddress(beneficiary)) {
+      throw new Error('Invalid beneficiary address.');
+    }
+
+    if (typeof amount !== 'string') {
+      throw new Error('Invalid stake amount.');
+    }
+
+    if (typeof gasPrice !== 'string') {
+      throw new Error('Invalid gas price.');
+    }
+
+    if (typeof gasLimit !== 'string') {
+      throw new Error('Invalid gas limit.');
+    }
+
+    if (typeof blockHeight !== 'string') {
+      throw new Error('Invalid block height.');
+    }
+
+    if (typeof storageProof !== 'string') {
+      throw new Error('Invalid storage proof data.');
+    }
+
+    if (!txOption) {
+      throw new Error('Invalid transaction options.');
+    }
+
+    const coGatewayContract = Contracts.getEIP20CoGateway(
+      this.auxiliaryWeb3,
+      this.coGatewayAddress,
+    );
+
+    const tx = coGatewayContract.methods.confirmStakeIntent(
+      staker,
+      nonce,
+      beneficiary,
+      amount,
+      gasPrice,
+      gasLimit,
+      hashLock,
+      blockHeight,
+      storageProof,
+    );
+
+    return StakeHelper.sendTransaction(tx, txOption);
   }
 
+  /**
+   * Performs progress mint.
+   *
+   * @param {string} messageHash Message hash.
+   * @param {string} unlockSecret Unlock secret.
+   * @param {Object} txOptions Transaction options.
+   *
+   * @returns {Promise} promise object.
+   */
+  progressMint(messageHash, unlockSecret, txOption) {
+    if (typeof messageHash !== 'string') {
+      throw new Error('Invalid message hash.');
+    }
+
+    if (typeof unlockSecret !== 'string') {
+      throw new Error('Invalid unlock secret.');
+    }
+
+    if (!txOption) {
+      throw new Error('Invalid transaction options.');
+    }
+
+    const coGatewayContract = Contracts.getEIP20CoGateway(
+      this.auxiliaryWeb3,
+      this.coGatewayAddress,
+    );
+
+    const tx = coGatewayContract.methods.progressMint(
+      messageHash,
+      unlockSecret,
+    );
+
+    return StakeHelper.sendTransaction(tx, txOption);
+  }
+
+  /**
+   * Performs progress stake.
+   *
+   * @param {string} messageHash Message hash.
+   * @param {string} unlockSecret Unlock secret.
+   * @param {Object} txOptions Transaction options.
+   *
+   * @returns {Promise} promise object.
+   */
   progressStake(messageHash, unlockSecret, txOption) {
-    // TODO
+    if (typeof messageHash !== 'string') {
+      throw new Error('Invalid message hash.');
+    }
+
+    if (typeof unlockSecret !== 'string') {
+      throw new Error('Invalid unlock secret.');
+    }
+
+    if (!txOption) {
+      throw new Error('Invalid transaction options.');
+    }
+
+    const gatewayContract = Contracts.getEIP20Gateway(
+      this.originWeb3,
+      this.gatewayAddress,
+    );
+
+    const tx = gatewayContract.methods.progressStake(
+      messageHash,
+      unlockSecret,
+    );
+
+    return StakeHelper.sendTransaction(tx, txOption);
   }
 
   /**

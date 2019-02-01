@@ -24,13 +24,7 @@ const StakeHelper = require('../helpers/StakeHelper');
 const Utils = require('../utils/Utils');
 const ProofUtils = require('../utils/ProofUtils');
 
-const MessageStatus = Object.freeze({
-  UNDECLARED: '0',
-  DECLARED: '1',
-  PROGRESSED: '2',
-  REVOCATION_DECLARED: '3',
-  REVOKED: '4',
-});
+const MessageStatus = Utils.messageStatus();
 
 /**
  * Class to facilitate stake and mint.

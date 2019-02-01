@@ -29,6 +29,14 @@ const STAKE_TYPE_HASH = web3.utils.sha3(
   'StakeIntent(uint256 amount,address beneficiary,address gateway)',
 );
 
+const MessageStatus = Object.freeze({
+  UNDECLARED: '0',
+  DECLARED: '1',
+  PROGRESSED: '2',
+  REVOCATION_DECLARED: '3',
+  REVOKED: '4',
+});
+
 /**
  * This class includes the utitity functions.
  * @class
@@ -139,6 +147,15 @@ class Utils {
       ),
     );
     return stakeIntentHash;
+  }
+
+  /**
+   * Returns the message status enum
+   *
+   * @returns {Object} message status enum.
+   */
+  static messageStatus() {
+    return MessageStatus;
   }
 }
 
