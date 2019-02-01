@@ -23,7 +23,7 @@
 const { assert } = require('chai');
 const Web3 = require('web3');
 
-const GatewayHelper = require('../../libs/helpers/setup/GatewayHelper');
+const GatewayHelper = require('../../src/helpers/setup/GatewayHelper');
 
 const shared = require('../shared');
 

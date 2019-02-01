@@ -23,7 +23,7 @@
 const { assert } = require('chai');
 const Web3 = require('web3');
 
-const LibsHelper = require('../../libs/helpers/setup/LibsHelper');
+const LibsHelper = require('../../src/helpers/setup/LibsHelper');
 
 const shared = require('../shared');
 

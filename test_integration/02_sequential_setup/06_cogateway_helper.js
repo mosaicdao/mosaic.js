@@ -23,7 +23,7 @@
 const { assert } = require('chai');
 const Web3 = require('web3');
 
-const CoGatewayHelper = require('../../libs/helpers/setup/CoGatewayHelper');
+const CoGatewayHelper = require('../../src/helpers/setup/CoGatewayHelper');
 
 const shared = require('../shared');
 

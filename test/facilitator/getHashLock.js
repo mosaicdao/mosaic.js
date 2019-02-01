@@ -20,41 +20,61 @@
 
 const chai = require('chai');
 const Web3 = require('web3');
-const Facilitator = require('../../libs/Facilitator/Facilitator');
+const Facilitator = require('../../src/Facilitator/Facilitator');
 
 const assert = chai.assert;
 
 describe('facilitator.getHashLock()', () => {
-    let facilitator, web3;
-    beforeEach(() => {
-        // runs before each test in this block
-        const gatewayAddress = '0x0000000000000000000000000000000000000001';
-        const coGatewayAddress = '0x0000000000000000000000000000000000000002';
-        web3 = new Web3();
-        facilitator = new Facilitator(web3, web3, gatewayAddress, coGatewayAddress);
-    });
+  let facilitator, web3;
+  beforeEach(() => {
+    // runs before each test in this block
+    const gatewayAddress = '0x0000000000000000000000000000000000000001';
+    const coGatewayAddress = '0x0000000000000000000000000000000000000002';
+    web3 = new Web3();
+    facilitator = new Facilitator(
+      web3,
+      web3,
+      gatewayAddress,
+      coGatewayAddress,
+    );
+  });
 
-    it('should return correct hash lock when secret is provided', async function() {
-        this.timeout(5000);
+  it('should return correct hash lock when secret is provided', async function() {
+    this.timeout(5000);
 
-        const secretString = 'secret';
-        const unlockSecret = `0x${Buffer.from(secretString).toString('hex')}`;
-        const expectedHashLock = web3.utils.sha3(secretString);
+    const secretString = 'secret';
+    const unlockSecret = `0x${Buffer.from(secretString).toString('hex')}`;
+    const expectedHashLock = web3.utils.sha3(secretString);
 
-        const hashObj = facilitator.getHashLock(secretString);
+    const hashObj = facilitator.getHashLock(secretString);
 
-        assert.strictEqual(hashObj.secret, secretString, 'Secret is different than expected value.');
-        assert.strictEqual(hashObj.unlockSecret, unlockSecret, 'Unlock secret is different than expected value.');
-        assert.strictEqual(hashObj.hashLock, expectedHashLock, 'Hash lock is different than expected value.');
-    });
+    assert.strictEqual(
+      hashObj.secret,
+      secretString,
+      'Secret is different than expected value.',
+    );
+    assert.strictEqual(
+      hashObj.unlockSecret,
+      unlockSecret,
+      'Unlock secret is different than expected value.',
+    );
+    assert.strictEqual(
+      hashObj.hashLock,
+      expectedHashLock,
+      'Hash lock is different than expected value.',
+    );
+  });
 
-    it('should return hash lock and secret when called without any arguments', async function() {
-        this.timeout(5000);
+  it('should return hash lock and secret when called without any arguments', async function() {
+    this.timeout(5000);
 
-        const hashObj = facilitator.getHashLock();
+    const hashObj = facilitator.getHashLock();
 
-        assert.isDefined(hashObj.secret, 'Secret must not be undefined.');
-        assert.isDefined(hashObj.unlockSecret, 'Unlock secret must not be undefined.');
-        assert.isDefined(hashObj.hashLock, 'Hash lock must not be undefined.');
-    });
+    assert.isDefined(hashObj.secret, 'Secret must not be undefined.');
+    assert.isDefined(
+      hashObj.unlockSecret,
+      'Unlock secret must not be undefined.',
+    );
+    assert.isDefined(hashObj.hashLock, 'Hash lock must not be undefined.');
+  });
 });

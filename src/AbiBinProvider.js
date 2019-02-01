@@ -13,7 +13,7 @@ DEFAULT_ABI_FOLDER_PATH = path.resolve(__dirname, '../contracts/abi/');
 DEFAULT_BIN_FOLDER_PATH = path.resolve(__dirname, '../contracts/bin/');
 //__NOT_FOR_WEB__END__
 
-const Linker = require('../libs/utils/linker');
+const Linker = require('../src/utils/linker');
 
 class AbiBinProvider {
   constructor(abiFolderPath, binFolderPath) {

@@ -1,5 +1,5 @@
 const Web3 = require('web3');
-const AbiBinProvider = require('../libs/AbiBinProvider');
+const AbiBinProvider = require('./AbiBinProvider');
 
 const abProvider = new AbiBinProvider();
 

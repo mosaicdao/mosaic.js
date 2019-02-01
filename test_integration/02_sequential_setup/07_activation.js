@@ -22,9 +22,9 @@
 
 const { assert } = require('chai');
 
-const AnchorHelper = require('../../libs/helpers/setup/AnchorHelper');
-const GatewayHelper = require('../../libs/helpers/setup/GatewayHelper');
-const OSTPrimeHelper = require('../../libs/helpers/setup/OSTPrimeHelper');
+const AnchorHelper = require('../../src/helpers/setup/AnchorHelper');
+const GatewayHelper = require('../../src/helpers/setup/GatewayHelper');
+const OSTPrimeHelper = require('../../src/helpers/setup/OSTPrimeHelper');
 
 const shared = require('../shared');
 

@@ -23,7 +23,7 @@
 const { assert } = require('chai');
 const Web3 = require('web3');
 
-const AnchorHelper = require('../../libs/helpers/setup/AnchorHelper');
+const AnchorHelper = require('../../src/helpers/setup/AnchorHelper');
 
 const shared = require('../shared');
 

@@ -1,12 +1,12 @@
 'use strict';
 
-const AbiBinProvider = require('./libs/AbiBinProvider');
-const ChainSetup = require('./libs/ChainSetup');
-const Contracts = require('./libs/Contracts');
-const StakeHelper = require('./libs/helpers/StakeHelper');
-const TypedData = require('./libs/utils/EIP712SignerExtension/TypedData');
+const AbiBinProvider = require('./src/AbiBinProvider');
+const ChainSetup = require('./src/ChainSetup');
+const Contracts = require('./src/Contracts');
+const StakeHelper = require('./src/helpers/StakeHelper');
+const TypedData = require('./src/utils/EIP712SignerExtension/TypedData');
 
-const signEIP712Extender = require('./libs/utils/EIP712SignerExtension/extender');
+const signEIP712Extender = require('./src/utils/EIP712SignerExtension/extender');
 signEIP712Extender();
 
 module.exports = {
@@ -14,9 +14,9 @@ module.exports = {
   ChainSetup: ChainSetup,
   Contracts: Contracts,
   Helpers: {
-    StakeHelper: StakeHelper
+    StakeHelper: StakeHelper,
   },
   Utils: {
-    EIP712TypedData: TypedData
-  }
+    EIP712TypedData: TypedData,
+  },
 };

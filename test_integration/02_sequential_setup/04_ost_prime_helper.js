@@ -23,7 +23,7 @@
 const { assert } = require('chai');
 const Web3 = require('web3');
 
-const OSTPrimeHelper = require('../../libs/helpers/setup/OSTPrimeHelper');
+const OSTPrimeHelper = require('../../src/helpers/setup/OSTPrimeHelper');
 
 const shared = require('../shared');
 

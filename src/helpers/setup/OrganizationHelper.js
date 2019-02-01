@@ -43,7 +43,14 @@ class OrganizationHelper {
     deployParams.from = config.deployer;
 
     //Deploy Contract
-    return oThis.deploy(config.owner, config.admin, config.workers, config.workerExpirationHeight, deployParams, web3);
+    return oThis.deploy(
+      config.owner,
+      config.admin,
+      config.workers,
+      config.workerExpirationHeight,
+      deployParams,
+      web3,
+    );
   }
 
   static validateSetupConfig(config) {
@@ -53,11 +60,15 @@ class OrganizationHelper {
     }
 
     if (!config.deployer) {
-      throw new Error('Mandatory configuration "deployer" missing. Set config.deployer address');
+      throw new Error(
+        'Mandatory configuration "deployer" missing. Set config.deployer address',
+      );
     }
 
     if (!config.owner) {
-      throw new Error('Mandatory configuration "owner" missing. Set config.owner address');
+      throw new Error(
+        'Mandatory configuration "owner" missing. Set config.owner address',
+      );
     }
     return true;
   }
@@ -67,7 +78,14 @@ class OrganizationHelper {
     web3 = web3 || oThis.web3;
     admin = admin || '0x0000000000000000000000000000000000000000';
 
-    let tx = oThis._deployRawTx(owner, admin, workers, expirationHeight, txOptions, web3);
+    let tx = oThis._deployRawTx(
+      owner,
+      admin,
+      workers,
+      expirationHeight,
+      txOptions,
+      web3,
+    );
 
     console.log('* Deploying Organization Contract');
 
@@ -83,7 +101,11 @@ class OrganizationHelper {
       })
       .on('receipt', function(receipt) {
         txReceipt = receipt;
-        console.log('\t - Receipt:\n\x1b[2m', JSON.stringify(receipt), '\x1b[0m\n');
+        console.log(
+          '\t - Receipt:\n\x1b[2m',
+          JSON.stringify(receipt),
+          '\x1b[0m\n',
+        );
       })
       .then(function(instace) {
         oThis.address = instace.options.address;
@@ -100,7 +122,7 @@ class OrganizationHelper {
     const bin = abiBinProvider.getBIN(ContractName);
 
     let defaultOptions = {
-      gas: '1600000'
+      gas: '1600000',
     };
 
     if (txOptions) {
@@ -126,9 +148,9 @@ class OrganizationHelper {
     return contract.deploy(
       {
         data: bin,
-        arguments: args
+        arguments: args,
       },
-      txOptions
+      txOptions,
     );
   }
 
@@ -138,7 +160,7 @@ class OrganizationHelper {
     contractAddress = contractAddress || oThis.address;
 
     let defaultOptions = {
-      gas: 61000
+      gas: 61000,
     };
 
     if (txOptions) {
@@ -158,7 +180,11 @@ class OrganizationHelper {
         console.log('\t - transaction hash:', transactionHash);
       })
       .on('receipt', function(receipt) {
-        console.log('\t - Receipt:\n\x1b[2m', JSON.stringify(receipt), '\x1b[0m\n');
+        console.log(
+          '\t - Receipt:\n\x1b[2m',
+          JSON.stringify(receipt),
+          '\x1b[0m\n',
+        );
       })
       .on('error', function(error) {
         console.log('\t !! Error !!', error, '\n\t !! ERROR !!\n');
@@ -166,14 +192,20 @@ class OrganizationHelper {
       });
   }
 
-  setWorker(workerAddress, _expirationHeight, txOptions, contractAddress, web3) {
+  setWorker(
+    workerAddress,
+    _expirationHeight,
+    txOptions,
+    contractAddress,
+    web3,
+  ) {
     const oThis = this;
     web3 = web3 || oThis.web3;
     contractAddress = contractAddress || oThis.address;
     _expirationHeight = Number(_expirationHeight || WorkerExpirationHeight);
 
     let defaultOptions = {
-      gas: 61000
+      gas: 61000,
     };
 
     if (txOptions) {
@@ -186,14 +218,23 @@ class OrganizationHelper {
     const contract = new web3.eth.Contract(abi, contractAddress, txOptions);
     let tx = contract.methods.setWorker(workerAddress, _expirationHeight);
 
-    console.log('* Setting Organization Worker:', workerAddress, 'with _expirationHeight', _expirationHeight);
+    console.log(
+      '* Setting Organization Worker:',
+      workerAddress,
+      'with _expirationHeight',
+      _expirationHeight,
+    );
     return tx
       .send(txOptions)
       .on('transactionHash', function(transactionHash) {
         console.log('\t - transaction hash:', transactionHash);
       })
       .on('receipt', function(receipt) {
-        console.log('\t - Receipt:\n\x1b[2m', JSON.stringify(receipt), '\x1b[0m\n');
+        console.log(
+          '\t - Receipt:\n\x1b[2m',
+          JSON.stringify(receipt),
+          '\x1b[0m\n',
+        );
       })
       .on('error', function(error) {
         console.log('\t !! Error !!', error, '\n\t !! ERROR !!\n');
@@ -207,7 +248,7 @@ class OrganizationHelper {
     contractAddress = contractAddress || oThis.address;
 
     let defaultOptions = {
-      gas: 61000
+      gas: 61000,
     };
 
     if (txOptions) {
@@ -227,7 +268,11 @@ class OrganizationHelper {
         console.log('\t - transaction hash:', transactionHash);
       })
       .on('receipt', function(receipt) {
-        console.log('\t - Receipt:\n\x1b[2m', JSON.stringify(receipt), '\x1b[0m\n');
+        console.log(
+          '\t - Receipt:\n\x1b[2m',
+          JSON.stringify(receipt),
+          '\x1b[0m\n',
+        );
       })
       .on('error', function(error) {
         console.log('\t !! Error !!', error, '\n\t !! ERROR !!\n');
@@ -241,7 +286,7 @@ class OrganizationHelper {
     contractAddress = contractAddress || oThis.address;
 
     let defaultOptions = {
-      gas: 61000
+      gas: 61000,
     };
 
     if (txOptions) {
@@ -261,7 +306,11 @@ class OrganizationHelper {
         console.log('\t - transaction hash:', transactionHash);
       })
       .on('receipt', function(receipt) {
-        console.log('\t - Receipt:\n\x1b[2m', JSON.stringify(receipt), '\x1b[0m\n');
+        console.log(
+          '\t - Receipt:\n\x1b[2m',
+          JSON.stringify(receipt),
+          '\x1b[0m\n',
+        );
       })
       .on('error', function(error) {
         console.log('\t !! Error !!', error, '\n\t !! ERROR !!\n');

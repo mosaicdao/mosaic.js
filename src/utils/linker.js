@@ -18,7 +18,8 @@ var linkBytecode = function(bytecode, libraries) {
       // API compatible with the standard JSON i/o
       for (var lib in libraries[libraryName]) {
         librariesComplete[lib] = libraries[libraryName][lib];
-        librariesComplete[libraryName + ':' + lib] = libraries[libraryName][lib];
+        librariesComplete[libraryName + ':' + lib] =
+          libraries[libraryName][lib];
       }
     } else {
       // backwards compatible API for early solc-js versions
@@ -44,7 +45,11 @@ var linkBytecode = function(bytecode, libraries) {
     var replace = function(name) {
       // truncate to 37 characters
       var truncatedName = name.slice(0, 36);
-      var libLabel = '__' + truncatedName + Array(37 - truncatedName.length).join('_') + '__';
+      var libLabel =
+        '__' +
+        truncatedName +
+        Array(37 - truncatedName.length).join('_') +
+        '__';
       while (bytecode.indexOf(libLabel) >= 0) {
         bytecode = bytecode.replace(libLabel, hexAddress);
       }
@@ -80,7 +85,7 @@ var findLinkReferences = function(bytecode) {
     linkReferences[libraryName].push({
       // offsets are in bytes in binary representation (and not hex)
       start: (offset + start) / 2,
-      length: 20
+      length: 20,
     });
 
     offset += start + 20;
@@ -92,5 +97,5 @@ var findLinkReferences = function(bytecode) {
 
 module.exports = {
   linkBytecode: linkBytecode,
-  findLinkReferences: findLinkReferences
+  findLinkReferences: findLinkReferences,
 };

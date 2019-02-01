@@ -11,13 +11,18 @@ const webpackOption = {
   node: { fs: 'empty' },
   entry: {
     'mosaic.js': [polyfillFile, entryFile],
-    'mosaic.js.min': [polyfillFile, entryFile]
+    'mosaic.js.min': [polyfillFile, entryFile],
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: '[name].js'
+    filename: '[name].js',
   },
-  plugins: [new webpack.NormalModuleReplacementPlugin(/libs\/AbiBinProvider\.js/, '../tmp/AbiBinProvider.js')],
+  plugins: [
+    new webpack.NormalModuleReplacementPlugin(
+      /src\/AbiBinProvider\.js/,
+      '../tmp/AbiBinProvider.js',
+    ),
+  ],
   module: {
     rules: [
       {
@@ -32,14 +37,14 @@ const webpackOption = {
                   '@babel/preset-env',
                   {
                     targets: {
-                      browsers: '> 0.25%, not dead'
-                    }
-                  }
-                ]
-              ]
-            }
-          }
-        ]
+                      browsers: '> 0.25%, not dead',
+                    },
+                  },
+                ],
+              ],
+            },
+          },
+        ],
       },
       {
         test: /\.js$/,
@@ -47,35 +52,35 @@ const webpackOption = {
         options: {
           search: '//__NOT_FOR_WEB__BEGIN__.*?//__NOT_FOR_WEB__END__',
           replace: '',
-          flags: 'isg'
-        }
+          flags: 'isg',
+        },
       },
       {
         test: require.resolve('./index.js'),
         use: [
           {
             loader: 'expose-loader',
-            options: 'Mosaic'
-          }
-        ]
+            options: 'Mosaic',
+          },
+        ],
       },
       {
         test: /package\.json$/,
         loader: 'package-json-cleanup-loader',
         options: {
-          only: ['version', 'name', 'otherParam']
-        }
-      }
-    ]
+          only: ['version', 'name', 'otherParam'],
+        },
+      },
+    ],
   },
   optimization: {
     minimize: true,
     minimizer: [
       new uglifyJsPlugin({
-        include: /\.min\.js$/
-      })
-    ]
-  }
+        include: /\.min\.js$/,
+      }),
+    ],
+  },
 };
 
 module.exports = webpackOption;
