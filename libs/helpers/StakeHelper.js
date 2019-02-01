@@ -56,6 +56,19 @@ class StakeHelper {
     this.auxiliaryWeb3 = auxiliaryWeb3;
     this.gatewayAddress = gatewayAddress;
     this.coGatewayAddress = coGatewayAddress;
+
+    this.getBounty = this.getBounty.bind(this);
+    this.getBaseToken = this.getBaseToken.bind(this);
+    this.getValueToken = this.getValueToken.bind(this);
+    this.getNonce = this.getNonce.bind(this);
+    this.approveBountyAmount = this.approveBountyAmount.bind(this);
+    this.approveStakeAmount = this.approveStakeAmount.bind(this);
+    this.isStakeAmountApproved = this.isStakeAmountApproved.bind(this);
+    this.isBountyAmountApproved = this.isBountyAmountApproved.bind(this);
+    this.stake = this.stake.bind(this);
+    this._getNonce = this._getNonce.bind(this);
+    this._approveStakeAmountRawTx = this._approveStakeAmountRawTx.bind(this);
+    this._stakeRawTx = this._stakeRawTx.bind(this);
   }
 
   /**

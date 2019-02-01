@@ -1,13 +1,14 @@
 'use strict';
 
 const fs = require('fs');
+const path = require('path');
 
 const testHelper = require('./helper'),
   configReader = require('./configReader');
 
 const passphrase = configReader.passphrase;
 
-const keystoreFolder = testHelper.gethDataDir + '/keystore';
+const keystoreFolder = path.join(__dirname, '/keystore');
 
 const Web3WalletHelper = function(web3Object) {
   const oThis = this;
@@ -32,7 +33,10 @@ Web3WalletHelper.prototype = {
           continue;
         }
 
-        fs.readFile(keystoreFolder + '/' + items[i], 'utf8', function(err, fileContent) {
+        fs.readFile(keystoreFolder + '/' + items[i], 'utf8', function(
+          err,
+          fileContent,
+        ) {
           if (err) {
             isRejected = true;
             console.log('Error Reading file!\n', err);
@@ -43,7 +47,10 @@ Web3WalletHelper.prototype = {
             return;
           }
 
-          let account = oThis.web3Object.eth.accounts.decrypt(fileContent, passphrase);
+          let account = oThis.web3Object.eth.accounts.decrypt(
+            fileContent,
+            passphrase,
+          );
           oThis.web3Object.eth.accounts.wallet.add(account);
           resolved--;
           if (!resolved) {
@@ -54,7 +61,7 @@ Web3WalletHelper.prototype = {
         });
       }
     });
-  }
+  },
 };
 
 module.exports = Web3WalletHelper;

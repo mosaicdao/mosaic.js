@@ -1,25 +1,8 @@
 'use strict';
 
-const testHelper = require('./helper');
+const Web3 = require('web3');
+const web3 = new Web3('http://localhost:8546');
 
-let devEnvConfig = require(testHelper.configFilePath);
-const ConfigReader = function() {};
-
-ConfigReader.prototype = {
-  deployerAddress: devEnvConfig.deployerAddress,
-  chainOwner: devEnvConfig.chainOwnerAddress,
-  organizationOwner: devEnvConfig.organizationAddress,
-  organizationAdmin: devEnvConfig.wallet1,
-  organizationWorker: devEnvConfig.facilitator,
-
-  wallet1: devEnvConfig.wallet1,
-  wallet2: devEnvConfig.wallet2,
-  ephemeralKey: devEnvConfig.ephemeralKey1,
-  facilitatorAddress: devEnvConfig.facilitator,
-  gethRpcEndPoint: devEnvConfig.gethRpcEndPoint,
+module.exports = {
   passphrase: 'testtest',
-  gasPrice: '0x3B9ACA00',
-  gas: 8000000
 };
-
-module.exports = new ConfigReader();

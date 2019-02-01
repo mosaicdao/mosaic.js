@@ -65,12 +65,14 @@ class Facilitator {
     this.auxiliaryWeb3 = auxiliaryWeb3;
     this.gatewayAddress = gatewayAddress;
     this.coGatewayAddress = coGatewayAddress;
+
     this.stakeHelper = new StakeHelper(
       originWeb3,
       auxiliaryWeb3,
       gatewayAddress,
       coGatewayAddress,
     );
+    this.stake = this.stake.bind(this);
   }
 
   /**

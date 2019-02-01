@@ -1,5 +1,7 @@
 'use strict';
 
+const mosaicContracts = require('@openstfoundation/mosaic-contracts');
+
 //__NOT_FOR_WEB__BEGIN__
 const fs = require('fs'),
   path = require('path');
@@ -20,11 +22,15 @@ class AbiBinProvider {
     binFolderPath = binFolderPath || DEFAULT_BIN_FOLDER_PATH;
     //__NOT_FOR_WEB__BEGIN__
     if (!path.isAbsolute(abiFolderPath)) {
-      let err = new Error('"abiFolderPath" is not Absolute. Please provide absolute path.');
+      let err = new Error(
+        '"abiFolderPath" is not Absolute. Please provide absolute path.',
+      );
       throw err;
     }
     if (!path.isAbsolute(binFolderPath)) {
-      let err = new Error('"binFolderPath" is not Absolute. Please provide absolute path.');
+      let err = new Error(
+        '"binFolderPath" is not Absolute. Please provide absolute path.',
+      );
       throw err;
     }
     //__NOT_FOR_WEB__END__
@@ -50,9 +56,12 @@ class AbiBinProvider {
       throw err;
     }
 
-    let holder = (oThis.custom[contractName] = oThis.custom[contractName] || {});
+    let holder = (oThis.custom[contractName] =
+      oThis.custom[contractName] || {});
     if (holder.abi) {
-      let err = new Error(`Abi for Contract Name ${contractName} already exists.`);
+      let err = new Error(
+        `Abi for Contract Name ${contractName} already exists.`,
+      );
       throw err;
     }
 
@@ -70,9 +79,12 @@ class AbiBinProvider {
       throw err;
     }
 
-    let holder = (oThis.custom[contractName] = oThis.custom[contractName] || {});
+    let holder = (oThis.custom[contractName] =
+      oThis.custom[contractName] || {});
     if (holder.bin) {
-      let err = new Error(`Bin for Contract Name ${contractName} already exists.`);
+      let err = new Error(
+        `Bin for Contract Name ${contractName} already exists.`,
+      );
       throw err;
     }
 
@@ -82,32 +94,47 @@ class AbiBinProvider {
   getABI(contractName) {
     const oThis = this;
 
-    if (oThis.custom && oThis.custom[contractName] && oThis.custom[contractName].abi) {
+    if (
+      oThis.custom &&
+      oThis.custom[contractName] &&
+      oThis.custom[contractName].abi
+    ) {
       return oThis.custom[contractName].abi;
     }
 
-    //__NOT_FOR_WEB__BEGIN__
-    let fPath = path.resolve(oThis.abiFolderPath, contractName + '.abi');
-    let abiFileContent = fs.readFileSync(fPath, 'utf8');
-    let abi = JSON.parse(abiFileContent);
-    //__NOT_FOR_WEB__END__
+    const contract = mosaicContracts[contractName];
+    if (!contract) {
+      throw new Error(
+        `Could not retrieve ABI for ${contractName}, because the contract doesn't exist.`,
+      );
+    }
+    const abi = contract.abi;
     return abi;
   }
 
   getBIN(contractName) {
     const oThis = this;
 
-    if (oThis.custom && oThis.custom[contractName] && oThis.custom[contractName].bin) {
+    if (
+      oThis.custom &&
+      oThis.custom[contractName] &&
+      oThis.custom[contractName].bin
+    ) {
       return oThis.custom[contractName].bin;
     }
 
-    //__NOT_FOR_WEB__BEGIN__
-    let fPath = path.resolve(oThis.binFolderPath, contractName + '.bin');
-    let bin = fs.readFileSync(fPath, 'utf8');
-    if (typeof bin === 'string' && bin.indexOf('0x') != 0) {
-      bin = '0x' + bin;
+    const contract = mosaicContracts[contractName];
+    if (!contract) {
+      throw new Error(
+        `Could not retrieve bin for ${contractName}, because the contract doesn't exist.`,
+      );
     }
-    //__NOT_FOR_WEB__END__
+    const bin = contract.bin;
+    if (!bin) {
+      throw new Error(
+        `Could not retrieve bin for ${contractName}. This means that either the contract ABI was added to the AbiBinProvider without the bin, or that the contract does not produce a bin (e.g. interface contracts).`,
+      );
+    }
     return bin;
   }
 
@@ -135,7 +162,9 @@ class AbiBinProvider {
     while (len--) {
       let libInfo = libs[len];
       if (typeof libInfo !== 'object' || !libInfo.name || !libInfo.address) {
-        throw new Error('Invalid contract info argument at index ' + (len + 1));
+        throw new Error(
+          'Invalid contract info argument at index ' + (len + 1),
+        );
       }
       libraries[libInfo.name] = libInfo.address;
     }
