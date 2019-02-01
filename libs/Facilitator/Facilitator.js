@@ -22,6 +22,15 @@ const BN = require('bn.js');
 const web3 = require('web3');
 const StakeHelper = require('../helpers/StakeHelper');
 const Utils = require('../utils/Utils');
+const ProofUtils = require('../utils/ProofUtils');
+
+const MessageStatus = Object.freeze({
+  UNDECLARED: '0',
+  DECLARED: '1',
+  PROGRESSED: '2',
+  REVOCATION_DECLARED: '3',
+  REVOKED: '4',
+});
 
 /**
  * Class to facilitate stake and mint.
@@ -171,12 +180,13 @@ class Facilitator {
   /**
    * Performs the progress stake and progress mint.
    *
+   * @param {string} messageHash Message hash.
    * @param {Object} [stakeRequestParams] Stake params object.
    * @param {Object} txOption Transaction options.
    *
    * @returns {Promise} Promise object.
    */
-  async progressStake(stakeRequestParams, txOption) {
+  async progressStake(messageHash, stakeRequestParams, txOption) {
     const stakeParams = stakeRequestParams || this.stakeParams;
     if (stakeParams === undefined) {
       throw new Error('Invalid stake parameters.');
@@ -185,7 +195,27 @@ class Facilitator {
       throw new Error('Invalid transaction options.');
     }
 
-    // Get the latest commit height form CoGateway.anchor
+    // TODO: Add code to validate message hash.
+    // Get latest message status
+    const mintStatus = await this.stakeHelper.getMintStatus(messageHash);
+
+    if (mintStatus === MessageStatus.UNDECLARED) {
+      await this.confirmStakeIntent(messageHash, stakeRequestParams, txOption);
+      await this.performProgress(messageHash, stakeRequestParams, txOption);
+    } else if (mintStatus === MessageStatus.DECLARED) {
+      await this.performProgress(messageHash, stakeRequestParams, txOption);
+    } else if (mintStatus === MessageStatus.PROGRESSED) {
+      return Promise.resolve(MessageStatus.PROGRESSED);
+    } else if (mintStatus === MessageStatus.REVOCATION_DECLARED) {
+      throw new Error(
+        'Cannot progress stake as the current message status is revocation declared',
+      );
+    } else if (mintStatus === MessageStatus.REVOKED) {
+      throw new Error(
+        'Cannot progress stake as the current message status is revoked',
+      );
+    }
+
     // If not there throw error.
     // Get the proof of message hash for the given block height.
     // Prove gateway on CoGateway.
@@ -193,6 +223,30 @@ class Facilitator {
     // wait for 24 block confirmations
     // call progress stake and progress mint simultaniously
   }
+
+  /**
+   * Performs confirm stake intent.
+   *
+   * @param {string} messageHash Message hash.
+   * @param {Object} [stakeRequestParams] Stake params object.
+   * @param {Object} txOption Transaction options.
+   *
+   * @returns {Promise} Promise object.
+   */
+  async confirmStakeIntent(messageHash, stakeRequestParams, txOption) {
+    // Get the latest commit height form CoGateway
+    const commitedBlockHeight = await this.stakeHelper.getLatestStateRootBlockHeight();
+
+    const proofUtils = new ProofUtils(this.originWeb3, this.auxiliaryWeb3);
+
+    const proof = await proofUtils.getOutboxProof(
+      this.gatewayAddress,
+      [messageHash],
+      commitedBlockHeight,
+    );
+  }
+
+  async getProof(messageHash) {}
   /**
    * Helper function to generate hash lock and unlock secrete. If unlock secret
    * is provided then it will generate the hash lock.

@@ -145,17 +145,17 @@ class StakeHelper {
   }
 
   /**
-   * Returns the auxiliary chain anchor contract address.
+   * Returns the auxiliary chain state root provider contract address.
    *
    * @returns {Promise} Promise object represents the anchor contract address.
    */
   async getCoGatewayStateRootProvider() {
-    if (this.auxiliaryAnchorAddress) {
-      return Promise.resolve(this.auxiliaryAnchorAddress);
+    if (this.auxiliarySRPAddress) {
+      return Promise.resolve(this.auxiliarySRPAddress);
     }
 
     const coGatewayContract = Contracts.getEIP20CoGateway(
-      this.originWeb3,
+      this.auxiliaryWeb3,
       this.coGatewayAddress,
     );
 
@@ -163,8 +163,49 @@ class StakeHelper {
       .stateRootProvider()
       .call()
       .then((stateRootProviderAddress) => {
-        this.auxiliaryAnchorAddress = stateRootProviderAddress;
+        this.auxiliarySRPAddress = stateRootProviderAddress;
         return stateRootProviderAddress;
+      });
+  }
+
+  /**
+   * Returns the auxiliary chain latest committed block number.
+   *
+   * @returns {Promise} Promise object represents the block number.
+   */
+  async getLatestStateRootBlockHeight() {
+    const anchorAddress = await this.getCoGatewayStateRootProvider();
+    const anchorContract = Contracts.getAnchor(
+      this.auxiliaryWeb3,
+      anchorAddress,
+    );
+
+    return anchorContract.methods
+      .getLatestStateRootBlockHeight()
+      .call()
+      .then((blockHeight) => {
+        return blockHeight;
+      });
+  }
+
+  /**
+   * Returns inbox message status from CoGateway contract.
+   *
+   * @param {string} messageHash Message hash.
+   *
+   * @returns {Promise} Promise object.
+   */
+  async getMintStatus(messageHash) {
+    const coGatewayContract = Contracts.getEIP20CoGateway(
+      this.auxiliaryWeb3,
+      this.coGatewayAddress,
+    );
+
+    return coGatewayContract.methods
+      .getInboxMessageStatus(messageHash)
+      .call()
+      .then((status) => {
+        return status;
       });
   }
 

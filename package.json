@@ -24,13 +24,12 @@
     "url": "https://github.com/OpenSTFoundation/mosaic.js/issues"
   },
   "scripts": {
-    "test": "echo \"No tests yet\"",
+    "test": "mocha --recursive --timeout 5000",
     "pre-commit": "lint-staged",
     "webpack-build": "webpack --mode=production",
     "web-pre-build": "node webPreBuild.js",
     "web-build": "npm-run-all web-pre-build webpack-build",
-    "web-post-build": "git add dist/.",
-    "test": "mocha --recursive --timeout 5000"
+    "web-post-build": "git add dist/."
   },
   "dependencies": {
     "bignumber.js": "4.1.0",
@@ -61,6 +60,7 @@
     "package-json-cleanup-loader": "1.0.3",
     "pre-commit": "1.2.2",
     "prettier": "1.15.3",
+    "rlp": "2.1.0",
     "sinon": "7.2.3",
     "string-replace-loader": "2.1.1",
     "webpack": "4.19.1",
