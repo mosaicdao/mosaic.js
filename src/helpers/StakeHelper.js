@@ -419,7 +419,7 @@ class StakeHelper {
   }
 
   /**
-   * Performs stake.
+   * Prove gateway contract account address on auxiliary chain.
    *
    * @param {string} blockHeight Block number.
    * @param {string} accountData Encoded account data.
