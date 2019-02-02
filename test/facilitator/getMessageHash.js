@@ -24,12 +24,14 @@ const Facilitator = require('../../src/Facilitator/Facilitator');
 
 const assert = chai.assert;
 
-describe('facilitator.getHashLock()', () => {
+describe('facilitator.getMessageHash()', () => {
   let facilitator;
   let web3;
+  let stakeRequestParams;
+  let expectedMessageHash;
   beforeEach(() => {
     // runs before each test in this block
-    const gatewayAddress = '0x0000000000000000000000000000000000000001';
+    const gatewayAddress = '0x8840EcA5EE92c1707d3A656FbbE75E66a02a3CB4';
     const coGatewayAddress = '0x0000000000000000000000000000000000000002';
     web3 = new Web3();
     facilitator = new Facilitator(
@@ -38,40 +40,39 @@ describe('facilitator.getHashLock()', () => {
       gatewayAddress,
       coGatewayAddress,
     );
+    expectedMessageHash =
+      '0x66be1db4f3926e19d2c7ef05af1503548ba8fbae13708e1b70c60fb4b8c5ca38';
+    stakeRequestParams = {
+      amount: '100000000',
+      beneficiary: '0x15113927E0EdF6b8430FA4B92FfFEB29B6F78D7C',
+      nonce: '2',
+      gasPrice: '1',
+      gasLimit: '10000',
+      sender: '0x751205Ac2dbD7C6a47d19E0FE9FD72eb2d270D14',
+      hashLock:
+        '0x1c1f2bccb60c653bd7046e27b4501373d9276c147350794ca62d01aa9321c8b0',
+    };
   });
 
-  it('should return correct hash lock when secret is provided', async function() {
-    const secretString = 'secret';
-    const unlockSecret = `0x${Buffer.from(secretString).toString('hex')}`;
-    const expectedHashLock = web3.utils.sha3(secretString);
-
-    const hashObj = facilitator.getHashLock(secretString);
-
-    assert.strictEqual(
-      hashObj.secret,
-      secretString,
-      'Secret is different than expected value.',
-    );
-    assert.strictEqual(
-      hashObj.unlockSecret,
-      unlockSecret,
-      'Unlock secret is different than expected value.',
-    );
-    assert.strictEqual(
-      hashObj.hashLock,
-      expectedHashLock,
-      'Hash lock is different than expected value.',
-    );
+  it('should throw error when stake params are invalid', async () => {
+    const expectedErrorMessage = 'Invalid stake request params.';
+    try {
+      await facilitator.getMessageHash();
+    } catch (exception) {
+      assert.strictEqual(
+        exception.message,
+        expectedErrorMessage,
+        `Exception reason must be "${expectedErrorMessage}"`,
+      );
+    }
   });
 
-  it('should return hash lock and secret when called without any arguments', async function() {
-    const hashObj = facilitator.getHashLock();
-
-    assert.isDefined(hashObj.secret, 'Secret must not be undefined.');
-    assert.isDefined(
-      hashObj.unlockSecret,
-      'Unlock secret must not be undefined.',
+  it('should return correct message hash', async () => {
+    const messageHash = await facilitator.getMessageHash(stakeRequestParams);
+    assert.strictEqual(
+      messageHash,
+      expectedMessageHash,
+      'Message hash must match.',
     );
-    assert.isDefined(hashObj.hashLock, 'Hash lock must not be undefined.');
   });
 });

@@ -21,12 +21,15 @@
 const chai = require('chai');
 const Web3 = require('web3');
 const Facilitator = require('../../src/Facilitator/Facilitator');
+const Utils = require('../../src/utils/Utils');
 
+const messageStatus = Utils.messageStatus();
 const assert = chai.assert;
 
-describe('facilitator.getHashLock()', () => {
+describe('facilitator.canPerformConfrimStakeIntent()', () => {
   let facilitator;
   let web3;
+
   beforeEach(() => {
     // runs before each test in this block
     const gatewayAddress = '0x0000000000000000000000000000000000000001';
@@ -40,38 +43,38 @@ describe('facilitator.getHashLock()', () => {
     );
   });
 
-  it('should return correct hash lock when secret is provided', async function() {
-    const secretString = 'secret';
-    const unlockSecret = `0x${Buffer.from(secretString).toString('hex')}`;
-    const expectedHashLock = web3.utils.sha3(secretString);
-
-    const hashObj = facilitator.getHashLock(secretString);
-
-    assert.strictEqual(
-      hashObj.secret,
-      secretString,
-      'Secret is different than expected value.',
+  it('should return false when message status is undeclared', async () => {
+    const result = facilitator.canPerformConfrimStakeIntent(
+      messageStatus.UNDECLARED,
     );
-    assert.strictEqual(
-      hashObj.unlockSecret,
-      unlockSecret,
-      'Unlock secret is different than expected value.',
-    );
-    assert.strictEqual(
-      hashObj.hashLock,
-      expectedHashLock,
-      'Hash lock is different than expected value.',
-    );
+    assert.strictEqual(result, false, 'Expected result is false');
   });
 
-  it('should return hash lock and secret when called without any arguments', async function() {
-    const hashObj = facilitator.getHashLock();
-
-    assert.isDefined(hashObj.secret, 'Secret must not be undefined.');
-    assert.isDefined(
-      hashObj.unlockSecret,
-      'Unlock secret must not be undefined.',
+  it('should return false when message status is revoked', async () => {
+    const result = facilitator.canPerformConfrimStakeIntent(
+      messageStatus.REVOKED,
     );
-    assert.isDefined(hashObj.hashLock, 'Hash lock must not be undefined.');
+    assert.strictEqual(result, false, 'Expected result is false');
+  });
+
+  it('should return true when message status is declared', async () => {
+    const result = facilitator.canPerformConfrimStakeIntent(
+      messageStatus.DECLARED,
+    );
+    assert.strictEqual(result, true, 'Expected result is true');
+  });
+
+  it('should return true when message status is progressed', async () => {
+    const result = facilitator.canPerformConfrimStakeIntent(
+      messageStatus.PROGRESSED,
+    );
+    assert.strictEqual(result, true, 'Expected result is true');
+  });
+
+  it('should return true when message status is revocation declared', async () => {
+    const result = facilitator.canPerformConfrimStakeIntent(
+      messageStatus.REVOCATION_DECLARED,
+    );
+    assert.strictEqual(result, true, 'Expected result is true');
   });
 });

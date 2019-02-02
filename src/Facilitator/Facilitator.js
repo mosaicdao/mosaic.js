@@ -244,7 +244,17 @@ class Facilitator {
    * @returns {Promise} Promise object.
    */
   async confirmStakeIntent(messageHash, stakeRequestParams, txOption) {
-    const stakeStatus = this.stakeHelper.getStakeStatus(messageHash);
+    if (typeof messageHash !== 'string') {
+      throw new Error('Invalid message hash.');
+    }
+    if (stakeRequestParams === undefined) {
+      throw new Error('Invalid stake params.');
+    }
+    if (txOption === undefined) {
+      throw new Error('Invalid transaction option.');
+    }
+
+    const stakeStatus = await this.stakeHelper.getStakeStatus(messageHash);
     if (!this.canPerformConfrimStakeIntent(stakeStatus)) {
       throw new Error(
         'Outbox message status must be declared, progressed or revocation declared.',
@@ -295,6 +305,19 @@ class Facilitator {
     txOptionOrigin,
     txOptionAuxiliary,
   ) {
+    if (typeof messageHash !== 'string') {
+      throw new Error('Invalid message hash.');
+    }
+    if (typeof unlockSecret !== 'string') {
+      throw new Error('Invalid unlock secret.');
+    }
+    if (txOptionOrigin === undefined) {
+      throw new Error('Invalid origin transaction option.');
+    }
+    if (txOptionAuxiliary === undefined) {
+      throw new Error('Invalid auxiliary transaction option.');
+    }
+
     return Promise.all([
       this.performProgressStake(messageHash, unlockSecret, txOptionOrigin),
       this.performProgressMint(messageHash, unlockSecret, txOptionAuxiliary),
@@ -311,13 +334,23 @@ class Facilitator {
    * @returns {Promise} Promise object.
    */
   async performProgressStake(messageHash, unlockSecret, txOption) {
-    const stakeStatus = this.stakeHelper.getStakeStatus(messageHash);
+    if (typeof messageHash !== 'string') {
+      throw new Error('Invalid message hash.');
+    }
+    if (typeof unlockSecret !== 'string') {
+      throw new Error('Invalid unlock secret.');
+    }
+    if (txOption === undefined) {
+      throw new Error('Invalid transaction option.');
+    }
+
+    const stakeStatus = await this.stakeHelper.getStakeStatus(messageHash);
     if (
       stakeStatus === MessageStatus.UNDECLARED ||
       stakeStatus === MessageStatus.REVOCATION_DECLARED ||
       stakeStatus === MessageStatus.REVOKED
     ) {
-      throw new Error('Stake status must be declared or progressed.');
+      throw new Error('Stake status must be declared.');
     }
     if (stakeStatus === MessageStatus.DECLARED) {
       await this.stakeHelper.progressStake(
@@ -326,7 +359,7 @@ class Facilitator {
         txOption,
       );
     }
-    return Promise.resolve();
+    return Promise.resolve(true);
   }
 
   /**
@@ -339,17 +372,29 @@ class Facilitator {
    * @returns {Promise} Promise object.
    */
   async performProgressMint(messageHash, unlockSecret, txOption) {
-    const mintStatus = this.stakeHelper.getMintStatus(messageHash);
+    if (typeof messageHash !== 'string') {
+      throw new Error('Invalid message hash.');
+    }
+    if (typeof unlockSecret !== 'string') {
+      throw new Error('Invalid unlock secret.');
+    }
+    if (txOption === undefined) {
+      throw new Error('Invalid transaction option.');
+    }
+
+    const mintStatus = await this.stakeHelper.getMintStatus(messageHash);
     if (
       mintStatus === MessageStatus.UNDECLARED ||
-      mintStatus === MessageStatus.REVOKED
+      mintStatus === MessageStatus.REVOKED ||
+      mintStatus === MessageStatus.REVOCATION_DECLARED
     ) {
-      throw new Error('Mint status must be declared or progressed.');
+      throw new Error('Mint status must be declared.');
     }
+
     if (mintStatus === MessageStatus.DECLARED) {
       await this.stakeHelper.progressMint(messageHash, unlockSecret, txOption);
     }
-    return Promise.resolve();
+    return Promise.resolve(true);
   }
 
   /**
@@ -360,6 +405,9 @@ class Facilitator {
    * @returns {string} message hash.
    */
   getMessageHash(stakeParams) {
+    if (!stakeParams) {
+      throw new Error('Invalid stake request params.');
+    }
     const stakeIntentHash = Utils.getStakeIntentHash(
       stakeParams.amount,
       stakeParams.beneficiary,

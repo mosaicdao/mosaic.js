@@ -19,15 +19,8 @@
 // ----------------------------------------------------------------------------
 
 const Web3Utils = require('web3-utils');
-const web3 = require('web3');
+const Web3 = require('web3');
 const Crypto = require('crypto');
-
-const MESSAGE_TYPE_HASH = web3.utils.sha3(
-  'Message(bytes32 intentHash,uint256 nonce,uint256 gasPrice,uint256 gasLimit,address sender,bytes32 hashLock)',
-);
-const STAKE_TYPE_HASH = web3.utils.sha3(
-  'StakeIntent(uint256 amount,address beneficiary,address gateway)',
-);
 
 const MessageStatus = Object.freeze({
   UNDECLARED: '0',
@@ -105,8 +98,17 @@ class Utils {
     sender,
     hashLock,
   ) {
-    const messageHash = web3.utils.sha3(
-      web3.eth.abi.encodeParameters(
+    const web3Obj = new Web3();
+
+    const messageTypeHash = Web3.utils.sha3(
+      web3Obj.eth.abi.encodeParameter(
+        'string',
+        'Message(bytes32 intentHash,uint256 nonce,uint256 gasPrice,uint256 gasLimit,address sender,bytes32 hashLock)',
+      ),
+    );
+
+    const messageHash = web3Obj.utils.sha3(
+      web3Obj.eth.abi.encodeParameters(
         [
           'bytes32',
           'bytes32',
@@ -117,7 +119,7 @@ class Utils {
           'bytes32',
         ],
         [
-          MESSAGE_TYPE_HASH,
+          messageTypeHash,
           intentHash,
           nonce,
           gasPrice,
@@ -140,10 +142,19 @@ class Utils {
    * @returns {string} stake intent hash.
    */
   static getStakeIntentHash(amount, beneficiary, gatewayAddress) {
-    const stakeIntentHash = web3.utils.sha3(
-      web3.eth.abi.encodeParameters(
+    const web3Obj = new Web3();
+
+    const stakeTypeHash = Web3.utils.sha3(
+      web3Obj.eth.abi.encodeParameter(
+        'string',
+        'StakeIntent(uint256 amount,address beneficiary,address gateway)',
+      ),
+    );
+
+    const stakeIntentHash = web3Obj.utils.sha3(
+      web3Obj.eth.abi.encodeParameters(
         ['bytes32', 'uint256', 'address', 'address'],
-        [STAKE_TYPE_HASH, amount, beneficiary, gatewayAddress],
+        [stakeTypeHash, amount, beneficiary, gatewayAddress],
       ),
     );
     return stakeIntentHash;
