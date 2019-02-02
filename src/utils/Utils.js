@@ -168,6 +168,32 @@ class Utils {
   static messageStatus() {
     return MessageStatus;
   }
+
+  /**
+   * Helper function to send ethereum transaction.
+   *
+   * @param {Object} tx Transaction object.
+   * @param {Object} tx Transaction options.
+   *
+   * @returns {Promise} Promise object.
+   */
+  static sendTransaction(tx, txOption) {
+    return new Promise((resolve, reject) => {
+      const result = {};
+      tx.send(txOption)
+        .on('transactionHash', (transactionHash) => {
+          result.trasactionHash = transactionHash;
+        })
+        .on('receipt', (receipt) => {
+          result.receipt = receipt;
+          resolve(result);
+        })
+        .on('error', (error) => {
+          result.error = error;
+          reject(result);
+        });
+    });
+  }
 }
 
 module.exports = Utils;

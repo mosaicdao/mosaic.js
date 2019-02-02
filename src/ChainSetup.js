@@ -689,7 +689,7 @@ class ChainSetup {
           });
       })
       .then(function(addresses) {
-        outAddresses.origin.gateway = addresses.gateway;
+        outAddresses.origin.gateway = addresses.tokenAddress;
         outAddresses.auxiliary.cogateway = addresses.cogateway;
       });
   }

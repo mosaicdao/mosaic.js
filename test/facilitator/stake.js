@@ -317,7 +317,7 @@ describe('Facilitator.stake()', () => {
     ]);
 
     SpyAssert.assert(spyGetGatewayNonce, 1, [[stakeParams.staker]]);
-    SpyAssert.assert(spyGetHashLock, 1, [[]]);
+    SpyAssert.assert(spyGetHashLock, 1, [[undefined]]);
     SpyAssert.assert(spyGetBounty, 1, [[]]);
     SpyAssert.assert(spyApproveStakeAmount, 0, [[]]);
     SpyAssert.assert(spyApproveBountyAmount, 0, [[]]);
@@ -476,9 +476,7 @@ describe('Facilitator.stake()', () => {
 
     SpyAssert.assert(spyGetGatewayNonce, 1, [[stakeParams.staker]]);
     SpyAssert.assert(spyGetHashLock, 1, [[hashLockObj.secret]]);
-    SpyAssert.assert(spyGetBounty, 1, [
-      [txOption.from, bountyAmount, txOption],
-    ]);
+    SpyAssert.assert(spyGetBounty, 1, [[]]);
 
     SpyAssert.assert(spyApproveStakeAmount, 0, [[]]);
     SpyAssert.assert(spyApproveBountyAmount, 1, [[txOption]]);
@@ -531,9 +529,7 @@ describe('Facilitator.stake()', () => {
 
     SpyAssert.assert(spyGetGatewayNonce, 1, [[stakeParams.staker]]);
     SpyAssert.assert(spyGetHashLock, 1, [[hashLockObj.secret]]);
-    SpyAssert.assert(spyGetBounty, 1, [
-      [txOption.from, bountyAmount, txOption],
-    ]);
+    SpyAssert.assert(spyGetBounty, 1, [[]]);
 
     SpyAssert.assert(spyApproveStakeAmount, 0, [[]]);
     SpyAssert.assert(spyApproveBountyAmount, 0, [[]]);

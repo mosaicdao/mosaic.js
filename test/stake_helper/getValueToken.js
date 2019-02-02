@@ -27,7 +27,7 @@ const SpyAssert = require('../../test_utils/SpyAssert');
 
 const assert = chai.assert;
 
-describe('Facilitator.getValueToken()', () => {
+describe('StakeHelper.getValueToken()', () => {
   let stakeHelper;
   let web3;
   let gatewayAddress;
@@ -84,7 +84,7 @@ describe('Facilitator.getValueToken()', () => {
       'Value token address must not be different.',
     );
 
-    SpyAssert.assert(spyToken, 1, [[gatewayAddress]]);
+    SpyAssert.assert(spyToken, 1, [[]]);
     SpyAssert.assert(spyContract, 1, [[web3, gatewayAddress]]);
     SpyAssert.assert(spy, 1, [[]]);
 
