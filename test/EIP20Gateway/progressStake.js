@@ -25,6 +25,7 @@ const sinon = require('sinon');
 const assert = chai.assert;
 const EIP20Gateway = require('../../src/ContractInteract/EIP20Gateway');
 const SpyAssert = require('../../test_utils/SpyAssert');
+const AssertAsync = require('../../test_utils/AssertAsync');
 const Utils = require('../../src/utils/Utils');
 
 describe('EIP20Gateway.progressStake()', () => {
@@ -53,7 +54,7 @@ describe('EIP20Gateway.progressStake()', () => {
     spySendTransaction = sinon.replace(
       Utils,
       'sendTransaction',
-      sinon.fake.returns(true),
+      sinon.fake.resolves(true),
     );
   };
 
@@ -82,8 +83,8 @@ describe('EIP20Gateway.progressStake()', () => {
   });
 
   it('should throw error transaction object is invalid', async () => {
-    assert.throws(() => {
-      gateway.progressStake(messageHash, unlockSecret, undefined);
+    AssertAsync.throws(async () => {
+      await gateway.progressStake(messageHash, unlockSecret, undefined);
     }, /Invalid transaction options./);
   });
 

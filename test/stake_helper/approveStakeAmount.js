@@ -78,7 +78,7 @@ describe('StakeHelper.approveStakeAmount()', () => {
       sinon.fake.returns(mockTx.object),
     );
 
-    spySendTransaction = sinon.replace(
+    spySendTransaction = sinon.resolves(
       StakeHelper,
       'sendTransaction',
       sinon.fake.returns(true),

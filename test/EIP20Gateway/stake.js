@@ -25,6 +25,7 @@ const sinon = require('sinon');
 const assert = chai.assert;
 const EIP20Gateway = require('../../src/ContractInteract/EIP20Gateway');
 const SpyAssert = require('../../test_utils/SpyAssert');
+const AssertAsync = require('../../test_utils/AssertAsync');
 const Utils = require('../../src/utils/Utils');
 
 describe('EIP20Gateway.stake()', () => {
@@ -52,7 +53,7 @@ describe('EIP20Gateway.stake()', () => {
     spySendTransaction = sinon.replace(
       Utils,
       'sendTransaction',
-      sinon.fake.returns(true),
+      sinon.fake.resolves(true),
     );
   };
 
@@ -75,7 +76,6 @@ describe('EIP20Gateway.stake()', () => {
     };
 
     stakeParams = {
-      staker: '0x0000000000000000000000000000000000000005',
       amount: '1000000000000',
       beneficiary: '0x0000000000000000000000000000000000000004',
       gasPrice: '1',
@@ -87,9 +87,8 @@ describe('EIP20Gateway.stake()', () => {
   });
 
   it('should throw error when transaction object is invalid', async () => {
-    assert.throws(() => {
-      gateway.stake(
-        stakeParams.staker,
+    AssertAsync.throws(async () => {
+      await gateway.stake(
         stakeParams.amount,
         stakeParams.beneficiary,
         stakeParams.gasPrice,
@@ -103,9 +102,8 @@ describe('EIP20Gateway.stake()', () => {
 
   it('should throw error when from address is invalid', async () => {
     delete txOptions.from;
-    assert.throws(() => {
-      gateway.stake(
-        stakeParams.staker,
+    AssertAsync.throws(async () => {
+      await gateway.stake(
         stakeParams.amount,
         stakeParams.beneficiary,
         stakeParams.gasPrice,
@@ -120,7 +118,6 @@ describe('EIP20Gateway.stake()', () => {
   it('should return correct mocked transaction object', async () => {
     setup();
     const result = await gateway.stake(
-      stakeParams.staker,
       stakeParams.amount,
       stakeParams.beneficiary,
       stakeParams.gasPrice,
@@ -133,7 +130,6 @@ describe('EIP20Gateway.stake()', () => {
 
     SpyAssert.assert(spyRawTx, 1, [
       [
-        stakeParams.staker,
         stakeParams.amount,
         stakeParams.beneficiary,
         stakeParams.gasPrice,
@@ -144,7 +140,6 @@ describe('EIP20Gateway.stake()', () => {
     ]);
     SpyAssert.assert(spyCall, 1, [
       [
-        stakeParams.staker,
         stakeParams.amount,
         stakeParams.beneficiary,
         stakeParams.gasPrice,

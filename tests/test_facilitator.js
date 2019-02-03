@@ -3,7 +3,7 @@ const Web3 = require('web3');
 const originWeb3 = new Web3('http://localhost:8546');
 const auxiliaryWeb3 = new Web3('http://localhost:8547');
 
-const Facilitator = require('../src/Facilitator/Facilitator1');
+const Facilitator = require('../src/Facilitator/Facilitator');
 const Anchor = require('../src/ContractInteract/Anchor.js');
 
 const gatewayAddress = '0x65f3a1a420679f9161c2b949ac372ab2bf091edc';

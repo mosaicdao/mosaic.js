@@ -26,7 +26,7 @@ const assert = chai.assert;
 const EIP20Gateway = require('../../src/ContractInteract/EIP20Gateway');
 const SpyAssert = require('../../test_utils/SpyAssert');
 
-describe('EIP20Gateway._progressStakeRawTx()', () => {
+describe('EIP20Gateway._stakeRawTx()', () => {
   let web3;
   let gatewayAddress;
   let gateway;
@@ -58,7 +58,6 @@ describe('EIP20Gateway._progressStakeRawTx()', () => {
     gateway = new EIP20Gateway(web3, gatewayAddress);
 
     stakeParams = {
-      staker: '0x0000000000000000000000000000000000000005',
       amount: '1000000000000',
       beneficiary: '0x0000000000000000000000000000000000000004',
       gasPrice: '1',
@@ -70,32 +69,10 @@ describe('EIP20Gateway._progressStakeRawTx()', () => {
     mockedTx = 'MockedTx';
   });
 
-  it('should throw error when staker address is invalid', async function() {
-    const expectedErrorMessage = 'Invalid staker address.';
-    await gateway
-      ._stakeRawTx(
-        '0x123',
-        stakeParams.amount,
-        stakeParams.beneficiary,
-        stakeParams.gasPrice,
-        stakeParams.gasLimit,
-        stakeParams.nonce,
-        stakeParams.hashLock,
-      )
-      .catch((exception) => {
-        assert.strictEqual(
-          exception.message,
-          expectedErrorMessage,
-          `Exception reason must be "${expectedErrorMessage}"`,
-        );
-      });
-  });
-
   it('should throw error when stake amount is zero', async function() {
     const expectedErrorMessage = 'Stake amount must not be zero.';
     await gateway
       ._stakeRawTx(
-        stakeParams.staker,
         '0',
         stakeParams.beneficiary,
         stakeParams.gasPrice,
@@ -116,7 +93,6 @@ describe('EIP20Gateway._progressStakeRawTx()', () => {
     const expectedErrorMessage = 'Invalid beneficiary address.';
     await gateway
       ._stakeRawTx(
-        stakeParams.staker,
         stakeParams.amount,
         '0x123',
         stakeParams.gasPrice,
@@ -137,7 +113,6 @@ describe('EIP20Gateway._progressStakeRawTx()', () => {
     const expectedErrorMessage = 'Invalid gas price.';
     await gateway
       ._stakeRawTx(
-        stakeParams.staker,
         stakeParams.amount,
         stakeParams.beneficiary,
         undefined,
@@ -158,7 +133,6 @@ describe('EIP20Gateway._progressStakeRawTx()', () => {
     const expectedErrorMessage = 'Invalid gas limit.';
     await gateway
       ._stakeRawTx(
-        stakeParams.staker,
         stakeParams.amount,
         stakeParams.beneficiary,
         stakeParams.gasPrice,
@@ -178,7 +152,6 @@ describe('EIP20Gateway._progressStakeRawTx()', () => {
   it('should return correct mocked transaction object', async () => {
     setup();
     const result = await gateway._stakeRawTx(
-      stakeParams.staker,
       stakeParams.amount,
       stakeParams.beneficiary,
       stakeParams.gasPrice,
@@ -204,7 +177,6 @@ describe('EIP20Gateway._progressStakeRawTx()', () => {
     ]);
     SpyAssert.assert(spyCall, 1, [
       [
-        stakeParams.staker,
         stakeParams.amount,
         stakeParams.beneficiary,
         stakeParams.gasPrice,

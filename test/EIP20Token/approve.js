@@ -25,6 +25,7 @@ const sinon = require('sinon');
 const assert = chai.assert;
 const EIP20Token = require('../../src/ContractInteract/EIP20Token');
 const SpyAssert = require('../../test_utils/SpyAssert');
+const AssertAsync = require('../../test_utils/AssertAsync');
 const Utils = require('../../src/utils/Utils');
 
 describe('EIP20Token.approve()', () => {
@@ -53,7 +54,7 @@ describe('EIP20Token.approve()', () => {
     spySendTransaction = sinon.replace(
       Utils,
       'sendTransaction',
-      sinon.fake.returns(true),
+      sinon.fake.resolves(true),
     );
   };
 
@@ -81,15 +82,15 @@ describe('EIP20Token.approve()', () => {
   });
 
   it('should throw an error when transaction options is undefined', async () => {
-    assert.throws(() => {
-      token.approve(spenderAddress, amount, undefined);
+    AssertAsync.throws(async () => {
+      await token.approve(spenderAddress, amount, undefined);
     }, /Invalid transaction options./);
   });
 
   it('should throw an error when account address is undefined', async () => {
     delete txOptions.from;
-    assert.throws(() => {
-      token.approve(spenderAddress, amount, txOptions);
+    AssertAsync.throws(async () => {
+      await token.approve(spenderAddress, amount, txOptions);
     }, /Invalid from address./);
   });
 

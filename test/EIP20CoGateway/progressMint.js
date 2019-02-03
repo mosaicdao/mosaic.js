@@ -53,7 +53,7 @@ describe('EIP20CoGateway.progressMint()', () => {
     spySendTransaction = sinon.replace(
       Utils,
       'sendTransaction',
-      sinon.fake.returns(true),
+      sinon.fake.resolves(true),
     );
   };
 
@@ -82,9 +82,15 @@ describe('EIP20CoGateway.progressMint()', () => {
   });
 
   it('should throw error transaction object is invalid', async () => {
-    assert.throws(() => {
-      coGateway.progressMint(messageHash, unlockSecret, undefined);
-    }, /Invalid transaction options./);
+    await coGateway
+      .progressMint(messageHash, unlockSecret, undefined)
+      .catch((exception) => {
+        assert.strictEqual(
+          exception.message,
+          'Invalid transaction options.',
+          'Exeception message should match',
+        );
+      });
   });
 
   it('should return correct mocked transaction object', async () => {

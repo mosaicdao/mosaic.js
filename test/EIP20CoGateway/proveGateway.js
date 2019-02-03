@@ -25,6 +25,7 @@ const sinon = require('sinon');
 const assert = chai.assert;
 const EIP20CoGateway = require('../../src/ContractInteract/EIP20CoGateway');
 const SpyAssert = require('../../test_utils/SpyAssert');
+const AssertAsync = require('../../test_utils/AssertAsync');
 const Utils = require('../../src/utils/Utils');
 
 describe('EIP20CoGateway.proveGateway()', () => {
@@ -55,7 +56,7 @@ describe('EIP20CoGateway.proveGateway()', () => {
     spySendTransaction = sinon.replace(
       Utils,
       'sendTransaction',
-      sinon.fake.returns(true),
+      sinon.fake.resolves(true),
     );
   };
 
@@ -85,8 +86,8 @@ describe('EIP20CoGateway.proveGateway()', () => {
   });
 
   it('should throw error transaction object is invalid', async () => {
-    assert.throws(() => {
-      coGateway.proveGateway(
+    AssertAsync.throws(async () => {
+      await coGateway.proveGateway(
         blockHeight,
         encodedAccount,
         accountProof,
