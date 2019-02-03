@@ -69,12 +69,12 @@ class Utils {
    * @returns {HashLock} HashLock object.
    */
   static toHashLock(secretString) {
-    const secretBytes = Buffer.from(secretString);
-
+    const unlockSecret = Web3Utils.keccak256(secretString);
+    const hashLock = Web3Utils.keccak256(unlockSecret);
     return {
       secret: secretString,
-      unlockSecret: `0x${secretBytes.toString('hex')}`,
-      hashLock: Web3Utils.keccak256(secretString),
+      unlockSecret,
+      hashLock,
     };
   }
 
@@ -178,19 +178,17 @@ class Utils {
    * @returns {Promise} Promise object.
    */
   static sendTransaction(tx, txOption) {
-    return new Promise((resolve, reject) => {
-      const result = {};
+    return new Promise((onResolve, onReject) => {
       tx.send(txOption)
-        .on('transactionHash', (transactionHash) => {
-          result.trasactionHash = transactionHash;
-        })
+        .on('transactionHash', (transactionHash) => {})
         .on('receipt', (receipt) => {
-          result.receipt = receipt;
-          resolve(result);
+          onResolve(receipt);
         })
         .on('error', (error) => {
-          result.error = error;
-          reject(result);
+          onReject(error);
+        })
+        .catch((exception) => {
+          onReject(exception);
         });
     });
   }

@@ -23,6 +23,7 @@
 const Web3 = require('web3');
 const Contracts = require('../Contracts');
 const Utils = require('../../src/utils/Utils');
+const Anchor = require('../../src/ContractInteract/Anchor');
 
 /**
  * Contract interact for EIP20CoGateway.
@@ -38,14 +39,14 @@ class EIP20CoGateway {
     if (web3 instanceof Web3) {
       this.web3 = web3;
     } else {
-      const err = new Error(
+      const err = new TypeError(
         "Mandatory Parameter 'web3' is missing or invalid",
       );
       throw err;
     }
 
     if (!Web3.utils.isAddress(coGatewayAddress)) {
-      const err = new Error(
+      const err = new TypeError(
         "Mandatory Parameter 'coGatewayAddress' is missing or invalid.",
       );
       throw err;
@@ -59,7 +60,7 @@ class EIP20CoGateway {
     );
 
     if (!this.contract) {
-      const err = new Error(
+      const err = new TypeError(
         `Could not load CoGateway contract for: ${this.coGatewayAddress}`,
       );
       throw err;
@@ -91,15 +92,24 @@ class EIP20CoGateway {
    * @returns {Promise} Promise object.
    */
   proveGateway(blockHeight, encodedAccount, accountProof, txOptions) {
-    if (!txOptions) {
-      throw new Error('Invalid transaction options.');
-    }
-    return this._proveGatewayRawTx(
-      blockHeight,
-      encodedAccount,
-      accountProof,
-    ).then((tx) => {
-      return Utils.sendTransaction(tx, txOptions);
+    return new Promise((onResolve, onReject) => {
+      if (!txOptions) {
+        const err = new Error('Invalid transaction options.');
+        onReject(err);
+      }
+      this._proveGatewayRawTx(blockHeight, encodedAccount, accountProof)
+        .then((tx) => {
+          Utils.sendTransaction(tx, txOptions)
+            .then((result) => {
+              onResolve(result);
+            })
+            .catch((exception) => {
+              onReject(exception);
+            });
+        })
+        .catch((exception) => {
+          onReject(exception);
+        });
     });
   }
 
@@ -166,21 +176,34 @@ class EIP20CoGateway {
     storageProof,
     txOptions,
   ) {
-    if (!txOptions) {
-      throw new Error('Invalid transaction options.');
-    }
-    return this._confirmStakeIntentRawTx(
-      staker,
-      nonce,
-      beneficiary,
-      amount,
-      gasPrice,
-      gasLimit,
-      hashLock,
-      blockHeight,
-      storageProof,
-    ).then((tx) => {
-      return Utils.sendTransaction(tx, txOptions);
+    return new Promise((onResolve, onReject) => {
+      if (!txOptions) {
+        const err = new TypeError('Invalid transaction options.');
+        onReject(err);
+      }
+      this._confirmStakeIntentRawTx(
+        staker,
+        nonce,
+        beneficiary,
+        amount,
+        gasPrice,
+        gasLimit,
+        hashLock,
+        blockHeight,
+        storageProof,
+      )
+        .then((tx) => {
+          Utils.sendTransaction(tx, txOptions)
+            .then((result) => {
+              onResolve(result);
+            })
+            .catch((exception) => {
+              onReject(exception);
+            });
+        })
+        .catch((exception) => {
+          onReject(exception);
+        });
     });
   }
 
@@ -276,11 +299,24 @@ class EIP20CoGateway {
    * @returns {Promise} promise object.
    */
   progressMint(messageHash, unlockSecret, txOptions) {
-    if (!txOptions) {
-      throw new Error('Invalid transaction options.');
-    }
-    return this._progressMintRawTx(messageHash, unlockSecret).then((tx) => {
-      return Utils.sendTransaction(tx, txOptions);
+    return new Promise((onResolve, onReject) => {
+      if (!txOptions) {
+        const err = new TypeError('Invalid transaction options.');
+        onReject(err);
+      }
+      this._progressMintRawTx(messageHash, unlockSecret)
+        .then((tx) => {
+          Utils.sendTransaction(tx, txOptions)
+            .then((result) => {
+              onResolve(result);
+            })
+            .catch((exception) => {
+              onReject(exception);
+            });
+        })
+        .catch((exception) => {
+          onReject(exception);
+        });
     });
   }
 
@@ -402,6 +438,42 @@ class EIP20CoGateway {
       .then((status) => {
         return status;
       });
+  }
+
+  /**
+   * Returns Anchor object.
+   *
+   * @returns {Promise} Promise object.
+   */
+  getAnchor() {
+    if (this._anchor) {
+      return Promise.resolve(this._anchor);
+    }
+    return this.getStateRootProviderAddress().then((anchorAddress) => {
+      const anchor = new Anchor(this.web3, anchorAddress);
+      this._anchor = anchor;
+      return anchor;
+    });
+  }
+
+  /**
+   * Get the state root for given block height.
+   *
+   * @returns {Promise} Promise object.
+   */
+  getLatestAnchorInfo() {
+    return new Promise((onResolve, onReject) => {
+      this.getAnchor().then((anchor) => {
+        anchor.getLatestStateRootBlockHeight().then((blockHeight) => {
+          anchor.getStateRoot(blockHeight).then((stateRoot) => {
+            onResolve({
+              blockHeight,
+              stateRoot,
+            });
+          });
+        });
+      });
+    });
   }
 }
 

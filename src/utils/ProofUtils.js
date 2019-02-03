@@ -32,8 +32,8 @@ const MESSAGE_INBOX_OFFSET = '8';
 class ProofUtils {
   /**
    *
-   * @param sourceWeb3 Web3 instance connected to source chain.
-   * @param targetWeb3 Web3 instance connected to target chain.
+   * @param {Web3} sourceWeb3 Web3 instance connected to source chain.
+   * @param {Web3} targetWeb3 Web3 instance connected to target chain.
    */
   constructor(sourceWeb3, targetWeb3) {
     this.sourceWeb3 = sourceWeb3;
@@ -42,23 +42,29 @@ class ProofUtils {
 
   /**
    * Get proof for inbox
-   *
-   * @param address Address of ethereum account for which proof needs to be
-   *                generated.
-   * @param keys Array of keys for a mapping in solidity.
-   * @param blockNumber Block number.
+   * @param {string} address Address of ethereum account for which proof needs
+   *                         to be generated.
+   * @param {String[]}keys Array of keys for a mapping in solidity.
+   * @param {String }blockNumber Block number in hex.
    *
    * @return {Object} Proof data.
    */
-  async getInboxProof(address, keys = [], blockNumber) {
-    const proof = await this._getProof(
-      this.targetWeb3,
-      MESSAGE_INBOX_OFFSET,
-      address,
-      keys,
-      blockNumber,
-    );
-    return proof;
+  getInboxProof(address, keys = [], blockNumber) {
+    return new Promise((onResolve, onReject) => {
+      this._getProof(
+        this.targetWeb3,
+        MESSAGE_INBOX_OFFSET,
+        address,
+        keys,
+        blockNumber,
+      )
+        .then((proof) => {
+          onResolve(proof);
+        })
+        .catch((exception) => {
+          onReject(exception);
+        });
+    });
   }
 
   /**
@@ -71,55 +77,61 @@ class ProofUtils {
    *
    * @return {Object} Proof data.
    */
-  async getOutboxProof(address, keys = [], blockNumber) {
-    const proof = await this._getProof(
-      this.sourceWeb3,
-      MESSAGE_OUTBOX_OFFSET,
-      address,
-      keys,
-      blockNumber,
-    );
-    return proof;
+  getOutboxProof(address, keys = [], blockNumber) {
+    return new Promise((onResolve, onReject) => {
+      this._getProof(
+        this.sourceWeb3,
+        MESSAGE_OUTBOX_OFFSET,
+        address,
+        keys,
+        blockNumber,
+      )
+        .then((proof) => {
+          onResolve(proof);
+        })
+        .catch((exception) => {
+          onReject(exception);
+        });
+    });
   }
 
   /**
    * Get proof data
    *
-   * @param web3 web3 instance of chain from which proof is generated.
-   * @param index Storage index.
-   * @param address Address of ethereum account for which proof needs to be
-   *                generated.
-   * @param keys Array of keys for a mapping in solidity.
-   * @param blockNumber Block number.
+   * @param {Web3} web3 web3 instance of chain from which proof is generated.
+   * @param {string} index Storage index.
+   * @param {string} address Address of ethereum account for which proof needs
+   *                         to be generated.
+   * @param {String[]} keys Array of keys for a mapping in solidity.
+   * @param {string} blockNumber Block number in hex.
    *
    * @return {Object} Proof data.
    */
-  async _getProof(web3, index, address, keys, blockNumber) {
-    if (!blockNumber) {
-      const block = await web3.eth.getBlock('latest');
-      blockNumber = await web3.utils.toHex(block.number);
-    }
-
-    const storageKey = this._storagePath(web3, index, keys);
-
-    const proof = await this._fetchProof(
-      web3,
-      address,
-      [storageKey],
-      blockNumber,
-    );
-
-    const proofData = proof.result;
-    proofData.block_number = blockNumber;
-    return proofData;
+  _getProof(web3, index, address, keys, blockNumber) {
+    return new Promise(async (onResolve, onReject) => {
+      if (!blockNumber) {
+        const block = await web3.eth.getBlock('latest');
+        blockNumber = await web3.utils.toHex(block.number);
+      }
+      const storageKey = this._storagePath(web3, index, keys);
+      this._fetchProof(web3, address, [storageKey], blockNumber)
+        .then((proof) => {
+          const proofData = proof.result;
+          proofData.block_number = blockNumber;
+          onResolve(proofData);
+        })
+        .catch((exception) => {
+          onReject(exception);
+        });
+    });
   }
 
   /**
-   * @param web3 web3 instance of chain from which proof is generated.
-   * @param address Address of ethereum account for which proof needs to be
-   *                generated.
-   * @param storageKeys Array of keys for a mapping in solidity.
-   * @param blockNumber Block number.
+   * @param {Web3} web3 web3 instance of chain from which proof is generated.
+   * @param {string} address Address of ethereum account for which proof needs
+   *                         to be generated.
+   * @param {String[]} storageKeys Array of keys for a mapping in solidity.
+   * @param {string} blockNumber Block number in hex.
    * @return {Promise<Proof>}
    */
   async _fetchProof(web3, address, storageKeys = [], blockNumber = 'latest') {
@@ -134,20 +146,24 @@ class ProofUtils {
         },
         (err, response) => {
           if (response) {
-            const accountProof = response.result.accountProof;
-            const storageProofs = response.result.storageProof;
+            try {
+              const accountProof = response.result.accountProof;
+              const storageProofs = response.result.storageProof;
 
-            response.result.serializedAccountProof = this._serializeProof(
-              accountProof,
-            );
-            response.result.encodedAccountValue = ProofUtils._encodedAccountValue(
-              response.result.serializedAccountProof,
-            );
+              response.result.serializedAccountProof = this._serializeProof(
+                accountProof,
+              );
+              response.result.encodedAccountValue = ProofUtils._encodedAccountValue(
+                response.result.serializedAccountProof,
+              );
 
-            storageProofs.forEach((sp) => {
-              sp.serializedProof = this._serializeProof(sp.proof);
-            });
-            resolve(response);
+              storageProofs.forEach((sp) => {
+                sp.serializedProof = this._serializeProof(sp.proof);
+              });
+              resolve(response);
+            } catch (exception) {
+              reject(exception);
+            }
           }
           reject(err);
         },
@@ -156,11 +172,11 @@ class ProofUtils {
   }
 
   /**
-   *
-   * @param web3 web3 instance of chain from which proof is generated.
-   * @param storageIndex Position of storage in the contract.
-   * @param mappings  list of keys in case storage is mapping.
-   * @return {*|string} Storage path.
+   * Provides storage path.
+   * @param {Web3} web3 web3 instance of chain from which proof is generated.
+   * @param {string} storageIndex Position of storage in the contract.
+   * @param {String[]}mappings  list of keys in case storage is mapping.
+   * @return {string} Storage path.
    * @private
    */
   _storagePath(web3, storageIndex, mappings) {
@@ -179,9 +195,9 @@ class ProofUtils {
   }
 
   /**
-   * @param proof Array of nodes representing merkel proof.
-   *
-   * @return {string | *} Serialized proof.
+   * Flatten the array of nodes.
+   * @param {Object} proof Array of nodes representing merkel proof.
+   * @return {string} Serialized proof.
    * @private
    */
   _serializeProof(proof) {
@@ -191,9 +207,8 @@ class ProofUtils {
   }
 
   /**
-   * Fetch rlp encoded account value (nonce, balance, codehash, storageRoot)
-   *
-   * @param accountProof
+   *  Fetch rlp encoded account value (nonce, balance, codehash, storageRoot)
+   * @param {string} accountProof Account proof.
    * @return {string}
    * @private
    */

@@ -20,6 +20,7 @@
 
 'use strict';
 
+const BN = require('bn.js');
 const Web3 = require('web3');
 const Contracts = require('../Contracts');
 const Utils = require('../../src/utils/Utils');
@@ -38,14 +39,14 @@ class EIP20Token {
     if (web3 instanceof Web3) {
       this.web3 = web3;
     } else {
-      const err = new Error(
+      const err = new TypeError(
         "Mandatory Parameter 'web3' is missing or invalid",
       );
       throw err;
     }
 
     if (!Web3.utils.isAddress(tokenAddress)) {
-      const err = new Error(
+      const err = new TypeError(
         "Mandatory Parameter 'tokenAddress' is missing or invalid.",
       );
       throw err;
@@ -56,7 +57,7 @@ class EIP20Token {
     this.contract = Contracts.getEIP20Token(this.web3, this.tokenAddress);
 
     if (!this.contract) {
-      const err = new Error(
+      const err = new TypeError(
         `Could not load token contract for: ${this.tokenAddress}`,
       );
       throw err;
@@ -77,16 +78,28 @@ class EIP20Token {
    * @returns {Promise} Promise object.
    */
   approve(spenderAddress, amount, txOptions) {
-    if (!txOptions) {
-      const err = new Error('Invalid transaction options.');
-      throw err;
-    }
-    if (!Web3.utils.isAddress(txOptions.from)) {
-      const err = new Error('Invalid from address.');
-      throw err;
-    }
-    return this._approveRawTx(spenderAddress, amount).then((tx) => {
-      return Utils.sendTransaction(tx, txOptions);
+    return new Promise((onResolve, onReject) => {
+      if (!txOptions) {
+        const err = new TypeError('Invalid transaction options.');
+        onReject(err);
+      }
+      if (!Web3.utils.isAddress(txOptions.from)) {
+        const err = new TypeError('Invalid from address.');
+        onReject(err);
+      }
+      this._approveRawTx(spenderAddress, amount)
+        .then((tx) => {
+          Utils.sendTransaction(tx, txOptions)
+            .then((result) => {
+              onResolve(result);
+            })
+            .catch((exception) => {
+              onReject(exception);
+            });
+        })
+        .catch((exception) => {
+          onReject(exception);
+        });
     });
   }
 
@@ -136,6 +149,30 @@ class EIP20Token {
       .then((allowance) => {
         return allowance;
       });
+  }
+
+  /**
+   * Check if the account has approved gateway contract.
+   *
+   * @param {string} ownerAddress Owner account address.
+   * @param {string} spenderAddress Spender account address.
+   * @param {string} amount Approval amount.
+   *
+   * @returns {bool} `true` if approved.
+   */
+  async isAmountApproved(ownerAddress, spenderAddress, amount) {
+    if (!Web3.utils.isAddress(ownerAddress)) {
+      throw new Error('Invalid owner address.');
+    }
+    if (!Web3.utils.isAddress(spenderAddress)) {
+      throw new Error('Invalid spender address.');
+    }
+
+    return this.allowance(ownerAddress, spenderAddress).then(
+      (approvedAllowance) => {
+        return new BN(amount).lte(new BN(approvedAllowance));
+      },
+    );
   }
 }
 
