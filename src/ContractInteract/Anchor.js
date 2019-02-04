@@ -101,21 +101,16 @@ class Anchor {
    * @returns {Promise} Promise object.
    */
   anchorStateRoot(blockHeight, stateRoot, txOptions) {
-    return new Promise((onResolve, onReject) => {
-      if (!txOptions) {
-        const err = new TypeError('Invalid transaction options.');
-        return onReject(err);
-      }
-      if (!Web3.utils.isAddress(txOptions.from)) {
-        const err = new TypeError('Invalid from address.');
-        return onReject(err);
-      }
-
-      const tx = this.contract.methods.anchorStateRoot(blockHeight, stateRoot);
-      Utils.sendTransaction(tx, txOptions)
-        .then(onResolve)
-        .catch(onReject);
-    });
+    if (!txOptions) {
+      const err = new TypeError('Invalid transaction options.');
+      return Promise.reject(err);
+    }
+    if (!Web3.utils.isAddress(txOptions.from)) {
+      const err = new TypeError('Invalid from address.');
+      return Promise.reject(err);
+    }
+    const tx = this.contract.methods.anchorStateRoot(blockHeight, stateRoot);
+    return Utils.sendTransaction(tx, txOptions);
   }
 }
 

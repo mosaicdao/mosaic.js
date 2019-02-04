@@ -21,10 +21,11 @@
 const chai = require('chai');
 const Web3 = require('web3');
 const sinon = require('sinon');
-
-const assert = chai.assert;
 const EIP20Gateway = require('../../src/ContractInteract/EIP20Gateway');
 const SpyAssert = require('../../test_utils/SpyAssert');
+const AssertAsync = require('../../test_utils/AssertAsync');
+
+const assert = chai.assert;
 
 describe('EIP20Gateway.getNonce()', () => {
   let web3;
@@ -63,8 +64,8 @@ describe('EIP20Gateway.getNonce()', () => {
   });
 
   it('should throw an error when account address is undefined', async () => {
-    assert.throws(() => {
-      gateway.getNonce();
+    AssertAsync.throws(async () => {
+      await gateway.getNonce();
     }, /Invalid account address./);
   });
 

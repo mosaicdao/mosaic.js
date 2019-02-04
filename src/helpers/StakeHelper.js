@@ -156,30 +156,24 @@ class StakeHelper {
    * @returns {Promise} Promise object.
    */
   async approveStakeAmount(stakeAmount, txOptions) {
-    return new Promise((onResolve, onReject) => {
-      if (!txOptions) {
-        const err = new TypeError('Invalid transaction options.');
-        return onReject(err);
-      }
-      if (!Web3.utils.isAddress(txOptions.from)) {
-        const err = new TypeError('Invalid staker address.');
-        return onReject(err);
-      }
-      this.getValueToken()
-        .then((valueTokenAddress) => {
-          const valueToken = Contracts.getEIP20Token(
-            this.originWeb3,
-            valueTokenAddress,
-          );
-          valueToken.methods
-            .approve(this.gatewayAddress, stakeAmount)
-            .then((tx) => {
-              Utils.sendTransaction(tx, txOptions)
-                .then(onResolve)
-                .catch(onReject);
-            });
-        })
-        .catch(onReject);
+    if (!txOptions) {
+      const err = new TypeError('Invalid transaction options.');
+      return Promise.reject(err);
+    }
+    if (!Web3.utils.isAddress(txOptions.from)) {
+      const err = new TypeError('Invalid staker address.');
+      return Promise.reject(err);
+    }
+    return this.getValueToken().then((valueTokenAddress) => {
+      const valueToken = Contracts.getEIP20Token(
+        this.originWeb3,
+        valueTokenAddress,
+      );
+      return valueToken.methods
+        .approve(this.gatewayAddress, stakeAmount)
+        .then((tx) => {
+          return Utils.sendTransaction(tx, txOptions);
+        });
     });
   }
 

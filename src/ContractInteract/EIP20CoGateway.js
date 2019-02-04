@@ -92,18 +92,16 @@ class EIP20CoGateway {
    * @returns {Promise} Promise object.
    */
   proveGateway(blockHeight, encodedAccount, accountProof, txOptions) {
-    return new Promise((onResolve, onReject) => {
-      if (!txOptions) {
-        const err = new TypeError('Invalid transaction options.');
-        return onReject(err);
-      }
-      this._proveGatewayRawTx(blockHeight, encodedAccount, accountProof)
-        .then((tx) => {
-          Utils.sendTransaction(tx, txOptions)
-            .then(onResolve)
-            .catch(onReject);
-        })
-        .catch(onReject);
+    if (!txOptions) {
+      const err = new TypeError('Invalid transaction options.');
+      return Promise.reject(err);
+    }
+    return this._proveGatewayRawTx(
+      blockHeight,
+      encodedAccount,
+      accountProof,
+    ).then((tx) => {
+      return Utils.sendTransaction(tx, txOptions);
     });
   }
 
@@ -117,29 +115,27 @@ class EIP20CoGateway {
    * @returns {Promise} Promise object.
    */
   _proveGatewayRawTx(blockHeight, encodedAccount, accountProof) {
-    return new Promise((onResolve, onReject) => {
-      if (blockHeight === undefined) {
-        const err = new TypeError('Invalid block height.');
-        return onReject(err);
-      }
+    if (blockHeight === undefined) {
+      const err = new TypeError('Invalid block height.');
+      return Promise.reject(err);
+    }
 
-      if (typeof encodedAccount !== 'string') {
-        const err = new TypeError('Invalid account data.');
-        return onReject(err);
-      }
+    if (typeof encodedAccount !== 'string') {
+      const err = new TypeError('Invalid account data.');
+      return Promise.reject(err);
+    }
 
-      if (typeof accountProof !== 'string') {
-        const err = new TypeError('Invalid account proof.');
-        return onReject(err);
-      }
+    if (typeof accountProof !== 'string') {
+      const err = new TypeError('Invalid account proof.');
+      return Promise.reject(err);
+    }
 
-      const tx = this.contract.methods.proveGateway(
-        blockHeight,
-        encodedAccount,
-        accountProof,
-      );
-      onResolve(tx);
-    });
+    const tx = this.contract.methods.proveGateway(
+      blockHeight,
+      encodedAccount,
+      accountProof,
+    );
+    return Promise.resolve(tx);
   }
 
   /**
@@ -170,28 +166,22 @@ class EIP20CoGateway {
     storageProof,
     txOptions,
   ) {
-    return new Promise((onResolve, onReject) => {
-      if (!txOptions) {
-        const err = new TypeError('Invalid transaction options.');
-        return onReject(err);
-      }
-      this._confirmStakeIntentRawTx(
-        staker,
-        nonce,
-        beneficiary,
-        amount,
-        gasPrice,
-        gasLimit,
-        hashLock,
-        blockHeight,
-        storageProof,
-      )
-        .then((tx) => {
-          Utils.sendTransaction(tx, txOptions)
-            .then(onResolve)
-            .catch(onReject);
-        })
-        .catch(onReject);
+    if (!txOptions) {
+      const err = new TypeError('Invalid transaction options.');
+      return Promise.reject(err);
+    }
+    return this._confirmStakeIntentRawTx(
+      staker,
+      nonce,
+      beneficiary,
+      amount,
+      gasPrice,
+      gasLimit,
+      hashLock,
+      blockHeight,
+      storageProof,
+    ).then((tx) => {
+      return Utils.sendTransaction(tx, txOptions);
     });
   }
 
@@ -221,60 +211,58 @@ class EIP20CoGateway {
     blockHeight,
     storageProof,
   ) {
-    return new Promise((onResolve, onReject) => {
-      if (!Web3.utils.isAddress(staker)) {
-        const err = new TypeError('Invalid staker address.');
-        return onReject(err);
-      }
+    if (!Web3.utils.isAddress(staker)) {
+      const err = new TypeError('Invalid staker address.');
+      return Promise.reject(err);
+    }
 
-      if (typeof nonce !== 'string') {
-        const err = new TypeError('Invalid nonce.');
-        return onReject(err);
-      }
+    if (typeof nonce !== 'string') {
+      const err = new TypeError('Invalid nonce.');
+      return Promise.reject(err);
+    }
 
-      if (!Web3.utils.isAddress(beneficiary)) {
-        const err = new TypeError('Invalid beneficiary address.');
-        return onReject(err);
-      }
+    if (!Web3.utils.isAddress(beneficiary)) {
+      const err = new TypeError('Invalid beneficiary address.');
+      return Promise.reject(err);
+    }
 
-      if (typeof amount !== 'string') {
-        const err = new TypeError('Invalid stake amount.');
-        return onReject(err);
-      }
+    if (typeof amount !== 'string') {
+      const err = new TypeError('Invalid stake amount.');
+      return Promise.reject(err);
+    }
 
-      if (typeof gasPrice !== 'string') {
-        const err = new TypeError('Invalid gas price.');
-        return onReject(err);
-      }
+    if (typeof gasPrice !== 'string') {
+      const err = new TypeError('Invalid gas price.');
+      return Promise.reject(err);
+    }
 
-      if (typeof gasLimit !== 'string') {
-        const err = new TypeError('Invalid gas limit.');
-        return onReject(err);
-      }
+    if (typeof gasLimit !== 'string') {
+      const err = new TypeError('Invalid gas limit.');
+      return Promise.reject(err);
+    }
 
-      if (typeof blockHeight !== 'string') {
-        const err = new TypeError('Invalid block height.');
-        return onReject(err);
-      }
+    if (typeof blockHeight !== 'string') {
+      const err = new TypeError('Invalid block height.');
+      return Promise.reject(err);
+    }
 
-      if (typeof storageProof !== 'string') {
-        const err = new TypeError('Invalid storage proof data.');
-        return onReject(err);
-      }
+    if (typeof storageProof !== 'string') {
+      const err = new TypeError('Invalid storage proof data.');
+      return Promise.reject(err);
+    }
 
-      const tx = this.contract.methods.confirmStakeIntent(
-        staker,
-        nonce,
-        beneficiary,
-        amount,
-        gasPrice,
-        gasLimit,
-        hashLock,
-        blockHeight,
-        storageProof,
-      );
-      return onResolve(tx);
-    });
+    const tx = this.contract.methods.confirmStakeIntent(
+      staker,
+      nonce,
+      beneficiary,
+      amount,
+      gasPrice,
+      gasLimit,
+      hashLock,
+      blockHeight,
+      storageProof,
+    );
+    return Promise.resolve(tx);
   }
 
   /**
@@ -287,18 +275,12 @@ class EIP20CoGateway {
    * @returns {Promise} promise object.
    */
   progressMint(messageHash, unlockSecret, txOptions) {
-    return new Promise((onResolve, onReject) => {
-      if (!txOptions) {
-        const err = new TypeError('Invalid transaction options.');
-        return onReject(err);
-      }
-      this._progressMintRawTx(messageHash, unlockSecret)
-        .then((tx) => {
-          Utils.sendTransaction(tx, txOptions)
-            .then(onResolve)
-            .catch(onReject);
-        })
-        .catch(onReject);
+    if (!txOptions) {
+      const err = new TypeError('Invalid transaction options.');
+      return Promise.reject(err);
+    }
+    return this._progressMintRawTx(messageHash, unlockSecret).then((tx) => {
+      return Utils.sendTransaction(tx, txOptions);
     });
   }
 
@@ -311,20 +293,18 @@ class EIP20CoGateway {
    * @returns {Promise} promise object.
    */
   _progressMintRawTx(messageHash, unlockSecret) {
-    return new Promise((onResolve, onReject) => {
-      if (typeof messageHash !== 'string') {
-        const err = new TypeError('Invalid message hash.');
-        return onReject(err);
-      }
+    if (typeof messageHash !== 'string') {
+      const err = new TypeError('Invalid message hash.');
+      return Promise.reject(err);
+    }
 
-      if (typeof unlockSecret !== 'string') {
-        const err = new TypeError('Invalid unlock secret.');
-        return onReject(err);
-      }
+    if (typeof unlockSecret !== 'string') {
+      const err = new TypeError('Invalid unlock secret.');
+      return Promise.reject(err);
+    }
 
-      const tx = this.contract.methods.progressMint(messageHash, unlockSecret);
-      onResolve(tx);
-    });
+    const tx = this.contract.methods.progressMint(messageHash, unlockSecret);
+    return Promise.resolve(tx);
   }
 
   /**
@@ -392,7 +372,7 @@ class EIP20CoGateway {
   getInboxMessageStatus(messageHash) {
     if (typeof messageHash !== 'string') {
       const err = new TypeError('Invalid message hash.');
-      throw err;
+      return Promise.reject(err);
     }
     return this.contract.methods
       .getInboxMessageStatus(messageHash)
@@ -412,7 +392,7 @@ class EIP20CoGateway {
   getOutboxMessageStatus(messageHash) {
     if (typeof messageHash !== 'string') {
       const err = new TypeError('Invalid message hash.');
-      throw err;
+      return Promise.reject(err);
     }
     return this.contract.methods
       .getOutboxMessageStatus(messageHash)
@@ -444,14 +424,12 @@ class EIP20CoGateway {
    * @returns {Promise} Promise object.
    */
   getLatestAnchorInfo() {
-    return new Promise((onResolve, onReject) => {
-      this.getAnchor().then((anchor) => {
-        anchor.getLatestStateRootBlockHeight().then((blockHeight) => {
-          anchor.getStateRoot(blockHeight).then((stateRoot) => {
-            onResolve({
-              blockHeight,
-              stateRoot,
-            });
+    return this.getAnchor().then((anchor) => {
+      anchor.getLatestStateRootBlockHeight().then((blockHeight) => {
+        anchor.getStateRoot(blockHeight).then((stateRoot) => {
+          return Promise.resolve({
+            blockHeight,
+            stateRoot,
           });
         });
       });

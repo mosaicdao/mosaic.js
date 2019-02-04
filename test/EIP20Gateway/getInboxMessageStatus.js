@@ -23,6 +23,7 @@ const Web3 = require('web3');
 const sinon = require('sinon');
 const EIP20Gateway = require('../../src/ContractInteract/EIP20Gateway');
 const SpyAssert = require('../../test_utils/SpyAssert');
+const AssertAsync = require('../../test_utils/AssertAsync');
 const Message = require('../../src/utils/Message');
 
 const MessageStatus = Message.messageStatus();
@@ -66,8 +67,8 @@ describe('EIP20Gateway.getInboxMessageStatus()', () => {
   });
 
   it('should throw an error when message hash is undefined', async () => {
-    assert.throws(() => {
-      gateway.getInboxMessageStatus();
+    AssertAsync.throws(async () => {
+      await gateway.getInboxMessageStatus();
     }, /Invalid message hash./);
   });
 

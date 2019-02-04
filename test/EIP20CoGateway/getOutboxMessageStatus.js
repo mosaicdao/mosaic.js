@@ -23,6 +23,7 @@ const Web3 = require('web3');
 const sinon = require('sinon');
 const EIP20CoGateway = require('../../src/ContractInteract/EIP20CoGateway');
 const SpyAssert = require('../../test_utils/SpyAssert');
+const AssertAsync = require('../../test_utils/AssertAsync');
 const Message = require('../../src/utils/Message');
 
 const MessageStatus = Message.messageStatus();
@@ -66,8 +67,8 @@ describe('EIP20CoGateway.getOutboxMessageStatus()', () => {
   });
 
   it('should throw an error when message hash is undefined', async () => {
-    assert.throws(() => {
-      coGateway.getOutboxMessageStatus();
+    AssertAsync.throws(async () => {
+      await coGateway.getOutboxMessageStatus();
     }, /Invalid message hash./);
   });
 
