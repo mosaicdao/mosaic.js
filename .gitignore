@@ -68,5 +68,8 @@ package-lock.json
 tmp/*
 !tmp/.gitkeep
 
+# webpack output
+lib
+
 .idea/*
 

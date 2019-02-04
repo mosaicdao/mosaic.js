@@ -1,9 +1,7 @@
 'use strict';
 
-//__NOT_FOR_WEB__BEGIN__
-const fs = require('fs'),
-  path = require('path');
-//__NOT_FOR_WEB__END__
+const fs = require('fs');
+const path = require('path');
 
 const Package = require('../../index');
 const AbiBinProvider = Package.AbiBinProvider;

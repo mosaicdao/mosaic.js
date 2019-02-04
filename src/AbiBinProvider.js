@@ -2,41 +2,18 @@
 
 const mosaicContracts = require('@openstfoundation/mosaic-contracts');
 
-//__NOT_FOR_WEB__BEGIN__
-const fs = require('fs'),
-  path = require('path');
-//__NOT_FOR_WEB__END__
-
-let DEFAULT_ABI_FOLDER_PATH, DEFAULT_BIN_FOLDER_PATH;
-//__NOT_FOR_WEB__BEGIN__
-DEFAULT_ABI_FOLDER_PATH = path.resolve(__dirname, '../contracts/abi/');
-DEFAULT_BIN_FOLDER_PATH = path.resolve(__dirname, '../contracts/bin/');
-//__NOT_FOR_WEB__END__
-
+const { loadContracts } = require('./AbiBinProvider-node.js');
 const Linker = require('../src/utils/linker');
 
 class AbiBinProvider {
   constructor(abiFolderPath, binFolderPath) {
     const oThis = this;
-    abiFolderPath = abiFolderPath || DEFAULT_ABI_FOLDER_PATH;
-    binFolderPath = binFolderPath || DEFAULT_BIN_FOLDER_PATH;
-    //__NOT_FOR_WEB__BEGIN__
-    if (!path.isAbsolute(abiFolderPath)) {
-      let err = new Error(
-        '"abiFolderPath" is not Absolute. Please provide absolute path.',
-      );
-      throw err;
-    }
-    if (!path.isAbsolute(binFolderPath)) {
-      let err = new Error(
-        '"binFolderPath" is not Absolute. Please provide absolute path.',
-      );
-      throw err;
-    }
-    //__NOT_FOR_WEB__END__
 
-    oThis.abiFolderPath = abiFolderPath;
-    oThis.binFolderPath = binFolderPath;
+    // only does something on nodejs
+    if (abiFolderPath && binFolderPath) {
+      loadContracts(this, abiFolderPath, binFolderPath);
+    }
+
     oThis.custom = oThis.custom || null;
   }
 
@@ -47,19 +24,19 @@ class AbiBinProvider {
 
     let abi;
     if (typeof abiFileContent === 'string') {
-      //Parse it.
+      // Parse it.
       abi = JSON.parse(abiFileContent);
     } else if (typeof abiFileContent === 'object') {
       abi = abiFileContent;
     } else {
-      let err = new Error('Abi should be either JSON String or an object');
+      const err = new Error('Abi should be either JSON String or an object');
       throw err;
     }
 
-    let holder = (oThis.custom[contractName] =
+    const holder = (oThis.custom[contractName] =
       oThis.custom[contractName] || {});
     if (holder.abi) {
-      let err = new Error(
+      const err = new Error(
         `Abi for Contract Name ${contractName} already exists.`,
       );
       throw err;
@@ -74,15 +51,15 @@ class AbiBinProvider {
     oThis.custom = oThis.custom || {};
 
     if (typeof binFileContent !== 'string') {
-      //Parse it.
-      let err = new Error('Bin should be a string');
+      // Parse it.
+      const err = new Error('Bin should be a string');
       throw err;
     }
 
-    let holder = (oThis.custom[contractName] =
+    const holder = (oThis.custom[contractName] =
       oThis.custom[contractName] || {});
     if (holder.bin) {
-      let err = new Error(
+      const err = new Error(
         `Bin for Contract Name ${contractName} already exists.`,
       );
       throw err;
@@ -108,7 +85,7 @@ class AbiBinProvider {
         `Could not retrieve ABI for ${contractName}, because the contract doesn't exist.`,
       );
     }
-    const abi = contract.abi;
+    const { abi } = contract;
     return abi;
   }
 
@@ -150,7 +127,7 @@ class AbiBinProvider {
   */
   getLinkedBIN(contractName) {
     const oThis = this;
-    let bin = oThis.getBIN(contractName);
+    const bin = oThis.getBIN(contractName);
     if (!bin) {
       return bin;
     }
@@ -158,7 +135,7 @@ class AbiBinProvider {
     const libs = Array.from(arguments);
     libs.shift();
     let len = libs.length;
-    let libraries = {};
+    const libraries = {};
     while (len--) {
       let libInfo = libs[len];
       if (typeof libInfo !== 'object' || !libInfo.name || !libInfo.address) {
@@ -169,13 +146,6 @@ class AbiBinProvider {
       libraries[libInfo.name] = libInfo.address;
     }
     return Linker.linkBytecode(bin, libraries);
-  }
-
-  _read(filePath) {
-    //__NOT_FOR_WEB__BEGIN__
-    filePath = path.join(__dirname, '/' + filePath);
-    return fs.readFileSync(filePath, 'utf8');
-    //__NOT_FOR_WEB__END__
   }
 
   static get Linker() {

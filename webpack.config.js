@@ -1,86 +1,82 @@
-const path = require('path'),
-  webpack = require('webpack'),
-  uglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const path = require('path');
+const webpack = require('webpack');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
-const rootPreFix = '.',
-  entryFile = rootPreFix + '/index.js',
-  polyfillFile = '@babel/polyfill';
+const rootPreFix = '.';
+const entryFile = rootPreFix + '/index.js';
+const polyfillFile = '@babel/polyfill';
 
-const webpackOption = {
-  target: 'web',
-  node: { fs: 'empty' },
-  entry: {
-    'mosaic.js': [polyfillFile, entryFile],
-    'mosaic.js.min': [polyfillFile, entryFile],
-  },
-  output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: '[name].js',
-  },
-  plugins: [
-    new webpack.NormalModuleReplacementPlugin(
-      /src\/AbiBinProvider\.js/,
-      '../tmp/AbiBinProvider.js',
-    ),
-  ],
-  module: {
-    rules: [
-      {
-        test: /\.js$/,
-        exclude: /(node_modules|bower_components)/,
-        use: [
-          {
-            loader: 'babel-loader',
-            options: {
-              presets: [
-                [
-                  '@babel/preset-env',
-                  {
-                    targets: {
-                      browsers: '> 0.25%, not dead',
+const commonConfig = (target, babelTargets) => {
+  return {
+    target,
+    entry: {
+      mosaic: [polyfillFile, entryFile],
+    },
+    output: {
+      path: path.resolve(__dirname, 'lib'),
+      filename: `[name].${target}.js`,
+    },
+    plugins: [
+      new webpack.NormalModuleReplacementPlugin(
+        /\.\/AbiBinProvider-node\.js/,
+        `./AbiBinProvider-${target}.js`,
+      ),
+    ],
+    module: {
+      rules: [
+        {
+          test: /\.js$/,
+          exclude: path.resolve(__dirname, 'node_modules'),
+          use: [
+            {
+              loader: 'babel-loader',
+              options: {
+                presets: [
+                  [
+                    '@babel/preset-env',
+                    {
+                      targets: babelTargets,
                     },
-                  },
+                  ],
                 ],
-              ],
+              },
             },
-          },
-        ],
-      },
-      {
-        test: /\.js$/,
-        loader: 'string-replace-loader',
-        options: {
-          search: '//__NOT_FOR_WEB__BEGIN__.*?//__NOT_FOR_WEB__END__',
-          replace: '',
-          flags: 'isg',
+          ],
         },
-      },
-      {
-        test: require.resolve('./index.js'),
-        use: [
-          {
-            loader: 'expose-loader',
-            options: 'Mosaic',
+        {
+          test: /package\.json$/,
+          loader: 'package-json-cleanup-loader',
+          options: {
+            only: ['version', 'name', 'otherParam'],
           },
-        ],
-      },
-      {
-        test: /package\.json$/,
-        loader: 'package-json-cleanup-loader',
-        options: {
-          only: ['version', 'name', 'otherParam'],
         },
-      },
-    ],
-  },
-  optimization: {
-    minimize: true,
-    minimizer: [
-      new uglifyJsPlugin({
-        include: /\.min\.js$/,
-      }),
-    ],
-  },
+      ],
+    },
+    optimization: {
+      minimize: true,
+      minimizer: [new UglifyJsPlugin()],
+    },
+  };
 };
 
-module.exports = webpackOption;
+const webConfig = () => commonConfig('web', '> 0.25%, not dead');
+
+const nodeConfig = () => {
+  const config = commonConfig('node', 'maintained node versions');
+  return {
+    ...config,
+    resolve: {
+      ...config.resolve,
+      alias: {
+        ...(config.resolve || {}).alias,
+        scrypt: 'js-scrypt',
+      },
+    },
+    plugins: [
+      ...config.plugins,
+      new webpack.IgnorePlugin(/^(?:electron|ws)$/),
+    ],
+  };
+};
+
+module.exports = [webConfig, nodeConfig];
