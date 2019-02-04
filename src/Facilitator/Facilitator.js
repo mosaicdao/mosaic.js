@@ -84,135 +84,145 @@ class Facilitator {
    *
    * @returns {Promise} Promise object.
    */
-  stake(staker, amount, beneficiary, gasPrice, gasLimit, hashLock, txOption) {
-    return new Promise(async (onResolve, onReject) => {
-      logger.info('Stake');
-      logger.info('-----------------------');
-      if (!Web3.utils.isAddress(staker)) {
-        const err = new TypeError('Invalid staker address.');
-        return onReject(err);
-      }
+  async stake(
+    staker,
+    amount,
+    beneficiary,
+    gasPrice,
+    gasLimit,
+    hashLock,
+    txOption,
+  ) {
+    logger.info('Stake');
+    logger.info('-----------------------');
+    if (!Web3.utils.isAddress(staker)) {
+      const err = new TypeError('Invalid staker address.');
+      return Promise.reject(err);
+    }
 
-      if (new BN(amount).eqn(0)) {
-        const err = new TypeError('Stake amount must not be zero.');
-        return onReject(err);
-      }
+    if (new BN(amount).eqn(0)) {
+      const err = new TypeError('Stake amount must not be zero.');
+      return Promise.reject(err);
+    }
 
-      if (!Web3.utils.isAddress(beneficiary)) {
-        const err = new TypeError('Invalid beneficiary address.');
-        return onReject(err);
-      }
+    if (!Web3.utils.isAddress(beneficiary)) {
+      const err = new TypeError('Invalid beneficiary address.');
+      return Promise.reject(err);
+    }
 
-      if (gasPrice === undefined) {
-        const err = new TypeError('Invalid gas price.');
-        return onReject(err);
-      }
+    if (gasPrice === undefined) {
+      const err = new TypeError('Invalid gas price.');
+      return Promise.reject(err);
+    }
 
-      if (gasLimit === undefined) {
-        const err = new TypeError('Invalid gas limit.');
-        return onReject(err);
-      }
+    if (gasLimit === undefined) {
+      const err = new TypeError('Invalid gas limit.');
+      return Promise.reject(err);
+    }
 
-      if (!txOption) {
-        const err = new TypeError('Invalid transaction options.');
-        return onReject(err);
-      }
+    if (!txOption) {
+      const err = new TypeError('Invalid transaction options.');
+      return Promise.reject(err);
+    }
 
-      if (!Web3.utils.isAddress(txOption.from)) {
-        const err = new TypeError('Invalid facilitator address.');
-        return onReject(err);
-      }
+    if (!Web3.utils.isAddress(txOption.from)) {
+      const err = new TypeError('Invalid facilitator address.');
+      return Promise.reject(err);
+    }
 
-      let stakeHashLock = hashLock;
-      if (hashLock === undefined) {
-        logger.info('* Generating hash lock and unlock secret *');
-        const hashLockObj = await this.getHashLock();
-        stakeHashLock = hashLockObj.hashLock;
-        logger.info(`  - hash lock generated is ${stakeHashLock}`);
-        logger.info(
-          `  - unlock secrete generated is ${hashLockObj.unlockSecret}`,
-        );
-      }
-
-      const facilitatorAddress = txOption.from;
-
+    let stakeHashLock = hashLock;
+    if (hashLock === undefined) {
+      logger.info('* Generating hash lock and unlock secret *');
+      const hashLockObj = await this.getHashLock();
+      stakeHashLock = hashLockObj.hashLock;
+      logger.info(`  - hash lock generated is ${stakeHashLock}`);
       logger.info(
-        '* Checking if staker has approved gateway for token transfer *',
+        `  - unlock secrete generated is ${hashLockObj.unlockSecret}`,
       );
-      const isStakeAmountApproved = await this.gateway.isStakeAmountApproved(
-        staker,
-        amount,
-      );
+    }
 
-      logger.info(`  - Approval status is ${isStakeAmountApproved}`);
+    const facilitatorAddress = txOption.from;
 
-      if (!isStakeAmountApproved) {
-        if (staker === facilitatorAddress) {
-          logger.info(
-            '  - As staker is facilitator, approving gateway for token transfer',
-          );
-          await this.gateway
-            .approveStakeAmount(amount, txOption)
-            .catch((exception) => {
-              logger.info(
-                '  - Failed to approve gateway contract for token transfer',
-              );
-              return onReject(exception);
-            });
-        } else {
-          logger.info('  - Cannot perform stake.');
-          const err = new TypeError(
-            'Transfer of stake amount must be approved.',
-          );
-          return onReject(err);
-        }
-      }
-
-      logger.info(
-        '* Checking if facilitator has approved gateway for bounty token transfer *',
-      );
-      const isBountyAmountApproved = await this.gateway.isBountyAmountApproved(
-        facilitatorAddress,
-      );
-      logger.info(`  - Approval status is ${isBountyAmountApproved}`);
-
-      if (!isBountyAmountApproved) {
-        logger.info('  - Approving gateway contract for bounty transfer');
-        await this.gateway.approveBountyAmount(txOption).catch((exception) => {
-          logger.info(
-            '  - Failed to approve gateway contract for bounty transfer',
-          );
-          return onReject(exception);
-        });
-      }
-
-      logger.info('* Getting nonce for the staker account *');
-      const nonce = await this.gateway.getNonce(staker).catch((exception) => {
-        logger.info('  - Failed to get staker nonce');
-        return onReject(exception);
+    logger.info(
+      '* Checking if staker has approved gateway for token transfer *',
+    );
+    const isStakeAmountApproved = await this.gateway
+      .isStakeAmountApproved(staker, amount)
+      .catch((exception) => {
+        logger.info('  - Exception while checking stake amount approval');
+        return Promise.reject(exception);
       });
-      logger.info(`  - Staker's nonce is ${nonce}`);
 
-      logger.info('* Performing stake *');
-      this.gateway
-        .stake(
-          amount,
-          beneficiary,
-          gasPrice,
-          gasLimit,
-          nonce,
-          hashLock,
-          txOption,
-        )
-        .then((stakeResult) => {
-          logger.info('  - Succcessfully performed stake.');
-          return onResolve(stakeResult);
-        })
-        .catch((exception) => {
-          logger.info('  - Failed to performed stake.');
-          return onReject(exception);
-        });
+    logger.info(`  - Approval status is ${isStakeAmountApproved}`);
+
+    if (!isStakeAmountApproved) {
+      if (staker === facilitatorAddress) {
+        logger.info(
+          '  - As staker is facilitator, approving gateway for token transfer',
+        );
+        await this.gateway
+          .approveStakeAmount(amount, txOption)
+          .catch((exception) => {
+            logger.info(
+              '  - Failed to approve gateway contract for token transfer',
+            );
+            return Promise.reject(exception);
+          });
+      } else {
+        logger.info('  - Cannot perform stake.');
+        const err = new Error('Transfer of stake amount must be approved.');
+        return Promise.reject(err);
+      }
+    }
+
+    logger.info(
+      '* Checking if facilitator has approved gateway for bounty token transfer *',
+    );
+    const isBountyAmountApproved = await this.gateway
+      .isBountyAmountApproved(facilitatorAddress)
+      .catch((exception) => {
+        logger.info('  - Exception while checking bounty amount approval');
+        return Promise.reject(exception);
+      });
+
+    logger.info(`  - Approval status is ${isBountyAmountApproved}`);
+
+    if (!isBountyAmountApproved) {
+      logger.info('  - Approving gateway contract for bounty transfer');
+      await this.gateway.approveBountyAmount(txOption).catch((exception) => {
+        logger.info(
+          '  - Failed to approve gateway contract for bounty transfer',
+        );
+        return Promise.reject(exception);
+      });
+    }
+
+    logger.info('* Getting nonce for the staker account *');
+    const nonce = await this.gateway.getNonce(staker).catch((exception) => {
+      logger.info('  - Failed to get staker nonce');
+      return Promise.reject(exception);
     });
+    logger.info(`  - Staker's nonce is ${nonce}`);
+
+    logger.info('* Performing stake *');
+    return this.gateway
+      .stake(
+        amount,
+        beneficiary,
+        gasPrice,
+        gasLimit,
+        nonce,
+        hashLock,
+        txOption,
+      )
+      .then((stakeResult) => {
+        logger.info('  - Succcessfully performed stake.');
+        return Promise.resolve(stakeResult);
+      })
+      .catch((exception) => {
+        logger.info('  - Failed to performed stake.');
+        return Promise.reject(exception);
+      });
   }
 
   /**
@@ -243,98 +253,92 @@ class Facilitator {
     txOptionOrigin,
     txOptionAuxiliary,
   ) {
-    return new Promise((onResolve, onReject) => {
-      logger.info('Performing stake and mint');
-      logger.info('-----------------------');
-      if (!Web3.utils.isAddress(staker)) {
-        const err = new TypeError('Invalid staker address.');
-        return onReject(err);
-      }
+    logger.info('Performing stake and mint');
+    logger.info('-----------------------');
+    if (!Web3.utils.isAddress(staker)) {
+      const err = new TypeError('Invalid staker address.');
+      return Promise.reject(err);
+    }
 
-      if (new BN(amount).eqn(0)) {
-        const err = new TypeError('Stake amount must not be zero.');
-        return onReject(err);
-      }
+    if (new BN(amount).eqn(0)) {
+      const err = new TypeError('Stake amount must not be zero.');
+      return Promise.reject(err);
+    }
 
-      if (!Web3.utils.isAddress(beneficiary)) {
-        const err = new TypeError('Invalid beneficiary address.');
-        return onReject(err);
-      }
+    if (!Web3.utils.isAddress(beneficiary)) {
+      const err = new TypeError('Invalid beneficiary address.');
+      return Promise.reject(err);
+    }
 
-      if (gasPrice === undefined) {
-        const err = new TypeError('Invalid gas price.');
-        return onReject(err);
-      }
+    if (gasPrice === undefined) {
+      const err = new TypeError('Invalid gas price.');
+      return Promise.reject(err);
+    }
 
-      if (gasLimit === undefined) {
-        const err = new TypeError('Invalid gas limit.');
-        return onReject(err);
-      }
+    if (gasLimit === undefined) {
+      const err = new TypeError('Invalid gas limit.');
+      return Promise.reject(err);
+    }
 
-      if (nonce === undefined) {
-        const err = new TypeError('Invalid staker nonce.');
-        return onReject(err);
-      }
+    if (nonce === undefined) {
+      const err = new TypeError('Invalid staker nonce.');
+      return Promise.reject(err);
+    }
 
-      if (!txOptionOrigin) {
-        const err = new TypeError(
-          'Invalid transaction options for origin chain.',
-        );
-        return onReject(err);
-      }
+    if (!txOptionOrigin) {
+      const err = new TypeError(
+        'Invalid transaction options for origin chain.',
+      );
+      return Promise.reject(err);
+    }
 
-      if (!txOptionAuxiliary) {
-        const err = new TypeError(
-          'Invalid transaction options for auxiliary chain.',
-        );
-        return onReject(err);
-      }
+    if (!txOptionAuxiliary) {
+      const err = new TypeError(
+        'Invalid transaction options for auxiliary chain.',
+      );
+      return Promise.reject(err);
+    }
 
-      if (!Web3.utils.isAddress(txOptionOrigin.from)) {
-        const err = new TypeError('Invalid origin chain facilitator address.');
-        return onReject(err);
-      }
+    if (!Web3.utils.isAddress(txOptionOrigin.from)) {
+      const err = new TypeError('Invalid origin chain facilitator address.');
+      return Promise.reject(err);
+    }
 
-      if (!Web3.utils.isAddress(txOptionAuxiliary.from)) {
-        const err = new TypeError(
-          'Invalid auxiliary chain facilitator address.',
-        );
-        return onReject(err);
-      }
+    if (!Web3.utils.isAddress(txOptionAuxiliary.from)) {
+      const err = new TypeError(
+        'Invalid auxiliary chain facilitator address.',
+      );
+      return Promise.reject(err);
+    }
 
-      this.confirmStakeIntent(
-        staker,
+    return this.confirmStakeIntent(
+      staker,
+      amount,
+      beneficiary,
+      gasPrice,
+      gasLimit,
+      nonce,
+      hashLock,
+      unlockSecret,
+      txOptionAuxiliary,
+    ).then(() => {
+      const messageHash = Message.getStakeMessageHash(
         amount,
         beneficiary,
+        this.gateway.gatewayAddress,
+        nonce,
         gasPrice,
         gasLimit,
-        nonce,
+        staker,
         hashLock,
-        unlockSecret,
-        txOptionAuxiliary,
-      )
-        .then(() => {
-          const messageHash = Message.getStakeMessageHash(
-            amount,
-            beneficiary,
-            this.gateway.gatewayAddress,
-            nonce,
-            gasPrice,
-            gasLimit,
-            staker,
-            hashLock,
-          );
+      );
 
-          this.performProgress(
-            messageHash,
-            unlockSecret,
-            txOptionOrigin,
-            txOptionAuxiliary,
-          )
-            .then(onResolve)
-            .catch(onReject);
-        })
-        .catch(onReject);
+      return this.performProgress(
+        messageHash,
+        unlockSecret,
+        txOptionOrigin,
+        txOptionAuxiliary,
+      );
     });
   }
 
@@ -353,7 +357,7 @@ class Facilitator {
    *
    * @returns {Promise} Promise object.
    */
-  confirmStakeIntent(
+  async confirmStakeIntent(
     staker,
     amount,
     beneficiary,
@@ -364,127 +368,124 @@ class Facilitator {
     unlockSecret,
     txOptions,
   ) {
-    return new Promise(async (onResolve, onReject) => {
-      logger.info('Confirming stake intent');
-      logger.info('-----------------------');
-      if (!Web3.utils.isAddress(staker)) {
-        const err = new TypeError('Invalid staker address.');
-        return onReject(err);
-      }
-      if (new BN(amount).eqn(0)) {
-        const err = new TypeError('Stake amount must not be zero.');
-        return onReject(err);
-      }
-      if (!Web3.utils.isAddress(beneficiary)) {
-        const err = new TypeError('Invalid beneficiary address.');
-        return onReject(err);
-      }
-      if (typeof gasPrice !== 'string') {
-        const err = new TypeError('Invalid gas price.');
-        return onReject(err);
-      }
-      if (typeof gasLimit !== 'string') {
-        const err = new TypeError('Invalid gas limit.');
-        return onReject(err);
-      }
-      if (typeof nonce !== 'string') {
-        const err = new TypeError('Invalid staker nonce.');
-        return onReject(err);
-      }
-      if (!txOptions) {
-        const err = new TypeError('Invalid transaction options.');
-        return onReject(err);
-      }
-      if (!Web3.utils.isAddress(txOptions.from)) {
-        const err = new TypeError('Invalid facilitator address.');
-        return onReject(err);
-      }
+    logger.info('Confirming stake intent');
+    logger.info('-----------------------');
+    if (!Web3.utils.isAddress(staker)) {
+      const err = new TypeError('Invalid staker address.');
+      return Promise.reject(err);
+    }
+    if (new BN(amount).eqn(0)) {
+      const err = new TypeError('Stake amount must not be zero.');
+      return Promise.reject(err);
+    }
+    if (!Web3.utils.isAddress(beneficiary)) {
+      const err = new TypeError('Invalid beneficiary address.');
+      return Promise.reject(err);
+    }
+    if (typeof gasPrice !== 'string') {
+      const err = new TypeError('Invalid gas price.');
+      return Promise.reject(err);
+    }
+    if (typeof gasLimit !== 'string') {
+      const err = new TypeError('Invalid gas limit.');
+      return Promise.reject(err);
+    }
+    if (typeof nonce !== 'string') {
+      const err = new TypeError('Invalid staker nonce.');
+      return Promise.reject(err);
+    }
+    if (!txOptions) {
+      const err = new TypeError('Invalid transaction options.');
+      return Promise.reject(err);
+    }
+    if (!Web3.utils.isAddress(txOptions.from)) {
+      const err = new TypeError('Invalid facilitator address.');
+      return Promise.reject(err);
+    }
 
-      logger.info('* Generating message hash with given stake parameters *');
-      const messageHash = Message.getStakeMessageHash(
-        amount,
-        beneficiary,
-        this.gateway.gatewayAddress,
-        nonce,
-        gasPrice,
-        gasLimit,
-        staker,
-        hashLock,
-      );
+    logger.info('* Generating message hash with given stake parameters *');
+    const messageHash = Message.getStakeMessageHash(
+      amount,
+      beneficiary,
+      this.gateway.gatewayAddress,
+      nonce,
+      gasPrice,
+      gasLimit,
+      staker,
+      hashLock,
+    );
 
-      logger.info(`  - Message hash is ${messageHash}`);
+    logger.info(`  - Message hash is ${messageHash}`);
 
-      const stakeMessageStatus = await this.gateway.getOutboxMessageStatus(
-        messageHash,
-      );
+    const stakeMessageStatus = await this.gateway
+      .getOutboxMessageStatus(messageHash)
+      .catch((exception) => {
+        logger.info('  - Exception while getting outbox message status');
+        return Promise.reject(exception);
+      });
 
-      logger.info(
-        `  - Gateway's outbox message hash is ${stakeMessageStatus}`,
-      );
+    logger.info(`  - Gateway's outbox message hash is ${stakeMessageStatus}`);
 
-      if (stakeMessageStatus === MessageStatus.UNDECLARED) {
-        const err = new TypeError('Stake message hash must be declared.');
-        return onReject(err);
-      }
+    if (stakeMessageStatus === MessageStatus.UNDECLARED) {
+      const err = new Error('Stake message hash must be declared.');
+      return Promise.reject(err);
+    }
 
-      const mintMessageStatus = await this.coGateway.getInboxMessageStatus(
-        messageHash,
-      );
+    const mintMessageStatus = await this.coGateway
+      .getInboxMessageStatus(messageHash)
+      .catch((exception) => {
+        logger.info('  - Exception while getting inbox message status');
+        return Promise.reject(exception);
+      });
 
-      logger.info(
-        `  - CoGateway's inbox message hash is ${mintMessageStatus}`,
-      );
+    logger.info(`  - CoGateway's inbox message hash is ${mintMessageStatus}`);
 
-      if (
-        mintMessageStatus === MessageStatus.DECLARED ||
-        mintMessageStatus === MessageStatus.PROGRESSED ||
-        mintMessageStatus === MessageStatus.REVOKED
-      ) {
-        logger.info('  - Stake intent already confirmed on CoGateway');
-        return onResolve(true);
-      } else {
-        this.getProof(messageHash, stakeMessageStatus)
-          .then(async (proofData) => {
-            logger.info('* Proving Gateway account on CoGateway *');
+    if (
+      mintMessageStatus === MessageStatus.DECLARED ||
+      mintMessageStatus === MessageStatus.PROGRESSED ||
+      mintMessageStatus === MessageStatus.REVOKED
+    ) {
+      logger.info('  - Stake intent already confirmed on CoGateway');
+      return Promise.resolve(true);
+    }
 
-            await this.coGateway
-              .proveGateway(
+    return this.getProof(messageHash, stakeMessageStatus).then(
+      async (proofData) => {
+        logger.info('* Proving Gateway account on CoGateway *');
+
+        return this.coGateway
+          .proveGateway(
+            proofData.blockNumber,
+            proofData.accountData,
+            proofData.accountProof,
+            txOptions,
+          )
+          .then(() => {
+            logger.info('  - Gateway was proven on CoGateway');
+            return this.coGateway
+              .confirmStakeIntent(
+                staker,
+                nonce,
+                beneficiary,
+                amount,
+                gasPrice,
+                gasLimit,
+                hashLock,
                 proofData.blockNumber,
-                proofData.accountData,
-                proofData.accountProof,
+                proofData.storageProof,
                 txOptions,
               )
-              .then(() => {
-                logger.info('  - Gateway was proven on CoGateway');
-                this.coGateway
-                  .confirmStakeIntent(
-                    staker,
-                    nonce,
-                    beneficiary,
-                    amount,
-                    gasPrice,
-                    gasLimit,
-                    hashLock,
-                    proofData.blockNumber,
-                    proofData.storageProof,
-                    txOptions,
-                  )
-                  .then((confirmStakeIntentResult) => {
-                    logger.info('  - Confirm stake intent successful');
-                    return onResolve(confirmStakeIntentResult);
-                  })
-                  .catch(onReject);
-              })
-              .catch((exception) => {
-                logger.info(
-                  '  - Failed to prove gateway account on CoGateway',
-                );
-                return onReject(exception);
+              .then((confirmStakeIntentResult) => {
+                logger.info('  - Confirm stake intent successful');
+                return Promise.resolve(confirmStakeIntentResult);
               });
           })
-          .catch(onReject);
-      }
-    });
+          .catch((exception) => {
+            logger.info('  - Failed to prove gateway account on CoGateway');
+            return Promise.reject(exception);
+          });
+      },
+    );
   }
 
   /**
@@ -503,33 +504,29 @@ class Facilitator {
     txOptionOrigin,
     txOptionAuxiliary,
   ) {
-    return new Promise((onResolve, onReject) => {
-      logger.info('Performing progress stake and progress mint');
-      logger.info('-----------------------');
-      if (typeof messageHash !== 'string') {
-        const err = new TypeError('Invalid message hash.');
-        return onReject(err);
-      }
-      if (typeof unlockSecret !== 'string') {
-        const err = new TypeError('Invalid unlock secret.');
-        return onReject(err);
-      }
-      if (txOptionOrigin === undefined) {
-        const err = new TypeError('Invalid origin transaction option.');
-        return onReject(err);
-      }
-      if (txOptionAuxiliary === undefined) {
-        const err = new TypeError('Invalid auxiliary transaction option.');
-        return onReject(err);
-      }
+    logger.info('Performing progress stake and progress mint');
+    logger.info('-----------------------');
+    if (typeof messageHash !== 'string') {
+      const err = new TypeError('Invalid message hash.');
+      return Promise.reject(err);
+    }
+    if (typeof unlockSecret !== 'string') {
+      const err = new TypeError('Invalid unlock secret.');
+      return Promise.reject(err);
+    }
+    if (txOptionOrigin === undefined) {
+      const err = new TypeError('Invalid origin transaction option.');
+      return Promise.reject(err);
+    }
+    if (txOptionAuxiliary === undefined) {
+      const err = new TypeError('Invalid auxiliary transaction option.');
+      return Promise.reject(err);
+    }
 
-      Promise.all([
-        this.performProgressStake(messageHash, unlockSecret, txOptionOrigin),
-        this.performProgressMint(messageHash, unlockSecret, txOptionAuxiliary),
-      ])
-        .then(onResolve)
-        .catch(onReject);
-    });
+    return Promise.all([
+      this.performProgressStake(messageHash, unlockSecret, txOptionOrigin),
+      this.performProgressMint(messageHash, unlockSecret, txOptionAuxiliary),
+    ]);
   }
 
   /**
@@ -541,52 +538,55 @@ class Facilitator {
    *
    * @returns {Promise} Promise object.
    */
-  performProgressStake(messageHash, unlockSecret, txOption) {
-    return new Promise(async (onResolve, onReject) => {
-      if (typeof messageHash !== 'string') {
-        const err = new TypeError('Invalid message hash.');
-        return onReject(err);
-      }
-      if (typeof unlockSecret !== 'string') {
-        const err = new TypeError('Invalid unlock secret.');
-        return onReject(err);
-      }
-      if (txOption === undefined) {
-        const err = new TypeError('Invalid transaction option.');
-        return onReject(err);
-      }
+  async performProgressStake(messageHash, unlockSecret, txOption) {
+    if (typeof messageHash !== 'string') {
+      const err = new TypeError('Invalid message hash.');
+      return Promise.reject(err);
+    }
+    if (typeof unlockSecret !== 'string') {
+      const err = new TypeError('Invalid unlock secret.');
+      return Promise.reject(err);
+    }
+    if (txOption === undefined) {
+      const err = new TypeError('Invalid transaction option.');
+      return Promise.reject(err);
+    }
 
-      const stakeMessageStatus = await this.gateway.getOutboxMessageStatus(
-        messageHash,
-      );
-      logger.info(
-        `  - Gateway's outbox message status is ${stakeMessageStatus}`,
-      );
+    const stakeMessageStatus = await this.gateway
+      .getOutboxMessageStatus(messageHash)
+      .catch((exception) => {
+        return Promise.reject(exception);
+      });
 
-      if (
-        stakeMessageStatus === MessageStatus.UNDECLARED ||
-        stakeMessageStatus === MessageStatus.REVOCATION_DECLARED ||
-        stakeMessageStatus === MessageStatus.REVOKED
-      ) {
-        logger.info('  - Cannot perform progress stake.');
-        const err = TypeError('Message cannot be progressed.');
-        return onReject(err);
-      } else if (stakeMessageStatus === MessageStatus.PROGRESSED) {
-        logger.info('  - Progress stake is already done.');
-        return onResolve(true);
-      } else {
-        this.gateway
-          .progressStake(messageHash, unlockSecret, txOption)
-          .then((progressStakeResult) => {
-            logger.info('  - Progress stake successful.');
-            return onResolve(progressStakeResult);
-          })
-          .catch((exception) => {
-            logger.info('  - Failed to progress stake.');
-            return onReject(exception);
-          });
-      }
-    });
+    logger.info(
+      `  - Gateway's outbox message status is ${stakeMessageStatus}`,
+    );
+
+    if (
+      stakeMessageStatus === MessageStatus.UNDECLARED ||
+      stakeMessageStatus === MessageStatus.REVOCATION_DECLARED ||
+      stakeMessageStatus === MessageStatus.REVOKED
+    ) {
+      logger.info('  - Cannot perform progress stake.');
+      const err = Error('Message cannot be progressed.');
+      return Promise.reject(err);
+    }
+
+    if (stakeMessageStatus === MessageStatus.PROGRESSED) {
+      logger.info('  - Progress stake is already done.');
+      return Promise.resolve(true);
+    }
+
+    return this.gateway
+      .progressStake(messageHash, unlockSecret, txOption)
+      .then((progressStakeResult) => {
+        logger.info('  - Progress stake successful.');
+        return Promise.resolve(progressStakeResult);
+      })
+      .catch((exception) => {
+        logger.info('  - Failed to progress stake.');
+        return Promise.reject(exception);
+      });
   }
 
   /**
@@ -599,50 +599,54 @@ class Facilitator {
    * @returns {Promise} Promise object.
    */
   async performProgressMint(messageHash, unlockSecret, txOption) {
-    return new Promise(async (onResolve, onReject) => {
-      if (typeof messageHash !== 'string') {
-        const err = new TypeError('Invalid message hash.');
-        return onReject(err);
-      }
-      if (typeof unlockSecret !== 'string') {
-        const err = new TypeError('Invalid unlock secret.');
-        return onReject(err);
-      }
-      if (txOption === undefined) {
-        const err = new TypeError('Invalid transaction option.');
-        return onReject(err);
-      }
+    if (typeof messageHash !== 'string') {
+      const err = new TypeError('Invalid message hash.');
+      return Promise.reject(err);
+    }
+    if (typeof unlockSecret !== 'string') {
+      const err = new TypeError('Invalid unlock secret.');
+      return Promise.reject(err);
+    }
+    if (txOption === undefined) {
+      const err = new TypeError('Invalid transaction option.');
+      return Promise.reject(err);
+    }
 
-      const mintMessageStatus = await this.coGateway.getInboxMessageStatus(
-        messageHash,
-      );
-      logger.info(
-        `  - CoGateway's inbox message status is ${mintMessageStatus}`,
-      );
-      if (
-        mintMessageStatus === MessageStatus.UNDECLARED ||
-        mintMessageStatus === MessageStatus.REVOKED ||
-        mintMessageStatus === MessageStatus.REVOCATION_DECLARED
-      ) {
-        logger.info('  - Cannot perform progress mint.');
-        const err = new TypeError('Message cannot be progressed.');
-        return onResolve(err);
-      } else if (mintMessageStatus === MessageStatus.PROGRESSED) {
-        logger.info('  - Progress mint is already done.');
-        return onResolve(true);
-      } else {
-        this.coGateway
-          .progressMint(messageHash, unlockSecret, txOption)
-          .then((progressMintResult) => {
-            logger.info('  - Progress mint successful.');
-            return onResolve(progressMintResult);
-          })
-          .catch((exception) => {
-            logger.info('  - Failed to progress mint.');
-            return onReject(exception);
-          });
-      }
-    });
+    const mintMessageStatus = await this.coGateway
+      .getInboxMessageStatus(messageHash)
+      .catch((exception) => {
+        return Promise.reject(exception);
+      });
+
+    logger.info(
+      `  - CoGateway's inbox message status is ${mintMessageStatus}`,
+    );
+
+    if (
+      mintMessageStatus === MessageStatus.UNDECLARED ||
+      mintMessageStatus === MessageStatus.REVOKED ||
+      mintMessageStatus === MessageStatus.REVOCATION_DECLARED
+    ) {
+      logger.info('  - Cannot perform progress mint.');
+      const err = new TypeError('Message cannot be progressed.');
+      return Promise.reject(err);
+    }
+
+    if (mintMessageStatus === MessageStatus.PROGRESSED) {
+      logger.info('  - Progress mint is already done.');
+      return Promise.resolve(true);
+    }
+
+    return this.coGateway
+      .progressMint(messageHash, unlockSecret, txOption)
+      .then((progressMintResult) => {
+        logger.info('  - Progress mint successful.');
+        return Promise.resolve(progressMintResult);
+      })
+      .catch((exception) => {
+        logger.info('  - Failed to progress mint.');
+        return Promise.reject(exception);
+      });
   }
 
   /**
@@ -653,48 +657,46 @@ class Facilitator {
    *
    * @returns {Object} Proof data.
    */
-  getProof(messageHash, messageStatus) {
-    return new Promise(async (onResolve, onReject) => {
-      logger.info('* Generating proof data *');
+  async getProof(messageHash, messageStatus) {
+    logger.info('* Generating proof data *');
 
-      const latestAnchorInfo = await this.coGateway.getLatestAnchorInfo();
+    const latestAnchorInfo = await this.coGateway
+      .getLatestAnchorInfo()
+      .catch((exception) => {
+        return Promise.reject(exception);
+      });
 
-      logger.info(
-        `  - Last committed block height is ${latestAnchorInfo.blockHeight}`,
-      );
-      logger.info(
-        `  - Last committed state root is ${latestAnchorInfo.stateRoot}`,
-      );
+    logger.info(
+      `  - Last committed block height is ${latestAnchorInfo.blockHeight}`,
+    );
+    logger.info(
+      `  - Last committed state root is ${latestAnchorInfo.stateRoot}`,
+    );
 
-      const proofUtils = new ProofUtils(this.originWeb3, this.auxiliaryWeb3);
-      const blockHeight = `0x${new BN(latestAnchorInfo.blockHeight).toString(
-        16,
-      )}`;
+    const proofUtils = new ProofUtils(this.originWeb3, this.auxiliaryWeb3);
+    const blockHeight = `0x${new BN(latestAnchorInfo.blockHeight).toString(
+      16,
+    )}`;
 
-      logger.info('  - Attempting to generate proof');
+    logger.info('  - Attempting to generate proof');
 
-      proofUtils
-        .getOutboxProof(
-          this.gateway.gatewayAddress,
-          [messageHash],
-          blockHeight,
-        )
-        .then((proof) => {
-          // TODO: validate proofdata for the status and gateway address.
-          logger.info('  - Proof generation successful');
-          onResolve({
-            accountData: proof.encodedAccountValue,
-            accountProof: proof.serializedAccountProof,
-            storageProof: proof.storageProof[0].serializedProof,
-            blockNumber: latestAnchorInfo.blockHeight,
-            stateRoot: latestAnchorInfo.stateRoot,
-          });
-        })
-        .catch((exception) => {
-          logger.info('  - Failed to generate proof');
-          return onReject(exception);
+    return proofUtils
+      .getOutboxProof(this.gateway.gatewayAddress, [messageHash], blockHeight)
+      .then((proof) => {
+        // TODO: validate proofdata for the status and gateway address.
+        logger.info('  - Proof generation successful');
+        return Promise.resolve({
+          accountData: proof.encodedAccountValue,
+          accountProof: proof.serializedAccountProof,
+          storageProof: proof.storageProof[0].serializedProof,
+          blockNumber: latestAnchorInfo.blockHeight,
+          stateRoot: latestAnchorInfo.stateRoot,
         });
-    });
+      })
+      .catch((exception) => {
+        logger.info('  - Failed to generate proof');
+        return Promise.reject(exception);
+      });
   }
 
   /**

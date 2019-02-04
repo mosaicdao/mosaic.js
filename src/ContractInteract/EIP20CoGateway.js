@@ -425,12 +425,12 @@ class EIP20CoGateway {
    */
   getLatestAnchorInfo() {
     return this.getAnchor().then((anchor) => {
-      anchor.getLatestStateRootBlockHeight().then((blockHeight) => {
-        anchor.getStateRoot(blockHeight).then((stateRoot) => {
-          return Promise.resolve({
+      return anchor.getLatestStateRootBlockHeight().then((blockHeight) => {
+        return anchor.getStateRoot(blockHeight).then((stateRoot) => {
+          return {
             blockHeight,
             stateRoot,
-          });
+          };
         });
       });
     });
