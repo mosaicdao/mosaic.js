@@ -20,11 +20,11 @@
 
 const BN = require('bn.js');
 const Web3 = require('web3');
-const EIP20Gateway = require('../../src/ContractInteract/EIP20Gateway');
-const EIP20CoGateway = require('../../src/ContractInteract/EIP20CoGateway');
+const EIP20Gateway = require('../ContractInteract/EIP20Gateway');
+const EIP20CoGateway = require('../ContractInteract/EIP20CoGateway');
 const Utils = require('../utils/Utils');
 const ProofUtils = require('../utils/ProofUtils');
-const Message = require('../../src/utils/Message');
+const Message = require('../utils/Message');
 const Logger = require('../../logger/Logger');
 
 const logger = new Logger('facilitator');

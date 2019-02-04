@@ -23,9 +23,9 @@
 const Web3 = require('web3');
 const BN = require('bn.js');
 const Contracts = require('../Contracts');
-const Utils = require('../../src/utils/Utils');
-const EIP20Token = require('../../src/ContractInteract/EIP20Token');
-const Anchor = require('../../src/ContractInteract/Anchor');
+const Utils = require('../utils/Utils');
+const EIP20Token = require('../ContractInteract/EIP20Token');
+const Anchor = require('../ContractInteract/Anchor');
 
 /**
  * Contract interact for EIP20Gateway.
@@ -59,7 +59,7 @@ class EIP20Gateway {
     this.contract = Contracts.getEIP20Gateway(this.web3, this.gatewayAddress);
 
     if (!this.contract) {
-      const err = new TypeError(
+      const err = new Error(
         `Could not load Gateway contract for: ${this.gatewayAddress}`,
       );
       throw err;

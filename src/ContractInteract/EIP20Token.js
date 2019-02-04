@@ -23,7 +23,7 @@
 const BN = require('bn.js');
 const Web3 = require('web3');
 const Contracts = require('../Contracts');
-const Utils = require('../../src/utils/Utils');
+const Utils = require('../utils/Utils');
 
 /**
  * Contract interact for EIP20Token contract.
@@ -57,7 +57,7 @@ class EIP20Token {
     this.contract = Contracts.getEIP20Token(this.web3, this.tokenAddress);
 
     if (!this.contract) {
-      const err = new TypeError(
+      const err = new Error(
         `Could not load token contract for: ${this.tokenAddress}`,
       );
       throw err;

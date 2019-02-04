@@ -22,8 +22,8 @@
 
 const Web3 = require('web3');
 const Contracts = require('../Contracts');
-const Utils = require('../../src/utils/Utils');
-const Anchor = require('../../src/ContractInteract/Anchor');
+const Utils = require('../utils/Utils');
+const Anchor = require('../ContractInteract/Anchor');
 
 /**
  * Contract interact for EIP20CoGateway.
@@ -60,7 +60,7 @@ class EIP20CoGateway {
     );
 
     if (!this.contract) {
-      const err = new TypeError(
+      const err = new Error(
         `Could not load CoGateway contract for: ${this.coGatewayAddress}`,
       );
       throw err;

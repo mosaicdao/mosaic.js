@@ -22,7 +22,7 @@
 
 const Web3 = require('web3');
 const Contracts = require('../Contracts');
-const Utils = require('../../src/utils/Utils');
+const Utils = require('../utils/Utils');
 
 /**
  * Contract interact for Anchor contract.
@@ -57,7 +57,7 @@ class Anchor {
 
     if (!this.contract) {
       const err = new TypeError(
-        `Could not load token contract for: ${this.anchorAddress}`,
+        `Could not load anchor contract for: ${this.anchorAddress}`,
       );
       throw err;
     }
