@@ -101,9 +101,7 @@ class EIP20Gateway {
       blockHeight,
       encodedAccount,
       accountProof,
-    ).then((tx) => {
-      return Utils.sendTransaction(tx, txOptions);
-    });
+    ).then((tx) => Utils.sendTransaction(tx, txOptions));
   }
 
   /**
@@ -161,6 +159,7 @@ class EIP20Gateway {
       const err = new TypeError('Invalid facilitator address.');
       return Promise.reject(err);
     }
+
     return this._stakeRawTx(
       amount,
       beneficiary,
@@ -168,9 +167,7 @@ class EIP20Gateway {
       gasLimit,
       nonce,
       hashLock,
-    ).then((tx) => {
-      return Utils.sendTransaction(tx, txOptions);
-    });
+    ).then((tx) => Utils.sendTransaction(tx, txOptions));
   }
 
   /**
@@ -228,9 +225,9 @@ class EIP20Gateway {
       const err = new TypeError('Invalid transaction options.');
       return Promise.reject(err);
     }
-    return this._progressStakeRawTx(messageHash, unlockSecret).then((tx) => {
-      return Utils.sendTransaction(tx, txOptions);
-    });
+    return this._progressStakeRawTx(messageHash, unlockSecret).then((tx) =>
+      Utils.sendTransaction(tx, txOptions),
+    );
   }
 
   /**
@@ -322,12 +319,7 @@ class EIP20Gateway {
       const err = TypeError('Invalid account address.');
       return Promise.reject(err);
     }
-    return this.contract.methods
-      .getNonce(accountAddress)
-      .call()
-      .then((nonce) => {
-        return nonce;
-      });
+    return this.contract.methods.getNonce(accountAddress).call();
   }
 
   /**
@@ -360,12 +352,7 @@ class EIP20Gateway {
       const err = new TypeError('Invalid message hash.');
       return Promise.reject(err);
     }
-    return this.contract.methods
-      .getInboxMessageStatus(messageHash)
-      .call()
-      .then((status) => {
-        return status;
-      });
+    return this.contract.methods.getInboxMessageStatus(messageHash).call();
   }
 
   /**
@@ -380,12 +367,7 @@ class EIP20Gateway {
       const err = new TypeError('Invalid message hash.');
       return Promise.reject(err);
     }
-    return this.contract.methods
-      .getOutboxMessageStatus(messageHash)
-      .call()
-      .then((status) => {
-        return status;
-      });
+    return this.contract.methods.getOutboxMessageStatus(messageHash).call();
   }
 
   /**
@@ -402,11 +384,11 @@ class EIP20Gateway {
       return Promise.reject(err);
     }
     return this.getEIP20ValueToken().then((eip20ValueToken) => {
-      eip20ValueToken
-        .isAmountApproved(stakerAddress, this.gatewayAddress, amount)
-        .then((result) => {
-          return result;
-        });
+      return eip20ValueToken.isAmountApproved(
+        stakerAddress,
+        this.gatewayAddress,
+        amount,
+      );
     });
   }
 
@@ -423,12 +405,12 @@ class EIP20Gateway {
       return Promise.reject(err);
     }
     return this.getEIP20BaseToken().then((eip20BaseToken) => {
-      this.getBounty().then((bounty) => {
-        eip20BaseToken
-          .isAmountApproved(facilityAddress, this.gatewayAddress, bounty)
-          .then((result) => {
-            return result;
-          });
+      return this.getBounty().then((bounty) => {
+        return eip20BaseToken.isAmountApproved(
+          facilityAddress,
+          this.gatewayAddress,
+          bounty,
+        );
       });
     });
   }
@@ -487,11 +469,7 @@ class EIP20Gateway {
       return Promise.reject(err);
     }
     return this.getEIP20ValueToken().then((eip20Token) => {
-      eip20Token
-        .approve(this.gatewayAddress, amount, txOptions)
-        .then((result) => {
-          return result;
-        });
+      eip20Token.approve(this.gatewayAddress, amount, txOptions);
     });
   }
 
@@ -514,11 +492,7 @@ class EIP20Gateway {
     }
     return this.getEIP20BaseToken().then((eip20BaseToken) => {
       this.getBounty().then((bounty) => {
-        eip20BaseToken
-          .approve(this.gatewayAddress, bounty, txOptions)
-          .then((result) => {
-            return result;
-          });
+        eip20BaseToken.approve(this.gatewayAddress, bounty, txOptions);
       });
     });
   }

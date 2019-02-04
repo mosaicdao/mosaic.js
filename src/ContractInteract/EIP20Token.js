@@ -86,9 +86,9 @@ class EIP20Token {
       const err = new TypeError('Invalid from address.');
       return Promise.reject(err);
     }
-    return this._approveRawTx(spenderAddress, amount).then((tx) => {
-      return Utils.sendTransaction(tx, txOptions);
-    });
+    return this._approveRawTx(spenderAddress, amount).then((tx) =>
+      Utils.sendTransaction(tx, txOptions),
+    );
   }
 
   /**

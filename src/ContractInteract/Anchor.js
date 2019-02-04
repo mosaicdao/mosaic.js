@@ -69,12 +69,7 @@ class Anchor {
    * @returns {Promise} Promise object.
    */
   getStateRoot(blockHeight) {
-    return this.contract.methods
-      .getStateRoot(blockHeight)
-      .call()
-      .then((stateRoot) => {
-        return stateRoot;
-      });
+    return this.contract.methods.getStateRoot(blockHeight).call();
   }
 
   /**
@@ -83,12 +78,7 @@ class Anchor {
    * @returns {Promise} Promise object.
    */
   getLatestStateRootBlockHeight() {
-    return this.contract.methods
-      .getLatestStateRootBlockHeight()
-      .call()
-      .then((blockHeight) => {
-        return blockHeight;
-      });
+    return this.contract.methods.getLatestStateRootBlockHeight().call();
   }
 
   /**

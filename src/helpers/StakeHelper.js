@@ -171,9 +171,7 @@ class StakeHelper {
       );
       return valueToken.methods
         .approve(this.gatewayAddress, stakeAmount)
-        .then((tx) => {
-          return Utils.sendTransaction(tx, txOptions);
-        });
+        .then((tx) => Utils.sendTransaction(tx, txOptions));
     });
   }
 

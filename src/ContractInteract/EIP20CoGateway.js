@@ -100,9 +100,7 @@ class EIP20CoGateway {
       blockHeight,
       encodedAccount,
       accountProof,
-    ).then((tx) => {
-      return Utils.sendTransaction(tx, txOptions);
-    });
+    ).then((tx) => Utils.sendTransaction(tx, txOptions));
   }
 
   /**
@@ -180,9 +178,7 @@ class EIP20CoGateway {
       hashLock,
       blockHeight,
       storageProof,
-    ).then((tx) => {
-      return Utils.sendTransaction(tx, txOptions);
-    });
+    ).then((tx) => Utils.sendTransaction(tx, txOptions));
   }
 
   /**
@@ -279,9 +275,9 @@ class EIP20CoGateway {
       const err = new TypeError('Invalid transaction options.');
       return Promise.reject(err);
     }
-    return this._progressMintRawTx(messageHash, unlockSecret).then((tx) => {
-      return Utils.sendTransaction(tx, txOptions);
-    });
+    return this._progressMintRawTx(messageHash, unlockSecret).then((tx) =>
+      Utils.sendTransaction(tx, txOptions),
+    );
   }
 
   /**
@@ -336,12 +332,7 @@ class EIP20CoGateway {
     if (!Web3.utils.isAddress(accountAddress)) {
       throw new TypeError('Invalid account address.');
     }
-    return this.contract.methods
-      .getNonce(accountAddress)
-      .call()
-      .then((nonce) => {
-        return nonce;
-      });
+    return this.contract.methods.getNonce(accountAddress).call();
   }
 
   /**
@@ -374,12 +365,7 @@ class EIP20CoGateway {
       const err = new TypeError('Invalid message hash.');
       return Promise.reject(err);
     }
-    return this.contract.methods
-      .getInboxMessageStatus(messageHash)
-      .call()
-      .then((status) => {
-        return status;
-      });
+    return this.contract.methods.getInboxMessageStatus(messageHash).call();
   }
 
   /**
@@ -394,12 +380,7 @@ class EIP20CoGateway {
       const err = new TypeError('Invalid message hash.');
       return Promise.reject(err);
     }
-    return this.contract.methods
-      .getOutboxMessageStatus(messageHash)
-      .call()
-      .then((status) => {
-        return status;
-      });
+    return this.contract.methods.getOutboxMessageStatus(messageHash).call();
   }
 
   /**

@@ -73,14 +73,14 @@ class Staker {
     let approvalChain = this.gatewayContract.getValueToken();
 
     // Create an instance of value token
-    approvalChain = approvalChain.then((valueTokenAddress) => {
-      return this.getValueToken(valueTokenAddress);
-    });
+    approvalChain = approvalChain.then((valueTokenAddress) =>
+      this.getValueToken(valueTokenAddress),
+    );
 
     // Call approve on value token.
-    approvalChain = approvalChain.then((valueToken) => {
-      return valueToken.approve(this.gatewayAddress, amount, txOptions);
-    });
+    approvalChain = approvalChain.then((valueToken) =>
+      valueToken.approve(this.gatewayAddress, amount, txOptions),
+    );
 
     return approvalChain;
   }
