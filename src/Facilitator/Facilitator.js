@@ -25,7 +25,9 @@ const EIP20CoGateway = require('../../src/ContractInteract/EIP20CoGateway');
 const Utils = require('../utils/Utils');
 const ProofUtils = require('../utils/ProofUtils');
 const Message = require('../../src/utils/Message');
+const Logger = require('../../logger/Logger');
 
+const logger = new Logger('facilitator');
 const MessageStatus = Message.messageStatus();
 
 /**
@@ -84,8 +86,8 @@ class Facilitator {
    */
   stake(staker, amount, beneficiary, gasPrice, gasLimit, hashLock, txOption) {
     return new Promise(async (onResolve, onReject) => {
-      console.log('\nStake');
-      console.log('-----------------------');
+      logger.info('Stake');
+      logger.info('-----------------------');
       if (!Web3.utils.isAddress(staker)) {
         const err = new TypeError('Invalid staker address.');
         onReject(err);
@@ -123,18 +125,18 @@ class Facilitator {
 
       let stakeHashLock = hashLock;
       if (hashLock === undefined) {
-        console.log('* Generating hash lock and unlock secret *');
+        logger.info('* Generating hash lock and unlock secret *');
         const hashLockObj = await this.getHashLock();
         stakeHashLock = hashLockObj.hashLock;
-        console.log(`  - hash lock generated is ${stakeHashLock}`);
-        console.log(
+        logger.info(`  - hash lock generated is ${stakeHashLock}`);
+        logger.info(
           `  - unlock secrete generated is ${hashLockObj.unlockSecret}`,
         );
       }
 
       const facilitatorAddress = txOption.from;
 
-      console.log(
+      logger.info(
         '* Checking if staker has approved gateway for token transfer *',
       );
       const isStakeAmountApproved = await this.gateway.isStakeAmountApproved(
@@ -142,23 +144,23 @@ class Facilitator {
         amount,
       );
 
-      console.log(`  - Approval status is ${isStakeAmountApproved}`);
+      logger.info(`  - Approval status is ${isStakeAmountApproved}`);
 
       if (!isStakeAmountApproved) {
         if (staker === facilitatorAddress) {
-          console.log(
+          logger.info(
             '  - As staker is facilitator, approving gateway for token transfer',
           );
           await this.gateway
             .approveStakeAmount(amount, txOption)
             .catch((exception) => {
-              console.log(
+              logger.info(
                 '  - Failed to approve gateway contract for token transfer',
               );
               onReject(exception);
             });
         } else {
-          console.log('  - Cannot perform stake.');
+          logger.info('  - Cannot perform stake.');
           const err = new TypeError(
             'Transfer of stake amount must be approved.',
           );
@@ -166,32 +168,32 @@ class Facilitator {
         }
       }
 
-      console.log(
+      logger.info(
         '* Checking if facilitator has approved gateway for bounty token transfer *',
       );
       const isBountyAmountApproved = await this.gateway.isBountyAmountApproved(
         facilitatorAddress,
       );
-      console.log(`  - Approval status is ${isBountyAmountApproved}`);
+      logger.info(`  - Approval status is ${isBountyAmountApproved}`);
 
       if (!isBountyAmountApproved) {
-        console.log('  - Approving gateway contract for bounty transfer');
+        logger.info('  - Approving gateway contract for bounty transfer');
         await this.gateway.approveBountyAmount(txOption).catch((exception) => {
-          console.log(
+          logger.info(
             '  - Failed to approve gateway contract for bounty transfer',
           );
           onReject(exception);
         });
       }
 
-      console.log('* Getting nonce for the staker account *');
+      logger.info('* Getting nonce for the staker account *');
       const nonce = await this.gateway.getNonce(staker).catch((exception) => {
-        console.log('  - Failed to get staker nonce');
+        logger.info('  - Failed to get staker nonce');
         onReject(exception);
       });
-      console.log(`  - Staker's nonce is ${nonce}`);
+      logger.info(`  - Staker's nonce is ${nonce}`);
 
-      console.log('* Performing stake *');
+      logger.info('* Performing stake *');
       this.gateway
         .stake(
           amount,
@@ -203,11 +205,11 @@ class Facilitator {
           txOption,
         )
         .then((stakeResult) => {
-          console.log('  - Succcessfully performed stake.');
+          logger.info('  - Succcessfully performed stake.');
           onResolve(stakeResult);
         })
         .catch((exception) => {
-          console.log('  - Failed to performed stake.');
+          logger.info('  - Failed to performed stake.');
           onReject(exception);
         });
     });
@@ -242,8 +244,8 @@ class Facilitator {
     txOptionAuxiliary,
   ) {
     return new Promise((onResolve, onReject) => {
-      console.log('\nPerforming stake and mint');
-      console.log('-----------------------');
+      logger.info('Performing stake and mint');
+      logger.info('-----------------------');
       if (!Web3.utils.isAddress(staker)) {
         const err = new TypeError('Invalid staker address.');
         onReject(err);
@@ -337,7 +339,7 @@ class Facilitator {
             });
         })
         .catch((exception) => {
-          console.log('  - Confirm stake intent failed');
+          logger.info('  - Confirm stake intent failed');
           onReject(exception);
         });
     });
@@ -370,8 +372,8 @@ class Facilitator {
     txOptions,
   ) {
     return new Promise(async (onResolve, onReject) => {
-      console.log('\nConfirming stake intent');
-      console.log('-----------------------');
+      logger.info('Confirming stake intent');
+      logger.info('-----------------------');
       if (!Web3.utils.isAddress(staker)) {
         const err = new TypeError('Invalid staker address.');
         onReject(err);
@@ -405,7 +407,7 @@ class Facilitator {
         onReject(err);
       }
 
-      console.log('* Generating message hash with given stake parameters *');
+      logger.info('* Generating message hash with given stake parameters *');
       const messageHash = Message.getStakeMessageHash(
         amount,
         beneficiary,
@@ -417,13 +419,13 @@ class Facilitator {
         hashLock,
       );
 
-      console.log(`  - Message hash is ${messageHash}`);
+      logger.info(`  - Message hash is ${messageHash}`);
 
       const stakeMessageStatus = await this.gateway.getOutboxMessageStatus(
         messageHash,
       );
 
-      console.log(
+      logger.info(
         `  - Gateway's outbox message hash is ${stakeMessageStatus}`,
       );
 
@@ -436,7 +438,7 @@ class Facilitator {
         messageHash,
       );
 
-      console.log(
+      logger.info(
         `  - CoGateway's inbox message hash is ${mintMessageStatus}`,
       );
 
@@ -445,12 +447,12 @@ class Facilitator {
         mintMessageStatus === MessageStatus.PROGRESSED ||
         mintMessageStatus === MessageStatus.REVOKED
       ) {
-        console.log('  - Stake intent already confirmed on CoGateway');
+        logger.info('  - Stake intent already confirmed on CoGateway');
         onResolve(true);
       } else {
         this.getProof(messageHash, stakeMessageStatus)
           .then(async (proofData) => {
-            console.log('* Proving Gateway account on CoGateway *');
+            logger.info('* Proving Gateway account on CoGateway *');
 
             await this.coGateway
               .proveGateway(
@@ -460,7 +462,7 @@ class Facilitator {
                 txOptions,
               )
               .then(() => {
-                console.log('  - Gateway was proven on CoGateway');
+                logger.info('  - Gateway was proven on CoGateway');
                 this.coGateway
                   .confirmStakeIntent(
                     staker,
@@ -475,7 +477,7 @@ class Facilitator {
                     txOptions,
                   )
                   .then((confirmStakeIntentResult) => {
-                    console.log('  - Confirm stake intent successful');
+                    logger.info('  - Confirm stake intent successful');
                     onResolve(confirmStakeIntentResult);
                   })
                   .catch((exception) => {
@@ -483,7 +485,7 @@ class Facilitator {
                   });
               })
               .catch((exception) => {
-                console.log(
+                logger.info(
                   '  - Failed to prove gateway account on CoGateway',
                 );
                 onReject(exception);
@@ -513,8 +515,8 @@ class Facilitator {
     txOptionAuxiliary,
   ) {
     return new Promise((onResolve, onReject) => {
-      console.log('\nPerforming progress stake and progress mint');
-      console.log('-----------------------');
+      logger.info('Performing progress stake and progress mint');
+      logger.info('-----------------------');
       if (typeof messageHash !== 'string') {
         const err = new TypeError('Invalid message hash.');
         onReject(err);
@@ -572,7 +574,7 @@ class Facilitator {
       const stakeMessageStatus = await this.gateway.getOutboxMessageStatus(
         messageHash,
       );
-      console.log(
+      logger.info(
         `  - Gateway's outbox message status is ${stakeMessageStatus}`,
       );
 
@@ -581,21 +583,21 @@ class Facilitator {
         stakeMessageStatus === MessageStatus.REVOCATION_DECLARED ||
         stakeMessageStatus === MessageStatus.REVOKED
       ) {
-        console.log('  - Cannot perform progress stake.');
+        logger.info('  - Cannot perform progress stake.');
         const err = TypeError('Message cannot be progressed.');
         onReject(err);
       } else if (stakeMessageStatus === MessageStatus.PROGRESSED) {
-        console.log('  - Progress stake is already done.');
+        logger.info('  - Progress stake is already done.');
         onResolve(true);
       } else {
         this.gateway
           .progressStake(messageHash, unlockSecret, txOption)
           .then((progressStakeResult) => {
-            console.log('  - Progress stake successful.');
+            logger.info('  - Progress stake successful.');
             onResolve(progressStakeResult);
           })
           .catch((exception) => {
-            console.log('  - Failed to progress stake.');
+            logger.info('  - Failed to progress stake.');
             onReject(exception);
           });
       }
@@ -629,7 +631,7 @@ class Facilitator {
       const mintMessageStatus = await this.coGateway.getInboxMessageStatus(
         messageHash,
       );
-      console.log(
+      logger.info(
         `  - CoGateway's inbox message status is ${mintMessageStatus}`,
       );
       if (
@@ -637,21 +639,21 @@ class Facilitator {
         mintMessageStatus === MessageStatus.REVOKED ||
         mintMessageStatus === MessageStatus.REVOCATION_DECLARED
       ) {
-        console.log('  - Cannot perform progress mint.');
+        logger.info('  - Cannot perform progress mint.');
         const err = new TypeError('Message cannot be progressed.');
         onResolve(err);
       } else if (mintMessageStatus === MessageStatus.PROGRESSED) {
-        console.log('  - Progress mint is already done.');
+        logger.info('  - Progress mint is already done.');
         onResolve(true);
       } else {
         this.coGateway
           .progressMint(messageHash, unlockSecret, txOption)
           .then((progressMintResult) => {
-            console.log('  - Progress mint successful.');
+            logger.info('  - Progress mint successful.');
             onResolve(progressMintResult);
           })
           .catch((exception) => {
-            console.log('  - Failed to progress mint.');
+            logger.info('  - Failed to progress mint.');
             onReject(exception);
           });
       }
@@ -668,14 +670,14 @@ class Facilitator {
    */
   getProof(messageHash, messageStatus) {
     return new Promise(async (onResolve, onReject) => {
-      console.log('* Generating proof data *');
+      logger.info('* Generating proof data *');
 
       const latestAnchorInfo = await this.coGateway.getLatestAnchorInfo();
 
-      console.log(
+      logger.info(
         `  - Last committed block height is ${latestAnchorInfo.blockHeight}`,
       );
-      console.log(
+      logger.info(
         `  - Last committed state root is ${latestAnchorInfo.stateRoot}`,
       );
 
@@ -684,7 +686,7 @@ class Facilitator {
         16,
       )}`;
 
-      console.log('  - Attempting to generate proof');
+      logger.info('  - Attempting to generate proof');
 
       proofUtils
         .getOutboxProof(
@@ -694,7 +696,7 @@ class Facilitator {
         )
         .then((proof) => {
           // TODO: validate proofdata for the status and gateway address.
-          console.log('  - Proof generation successful');
+          logger.info('  - Proof generation successful');
           onResolve({
             accountData: proof.encodedAccountValue,
             accountProof: proof.serializedAccountProof,
@@ -704,7 +706,7 @@ class Facilitator {
           });
         })
         .catch((exception) => {
-          console.log('  - Failed to generate proof');
+          logger.info('  - Failed to generate proof');
           onReject(exception);
         });
     });

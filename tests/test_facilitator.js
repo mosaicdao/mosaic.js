@@ -33,7 +33,7 @@ const hashLock =
   '0x64e453e30851fa25676fcf79fd3f1d92198d240a6e0894ec99eba9d9d6ed6ab2';
 
 const facilitatorAddress = txOptions.from;
-
+//
 // facilitator.stake(
 //   staker,
 //   amount,
@@ -61,7 +61,7 @@ facilitator
     beneficiary,
     gasPrice,
     gasLimit,
-    '3',
+    '4',
     hashLock,
     unlockSecret,
     txOptionOrigin,

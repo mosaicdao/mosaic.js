@@ -505,7 +505,6 @@ class EIP20Gateway {
       return Promise.resolve(this._eip20ValueToken);
     }
     return this.getValueToken().then((valueTokenAddress) => {
-      console.log('valueTokenAddress: ', valueTokenAddress);
       const token = new EIP20Token(this.web3, valueTokenAddress);
       this._eip20ValueToken = token;
       return token;
@@ -522,7 +521,6 @@ class EIP20Gateway {
       return Promise.resolve(this._eip20BaseToken);
     }
     return this.getBaseToken().then((baseTokenAddress) => {
-      console.log('baseTokenAddress: ', baseTokenAddress);
       const token = new EIP20Token(this.web3, baseTokenAddress);
       this._eip20BaseToken = token;
       return token;
