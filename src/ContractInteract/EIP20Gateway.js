@@ -80,6 +80,14 @@ class EIP20Gateway {
     );
     this.getInboxMessageStatus = this.getInboxMessageStatus.bind(this);
     this.getOutboxMessageStatus = this.getOutboxMessageStatus.bind(this);
+    this.approveStakeAmount = this.approveStakeAmount.bind(this);
+    this.approveBountyAmount = this.approveBountyAmount.bind(this);
+    this.getAnchor = this.getAnchor.bind(this);
+    this.getLatestAnchorInfo = this.getLatestAnchorInfo.bind(this);
+    this.getEIP20BaseToken = this.getEIP20BaseToken.bind(this);
+    this.getEIP20ValueToken = this.getEIP20ValueToken.bind(this);
+    this.isBountyAmountApproved = this.isBountyAmountApproved.bind(this);
+    this.isStakeAmountApproved = this.isStakeAmountApproved.bind(this);
   }
 
   /**

@@ -61,6 +61,12 @@ class Anchor {
       );
       throw err;
     }
+
+    this.getStateRoot = this.getStateRoot.bind(this);
+    this.getLatestStateRootBlockHeight = this.getLatestStateRootBlockHeight.bind(
+      this,
+    );
+    this.anchorStateRoot = this.anchorStateRoot.bind(this);
   }
 
   /**

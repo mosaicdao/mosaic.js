@@ -66,6 +66,7 @@ class EIP20Token {
     this.approve = this.approve.bind(this);
     this._approveRawTx = this._approveRawTx.bind(this);
     this.allowance = this.allowance.bind(this);
+    this.isAmountApproved = this.isAmountApproved.bind(this);
   }
 
   /**

@@ -69,6 +69,10 @@ class Facilitator {
     this.progressStake = this.progressStake.bind(this);
     this.confirmStakeIntent = this.confirmStakeIntent.bind(this);
     this.getProof = this.getProof.bind(this);
+    this.performProgress = this.performProgress.bind(this);
+    this.performProgressStake = this.performProgressStake.bind(this);
+    this.performProgressMint = this.performProgressMint.bind(this);
+    this.getProof = this.getProof.bind(this);
   }
 
   /**

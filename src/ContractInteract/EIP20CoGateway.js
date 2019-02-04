@@ -79,6 +79,8 @@ class EIP20CoGateway {
     );
     this.getInboxMessageStatus = this.getInboxMessageStatus.bind(this);
     this.getOutboxMessageStatus = this.getOutboxMessageStatus.bind(this);
+    this.getAnchor = this.getAnchor.bind(this);
+    this.getLatestAnchorInfo = this.getLatestAnchorInfo.bind(this);
   }
 
   /**
