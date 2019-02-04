@@ -26,9 +26,9 @@ const Target = require('./Target');
 
 /**
  * A configuration for anchoring a state root.
- * @param {Target} target Which target to anchor onto.
- * @param {string} address The address of the anchor contract on the target chain.
- * @param {number} delay The delay to wait before anchoring a state root in blocks.
+ * @property {Target} target Which target to anchor onto.
+ * @property {string} address The address of the anchor contract on the target chain.
+ * @property {number} delay The delay to wait before anchoring a state root in blocks.
  */
 class AnchorConfig {
   /**
