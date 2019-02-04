@@ -1,0 +1,12 @@
+{
+  "anchor": {
+    "origin": {
+      "address": "0x7dDccC2a3D94B18b4758D9C5255A8C3FAC5507a6",
+      "delay": 24
+    },
+    "auxiliary": {
+      "address": "0xE4F0C9FbB89B2131EfBf4DBa43EDE20489c3cf2b",
+      "delay": 8
+    }
+  }
+}

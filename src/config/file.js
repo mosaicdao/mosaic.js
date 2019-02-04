@@ -20,26 +20,19 @@
 
 'use strict';
 
-const file = require('../../config/file');
-const AnchorConfig = require('../../config/AnchorConfig');
+const fs = require('fs');
 
 /**
- * Anchors a state root from a source blockchain onto a target blockchain.
- * @param {string} configFile Path to a mosaic configuration file.
- * @param {Object} anchorCmd The command that provides the options from CLI.
- * @param {string} target Which target to anchor onto.
+ * Reads a configuration from a file and returns the object.
+ * @param {string} filePath The path to the config file to read.
  */
-const anchor = (configFile, anchorCmd, target) => {
-  try {
-    const config = file.readConfig(configFile);
-    const anchorConfig = new AnchorConfig(config, anchorCmd, target);
+const readConfig = (filePath) => {
+  const configFile = fs.readFileSync(filePath);
+  const config = JSON.parse(configFile);
 
-    // Actual anchor CLI code will go here. console.log as placeholder.
-    console.log(anchorConfig);
-  } catch (error) {
-    console.log(error.toString());
-    process.exit(1);
-  }
+  return config;
 };
 
-module.exports = anchor;
+module.exports = {
+  readConfig,
+};

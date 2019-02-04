@@ -20,46 +20,12 @@
 
 'use strict';
 
-const fs = require('fs');
-
-const TARGET = Object.freeze({
+/**
+ * Target is an enumeration of valid targets for mosaic operations.
+ */
+const Target = Object.freeze({
   ORIGIN: 'origin',
   AUXILIARY: 'auxiliary',
 });
 
-const readConfigFile = (filePath) => {
-  const configFile = fs.readFileSync(filePath);
-  const config = JSON.parse(configFile);
-
-  return config;
-};
-
-const readAnchorConfig = (configFile, target, anchorCmd) => {
-  const regexp = new RegExp(`(${TARGET.ORIGIN}|${TARGET.AUXILIARY})`);
-  if (target.match(regexp) === null) {
-    console.log(
-      'error: argument `target` must be ' +
-        `"${TARGET.ORIGIN}" or "${TARGET.AUXILIARY}"`,
-    );
-    process.exit(1);
-  }
-
-  let config = readConfigFile(configFile);
-  config = config.anchor[target];
-  config.target = target;
-
-  if (anchorCmd.address) {
-    config.address = anchorCmd.address;
-  }
-
-  if (anchorCmd.delay) {
-    config.delay = anchorCmd.delay;
-  }
-
-  return config;
-};
-
-module.exports = {
-  readAnchorConfig,
-  TARGET,
-};
+module.exports = Target;

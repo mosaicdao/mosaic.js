@@ -20,26 +20,31 @@
 
 'use strict';
 
-const file = require('../../config/file');
-const AnchorConfig = require('../../config/AnchorConfig');
+const chai = require('chai');
 
-/**
- * Anchors a state root from a source blockchain onto a target blockchain.
- * @param {string} configFile Path to a mosaic configuration file.
- * @param {Object} anchorCmd The command that provides the options from CLI.
- * @param {string} target Which target to anchor onto.
- */
-const anchor = (configFile, anchorCmd, target) => {
-  try {
-    const config = file.readConfig(configFile);
-    const anchorConfig = new AnchorConfig(config, anchorCmd, target);
+const Target = require('../../src/config/Target');
 
-    // Actual anchor CLI code will go here. console.log as placeholder.
-    console.log(anchorConfig);
-  } catch (error) {
-    console.log(error.toString());
-    process.exit(1);
-  }
-};
+const { assert } = chai;
 
-module.exports = anchor;
+describe('Target', () => {
+  it('provides the correct options', () => {
+    assert.deepEqual(
+      {
+        ORIGIN: 'origin',
+        AUXILIARY: 'auxiliary',
+      },
+      Target,
+      'Target does not expose the expected parameters.',
+    );
+  });
+
+  it('cannot be updated', () => {
+    assert.throws(() => {
+      Target.origin = 'fancy_chain';
+    }, 'Cannot add property origin, object is not extensible');
+
+    assert.throws(() => {
+      Target.new_property = 'ice_cream';
+    }, 'Cannot add property new_property, object is not extensible');
+  });
+});

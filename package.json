@@ -29,7 +29,8 @@
     "test:integration": "node test_integration/integration_tests.js",
     "pre-commit": "lint-staged",
     "build": "webpack --mode=production",
-    "prepare": "npm run build"
+    "prepare": "npm run build",
+    "mosaic": "./bin/mosaic"
   },
   "dependencies": {
     "@openstfoundation/mosaic-contracts": "^0.10.0-alpha.1",

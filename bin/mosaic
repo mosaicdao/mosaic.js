@@ -22,35 +22,58 @@
 
 'use strict';
 
+/**
+ * @file A single binary to run simple mosaic commands.
+ *
+ * All the commands are defined here. The actual execution is written in `src`. That makes it easier
+ * to maintain and test.
+ */
+
 const mosaic = require('commander');
 
 const anchor = require('../src/cli/anchor');
 const { version } = require('../package.json');
 
 mosaic
-  .version(version);
+  .version(version)
+  .on('--help', () => {
+    console.log(
+      '  More info:\n\n'
+      + '    Run \'mosaic COMMAND --help\' for more information on a command.',
+    );
+  });
 
 mosaic
   .command('anchor <config> <target>')
   .option('-a, --address <string>', 'the address of the anchor')
   .option('-d, --delay <number>', 'the number of blocks to delay anchoring', parseInt)
-  .description(
-    'Anchor a state root to a different blockchain.\n\n'
-    + '<config> must be a configuration file in JSON format.\n'
-    + '<target> must be "origin" or "auxiliary".\n\n'
-    + 'Options given on the command line override options from the config file.',
-  )
+  .description('Anchor a state root to a different blockchain')
+  .on('--help', () => {
+    console.log(
+      '  More info:\n\n'
+      + '    CONFIG must be a configuration file in JS or JSON format.\n'
+      + '    TARGET must be "origin" or "auxiliary".\n\n'
+      + '    Options given on the command line override options from the config file.',
+    );
+  })
   .action(
-    (configFile, target, anchorCmd) => anchor(configFile, target, anchorCmd),
+    (configFile, target, anchorCmd) => anchor(configFile, anchorCmd, target),
   );
 
 // Example how the facilitator would be added:
 // mosaic
 //   .command('facilitate <config>')
 //   .description(
-//     'Facilitate a stake or redeem process.\n' +
-//     '<config> must be a configuration file in JSON format.',
+//     'Facilitate a stake or redeem process.',
 //   )
 //   .action((configFile, facilitateCmd) => facilitate(configFile, facilitateCmd));
 
 mosaic.parse(process.argv);
+
+/*
+ * If no command was given to `mosaic`, print the help so that the user notes they need to add a
+ * command and where they can get more help.
+ */
+if (!process.argv.slice(2).length) {
+  mosaic.outputHelp();
+}
