@@ -23,9 +23,9 @@ const Web3 = require('web3');
 const sinon = require('sinon');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const Facilitator = require('../../src/Facilitator/Facilitator');
-const Utils = require('../../src/utils/Utils');
+const Message = require('../../src/utils/Message');
 
-const messageStatus = Utils.messageStatus();
+const messageStatus = Message.messageStatus();
 const assert = chai.assert;
 
 describe('facilitator.performProgressMint()', () => {

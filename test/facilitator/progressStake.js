@@ -21,12 +21,11 @@
 const chai = require('chai');
 const Web3 = require('web3');
 const sinon = require('sinon');
-const Utils = require('../../src/utils/Utils');
-
-const messageStatus = Utils.messageStatus();
 const SpyAssert = require('../../test_utils/SpyAssert');
 const Facilitator = require('../../src/Facilitator/Facilitator');
+const Message = require('../../src/utils/Message');
 
+const messageStatus = Message.messageStatus();
 const assert = chai.assert;
 
 describe('facilitator.progressStake()', () => {

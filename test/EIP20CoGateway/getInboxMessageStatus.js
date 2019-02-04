@@ -21,12 +21,12 @@
 const chai = require('chai');
 const Web3 = require('web3');
 const sinon = require('sinon');
-const Utils = require('../../src/utils/Utils');
-
-const MessageStatus = Utils.messageStatus();
-const assert = chai.assert;
 const EIP20CoGateway = require('../../src/ContractInteract/EIP20CoGateway');
 const SpyAssert = require('../../test_utils/SpyAssert');
+const Message = require('../../src/utils/Message');
+
+const assert = chai.assert;
+const MessageStatus = Message.messageStatus();
 
 describe('EIP20CoGateway.getInboxMessageStatus()', () => {
   let web3;
