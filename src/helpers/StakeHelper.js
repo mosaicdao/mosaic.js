@@ -19,7 +19,6 @@
 // ----------------------------------------------------------------------------
 
 const Web3 = require('web3');
-const BN = require('bn.js');
 const Contracts = require('../Contracts');
 const Utils = require('../utils/Utils.js');
 
@@ -90,6 +89,30 @@ class StakeHelper {
   }
 
   /**
+   * Returns the EIP20 token address.
+   *
+   * @returns {Promise} Promise object represents EIP20 token address.
+   */
+  async getValueToken() {
+    if (this.valueTokenAddress) {
+      return Promise.resolve(this.valueTokenAddress);
+    }
+
+    const gatewayContract = Contracts.getEIP20Gateway(
+      this.originWeb3,
+      this.gatewayAddress,
+    );
+
+    return gatewayContract.methods
+      .token()
+      .call()
+      .then((token) => {
+        this.valueTokenAddress = token;
+        return token;
+      });
+  }
+
+  /**
    * Returns the gateway nonce for the given account address.
    *
    * @param {string} accountAddress Account address for which the nonce is to be fetched.
@@ -101,30 +124,6 @@ class StakeHelper {
       throw new Error('Invalid account address.');
     }
     return this._getNonce(staker, this.originWeb3, this.gatewayAddress);
-  }
-
-  /**
-   * Approves gateway address for the stake amount transfer.
-   *
-   * @param {string} stakeAmount Stake amount.
-   * @param {string} txOption Transaction options.
-   *
-   * @returns {Promise} Promise object.
-   */
-  async approveStakeAmount(stakeAmount, txOption) {
-    if (!txOption) {
-      throw new Error('Invalid transaction options.');
-    }
-    if (!Web3.utils.isAddress(txOption.from)) {
-      throw new Error('Invalid staker address.');
-    }
-    const valueTokenAddress = await this.getValueToken();
-    const valueToken = Contracts.getEIP20Token(
-      this.originWeb3,
-      valueTokenAddress,
-    );
-    const tx = valueToken.methods.approve(this.gatewayAddress, stakeAmount);
-    return StakeHelper.sendTransaction(tx, txOption);
   }
 
   /**
@@ -146,6 +145,48 @@ class StakeHelper {
       .then((nonce) => {
         return nonce;
       });
+  }
+
+  /**
+   * Approves gateway address for the stake amount transfer.
+   *
+   * @param {string} stakeAmount Stake amount.
+   * @param {string} txOptions Transaction options.
+   *
+   * @returns {Promise} Promise object.
+   */
+  async approveStakeAmount(stakeAmount, txOptions) {
+    return new Promise((onResolve, onReject) => {
+      if (!txOptions) {
+        const err = new TypeError('Invalid transaction options.');
+        onReject(err);
+      }
+      if (!Web3.utils.isAddress(txOptions.from)) {
+        const err = new TypeError('Invalid staker address.');
+        onReject(err);
+      }
+      this.getValueToken()
+        .then((valueTokenAddress) => {
+          const valueToken = Contracts.getEIP20Token(
+            this.originWeb3,
+            valueTokenAddress,
+          );
+          valueToken.methods
+            .approve(this.gatewayAddress, stakeAmount)
+            .then((tx) => {
+              Utils.sendTransaction(tx, txOptions)
+                .then((result) => {
+                  onResolve(result);
+                })
+                .catch((exception) => {
+                  onReject(exception);
+                });
+            });
+        })
+        .catch((exception) => {
+          onReject(exception);
+        });
+    });
   }
 
   /**

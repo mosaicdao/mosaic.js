@@ -24,6 +24,7 @@ const Web3 = require('web3');
 const StakeHelper = require('../../src/helpers/StakeHelper');
 const Contracts = require('../../src/Contracts');
 const SpyAssert = require('../../test_utils/SpyAssert');
+const Utils = require('../../src/utils/Utils');
 
 const assert = chai.assert;
 
@@ -51,7 +52,7 @@ describe('StakeHelper.approveStakeAmount()', () => {
     spyGetValueToken = sinon.replace(
       stakeHelper,
       'getValueToken',
-      sinon.fake.returns(valueTokenAddress),
+      sinon.fake.resolves(valueTokenAddress),
     );
 
     // Mock an instance of ValueToken contract.
@@ -75,13 +76,13 @@ describe('StakeHelper.approveStakeAmount()', () => {
     spyValueTokenApprove = sinon.replace(
       valueTokenContract.methods,
       'approve',
-      sinon.fake.returns(mockTx.object),
+      sinon.fake.resolves(mockTx.object),
     );
 
-    spySendTransaction = sinon.resolves(
-      StakeHelper,
+    spySendTransaction = sinon.replace(
+      Utils,
       'sendTransaction',
-      sinon.fake.returns(true),
+      sinon.fake.resolves(true),
     );
 
     // Add spy on stakeHelper.approveStakeAmount.
