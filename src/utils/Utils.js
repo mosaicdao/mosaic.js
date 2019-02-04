@@ -83,13 +83,13 @@ class Utils {
       tx.send(txOption)
         .on('transactionHash', (transactionHash) => {})
         .on('receipt', (receipt) => {
-          onResolve(receipt);
+          return onResolve(receipt);
         })
         .on('error', (error) => {
-          onReject(error);
+          return onReject(error);
         })
         .catch((exception) => {
-          onReject(exception);
+          return onReject(exception);
         });
     });
   }

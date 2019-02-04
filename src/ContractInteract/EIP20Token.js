@@ -81,25 +81,19 @@ class EIP20Token {
     return new Promise((onResolve, onReject) => {
       if (!txOptions) {
         const err = new TypeError('Invalid transaction options.');
-        onReject(err);
+        return onReject(err);
       }
       if (!Web3.utils.isAddress(txOptions.from)) {
         const err = new TypeError('Invalid from address.');
-        onReject(err);
+        return onReject(err);
       }
       this._approveRawTx(spenderAddress, amount)
         .then((tx) => {
           Utils.sendTransaction(tx, txOptions)
-            .then((result) => {
-              onResolve(result);
-            })
-            .catch((exception) => {
-              onReject(exception);
-            });
+            .then(onResolve)
+            .catch(onReject);
         })
-        .catch((exception) => {
-          onReject(exception);
-        });
+        .catch(onReject);
     });
   }
 
@@ -115,14 +109,14 @@ class EIP20Token {
     return new Promise((onResolve, onReject) => {
       if (!Web3.utils.isAddress(spenderAddress)) {
         const err = new TypeError('Invalid spender address.');
-        onReject(err);
+        return onReject(err);
       }
       if (typeof amount !== 'string') {
         const err = new TypeError('Invalid approval amount.');
-        onReject(err);
+        return onReject(err);
       }
       const tx = this.contract.methods.approve(spenderAddress, amount);
-      onResolve(tx);
+      return onResolve(tx);
     });
   }
 

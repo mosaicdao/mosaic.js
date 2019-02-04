@@ -159,11 +159,11 @@ class StakeHelper {
     return new Promise((onResolve, onReject) => {
       if (!txOptions) {
         const err = new TypeError('Invalid transaction options.');
-        onReject(err);
+        return onReject(err);
       }
       if (!Web3.utils.isAddress(txOptions.from)) {
         const err = new TypeError('Invalid staker address.');
-        onReject(err);
+        return onReject(err);
       }
       this.getValueToken()
         .then((valueTokenAddress) => {
@@ -175,17 +175,11 @@ class StakeHelper {
             .approve(this.gatewayAddress, stakeAmount)
             .then((tx) => {
               Utils.sendTransaction(tx, txOptions)
-                .then((result) => {
-                  onResolve(result);
-                })
-                .catch((exception) => {
-                  onReject(exception);
-                });
+                .then(onResolve)
+                .catch(onReject);
             });
         })
-        .catch((exception) => {
-          onReject(exception);
-        });
+        .catch(onReject);
     });
   }
 

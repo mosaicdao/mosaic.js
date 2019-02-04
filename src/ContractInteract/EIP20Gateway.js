@@ -96,21 +96,15 @@ class EIP20Gateway {
     return new Promise((onResolve, onReject) => {
       if (!txOptions) {
         const err = new TypeError('Invalid transaction options.');
-        onReject(err);
+        return onReject(err);
       }
       this._proveGatewayRawTx(blockHeight, encodedAccount, accountProof)
         .then((tx) => {
           Utils.sendTransaction(tx, txOptions)
-            .then((result) => {
-              onResolve(result);
-            })
-            .catch((exception) => {
-              onReject(exception);
-            });
+            .then(onResolve)
+            .catch(onReject);
         })
-        .catch((exception) => {
-          onReject(exception);
-        });
+        .catch(onReject);
     });
   }
 
@@ -127,17 +121,17 @@ class EIP20Gateway {
     return new Promise((onResolve, onReject) => {
       if (blockHeight === undefined) {
         const err = new TypeError('Invalid block height.');
-        onReject(err);
+        return onReject(err);
       }
 
       if (typeof encodedAccount !== 'string') {
         const err = new TypeError('Invalid account data.');
-        onReject(err);
+        return onReject(err);
       }
 
       if (typeof accountProof !== 'string') {
         const err = new TypeError('Invalid account proof.');
-        onReject(err);
+        return onReject(err);
       }
 
       const tx = this.contract.methods.proveGateway(
@@ -166,11 +160,11 @@ class EIP20Gateway {
     return new Promise((onResolve, onReject) => {
       if (!txOptions) {
         const err = new TypeError('Invalid transaction options.');
-        onReject(err);
+        return onReject(err);
       }
       if (!Web3.utils.isAddress(txOptions.from)) {
         const err = new TypeError('Invalid facilitator address.');
-        onReject(err);
+        return onReject(err);
       }
       this._stakeRawTx(
         amount,
@@ -182,16 +176,10 @@ class EIP20Gateway {
       )
         .then((tx) => {
           Utils.sendTransaction(tx, txOptions)
-            .then((result) => {
-              onResolve(result);
-            })
-            .catch((exception) => {
-              onReject(exception);
-            });
+            .then(onResolve)
+            .catch(onReject);
         })
-        .catch((exception) => {
-          onReject(exception);
-        });
+        .catch(onReject);
     });
   }
 
@@ -212,19 +200,19 @@ class EIP20Gateway {
     return new Promise((onResolve, onReject) => {
       if (new BN(amount).eqn(0)) {
         const err = new TypeError('Stake amount must not be zero.');
-        onReject(err);
+        return onReject(err);
       }
       if (!Web3.utils.isAddress(beneficiary)) {
         const err = new TypeError('Invalid beneficiary address.');
-        onReject(err);
+        return onReject(err);
       }
       if (gasPrice === undefined) {
         const err = new TypeError('Invalid gas price.');
-        onReject(err);
+        return onReject(err);
       }
       if (gasLimit === undefined) {
         const err = new TypeError('Invalid gas limit.');
-        onReject(err);
+        return onReject(err);
       }
       const tx = this.contract.methods.stake(
         amount,
@@ -251,21 +239,15 @@ class EIP20Gateway {
     return new Promise((onResolve, onReject) => {
       if (!txOptions) {
         const err = new TypeError('Invalid transaction options.');
-        onReject(err);
+        return onReject(err);
       }
       this._progressStakeRawTx(messageHash, unlockSecret)
         .then((tx) => {
           Utils.sendTransaction(tx, txOptions)
-            .then((result) => {
-              onResolve(result);
-            })
-            .catch((exception) => {
-              onReject(exception);
-            });
+            .then(onResolve)
+            .catch(onReject);
         })
-        .catch((exception) => {
-          onReject(exception);
-        });
+        .catch(onReject);
     });
   }
 
@@ -281,12 +263,12 @@ class EIP20Gateway {
     return new Promise((onResolve, onReject) => {
       if (typeof messageHash !== 'string') {
         const err = new TypeError('Invalid message hash.');
-        onReject(err);
+        return onReject(err);
       }
 
       if (typeof unlockSecret !== 'string') {
         const err = new TypeError('Invalid unlock secret.');
-        onReject(err);
+        return onReject(err);
       }
 
       const tx = this.contract.methods.progressStake(
@@ -440,7 +422,7 @@ class EIP20Gateway {
     return new Promise((onResolve, onReject) => {
       if (!Web3.utils.isAddress(stakerAddress)) {
         const err = new TypeError('Invalid staker address.');
-        onReject(err);
+        return onReject(err);
       }
       this.getEIP20ValueToken()
         .then((eip20ValueToken) => {
@@ -450,11 +432,11 @@ class EIP20Gateway {
               onResolve(result);
             })
             .catch((exception) => {
-              onReject(exception);
+              return onReject(exception);
             });
         })
         .catch((exception) => {
-          onReject(exception);
+          return onReject(exception);
         });
     });
   }
@@ -470,7 +452,7 @@ class EIP20Gateway {
     return new Promise((onResolve, onReject) => {
       if (!Web3.utils.isAddress(facilityAddress)) {
         const err = new TypeError('Invalid facility address.');
-        onReject(err);
+        return onReject(err);
       }
       this.getEIP20BaseToken()
         .then((eip20BaseToken) => {
@@ -478,20 +460,12 @@ class EIP20Gateway {
             .then((bounty) => {
               eip20BaseToken
                 .isAmountApproved(facilityAddress, this.gatewayAddress, bounty)
-                .then((result) => {
-                  onResolve(result);
-                })
-                .catch((exception) => {
-                  onReject(exception);
-                });
+                .then(onResolve)
+                .catch(onReject);
             })
-            .catch((exception) => {
-              onReject(exception);
-            });
+            .catch(onReject);
         })
-        .catch((exception) => {
-          onReject(exception);
-        });
+        .catch(onReject);
     });
   }
 
@@ -539,30 +513,24 @@ class EIP20Gateway {
     return new Promise((onResolve, onReject) => {
       if (!txOptions) {
         const err = new TypeError('Invalid transaction options.');
-        onReject(err);
+        return onReject(err);
       }
       if (!Web3.utils.isAddress(txOptions.from)) {
         const err = new TypeError('Invalid from address.');
-        onReject(err);
+        return onReject(err);
       }
       if (typeof amount !== 'string') {
         const err = new TypeError('Invalid stake amount.');
-        onReject(err);
+        return onReject(err);
       }
       this.getEIP20ValueToken()
         .then((eip20Token) => {
           eip20Token
             .approve(this.gatewayAddress, amount, txOptions)
-            .then((result) => {
-              onResolve(result);
-            })
-            .catch((exception) => {
-              onReject(exception);
-            });
+            .then(onResolve)
+            .catch(onReject);
         })
-        .catch((exception) => {
-          onReject(exception);
-        });
+        .catch(onReject);
     });
   }
 
@@ -578,11 +546,11 @@ class EIP20Gateway {
     return new Promise((onResolve, onReject) => {
       if (!txOptions) {
         const err = new TypeError('Invalid transaction options.');
-        onReject(err);
+        return onReject(err);
       }
       if (!Web3.utils.isAddress(txOptions.from)) {
         const err = new TypeError('Invalid from address.');
-        onReject(err);
+        return onReject(err);
       }
       this.getEIP20BaseToken()
         .then((eip20BaseToken) => {
@@ -590,20 +558,12 @@ class EIP20Gateway {
             .then((bounty) => {
               eip20BaseToken
                 .approve(this.gatewayAddress, bounty, txOptions)
-                .then((result) => {
-                  onResolve(result);
-                })
-                .catch((exception) => {
-                  onReject(exception);
-                });
+                .then(onResolve)
+                .catch(onReject);
             })
-            .catch((exception) => {
-              onReject(exception);
-            });
+            .catch(onReject);
         })
-        .catch((exception) => {
-          onReject(exception);
-        });
+        .catch(onReject);
     });
   }
 

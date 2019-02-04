@@ -95,21 +95,15 @@ class EIP20CoGateway {
     return new Promise((onResolve, onReject) => {
       if (!txOptions) {
         const err = new TypeError('Invalid transaction options.');
-        onReject(err);
+        return onReject(err);
       }
       this._proveGatewayRawTx(blockHeight, encodedAccount, accountProof)
         .then((tx) => {
           Utils.sendTransaction(tx, txOptions)
-            .then((result) => {
-              onResolve(result);
-            })
-            .catch((exception) => {
-              onReject(exception);
-            });
+            .then(onResolve)
+            .catch(onReject);
         })
-        .catch((exception) => {
-          onReject(exception);
-        });
+        .catch(onReject);
     });
   }
 
@@ -126,17 +120,17 @@ class EIP20CoGateway {
     return new Promise((onResolve, onReject) => {
       if (blockHeight === undefined) {
         const err = new TypeError('Invalid block height.');
-        onReject(err);
+        return onReject(err);
       }
 
       if (typeof encodedAccount !== 'string') {
         const err = new TypeError('Invalid account data.');
-        onReject(err);
+        return onReject(err);
       }
 
       if (typeof accountProof !== 'string') {
         const err = new TypeError('Invalid account proof.');
-        onReject(err);
+        return onReject(err);
       }
 
       const tx = this.contract.methods.proveGateway(
@@ -179,7 +173,7 @@ class EIP20CoGateway {
     return new Promise((onResolve, onReject) => {
       if (!txOptions) {
         const err = new TypeError('Invalid transaction options.');
-        onReject(err);
+        return onReject(err);
       }
       this._confirmStakeIntentRawTx(
         staker,
@@ -194,16 +188,10 @@ class EIP20CoGateway {
       )
         .then((tx) => {
           Utils.sendTransaction(tx, txOptions)
-            .then((result) => {
-              onResolve(result);
-            })
-            .catch((exception) => {
-              onReject(exception);
-            });
+            .then(onResolve)
+            .catch(onReject);
         })
-        .catch((exception) => {
-          onReject(exception);
-        });
+        .catch(onReject);
     });
   }
 
@@ -236,42 +224,42 @@ class EIP20CoGateway {
     return new Promise((onResolve, onReject) => {
       if (!Web3.utils.isAddress(staker)) {
         const err = new TypeError('Invalid staker address.');
-        onReject(err);
+        return onReject(err);
       }
 
       if (typeof nonce !== 'string') {
         const err = new TypeError('Invalid nonce.');
-        onReject(err);
+        return onReject(err);
       }
 
       if (!Web3.utils.isAddress(beneficiary)) {
         const err = new TypeError('Invalid beneficiary address.');
-        onReject(err);
+        return onReject(err);
       }
 
       if (typeof amount !== 'string') {
         const err = new TypeError('Invalid stake amount.');
-        onReject(err);
+        return onReject(err);
       }
 
       if (typeof gasPrice !== 'string') {
         const err = new TypeError('Invalid gas price.');
-        onReject(err);
+        return onReject(err);
       }
 
       if (typeof gasLimit !== 'string') {
         const err = new TypeError('Invalid gas limit.');
-        onReject(err);
+        return onReject(err);
       }
 
       if (typeof blockHeight !== 'string') {
         const err = new TypeError('Invalid block height.');
-        onReject(err);
+        return onReject(err);
       }
 
       if (typeof storageProof !== 'string') {
         const err = new TypeError('Invalid storage proof data.');
-        onReject(err);
+        return onReject(err);
       }
 
       const tx = this.contract.methods.confirmStakeIntent(
@@ -285,7 +273,7 @@ class EIP20CoGateway {
         blockHeight,
         storageProof,
       );
-      onResolve(tx);
+      return onResolve(tx);
     });
   }
 
@@ -302,21 +290,15 @@ class EIP20CoGateway {
     return new Promise((onResolve, onReject) => {
       if (!txOptions) {
         const err = new TypeError('Invalid transaction options.');
-        onReject(err);
+        return onReject(err);
       }
       this._progressMintRawTx(messageHash, unlockSecret)
         .then((tx) => {
           Utils.sendTransaction(tx, txOptions)
-            .then((result) => {
-              onResolve(result);
-            })
-            .catch((exception) => {
-              onReject(exception);
-            });
+            .then(onResolve)
+            .catch(onReject);
         })
-        .catch((exception) => {
-          onReject(exception);
-        });
+        .catch(onReject);
     });
   }
 
@@ -332,12 +314,12 @@ class EIP20CoGateway {
     return new Promise((onResolve, onReject) => {
       if (typeof messageHash !== 'string') {
         const err = new TypeError('Invalid message hash.');
-        onReject(err);
+        return onReject(err);
       }
 
       if (typeof unlockSecret !== 'string') {
         const err = new TypeError('Invalid unlock secret.');
-        onReject(err);
+        return onReject(err);
       }
 
       const tx = this.contract.methods.progressMint(messageHash, unlockSecret);

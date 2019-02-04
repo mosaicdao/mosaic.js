@@ -58,12 +58,8 @@ class ProofUtils {
         keys,
         blockNumber,
       )
-        .then((proof) => {
-          onResolve(proof);
-        })
-        .catch((exception) => {
-          onReject(exception);
-        });
+        .then(onResolve)
+        .catch(onReject);
     });
   }
 
@@ -86,12 +82,8 @@ class ProofUtils {
         keys,
         blockNumber,
       )
-        .then((proof) => {
-          onResolve(proof);
-        })
-        .catch((exception) => {
-          onReject(exception);
-        });
+        .then(onResolve)
+        .catch(onReject);
     });
   }
 
@@ -120,9 +112,7 @@ class ProofUtils {
           proofData.block_number = blockNumber;
           onResolve(proofData);
         })
-        .catch((exception) => {
-          onReject(exception);
-        });
+        .catch(onReject);
     });
   }
 
