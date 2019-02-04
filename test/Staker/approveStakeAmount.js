@@ -26,10 +26,10 @@ const assert = chai.assert;
 const Staker = require('../../src/Staker/Staker');
 const EIP20Token = require('../../src/ContractInteract/EIP20Token');
 const SpyAssert = require('../../test_utils/SpyAssert');
+const TestMosaic = require('../../test_utils/GetTestMosaic');
 
 describe('Staker.approveStakeAmount()', () => {
-  let web3;
-  let gatewayAddress;
+  let mosaic;
   let staker;
   let stakeAmount;
   let txOptions;
@@ -49,7 +49,10 @@ describe('Staker.approveStakeAmount()', () => {
     );
 
     mockEIP20Token = sinon.mock(
-      new EIP20Token(web3, '0x0000000000000000000000000000000000000004'),
+      new EIP20Token(
+        mosaic.origin.web3,
+        '0x0000000000000000000000000000000000000004',
+      ),
     );
     const eip20TokenContract = mockEIP20Token.object;
 
@@ -74,13 +77,12 @@ describe('Staker.approveStakeAmount()', () => {
   };
 
   beforeEach(() => {
-    web3 = new Web3();
-    gatewayAddress = '0x0000000000000000000000000000000000000002';
-    staker = new Staker(web3, gatewayAddress);
+    mosaic = TestMosaic.mosaic();
+    staker = new Staker(mosaic);
     stakeAmount = '10000';
     txOptions = {
       from: '0x0000000000000000000000000000000000000004',
-      to: gatewayAddress,
+      to: mosaic.origin.contractAddresses.EIP20Gateway,
       gasLimit: 0,
       gasPrice: 0,
       value: 0,
@@ -115,7 +117,7 @@ describe('Staker.approveStakeAmount()', () => {
     SpyAssert.assert(spyGetValueToken, 1, [[]]);
     SpyAssert.assert(spyToken, 1, [[mockedValueTokenAdress]]);
     SpyAssert.assert(spyApprove, 1, [
-      [gatewayAddress, stakeAmount, txOptions],
+      [mosaic.origin.contractAddresses.EIP20Gateway, stakeAmount, txOptions],
     ]);
     SpyAssert.assert(spyCall, 1, [[stakeAmount, txOptions]]);
 

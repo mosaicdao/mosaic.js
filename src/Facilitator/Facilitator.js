@@ -26,6 +26,7 @@ const Utils = require('../utils/Utils');
 const ProofUtils = require('../utils/ProofUtils');
 const Message = require('../utils/Message');
 const Logger = require('../../logger/Logger');
+const Mosaic = require('../Mosaic');
 
 const logger = new Logger('facilitator');
 const MessageStatus = Message.messageStatus();
@@ -37,33 +38,41 @@ class Facilitator {
   /**
    * Constructor for facilitator.
    *
-   * @param {Object} originWeb3 Origin chain web3 object.
-   * @param {Object} auxiliaryWeb3 Auxiliary chain web3 object.
-   * @param {string} Gateway contract address.
-   * @param {string} CoGateway contract address.
+   * @param {Object} mosaic Mosaic object.
    */
-  constructor(originWeb3, auxiliaryWeb3, gatewayAddress, coGatewayAddress) {
-    if (!(originWeb3 instanceof Web3)) {
+  constructor(mosaic) {
+    if (!(mosaic instanceof Mosaic)) {
+      const err = new TypeError('Invalid mosaic object.');
+      throw err;
+    }
+    if (!(mosaic.origin.web3 instanceof Web3)) {
       const err = new TypeError('Invalid origin web3 object.');
       throw err;
     }
-    if (!(auxiliaryWeb3 instanceof Web3)) {
+    if (!(mosaic.auxiliary.web3 instanceof Web3)) {
       const err = new TypeError('Invalid auxiliary web3 object.');
       throw err;
     }
-    if (!Web3.utils.isAddress(gatewayAddress)) {
+    if (!Web3.utils.isAddress(mosaic.origin.contractAddresses.EIP20Gateway)) {
       const err = new TypeError('Invalid Gateway address.');
       throw err;
     }
-    if (!Web3.utils.isAddress(coGatewayAddress)) {
+    if (
+      !Web3.utils.isAddress(mosaic.auxiliary.contractAddresses.EIP20CoGateway)
+    ) {
       const err = new TypeError('Invalid CoGateway address.');
       throw err;
     }
 
-    this.originWeb3 = originWeb3;
-    this.auxiliaryWeb3 = auxiliaryWeb3;
-    this.gateway = new EIP20Gateway(originWeb3, gatewayAddress);
-    this.coGateway = new EIP20CoGateway(auxiliaryWeb3, coGatewayAddress);
+    this.mosaic = mosaic;
+    this.gateway = new EIP20Gateway(
+      mosaic.origin.web3,
+      mosaic.origin.contractAddresses.EIP20Gateway,
+    );
+    this.coGateway = new EIP20CoGateway(
+      mosaic.auxiliary.web3,
+      mosaic.auxiliary.contractAddresses.EIP20CoGateway,
+    );
 
     this.stake = this.stake.bind(this);
     this.progressStake = this.progressStake.bind(this);
@@ -677,7 +686,11 @@ class Facilitator {
       `  - Last committed state root is ${latestAnchorInfo.stateRoot}`,
     );
 
-    const proofUtils = new ProofUtils(this.originWeb3, this.auxiliaryWeb3);
+    const proofUtils = new ProofUtils(
+      this.mosaic.origin.web3,
+      this.mosaic.auxiliary.web3,
+    );
+
     const blockHeight = `0x${new BN(latestAnchorInfo.blockHeight).toString(
       16,
     )}`;

@@ -20,29 +20,20 @@
 
 const chai = require('chai');
 const sinon = require('sinon');
-const Web3 = require('web3');
 const StakeHelper = require('../../src/helpers/StakeHelper');
 const SpyAssert = require('../../test_utils/SpyAssert');
+const TestMosaic = require('../../test_utils/GetTestMosaic');
 
 const assert = chai.assert;
 
 describe('StakeHelper.getNonce()', () => {
   let stakeHelper;
-  let web3;
-  let gatewayAddress;
-  let coGatewayAddress;
+  let mosaic;
 
   beforeEach(() => {
     // runs before each test in this block
-    web3 = new Web3();
-    gatewayAddress = '0x0000000000000000000000000000000000000001';
-    coGatewayAddress = '0x0000000000000000000000000000000000000002';
-    stakeHelper = new StakeHelper(
-      web3,
-      web3,
-      gatewayAddress,
-      coGatewayAddress,
-    );
+    mosaic = TestMosaic.mosaic();
+    stakeHelper = new StakeHelper(mosaic);
   });
 
   it('should throw error when account address is not string', async function() {
@@ -87,7 +78,13 @@ describe('StakeHelper.getNonce()', () => {
     // Assert the returned value.
     assert.strictEqual(nonce, 1, 'Nonce must be equal.');
 
-    SpyAssert.assert(spyNonce, 1, [[accountAddress, web3, gatewayAddress]]);
+    SpyAssert.assert(spyNonce, 1, [
+      [
+        accountAddress,
+        mosaic.origin.web3,
+        mosaic.origin.contractAddresses.EIP20Gateway,
+      ],
+    ]);
     SpyAssert.assert(spy, 1, [[accountAddress]]);
 
     // Restore all mocked and spy objects.

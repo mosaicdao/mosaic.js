@@ -21,6 +21,7 @@
 const Web3 = require('web3');
 const Contracts = require('../Contracts');
 const Utils = require('../utils/Utils.js');
+const Mosaic = require('../Mosaic');
 
 /**
  * Class for stake helper methods
@@ -29,32 +30,25 @@ class StakeHelper {
   /**
    * Constructor for stake helper.
    *
-   * @param {Object} originWeb3 Origin chain web3 object.
-   * @param {Object} auxiliaryWeb3 Auxiliary chain web3 object.
-   * @param {string} Gateway contract address.
-   * @param {string} CoGateway contract address.
+   * @param {Object} mosaic Mosaic object.
    */
-  constructor(originWeb3, auxiliaryWeb3, gatewayAddress, coGatewayAddress) {
-    if (originWeb3 === undefined) {
-      throw new TypeError('Invalid origin web3 object.');
+  constructor(mosaic) {
+    if (!(mosaic instanceof Mosaic)) {
+      const err = new TypeError('Invalid mosaic object.');
+      throw err;
+    }
+    if (!(mosaic.origin.web3 instanceof Web3)) {
+      const err = new TypeError('Invalid origin web3 object.');
+      throw err;
+    }
+    if (!Web3.utils.isAddress(mosaic.origin.contractAddresses.EIP20Gateway)) {
+      const err = new TypeError('Invalid Gateway address.');
+      throw err;
     }
 
-    if (auxiliaryWeb3 === undefined) {
-      throw new TypeError('Invalid auxiliary web3 object.');
-    }
-
-    if (!Web3.utils.isAddress(gatewayAddress)) {
-      throw new TypeError('Invalid Gateway address.');
-    }
-
-    if (!Web3.utils.isAddress(coGatewayAddress)) {
-      throw new TypeError('Invalid Cogateway address.');
-    }
-
-    this.originWeb3 = originWeb3;
-    this.auxiliaryWeb3 = auxiliaryWeb3;
-    this.gatewayAddress = gatewayAddress;
-    this.coGatewayAddress = coGatewayAddress;
+    this.mosaic = mosaic;
+    this.originWeb3 = mosaic.origin.web3;
+    this.gatewayAddress = mosaic.origin.contractAddresses.EIP20Gateway;
 
     this.getBounty = this.getBounty.bind(this);
     this.getNonce = this.getNonce.bind(this);

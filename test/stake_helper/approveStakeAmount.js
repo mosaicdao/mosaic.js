@@ -20,19 +20,17 @@
 
 const chai = require('chai');
 const sinon = require('sinon');
-const Web3 = require('web3');
 const StakeHelper = require('../../src/helpers/StakeHelper');
 const Contracts = require('../../src/Contracts');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const Utils = require('../../src/utils/Utils');
+const TestMosaic = require('../../test_utils/GetTestMosaic');
 
 const assert = chai.assert;
 
 describe('StakeHelper.approveStakeAmount()', () => {
+  let mosaic;
   let stakeHelper;
-  let web3;
-  let gatewayAddress;
-  let coGatewayAddress;
   let valueTokenAddress;
   let stakerAddress;
   let stakeAmount;
@@ -57,7 +55,7 @@ describe('StakeHelper.approveStakeAmount()', () => {
 
     // Mock an instance of ValueToken contract.
     mockValueTokenContract = sinon.mock(
-      Contracts.getEIP20Token(web3, valueTokenAddress),
+      Contracts.getEIP20Token(mosaic.origin.web3, valueTokenAddress),
     );
     const valueTokenContract = mockValueTokenContract.object;
 
@@ -69,7 +67,10 @@ describe('StakeHelper.approveStakeAmount()', () => {
 
     // Mock approve transaction object.
     mockTx = sinon.mock(
-      valueTokenContract.methods.approve(gatewayAddress, stakeAmount),
+      valueTokenContract.methods.approve(
+        mosaic.origin.contractAddresses.EIP20Gateway,
+        stakeAmount,
+      ),
     );
 
     // Fake the approve call.
@@ -99,15 +100,8 @@ describe('StakeHelper.approveStakeAmount()', () => {
 
   beforeEach(() => {
     // runs before each test in this block
-    web3 = new Web3();
-    gatewayAddress = '0x0000000000000000000000000000000000000001';
-    coGatewayAddress = '0x0000000000000000000000000000000000000002';
-    stakeHelper = new StakeHelper(
-      web3,
-      web3,
-      gatewayAddress,
-      coGatewayAddress,
-    );
+    mosaic = TestMosaic.mosaic();
+    stakeHelper = new StakeHelper(mosaic);
 
     valueTokenAddress = '0x0000000000000000000000000000000000000003';
     stakerAddress = '0x0000000000000000000000000000000000000004';
@@ -161,9 +155,13 @@ describe('StakeHelper.approveStakeAmount()', () => {
 
     SpyAssert.assert(spyApproveStakeAmount, 1, [[stakeAmount, txOption]]);
     SpyAssert.assert(spyGetValueToken, 1, [[]]);
-    SpyAssert.assert(spyContract, 1, [[web3, valueTokenAddress]]);
+    SpyAssert.assert(spyContract, 1, [
+      [mosaic.origin.web3, valueTokenAddress],
+    ]);
     SpyAssert.assert(spySendTransaction, 1, [[mockTx.object, txOption]]);
-    SpyAssert.assert(spyValueTokenApprove, 1, [[gatewayAddress, stakeAmount]]);
+    SpyAssert.assert(spyValueTokenApprove, 1, [
+      [mosaic.origin.contractAddresses.EIP20Gateway, stakeAmount],
+    ]);
 
     tearDown();
   });

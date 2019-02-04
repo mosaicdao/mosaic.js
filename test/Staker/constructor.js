@@ -19,38 +19,30 @@
 // ----------------------------------------------------------------------------
 
 const chai = require('chai');
-const Web3 = require('web3');
 
 const assert = chai.assert;
 const Staker = require('../../src/Staker/Staker');
+const TestMosaic = require('../../test_utils/GetTestMosaic');
 
 describe('Staker.constructor()', () => {
-  let web3;
-  let gatewayAddress;
+  let mosaic;
 
   beforeEach(() => {
-    web3 = new Web3();
-    gatewayAddress = '0x0000000000000000000000000000000000000002';
+    mosaic = TestMosaic.mosaic();
   });
 
-  it('should throw an error when web3 object is undefined', async () => {
+  it('should throw an error when mosaic object is undefined', async () => {
     assert.throws(() => {
-      new Staker(undefined, gatewayAddress);
-    }, /web3 must be an instance of Web3./);
-  });
-
-  it('should throw an error when gateway contract address is undefined', async () => {
-    assert.throws(() => {
-      new Staker(web3, undefined);
-    }, /Invalid Gateway address./);
+      new Staker();
+    }, /Invalid mosaic object./);
   });
 
   it('should pass when called with correct arguments', async () => {
-    const staker = new Staker(web3, gatewayAddress);
-    assert.strictEqual(staker.web3, web3, 'Web3 object is not set.');
+    const staker = new Staker(mosaic);
+    assert.strictEqual(staker.mosaic, mosaic, 'Mosaic object is not set.');
     assert.strictEqual(
       staker.gatewayAddress,
-      gatewayAddress,
+      mosaic.origin.contractAddresses.EIP20Gateway,
       'Gateway address is not set',
     );
   });

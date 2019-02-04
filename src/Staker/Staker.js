@@ -21,6 +21,8 @@
 const Web3 = require('web3');
 const EIP20Gateway = require('../../src/ContractInteract/EIP20Gateway');
 const EIP20Token = require('../../src/ContractInteract/EIP20Token');
+const Mosaic = require('../Mosaic');
+
 /**
  * Staker class
  */
@@ -31,20 +33,27 @@ class Staker {
    * @param {Object} originWeb3 Origin chain web3 object.
    * @param {string} Gateway contract address.
    */
-  constructor(web3, gatewayAddress) {
-    if (!(web3 instanceof Web3)) {
-      throw new TypeError('web3 must be an instance of Web3.');
+  constructor(mosaic) {
+    if (!(mosaic instanceof Mosaic)) {
+      const err = new TypeError('Invalid mosaic object.');
+      throw err;
+    }
+    if (!(mosaic.origin.web3 instanceof Web3)) {
+      const err = new TypeError('Invalid origin web3 object.');
+      throw err;
+    }
+    if (!Web3.utils.isAddress(mosaic.origin.contractAddresses.EIP20Gateway)) {
+      const err = new TypeError('Invalid Gateway address.');
+      throw err;
     }
 
-    if (!Web3.utils.isAddress(gatewayAddress)) {
-      throw new TypeError('Invalid Gateway address.');
-    }
-
-    this.web3 = web3;
-    this.gatewayAddress = gatewayAddress;
-    this.gatewayContract = new EIP20Gateway(web3, gatewayAddress);
+    this.mosaic = mosaic;
+    this.web3 = mosaic.origin.web3;
+    this.gatewayAddress = mosaic.origin.contractAddresses.EIP20Gateway;
+    this.gatewayContract = new EIP20Gateway(this.web3, this.gatewayAddress);
 
     this.approveStakeAmount = this.approveStakeAmount.bind(this);
+    this.getValueToken = this.getValueToken.bind(this);
   }
 
   /**
