@@ -47,7 +47,6 @@ class Staker {
       throw err;
     }
 
-    this.mosaic = mosaic;
     this.web3 = mosaic.origin.web3;
     this.gatewayAddress = mosaic.origin.contractAddresses.EIP20Gateway;
     this.gatewayContract = new EIP20Gateway(this.web3, this.gatewayAddress);

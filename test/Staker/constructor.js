@@ -39,7 +39,11 @@ describe('Staker.constructor()', () => {
 
   it('should pass when called with correct arguments', async () => {
     const staker = new Staker(mosaic);
-    assert.strictEqual(staker.mosaic, mosaic, 'Mosaic object is not set.');
+    assert.strictEqual(
+      staker.web3,
+      mosaic.origin.web3,
+      'Web3 object is not set.',
+    );
     assert.strictEqual(
       staker.gatewayAddress,
       mosaic.origin.contractAddresses.EIP20Gateway,
