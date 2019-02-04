@@ -428,7 +428,7 @@ class Facilitator {
       );
 
       if (stakeMessageStatus === MessageStatus.UNDECLARED) {
-        const err = new Error('Stake message hash must be declared.');
+        const err = new TypeError('Stake message hash must be declared.');
         onReject(err);
       }
 
@@ -638,7 +638,7 @@ class Facilitator {
         mintMessageStatus === MessageStatus.REVOCATION_DECLARED
       ) {
         console.log('  - Cannot perform progress mint.');
-        const err = new Error('Message cannot be progressed.');
+        const err = new TypeError('Message cannot be progressed.');
         onResolve(err);
       } else if (mintMessageStatus === MessageStatus.PROGRESSED) {
         console.log('  - Progress mint is already done.');

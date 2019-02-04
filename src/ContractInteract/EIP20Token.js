@@ -114,11 +114,11 @@ class EIP20Token {
   _approveRawTx(spenderAddress, amount) {
     return new Promise((onResolve, onReject) => {
       if (!Web3.utils.isAddress(spenderAddress)) {
-        const err = new Error('Invalid spender address.');
+        const err = new TypeError('Invalid spender address.');
         onReject(err);
       }
       if (typeof amount !== 'string') {
-        const err = new Error('Invalid approval amount.');
+        const err = new TypeError('Invalid approval amount.');
         onReject(err);
       }
       const tx = this.contract.methods.approve(spenderAddress, amount);
@@ -136,11 +136,11 @@ class EIP20Token {
    */
   allowance(ownerAddress, spenderAddress) {
     if (!Web3.utils.isAddress(ownerAddress)) {
-      const err = new Error('Owner address is invalid or missing');
+      const err = new TypeError('Owner address is invalid or missing');
       throw err;
     }
     if (!Web3.utils.isAddress(spenderAddress)) {
-      const err = new Error('Spender address is invalid or missing');
+      const err = new TypeError('Spender address is invalid or missing');
       throw err;
     }
     return this.contract.methods
@@ -162,10 +162,10 @@ class EIP20Token {
    */
   async isAmountApproved(ownerAddress, spenderAddress, amount) {
     if (!Web3.utils.isAddress(ownerAddress)) {
-      throw new Error('Invalid owner address.');
+      throw new TypeError('Invalid owner address.');
     }
     if (!Web3.utils.isAddress(spenderAddress)) {
-      throw new Error('Invalid spender address.');
+      throw new TypeError('Invalid spender address.');
     }
 
     return this.allowance(ownerAddress, spenderAddress).then(

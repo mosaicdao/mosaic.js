@@ -36,19 +36,19 @@ class StakeHelper {
    */
   constructor(originWeb3, auxiliaryWeb3, gatewayAddress, coGatewayAddress) {
     if (originWeb3 === undefined) {
-      throw new Error('Invalid origin web3 object.');
+      throw new TypeError('Invalid origin web3 object.');
     }
 
     if (auxiliaryWeb3 === undefined) {
-      throw new Error('Invalid auxiliary web3 object.');
+      throw new TypeError('Invalid auxiliary web3 object.');
     }
 
     if (!Web3.utils.isAddress(gatewayAddress)) {
-      throw new Error('Invalid Gateway address.');
+      throw new TypeError('Invalid Gateway address.');
     }
 
     if (!Web3.utils.isAddress(coGatewayAddress)) {
-      throw new Error('Invalid Cogateway address.');
+      throw new TypeError('Invalid Cogateway address.');
     }
 
     this.originWeb3 = originWeb3;
@@ -121,7 +121,7 @@ class StakeHelper {
    */
   async getNonce(staker) {
     if (!Web3.utils.isAddress(staker)) {
-      throw new Error('Invalid account address.');
+      throw new TypeError('Invalid account address.');
     }
     return this._getNonce(staker, this.originWeb3, this.gatewayAddress);
   }

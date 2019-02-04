@@ -94,7 +94,7 @@ class EIP20CoGateway {
   proveGateway(blockHeight, encodedAccount, accountProof, txOptions) {
     return new Promise((onResolve, onReject) => {
       if (!txOptions) {
-        const err = new Error('Invalid transaction options.');
+        const err = new TypeError('Invalid transaction options.');
         onReject(err);
       }
       this._proveGatewayRawTx(blockHeight, encodedAccount, accountProof)
@@ -125,17 +125,17 @@ class EIP20CoGateway {
   _proveGatewayRawTx(blockHeight, encodedAccount, accountProof) {
     return new Promise((onResolve, onReject) => {
       if (blockHeight === undefined) {
-        const err = new Error('Invalid block height.');
+        const err = new TypeError('Invalid block height.');
         onReject(err);
       }
 
       if (typeof encodedAccount !== 'string') {
-        const err = new Error('Invalid account data.');
+        const err = new TypeError('Invalid account data.');
         onReject(err);
       }
 
       if (typeof accountProof !== 'string') {
-        const err = new Error('Invalid account proof.');
+        const err = new TypeError('Invalid account proof.');
         onReject(err);
       }
 
@@ -235,42 +235,42 @@ class EIP20CoGateway {
   ) {
     return new Promise((onResolve, onReject) => {
       if (!Web3.utils.isAddress(staker)) {
-        const err = new Error('Invalid staker address.');
+        const err = new TypeError('Invalid staker address.');
         onReject(err);
       }
 
       if (typeof nonce !== 'string') {
-        const err = new Error('Invalid nonce.');
+        const err = new TypeError('Invalid nonce.');
         onReject(err);
       }
 
       if (!Web3.utils.isAddress(beneficiary)) {
-        const err = new Error('Invalid beneficiary address.');
+        const err = new TypeError('Invalid beneficiary address.');
         onReject(err);
       }
 
       if (typeof amount !== 'string') {
-        const err = new Error('Invalid stake amount.');
+        const err = new TypeError('Invalid stake amount.');
         onReject(err);
       }
 
       if (typeof gasPrice !== 'string') {
-        const err = new Error('Invalid gas price.');
+        const err = new TypeError('Invalid gas price.');
         onReject(err);
       }
 
       if (typeof gasLimit !== 'string') {
-        const err = new Error('Invalid gas limit.');
+        const err = new TypeError('Invalid gas limit.');
         onReject(err);
       }
 
       if (typeof blockHeight !== 'string') {
-        const err = new Error('Invalid block height.');
+        const err = new TypeError('Invalid block height.');
         onReject(err);
       }
 
       if (typeof storageProof !== 'string') {
-        const err = new Error('Invalid storage proof data.');
+        const err = new TypeError('Invalid storage proof data.');
         onReject(err);
       }
 
@@ -331,12 +331,12 @@ class EIP20CoGateway {
   _progressMintRawTx(messageHash, unlockSecret) {
     return new Promise((onResolve, onReject) => {
       if (typeof messageHash !== 'string') {
-        const err = new Error('Invalid message hash.');
+        const err = new TypeError('Invalid message hash.');
         onReject(err);
       }
 
       if (typeof unlockSecret !== 'string') {
-        const err = new Error('Invalid unlock secret.');
+        const err = new TypeError('Invalid unlock secret.');
         onReject(err);
       }
 
@@ -372,7 +372,7 @@ class EIP20CoGateway {
    */
   getNonce(accountAddress) {
     if (!Web3.utils.isAddress(accountAddress)) {
-      throw new Error('Invalid account address.');
+      throw new TypeError('Invalid account address.');
     }
     return this.contract.methods
       .getNonce(accountAddress)
@@ -409,7 +409,7 @@ class EIP20CoGateway {
    */
   getInboxMessageStatus(messageHash) {
     if (typeof messageHash !== 'string') {
-      const err = new Error('Invalid message hash.');
+      const err = new TypeError('Invalid message hash.');
       throw err;
     }
     return this.contract.methods
@@ -429,7 +429,7 @@ class EIP20CoGateway {
    */
   getOutboxMessageStatus(messageHash) {
     if (typeof messageHash !== 'string') {
-      const err = new Error('Invalid message hash.');
+      const err = new TypeError('Invalid message hash.');
       throw err;
     }
     return this.contract.methods
