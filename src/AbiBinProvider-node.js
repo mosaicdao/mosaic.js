@@ -22,8 +22,15 @@
 
 const fs = require('fs');
 const path = require('path');
+const Logger = require('../logger/Logger');
+
+const logger = new Logger('AbiBinProvider');
 
 const loadContracts = (provider, abiFolderPath, binFolderPath) => {
+  logger.warn(
+    'Providing the `abiFolderPath` and `binFolderPath` parameter to the AbiBinProvider is deperecated and support for it will be removed in the future. See https://github.com/OpenSTFoundation/mosaic.js/issues/50 for migration recommendations.',
+  );
+
   if (!path.isAbsolute(abiFolderPath)) {
     const err = new Error(
       '"abiFolderPath" is not Absolute. Please provide absolute path.',
@@ -48,7 +55,7 @@ const loadContracts = (provider, abiFolderPath, binFolderPath) => {
   fs.readdirSync(binFolderPath).forEach((binFile) => {
     const contractName = path.basename(binFile, path.extname(binFile));
     const contractBin = fs.readFileSync(binFile, 'utf8');
-    provider.addABI(contractName, contractBin);
+    provider.addBIN(contractName, contractBin);
   });
 };
 
