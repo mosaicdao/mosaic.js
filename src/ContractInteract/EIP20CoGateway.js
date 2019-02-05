@@ -313,6 +313,48 @@ class EIP20CoGateway {
   }
 
   /**
+   * Performs progress redeem.
+   *
+   * @param {string} messageHash Message hash.
+   * @param {string} unlockSecret Unlock secret.
+   * @param {Object} txOptions Transaction options.
+   *
+   * @returns {Promise} promise object.
+   */
+  progressRedeem(messageHash, unlockSecret, txOptions) {
+    if (!txOptions) {
+      const err = new TypeError('Invalid transaction options.');
+      return Promise.reject(err);
+    }
+    return this._progressRedeemRawTx(messageHash, unlockSecret).then((tx) =>
+      Utils.sendTransaction(tx, txOptions),
+    );
+  }
+
+  /**
+   * Get the raw transaction for progress redeem.
+   *
+   * @param {string} messageHash Message hash.
+   * @param {string} unlockSecret Unlock secret.
+   *
+   * @returns {Promise} promise object.
+   */
+  _progressRedeemRawTx(messageHash, unlockSecret) {
+    if (typeof messageHash !== 'string') {
+      const err = new TypeError('Invalid message hash.');
+      return Promise.reject(err);
+    }
+
+    if (typeof unlockSecret !== 'string') {
+      const err = new TypeError('Invalid unlock secret.');
+      return Promise.reject(err);
+    }
+
+    const tx = this.contract.methods.progressRedeem(messageHash, unlockSecret);
+    return Promise.resolve(tx);
+  }
+
+  /**
    * Returns the bounty amount.
    *
    * @returns {Promise} Promise object.

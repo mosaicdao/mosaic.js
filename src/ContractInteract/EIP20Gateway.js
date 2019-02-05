@@ -261,6 +261,176 @@ class EIP20Gateway {
   }
 
   /**
+   * Confirm redeem intent
+   *
+   * @param {string} redeemer Redeemer address.
+   * @param {string} nonce Redeemer nonce.
+   * @param {string} beneficiary Beneficiary address.
+   * @param {string} amount Redeem amount.
+   * @param {string} gasPrice Gas price that staker is willing to pay for the reward.
+   * @param {string} gasLimit Maximum gas limit for reward calculation.
+   * @param {string} blockNumber Block number.
+   * @param {string} storageProof Storage proof.
+   * @param {string} hashLock Hash lock.
+   * @param {Object} txOptions Transaction option.
+   *
+   * @returns {Promise} Promise object.
+   */
+  confirmRedeemIntent(
+    redeemer,
+    nonce,
+    beneficiary,
+    amount,
+    gasPrice,
+    gasLimit,
+    blockNumber,
+    hashLock,
+    storageProof,
+    txOptions,
+  ) {
+    if (!txOptions) {
+      const err = new TypeError('Invalid transaction options.');
+      return Promise.reject(err);
+    }
+    return this._confirmRedeemIntentRawTx(
+      redeemer,
+      nonce,
+      beneficiary,
+      amount,
+      gasPrice,
+      gasLimit,
+      blockNumber,
+      hashLock,
+      storageProof,
+    ).then((tx) => Utils.sendTransaction(tx, txOptions));
+  }
+
+  /**
+   * Get confirm redeem intent raw transaction object
+   *
+   * @param {string} redeemer Redeemer address.
+   * @param {string} nonce Redeemer nonce.
+   * @param {string} beneficiary Beneficiary address.
+   * @param {string} amount Redeem amount.
+   * @param {string} gasPrice Gas price that staker is willing to pay for the reward.
+   * @param {string} gasLimit Maximum gas limit for reward calculation.
+   * @param {string} blockHeight Block height.
+   * @param {string} storageProof Storage proof.
+   * @param {string} hashLock Hash lock.
+   *
+   * @returns {Promise} Promise object.
+   */
+  _confirmRedeemIntentRawTx(
+    redeemer,
+    nonce,
+    beneficiary,
+    amount,
+    gasPrice,
+    gasLimit,
+    blockHeight,
+    hashLock,
+    storageProof,
+  ) {
+    if (!Web3.utils.isAddress(redeemer)) {
+      const err = new TypeError('Invalid redeemer address.');
+      return Promise.reject(err);
+    }
+
+    if (typeof nonce !== 'string') {
+      const err = new TypeError('Invalid nonce.');
+      return Promise.reject(err);
+    }
+
+    if (!Web3.utils.isAddress(beneficiary)) {
+      const err = new TypeError('Invalid beneficiary address.');
+      return Promise.reject(err);
+    }
+
+    if (typeof amount !== 'string') {
+      const err = new TypeError('Invalid redeem amount.');
+      return Promise.reject(err);
+    }
+
+    if (typeof gasPrice !== 'string') {
+      const err = new TypeError('Invalid gas price.');
+      return Promise.reject(err);
+    }
+
+    if (typeof gasLimit !== 'string') {
+      const err = new TypeError('Invalid gas limit.');
+      return Promise.reject(err);
+    }
+
+    if (typeof blockHeight !== 'string') {
+      const err = new TypeError('Invalid block height.');
+      return Promise.reject(err);
+    }
+
+    if (typeof storageProof !== 'string') {
+      const err = new TypeError('Invalid storage proof data.');
+      return Promise.reject(err);
+    }
+
+    const tx = this.contract.methods.confirmRedeemIntent(
+      redeemer,
+      nonce,
+      beneficiary,
+      amount,
+      gasPrice,
+      gasLimit,
+      blockHeight,
+      hashLock,
+      storageProof,
+    );
+    return Promise.resolve(tx);
+  }
+
+  /**
+   * Performs progress unstake.
+   *
+   * @param {string} messageHash Message hash.
+   * @param {string} unlockSecret Unlock secret.
+   * @param {Object} txOptions Transaction options.
+   *
+   * @returns {Promise} promise object.
+   */
+  progressUnstake(messageHash, unlockSecret, txOptions) {
+    if (!txOptions) {
+      const err = new TypeError('Invalid transaction options.');
+      return Promise.reject(err);
+    }
+    return this._progressUnstakeRawTx(messageHash, unlockSecret).then((tx) =>
+      Utils.sendTransaction(tx, txOptions),
+    );
+  }
+
+  /**
+   * Get the raw transaction for progress unstake.
+   *
+   * @param {string} messageHash Message hash.
+   * @param {string} unlockSecret Unlock secret.
+   *
+   * @returns {Promise} promise object.
+   */
+  _progressUnstakeRawTx(messageHash, unlockSecret) {
+    if (typeof messageHash !== 'string') {
+      const err = new TypeError('Invalid message hash.');
+      return Promise.reject(err);
+    }
+
+    if (typeof unlockSecret !== 'string') {
+      const err = new TypeError('Invalid unlock secret.');
+      return Promise.reject(err);
+    }
+
+    const tx = this.contract.methods.progressUnstake(
+      messageHash,
+      unlockSecret,
+    );
+    return Promise.resolve(tx);
+  }
+
+  /**
    * Returns the bounty amount.
    *
    * @returns {Promise} Promise object.
