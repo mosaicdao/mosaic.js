@@ -187,7 +187,6 @@ class EIP20Gateway {
    * @param {string} gasLimit Maximum gas limit for reward calculation.
    * @param {string} nonce Staker nonce.
    * @param {string} hashLock Hash lock.
-   * @param {Object} txOptions Transaction options.
    *
    * @returns {Object} Raw transaction object.
    */

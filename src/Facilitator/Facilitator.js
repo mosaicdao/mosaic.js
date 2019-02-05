@@ -663,6 +663,136 @@ class Facilitator {
   }
 
   /**
+   * Perform redeem.
+   *
+   * @param {string} amount Redeem amount
+   * @param {string} beneficiary Beneficiary address.
+   * @param {string} gasPrice Gas price.
+   * @param {string} gasLimit Gas limit.
+   * @param {string} nonce Redeemer's nonce.
+   * @param {string} hashLock Hash lock;
+   * @param {Object} txOptions Transaction options.
+   * @return {Promise} Promise object
+   */
+  async redeem(amount, beneficiary, gasPrice, gasLimit, hashLock, txOptions) {
+    logger.info('Redeem');
+    logger.info('-----------------------');
+    if (new BN(amount).eqn(0)) {
+      const err = new TypeError('Redeem amount must not be zero.');
+      return Promise.reject(err);
+    }
+
+    if (!Web3.utils.isAddress(beneficiary)) {
+      const err = new TypeError('Invalid beneficiary address.');
+      return Promise.reject(err);
+    }
+
+    if (typeof gasPrice !== 'string') {
+      const err = new TypeError('Invalid gas price.');
+      return Promise.reject(err);
+    }
+
+    if (typeof gasLimit !== 'string') {
+      const err = new TypeError('Invalid gas limit.');
+      return Promise.reject(err);
+    }
+
+    if (typeof hashLock !== 'string') {
+      const err = new TypeError('Invalid hash lock.');
+      return Promise.reject(err);
+    }
+
+    if (!txOptions) {
+      const err = new TypeError('Invalid transaction options.');
+      return Promise.reject(err);
+    }
+
+    if (!Web3.utils.isAddress(txOptions.from)) {
+      const err = new TypeError('Invalid redeemer address.');
+      return Promise.reject(err);
+    }
+
+    const redeemer = txOptions.from;
+
+    logger.info('* Getting bounty amount *');
+    const bounty = await this.coGateway.getBounty().catch((exception) => {
+      logger.info('  - Exception while getting bounty amount');
+      return Promise.reject(exception);
+    });
+
+    if (!new BN(txOptions.value).eq(new BN(bounty))) {
+      logger.info(
+        '  - Value in transaction option is not equal to the bounty amount',
+      );
+      return Promise.reject(false);
+    }
+
+    logger.info(
+      '* Checking if redeemer has approved CoGateway for token transfer *',
+    );
+
+    const isRedeemAmountApproved = await this.coGateway
+      .isRedeemAmountApproved(redeemer, amount)
+      .catch((exception) => {
+        logger.info('  - Exception while checking redeem amount approval');
+        return Promise.reject(exception);
+      });
+
+    logger.info(`  - Approval status is ${isRedeemAmountApproved}`);
+
+    if (!isRedeemAmountApproved) {
+      /*
+       * If a redeemer is initiating the redeem process through this,
+       * then redeemer is the facilitator and its correct to assume that approval
+       * can be done.
+       */
+      logger.info(
+        '  - As Redeemer is facilitator, approving CoGateway for token transfer',
+      );
+      const approvalTxOption = Object.assign({}, txOptions);
+      delete approvalTxOption.value;
+      await this.coGateway
+        .approveRedeemAmount(amount, approvalTxOption)
+        .catch((exception) => {
+          logger.info(
+            '  - Failed to approve CoGateway contract for token transfer',
+          );
+          return Promise.reject(exception);
+        });
+      logger.info('  - Approval done.');
+    }
+
+    logger.info('* Getting nonce for the redeemer account *');
+    const nonce = await this.coGateway
+      .getNonce(redeemer)
+      .catch((exception) => {
+        logger.info('  - Failed to get redeemer nonce');
+        return Promise.reject(exception);
+      });
+    logger.info(`  - Redeemer's nonce is ${nonce}`);
+
+    logger.info('* Performing Redeem *');
+    return this.coGateway
+      .redeem(
+        amount,
+        beneficiary,
+        gasPrice,
+        gasLimit,
+        nonce,
+        hashLock,
+        txOptions,
+      )
+      .then((redeemResult) => {
+        logger.info('  - Succcessfully performed redeem.');
+        return Promise.resolve(redeemResult);
+      })
+      .catch((exception) => {
+        logger.info('  - Failed to performed redeem.');
+        return Promise.reject(exception);
+      });
+  }
+
+  /**
    * Gets the proof and validates it.
    *
    * @param {string} messageHash Message hash.

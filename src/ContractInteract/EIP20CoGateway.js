@@ -21,6 +21,7 @@
 'use strict';
 
 const Web3 = require('web3');
+const BN = require('bn.js');
 const Contracts = require('../Contracts');
 const Utils = require('../utils/Utils');
 const Anchor = require('../ContractInteract/Anchor');
@@ -82,6 +83,11 @@ class EIP20CoGateway {
     this.getOutboxMessageStatus = this.getOutboxMessageStatus.bind(this);
     this.getAnchor = this.getAnchor.bind(this);
     this.getLatestAnchorInfo = this.getLatestAnchorInfo.bind(this);
+    this.getEIP20UtilityToken = this.getEIP20UtilityToken.bind(this);
+    this.getUtilityToken = this.getUtilityToken.bind(this);
+    this.isRedeemAmountApproved = this.isRedeemAmountApproved.bind(this);
+    this.redeem = this.redeem.bind(this);
+    this._redeemRawTx = this._redeemRawTx.bind(this);
   }
 
   /**
@@ -402,6 +408,127 @@ class EIP20CoGateway {
       return Promise.reject(err);
     }
     return this.contract.methods.getOutboxMessageStatus(messageHash).call();
+  }
+
+  /**
+   * Performs redeem.
+   *
+   * @param {string} amount Amount to redeem.
+   * @param {string} beneficiary Beneficiary address.
+   * @param {string} gasPrice Gas price that staker is willing to pay for the reward.
+   * @param {string} gasLimit Maximum gas limit for reward calculation.
+   * @param {string} nonce Redeemer's nonce.
+   * @param {string} hashLock Hash lock.
+   * @param {Object} txOptions Transaction options.
+   *
+   * @returns {Object} Raw transaction object.
+   */
+  redeem(amount, beneficiary, gasPrice, gasLimit, nonce, hashLock, txOptions) {
+    if (!txOptions) {
+      const err = new TypeError('Invalid transaction options.');
+      return Promise.reject(err);
+    }
+    if (!Web3.utils.isAddress(txOptions.from)) {
+      const err = new TypeError('Invalid redeemer address.');
+      return Promise.reject(err);
+    }
+
+    return this._redeemRawTx(
+      amount,
+      beneficiary,
+      gasPrice,
+      gasLimit,
+      nonce,
+      hashLock,
+    ).then((tx) => Utils.sendTransaction(tx, txOptions));
+  }
+
+  /**
+   * Get the raw transaction for redeem.
+   *
+   * @param {string} amount Amount to redeem.
+   * @param {string} beneficiary Beneficiary address.
+   * @param {string} gasPrice Gas price that staker is willing to pay for the reward.
+   * @param {string} gasLimit Maximum gas limit for reward calculation.
+   * @param {string} nonce Redeemer's nonce.
+   * @param {string} hashLock Hash lock.
+   *
+   * @returns {Object} Raw transaction object.
+   */
+  _redeemRawTx(amount, beneficiary, gasPrice, gasLimit, nonce, hashLock) {
+    if (new BN(amount).eqn(0)) {
+      const err = new TypeError('Redeem amount must not be zero.');
+      return Promise.reject(err);
+    }
+    if (!Web3.utils.isAddress(beneficiary)) {
+      const err = new TypeError('Invalid beneficiary address.');
+      return Promise.reject(err);
+    }
+    if (gasPrice === undefined) {
+      const err = new TypeError('Invalid gas price.');
+      return Promise.reject(err);
+    }
+    if (gasLimit === undefined) {
+      const err = new TypeError('Invalid gas limit.');
+      return Promise.reject(err);
+    }
+    const tx = this.contract.methods.redeem(
+      amount,
+      beneficiary,
+      gasPrice,
+      gasLimit,
+      nonce,
+      hashLock,
+    );
+    return Promise.resolve(tx);
+  }
+
+  /**
+   * Check if the account has approved CoGateway contract for redeem amount transfer.
+   *
+   * @param {string} redmeer Redeemer account address.
+   * @param {string} amount Approval amount.
+   *
+   * @returns {Promise} Promise object.
+   */
+  isRedeemAmountApproved(redeemer, amount) {
+    if (!Web3.utils.isAddress(redeemer)) {
+      const err = new TypeError('Invalid redemeer address.');
+      return Promise.reject(err);
+    }
+    return this.getEIP20UtilityToken().then((eip20ValueToken) => {
+      return eip20ValueToken.isAmountApproved(
+        redeemer,
+        this.coGatewayAddress,
+        amount,
+      );
+    });
+  }
+
+  /**
+   * Approves CoGateway contract address for the amount transfer.
+   *
+   * @param {string} amount Approve amount.
+   * @param {string} txOptions Transaction options.
+   *
+   * @returns {Promise} Promise object.
+   */
+  approveRedeemAmount(amount, txOptions) {
+    if (!txOptions) {
+      const err = new TypeError('Invalid transaction options.');
+      return Promise.reject(err);
+    }
+    if (!Web3.utils.isAddress(txOptions.from)) {
+      const err = new TypeError('Invalid from address.');
+      return Promise.reject(err);
+    }
+    if (typeof amount !== 'string') {
+      const err = new TypeError('Invalid stake amount.');
+      return Promise.reject(err);
+    }
+    return this.getEIP20UtilityToken().then((eip20Token) => {
+      return eip20Token.approve(this.coGatewayAddress, amount, txOptions);
+    });
   }
 
   /**

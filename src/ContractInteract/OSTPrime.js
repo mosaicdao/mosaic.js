@@ -26,16 +26,16 @@ const Contracts = require('../Contracts');
 const Utils = require('../utils/Utils');
 
 /**
- * Contract interact for EIP20Token contract.
+ * Contract interact for OSTPrime contract.
  */
-class EIP20Token {
+class OSTPrime {
   /**
-   * Constructor for EIP20Gateway.
+   * Constructor for OSTPrime.
    *
    * @param {Object} web3 Web3 object.
-   * @param {string} tokenAddress EIP20Token contract address.
+   * @param {string} contractAddress OSTPrime contract address.
    */
-  constructor(web3, tokenAddress) {
+  constructor(web3, contractAddress) {
     if (web3 instanceof Web3) {
       this.web3 = web3;
     } else {
@@ -45,20 +45,20 @@ class EIP20Token {
       throw err;
     }
 
-    if (!Web3.utils.isAddress(tokenAddress)) {
+    if (!Web3.utils.isAddress(contractAddress)) {
       const err = new TypeError(
-        "Mandatory Parameter 'tokenAddress' is missing or invalid.",
+        "Mandatory Parameter 'contractAddress' is missing or invalid.",
       );
       throw err;
     }
 
-    this.tokenAddress = tokenAddress;
+    this.contractAddress = contractAddress;
 
-    this.contract = Contracts.getEIP20Token(this.web3, this.tokenAddress);
+    this.contract = Contracts.getOSTPrime(this.web3, this.contractAddress);
 
     if (!this.contract) {
       const err = new Error(
-        `Could not load token contract for: ${this.tokenAddress}`,
+        `Could not load OSTPrime contract for: ${this.contractAddress}`,
       );
       throw err;
     }
@@ -176,6 +176,73 @@ class EIP20Token {
     }
     return this.contract.methods.balanceOf(accountAddress).call();
   }
+
+  /**
+   * Unwrap amount.
+   *
+   * @param {string} amount Amount to unwrap.
+   * @param {Object} txOptions Transaction options.
+   *
+   * @return {Promise} Promise object.
+   */
+  unwrap(amount, txOptions) {
+    if (!txOptions) {
+      const err = new TypeError('Invalid transaction options.');
+      return Promise.reject(err);
+    }
+    return this._unwrapRawTx(amount).then((tx) =>
+      Utils.sendTransaction(tx, txOptions),
+    );
+  }
+
+  /**
+   * Unwrap amount raw tansaction.
+   *
+   * @param {string} amount Amount to unwrap.
+   *
+   * @return {Promise} Promise object.
+   */
+  _unwrapRawTx(amount) {
+    if (typeof amount !== 'string') {
+      const err = new TypeError('Invalid amount.');
+      return Promise.reject(err);
+    }
+    const tx = this.contract.methods.unwrap(amount);
+    return Promise.resolve(tx);
+  }
+
+  /**
+   * Unwrap amount.
+   *
+   * @param {string} amount Amount to unwrap.
+   */
+  wrap(txOptions) {
+    if (!txOptions) {
+      const err = new TypeError('Invalid transaction options.');
+      return Promise.reject(err);
+    }
+    if (new BN(txOptions.value).eqn(0)) {
+      const err = new TypeError('Transaction value amount must not be zero.');
+      return Promise.reject(err);
+    }
+    if (!Web3.utils.isAddress(txOptions.from)) {
+      const err = new TypeError('Invalid address.');
+      return Promise.reject(err);
+    }
+    return this._wrapRawTx().then((tx) =>
+      Utils.sendTransaction(tx, txOptions),
+    );
+  }
+
+  /**
+   * wrap amount raw tansaction.
+   *
+   * @return {Promise} Promise object.
+   */
+  _wrapRawTx() {
+    const tx = this.contract.methods.wrap();
+    return Promise.resolve(tx);
+  }
 }
 
-module.exports = EIP20Token;
+module.exports = OSTPrime;
