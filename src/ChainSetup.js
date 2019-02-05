@@ -1,13 +1,15 @@
 'use strict';
 
 const Web3 = require('web3');
-const AbiBinProvider = require('../src/AbiBinProvider');
-const OrganizationHelper = require('../src/helpers/setup/OrganizationHelper');
-const AnchorHelper = require('../src/helpers/setup/AnchorHelper');
-const OSTPrimeHelper = require('../src/helpers/setup/OSTPrimeHelper');
-const LibsHelper = require('../src/helpers/setup/LibsHelper');
-const GatewayHelper = require('../src/helpers/setup/GatewayHelper');
-const CoGatewayHelper = require('../src/helpers/setup/CoGatewayHelper');
+
+const { deprecationNoticeChainSetup } = require('./utils/Utils');
+const AbiBinProvider = require('./AbiBinProvider');
+const OrganizationHelper = require('./helpers/setup/OrganizationHelper');
+const AnchorHelper = require('./helpers/setup/AnchorHelper');
+const OSTPrimeHelper = require('./helpers/setup/OSTPrimeHelper');
+const LibsHelper = require('./helpers/setup/LibsHelper');
+const GatewayHelper = require('./helpers/setup/GatewayHelper');
+const CoGatewayHelper = require('./helpers/setup/CoGatewayHelper');
 
 class ChainSetup {
   constructor(originWeb3, auxiliaryWeb3) {
@@ -769,6 +771,7 @@ class ChainSetup {
   }
 
   static get OrganizationHelper() {
+    deprecationNoticeChainSetup('ChainSetup.OrganizationHelper');
     return OrganizationHelper;
   }
 

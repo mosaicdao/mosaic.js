@@ -5,7 +5,7 @@ const { ChainSetup } = require('../../index');
 
 const MockContractsDeployer = require('../../tests/utils/MockContractsDeployer');
 
-describe('ChainSetup', () => {
+describe.skip('ChainSetup', () => {
   let addressMockToken;
 
   before(async () => {

@@ -75,6 +75,13 @@ class Utils {
         });
     });
   }
+
+  // TODO: docs and correct issue number
+  static deprecationNoticeChainSetup(method) {
+    console.warn(
+      `${method} has been deprecated. See #TODO for migration instructions.`,
+    );
+  }
 }
 
 module.exports = Utils;
