@@ -34,7 +34,6 @@
     "@openstfoundation/mosaic-contracts": "^0.10.0-alpha.1",
     "bn.js": "4.11.8",
     "js-scrypt": "^0.2.0",
-    "shelljs": "0.8.1",
     "web3": "1.0.0-beta.37",
     "web3-eth-accounts": "1.0.0-beta.37"
   },
@@ -77,5 +76,8 @@
     "ignore": [
       "**/dist/*.js"
     ]
-  }
+  },
+  "files": [
+    "lib"
+  ]
 }
