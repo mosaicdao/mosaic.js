@@ -2,9 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
-
-const testHelper = require('./helper'),
-  configReader = require('./configReader');
+const configReader = require('./configReader');
 
 const passphrase = configReader.passphrase;
 
