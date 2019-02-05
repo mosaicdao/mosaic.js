@@ -323,7 +323,7 @@ class EIP20CoGateway {
    * @param {string} unlockSecret Unlock secret.
    * @param {Object} txOptions Transaction options.
    *
-   * @returns {Promise} promise object.
+   * @returns {Promise<Object>} Promise that resolves to transaction receipt.
    */
   progressRedeem(messageHash, unlockSecret, txOptions) {
     if (!txOptions) {
@@ -341,7 +341,7 @@ class EIP20CoGateway {
    * @param {string} messageHash Message hash.
    * @param {string} unlockSecret Unlock secret.
    *
-   * @returns {Promise} promise object.
+   * @returns {Promise<Object>} Promise that resolves to raw transaction object.
    */
   _progressRedeemRawTx(messageHash, unlockSecret) {
     if (typeof messageHash !== 'string') {

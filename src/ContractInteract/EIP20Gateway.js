@@ -280,7 +280,7 @@ class EIP20Gateway {
    * @param {string} hashLock Hash lock.
    * @param {Object} txOptions Transaction option.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<Object>} Promise that resolves to transaction receipt.
    */
   confirmRedeemIntent(
     redeemer,
@@ -324,7 +324,7 @@ class EIP20Gateway {
    * @param {string} storageProof Storage proof.
    * @param {string} hashLock Hash lock.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<Object>} Promise that resolves to raw transaction object.
    */
   _confirmRedeemIntentRawTx(
     redeemer,
@@ -398,7 +398,7 @@ class EIP20Gateway {
    * @param {string} unlockSecret Unlock secret.
    * @param {Object} txOptions Transaction options.
    *
-   * @returns {Promise} promise object.
+   * @returns {Promise<Object>} Promise that resolves to transaction receipt.
    */
   progressUnstake(messageHash, unlockSecret, txOptions) {
     if (!txOptions) {
@@ -416,7 +416,7 @@ class EIP20Gateway {
    * @param {string} messageHash Message hash.
    * @param {string} unlockSecret Unlock secret.
    *
-   * @returns {Promise} promise object.
+   * @returns {Promise<Object>} Promise that resolves to raw transaction object.
    */
   _progressUnstakeRawTx(messageHash, unlockSecret) {
     if (typeof messageHash !== 'string') {
