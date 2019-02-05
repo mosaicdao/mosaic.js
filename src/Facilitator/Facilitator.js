@@ -23,7 +23,7 @@ const Web3 = require('web3');
 const EIP20Gateway = require('../ContractInteract/EIP20Gateway');
 const EIP20CoGateway = require('../ContractInteract/EIP20CoGateway');
 const Utils = require('../utils/Utils');
-const ProofUtils = require('../utils/ProofUtils');
+const Proof = require('../utils/Proof');
 const Message = require('../utils/Message');
 const Logger = require('../../logger/Logger');
 const Mosaic = require('../Mosaic');
@@ -686,7 +686,7 @@ class Facilitator {
       `  - Last committed state root is ${latestAnchorInfo.stateRoot}`,
     );
 
-    const proofUtils = new ProofUtils(
+    const proof = new Proof(
       this.mosaic.origin.web3,
       this.mosaic.auxiliary.web3,
     );
@@ -697,7 +697,7 @@ class Facilitator {
 
     logger.info('  - Attempting to generate proof');
 
-    return proofUtils
+    return proof
       .getOutboxProof(this.gateway.gatewayAddress, [messageHash], blockHeight)
       .then((proof) => {
         // TODO: validate proofdata for the status and gateway address.

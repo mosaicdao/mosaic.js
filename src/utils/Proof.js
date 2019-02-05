@@ -29,7 +29,7 @@ const MESSAGE_INBOX_OFFSET = '8';
 /**
  * Utils class to generate inbox and outbox proof.
  */
-class ProofUtils {
+class Proof {
   /**
    *
    * @param {Web3} sourceWeb3 Web3 instance connected to source chain.
@@ -50,17 +50,13 @@ class ProofUtils {
    * @return {Object} Proof data.
    */
   getInboxProof(address, keys = [], blockNumber) {
-    return new Promise((onResolve, onReject) => {
-      this._getProof(
-        this.targetWeb3,
-        MESSAGE_INBOX_OFFSET,
-        address,
-        keys,
-        blockNumber,
-      )
-        .then(onResolve)
-        .catch(onReject);
-    });
+    return this._getProof(
+      this.targetWeb3,
+      MESSAGE_INBOX_OFFSET,
+      address,
+      keys,
+      blockNumber,
+    );
   }
 
   /**
@@ -74,17 +70,13 @@ class ProofUtils {
    * @return {Object} Proof data.
    */
   getOutboxProof(address, keys = [], blockNumber) {
-    return new Promise((onResolve, onReject) => {
-      this._getProof(
-        this.sourceWeb3,
-        MESSAGE_OUTBOX_OFFSET,
-        address,
-        keys,
-        blockNumber,
-      )
-        .then(onResolve)
-        .catch(onReject);
-    });
+    return this._getProof(
+      this.sourceWeb3,
+      MESSAGE_OUTBOX_OFFSET,
+      address,
+      keys,
+      blockNumber,
+    );
   }
 
   /**
@@ -99,21 +91,23 @@ class ProofUtils {
    *
    * @return {Object} Proof data.
    */
-  _getProof(web3, index, address, keys, blockNumber) {
-    return new Promise(async (onResolve, onReject) => {
-      if (!blockNumber) {
+  async _getProof(web3, index, address, keys, blockNumber) {
+    if (!blockNumber) {
+      try {
         const block = await web3.eth.getBlock('latest');
         blockNumber = await web3.utils.toHex(block.number);
+      } catch (exception) {
+        return Promise.reject(exception);
       }
-      const storageKey = this._storagePath(web3, index, keys);
-      this._fetchProof(web3, address, [storageKey], blockNumber)
-        .then((proof) => {
-          const proofData = proof.result;
-          proofData.block_number = blockNumber;
-          onResolve(proofData);
-        })
-        .catch(onReject);
-    });
+    }
+    const storageKey = this._storagePath(web3, index, keys);
+    return this._fetchProof(web3, address, [storageKey], blockNumber).then(
+      (proof) => {
+        const proofData = proof.result;
+        proofData.block_number = blockNumber;
+        return proofData;
+      },
+    );
   }
 
   /**
@@ -143,7 +137,7 @@ class ProofUtils {
               response.result.serializedAccountProof = this._serializeProof(
                 accountProof,
               );
-              response.result.encodedAccountValue = ProofUtils._encodedAccountValue(
+              response.result.encodedAccountValue = Proof._encodedAccountValue(
                 response.result.serializedAccountProof,
               );
 
@@ -209,4 +203,4 @@ class ProofUtils {
   }
 }
 
-module.exports = ProofUtils;
+module.exports = Proof;
