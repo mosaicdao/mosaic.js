@@ -1,8 +1,16 @@
 'use strict';
 
 const Web3 = require('web3');
+
+const AbiBinProvider = require('../AbiBinProvider');
 const Contracts = require('../Contracts');
 const Utils = require('../utils/Utils');
+const {
+  validateConfigExists,
+  validateConfigKeyExists,
+} = require('../helpers/setup/validation');
+
+const ContractName = 'Anchor';
 
 /**
  * Contract interact for Anchor contract.
@@ -40,6 +48,129 @@ class Anchor {
       this,
     );
     this.anchorStateRoot = this.anchorStateRoot.bind(this);
+  }
+
+  /*
+    //Supported Configurations for setup
+    {
+      "remoteChainId": 123456,
+      "deployer": config.deployerAddress,
+      "organization": caOrganization,
+      "coAnchorAddress": caAnchor,
+      "maxStateRoots": maxStateRoots,
+      "organizationOwner": organizationOwner
+    }
+  */
+
+  // TODO: docs
+  static setup(web3, coWeb3, config, txOptions = {}) {
+    Anchor.validateSetupConfig(config);
+
+    const deployParams = Object.assign({}, txOptions);
+    deployParams.from = config.deployer;
+
+    // 1. Get block and stateRoot.
+    const blockHeight = config.blockHeight || 'latest';
+    let initialBlockHeight;
+    let initialStateRoot;
+
+    let promiseChain = coWeb3.eth.getBlock(blockHeight).then((block) => {
+      initialBlockHeight = block.number;
+      initialStateRoot = block.stateRoot;
+    });
+
+    // 2. Deploy the Contract
+    promiseChain = promiseChain.then(() => {
+      return Anchor.deploy(
+        web3,
+        config.remoteChainId,
+        initialBlockHeight,
+        initialStateRoot,
+        config.maxStateRoots,
+        config.organization,
+        deployParams,
+      );
+    });
+
+    // 3. Set coAnchorAddress.
+    if (config.coAnchorAddress) {
+      promiseChain = promiseChain.then((anchor) => {
+        const ownerParams = Object.assign({}, deployParams);
+        ownerParams.from = config.organizationOwner;
+
+        return anchor.setCoAnchorAddress(config.coAnchorAddress, ownerParams);
+      });
+    }
+
+    return promiseChain;
+  }
+
+  static validateSetupConfig(config) {
+    validateConfigExists(config);
+    validateConfigKeyExists(config, 'deployer', 'config');
+    validateConfigKeyExists(config, 'organization', 'config');
+    validateConfigKeyExists(config, 'remoteChainId', 'config');
+
+    if (config.coAnchorAddress && !config.organizationOwner) {
+      throw new Error(
+        'Mandatory configuration "organizationOwner" missing. Set config.organizationOwner address. organizationOwner is mandatory when using coAnchorAddress config option',
+      );
+    }
+  }
+
+  static async deploy(
+    web3,
+    remoteChainId,
+    blockHeight,
+    stateRoot,
+    maxStateRoots,
+    membersManager,
+    txOptions,
+  ) {
+    const tx = Anchor.deployRawTx(
+      web3,
+      remoteChainId,
+      blockHeight,
+      stateRoot,
+      maxStateRoots,
+      membersManager,
+    );
+
+    const _txOptions = txOptions;
+    if (!_txOptions.gas) {
+      _txOptions.gas = await tx.estimateGas();
+    }
+
+    return Utils.sendTransaction(tx, _txOptions).then((txReceipt) => {
+      const address = txReceipt.contractAddress;
+      return new Anchor(web3, address);
+    });
+  }
+
+  static deployRawTx(
+    web3,
+    remoteChainId,
+    blockHeight,
+    stateRoot,
+    maxStateRoots,
+    membersManager,
+  ) {
+    const abiBinProvider = new AbiBinProvider();
+    const contract = Contracts.getAnchor(web3, null, null);
+
+    const bin = abiBinProvider.getBIN(ContractName);
+    const args = [
+      remoteChainId,
+      blockHeight,
+      stateRoot,
+      maxStateRoots,
+      membersManager,
+    ];
+
+    return contract.deploy({
+      data: bin,
+      arguments: args,
+    });
   }
 
   /**
@@ -108,6 +239,34 @@ class Anchor {
       blockHeight,
       stateRoot,
     };
+  }
+
+  // TODO: docs
+  setCoAnchorAddress(coAnchorAddress, txOptions) {
+    if (!txOptions) {
+      const err = new TypeError('Invalid transaction options.');
+      return Promise.reject(err);
+    }
+    if (!Web3.utils.isAddress(txOptions.from)) {
+      const err = new TypeError('Invalid from address.');
+      return Promise.reject(err);
+    }
+
+    return this.setCoAnchorAddressRawTx(coAnchorAddress).then((tx) =>
+      Utils.sendTransaction(tx, txOptions),
+    );
+  }
+
+  // TODO: docs
+  setCoAnchorAddressRawTx(coAnchorAddress) {
+    if (!Web3.utils.isAddress(coAnchorAddress)) {
+      const err = new TypeError('Invalid coAnchor address.');
+      return Promise.reject(err);
+    }
+
+    return Promise.resolve(
+      this.contract.methods.setCoAnchorAddress(coAnchorAddress),
+    );
   }
 }
 

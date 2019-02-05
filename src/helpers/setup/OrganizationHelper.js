@@ -20,7 +20,6 @@
 
 'use strict';
 
-const AbiBinProvider = require('../../AbiBinProvider');
 const {
   sendTransaction,
   deprecationNoticeChainSetup,
@@ -32,7 +31,6 @@ class OrganizationHelper {
   constructor(web3, address) {
     this.web3 = web3;
     this.address = address;
-    this.abiBinProvider = new AbiBinProvider();
 
     this.deploy = this.deploy.bind(this);
     this._deployRawTx = this._deployRawTx.bind(this);
@@ -56,7 +54,12 @@ class OrganizationHelper {
       web3,
     );
 
-    return sendTransaction(tx, txOptions).then((txReceipt) => {
+    const defaultOptions = {
+      gas: '1600000',
+    };
+    const _txOptions = Object.assign({}, defaultOptions, txOptions);
+
+    return sendTransaction(tx, _txOptions).then((txReceipt) => {
       this.address = txReceipt.contractAddress;
       return txReceipt;
     });

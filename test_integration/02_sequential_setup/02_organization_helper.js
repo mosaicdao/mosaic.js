@@ -4,8 +4,9 @@ const { assert } = require('chai');
 const Web3 = require('web3');
 
 const { ChainSetup } = require('../../index');
-const OrganizationHelper = ChainSetup.OrganizationHelper;
 const Organization = require('../../src/ContractInteract/Organization');
+
+const OrganizationHelper = ChainSetup.OrganizationHelper;
 
 const shared = require('../shared');
 

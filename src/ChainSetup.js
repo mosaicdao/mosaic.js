@@ -776,6 +776,7 @@ class ChainSetup {
   }
 
   static get AnchorHelper() {
+    deprecationNoticeChainSetup('ChainSetup.AnchorHelper');
     return AnchorHelper;
   }
 

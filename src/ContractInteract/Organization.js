@@ -121,7 +121,6 @@ class Organization {
       admin,
       workers,
       expirationHeight,
-      txOptions,
     );
 
     const _txOptions = txOptions;
@@ -135,27 +134,17 @@ class Organization {
     });
   }
 
-  static deployRawTx(
-    web3,
-    owner,
-    admin,
-    workers,
-    expirationHeight,
-    txOptions,
-  ) {
+  static deployRawTx(web3, owner, admin, workers, expirationHeight) {
     const abiBinProvider = new AbiBinProvider();
-    const contract = Contracts.getOrganization(web3, null, txOptions);
+    const contract = Contracts.getOrganization(web3, null, null);
 
     const bin = abiBinProvider.getBIN(ContractName);
     const args = [owner, admin, workers, expirationHeight];
 
-    return contract.deploy(
-      {
-        data: bin,
-        arguments: args,
-      },
-      txOptions,
-    );
+    return contract.deploy({
+      data: bin,
+      arguments: args,
+    });
   }
 }
 
