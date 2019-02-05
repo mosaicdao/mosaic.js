@@ -32,9 +32,8 @@
   },
   "dependencies": {
     "@openstfoundation/mosaic-contracts": "^0.10.0-alpha.1",
-    "bignumber.js": "4.1.0",
+    "bn.js": "4.11.8",
     "js-scrypt": "^0.2.0",
-    "node-cmd": "3.0.0",
     "shelljs": "0.8.1",
     "web3": "1.0.0-beta.37",
     "web3-eth-accounts": "1.0.0-beta.37"
@@ -45,10 +44,7 @@
     "@babel/preset-env": "7.1.0",
     "@babel/runtime": "7.0.0",
     "babel-loader": "8.0.2",
-    "bn.js": "4.11.8",
     "chai": "4.2.0",
-    "commander": "2.8.1",
-    "edit-json-file": "1.0.8",
     "eslint": "^5.12.1",
     "eslint-config-airbnb": "^17.1.0",
     "eslint-config-airbnb-base": "^13.1.0",
