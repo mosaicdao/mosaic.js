@@ -30,8 +30,7 @@ class Staker {
   /**
    * Constructor for staker.
    *
-   * @param {Object} originWeb3 Origin chain web3 object.
-   * @param {string} Gateway contract address.
+   * @param {Object} mosaic Mosaic object.
    */
   constructor(mosaic) {
     if (!(mosaic instanceof Mosaic)) {
@@ -43,7 +42,7 @@ class Staker {
       throw err;
     }
     if (!Web3.utils.isAddress(mosaic.origin.contractAddresses.EIP20Gateway)) {
-      const err = new TypeError('Invalid Gateway address.');
+      const err = new TypeError('Invalid EIP20Gateway address.');
       throw err;
     }
 

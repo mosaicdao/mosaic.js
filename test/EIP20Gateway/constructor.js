@@ -72,7 +72,7 @@ describe('EIP20Gateway.constructor()', () => {
     setup();
 
     mockedGatewayObject = undefined;
-    const errorMessage = `Could not load Gateway contract for: ${gatewayAddress}`;
+    const errorMessage = `Could not load EIP20Gateway contract for: ${gatewayAddress}`;
 
     assert.throws(() => {
       new EIP20Gateway(web3, gatewayAddress);
