@@ -1,3 +1,29 @@
+// Copyright 2019 OpenST Ltd.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// ----------------------------------------------------------------------------
+//
+// http://www.simpletoken.org/
+//
+// ----------------------------------------------------------------------------
+
+/**
+ * @typedef {Object} Library Smart contract library for use in linking.
+ * @property {string} name Name of the libary, as used in linking placeholders.
+ * @property {string} address Address of the deployed library.
+ */
+
 'use strict';
 
 const mosaicContracts = require('@openstfoundation/mosaic-contracts');
@@ -24,7 +50,6 @@ class AbiBinProvider {
 
     let abi;
     if (typeof abiFileContent === 'string') {
-      // Parse it.
       abi = JSON.parse(abiFileContent);
     } else if (typeof abiFileContent === 'object') {
       abi = abiFileContent;
@@ -115,25 +140,21 @@ class AbiBinProvider {
     return bin;
   }
 
-  //Note
-  //links is an array of
-  //Send as many libInfo as needed.
-  //libInfo format:
-  /* 
-  {
-    "name": "NAME_OF_LIB",
-    "address": "ADDRESS_OF_DEPLOYED_LIB"
-  }
-  */
-  getLinkedBIN(contractName) {
+  /**
+   * Returns the a linked bin for a contract.
+   *
+   * @param {string} contractName Name of the contract to be linked.
+   * @param {...Library} libs The libraries to be linked to the bin.
+   *
+   * @returns {string} The linked bin.
+   */
+  getLinkedBIN(contractName, ...libs) {
     const oThis = this;
     const bin = oThis.getBIN(contractName);
     if (!bin) {
       return bin;
     }
 
-    const libs = Array.from(arguments);
-    libs.shift();
     let len = libs.length;
     const libraries = {};
     while (len--) {
