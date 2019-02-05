@@ -93,7 +93,7 @@ describe('EIP20Gateway.proveGateway()', () => {
         accountProof,
         undefined,
       );
-    }, /Invalid transaction options./);
+    }, `Invalid transaction options: ${undefined}.`);
   });
 
   it('should return correct mocked transaction object', async () => {

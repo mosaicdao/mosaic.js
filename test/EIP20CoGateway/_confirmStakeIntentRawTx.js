@@ -72,7 +72,7 @@ describe('EIP20CoGateway._confirmStakeIntentRawTx()', () => {
   });
 
   it('should throw error when staker address is invalid', async () => {
-    const expectedErrorMessage = 'Invalid staker address.';
+    const expectedErrorMessage = `Invalid staker address: ${undefined}.`;
     await coGateway
       ._confirmStakeIntentRawTx(
         undefined,
@@ -95,7 +95,7 @@ describe('EIP20CoGateway._confirmStakeIntentRawTx()', () => {
   });
 
   it('should throw error when nonce is invalid', async () => {
-    const expectedErrorMessage = 'Invalid nonce.';
+    const expectedErrorMessage = `Invalid nonce: ${undefined}.`;
     await coGateway
       ._confirmStakeIntentRawTx(
         stakeParams.staker,
@@ -118,7 +118,7 @@ describe('EIP20CoGateway._confirmStakeIntentRawTx()', () => {
   });
 
   it('should throw error when beneficiary address is invalid', async () => {
-    const expectedErrorMessage = 'Invalid beneficiary address.';
+    const expectedErrorMessage = `Invalid beneficiary address: ${undefined}.`;
     await coGateway
       ._confirmStakeIntentRawTx(
         stakeParams.staker,
@@ -141,7 +141,7 @@ describe('EIP20CoGateway._confirmStakeIntentRawTx()', () => {
   });
 
   it('should throw error when stake amount is invalid', async () => {
-    const expectedErrorMessage = 'Invalid stake amount.';
+    const expectedErrorMessage = `Invalid stake amount: ${undefined}.`;
     await coGateway
       ._confirmStakeIntentRawTx(
         stakeParams.staker,
@@ -164,7 +164,7 @@ describe('EIP20CoGateway._confirmStakeIntentRawTx()', () => {
   });
 
   it('should throw error when gas price is invalid', async () => {
-    const expectedErrorMessage = 'Invalid gas price.';
+    const expectedErrorMessage = `Invalid gas price: ${undefined}.`;
     await coGateway
       ._confirmStakeIntentRawTx(
         stakeParams.staker,
@@ -187,7 +187,7 @@ describe('EIP20CoGateway._confirmStakeIntentRawTx()', () => {
   });
 
   it('should throw error when gas limit is invalid', async () => {
-    const expectedErrorMessage = 'Invalid gas limit.';
+    const expectedErrorMessage = `Invalid gas limit: ${undefined}.`;
     await coGateway
       ._confirmStakeIntentRawTx(
         stakeParams.staker,
@@ -210,7 +210,7 @@ describe('EIP20CoGateway._confirmStakeIntentRawTx()', () => {
   });
 
   it('should throw error when block height is invalid', async () => {
-    const expectedErrorMessage = 'Invalid block height.';
+    const expectedErrorMessage = `Invalid block height: ${undefined}.`;
     await coGateway
       ._confirmStakeIntentRawTx(
         stakeParams.staker,
@@ -233,7 +233,7 @@ describe('EIP20CoGateway._confirmStakeIntentRawTx()', () => {
   });
 
   it('should throw error when storage proof is invalid', async () => {
-    const expectedErrorMessage = 'Invalid storage proof data.';
+    const expectedErrorMessage = `Invalid storage proof data: ${undefined}.`;
     await coGateway
       ._confirmStakeIntentRawTx(
         stakeParams.staker,

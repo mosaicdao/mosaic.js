@@ -76,15 +76,15 @@ class EIP20Token {
    * @param {string} amount Approve amount.
    * @param {string} txOptions Transaction options.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<boolean>} Promise that resolves to transaction receipt.
    */
   approve(spenderAddress, amount, txOptions) {
     if (!txOptions) {
-      const err = new TypeError('Invalid transaction options.');
+      const err = new TypeError(`Invalid transaction options: ${txOptions}.`);
       return Promise.reject(err);
     }
     if (!Web3.utils.isAddress(txOptions.from)) {
-      const err = new TypeError('Invalid from address.');
+      const err = new TypeError(`Invalid from address: ${txOptions.from}.`);
       return Promise.reject(err);
     }
     return this._approveRawTx(spenderAddress, amount).then((tx) =>
@@ -98,15 +98,15 @@ class EIP20Token {
    * @param {string} spenderAddress Spender address.
    * @param {string} amount Approve amount.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<boolean>} Promise that resolves to raw transaction object.
    */
   _approveRawTx(spenderAddress, amount) {
     if (!Web3.utils.isAddress(spenderAddress)) {
-      const err = new TypeError('Invalid spender address.');
+      const err = new TypeError(`Invalid spender address: ${spenderAddress}.`);
       return Promise.reject(err);
     }
     if (typeof amount !== 'string') {
-      const err = new TypeError('Invalid approval amount.');
+      const err = new TypeError(`Invalid approval amount: ${amount}.`);
       return Promise.reject(err);
     }
     const tx = this.contract.methods.approve(spenderAddress, amount);
@@ -119,23 +119,24 @@ class EIP20Token {
    * @param {string} ownerAddress Owner account address.
    * @param {string} spenderAddress Spender account address.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<string>} Promise that resolves to allowance amount.
    */
   allowance(ownerAddress, spenderAddress) {
     if (!Web3.utils.isAddress(ownerAddress)) {
-      const err = new TypeError('Owner address is invalid or missing');
+      const err = new TypeError(
+        `Owner address is invalid or missing: ${ownerAddress}.`,
+      );
       return Promise.reject(err);
     }
     if (!Web3.utils.isAddress(spenderAddress)) {
-      const err = new TypeError('Spender address is invalid or missing');
+      const err = new TypeError(
+        `Spender address is invalid or missing: ${spenderAddress}`,
+      );
       return Promise.reject(err);
     }
     return this.contract.methods
       .allowance(ownerAddress, spenderAddress)
-      .call()
-      .then((allowance) => {
-        return allowance;
-      });
+      .call();
   }
 
   /**
@@ -145,15 +146,19 @@ class EIP20Token {
    * @param {string} spenderAddress Spender account address.
    * @param {string} amount Approval amount.
    *
-   * @returns {bool} `true` if approved.
+   * @returns {Promise<boolean>} Promise that resolves to `true` when its approved.
    */
   isAmountApproved(ownerAddress, spenderAddress, amount) {
     if (!Web3.utils.isAddress(ownerAddress)) {
-      const err = new TypeError('Invalid owner address.');
+      const err = new TypeError(`Invalid owner address: ${ownerAddress}.`);
       return Promise.reject(err);
     }
     if (!Web3.utils.isAddress(spenderAddress)) {
-      const err = new TypeError('Invalid spender address.');
+      const err = new TypeError(`Invalid spender address: ${spenderAddress}.`);
+      return Promise.reject(err);
+    }
+    if (typeof amount !== 'string') {
+      const err = new TypeError(`Invalid amount: ${amount}.`);
       return Promise.reject(err);
     }
     return this.allowance(ownerAddress, spenderAddress).then(
@@ -167,11 +172,11 @@ class EIP20Token {
    * Returns the balance of an account.
    *
    * @param {string} accountAddress Account address
-   * @return {Promise} Promise object.
+   * @returns {Promise<Object>} Promise that resolves to balance amount.
    */
   balanceOf(accountAddress) {
     if (!Web3.utils.isAddress(accountAddress)) {
-      const err = new TypeError('Invalid address.');
+      const err = new TypeError(`Invalid address: ${accountAddress}.`);
       return Promise.reject(err);
     }
     return this.contract.methods.balanceOf(accountAddress).call();

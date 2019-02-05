@@ -67,6 +67,10 @@ class OSTPrime {
     this._approveRawTx = this._approveRawTx.bind(this);
     this.allowance = this.allowance.bind(this);
     this.isAmountApproved = this.isAmountApproved.bind(this);
+    this.wrap = this.wrap.bind(this);
+    this._wrapRawTx = this._wrapRawTx.bind(this);
+    this.unwrap = this.unwrap.bind(this);
+    this._unwrapRawTx = this._unwrapRawTx.bind(this);
   }
 
   /**
@@ -76,15 +80,17 @@ class OSTPrime {
    * @param {string} amount Approve amount.
    * @param {string} txOptions Transaction options.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<boolean>} Promise that resolves to transaction receipt.
    */
   approve(spenderAddress, amount, txOptions) {
     if (!txOptions) {
-      const err = new TypeError('Invalid transaction options.');
+      const err = new TypeError(
+        `Invalid transaction options: ${spenderAddress}.`,
+      );
       return Promise.reject(err);
     }
     if (!Web3.utils.isAddress(txOptions.from)) {
-      const err = new TypeError('Invalid from address.');
+      const err = new TypeError(`Invalid from address: ${txOptions.from}.`);
       return Promise.reject(err);
     }
     return this._approveRawTx(spenderAddress, amount).then((tx) =>
@@ -98,15 +104,15 @@ class OSTPrime {
    * @param {string} spenderAddress Spender address.
    * @param {string} amount Approve amount.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<boolean>} Promise that resolves to raw transaction object.
    */
   _approveRawTx(spenderAddress, amount) {
     if (!Web3.utils.isAddress(spenderAddress)) {
-      const err = new TypeError('Invalid spender address.');
+      const err = new TypeError(`Invalid spender address: ${spenderAddress}.`);
       return Promise.reject(err);
     }
     if (typeof amount !== 'string') {
-      const err = new TypeError('Invalid approval amount.');
+      const err = new TypeError(`Invalid approval amount: ${amount}.`);
       return Promise.reject(err);
     }
     const tx = this.contract.methods.approve(spenderAddress, amount);
@@ -119,23 +125,24 @@ class OSTPrime {
    * @param {string} ownerAddress Owner account address.
    * @param {string} spenderAddress Spender account address.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<string>} Promise that resolves to allowance amount.
    */
   allowance(ownerAddress, spenderAddress) {
     if (!Web3.utils.isAddress(ownerAddress)) {
-      const err = new TypeError('Owner address is invalid or missing');
+      const err = new TypeError(
+        `Owner address is invalid or missing: ${ownerAddress}`,
+      );
       return Promise.reject(err);
     }
     if (!Web3.utils.isAddress(spenderAddress)) {
-      const err = new TypeError('Spender address is invalid or missing');
+      const err = new TypeError(
+        `Spender address is invalid or missing: ${spenderAddress}`,
+      );
       return Promise.reject(err);
     }
     return this.contract.methods
       .allowance(ownerAddress, spenderAddress)
-      .call()
-      .then((allowance) => {
-        return allowance;
-      });
+      .call();
   }
 
   /**
@@ -145,15 +152,19 @@ class OSTPrime {
    * @param {string} spenderAddress Spender account address.
    * @param {string} amount Approval amount.
    *
-   * @returns {bool} `true` if approved.
+   * @returns {Promise<boolean>} Promise that resolves to `true` when its approved.
    */
   isAmountApproved(ownerAddress, spenderAddress, amount) {
     if (!Web3.utils.isAddress(ownerAddress)) {
-      const err = new TypeError('Invalid owner address.');
+      const err = new TypeError(`Invalid owner address: ${ownerAddress}.`);
       return Promise.reject(err);
     }
     if (!Web3.utils.isAddress(spenderAddress)) {
-      const err = new TypeError('Invalid spender address.');
+      const err = new TypeError(`Invalid spender address: ${spenderAddress}.`);
+      return Promise.reject(err);
+    }
+    if (typeof amount !== 'string') {
+      const err = new TypeError(`Invalid amount: ${amount}.`);
       return Promise.reject(err);
     }
     return this.allowance(ownerAddress, spenderAddress).then(
@@ -167,11 +178,11 @@ class OSTPrime {
    * Returns the balance of an account.
    *
    * @param {string} accountAddress Account address
-   * @return {Promise} Promise object.
+   * @returns {Promise<Object>} Promise that resolves to balance amount.
    */
   balanceOf(accountAddress) {
     if (!Web3.utils.isAddress(accountAddress)) {
-      const err = new TypeError('Invalid address.');
+      const err = new TypeError(`Invalid address: ${accountAddress}.`);
       return Promise.reject(err);
     }
     return this.contract.methods.balanceOf(accountAddress).call();
@@ -183,11 +194,11 @@ class OSTPrime {
    * @param {string} amount Amount to unwrap.
    * @param {Object} txOptions Transaction options.
    *
-   * @return {Promise} Promise object.
+   * @returns {Promise<Object>} Promise that resolves to transaction receipt.
    */
   unwrap(amount, txOptions) {
     if (!txOptions) {
-      const err = new TypeError('Invalid transaction options.');
+      const err = new TypeError(`Invalid transaction options: ${txOptions}.`);
       return Promise.reject(err);
     }
     return this._unwrapRawTx(amount).then((tx) =>
@@ -200,11 +211,11 @@ class OSTPrime {
    *
    * @param {string} amount Amount to unwrap.
    *
-   * @return {Promise} Promise object.
+   * @returns {Promise<Object>} Promise that resolves to raw transaction object.
    */
   _unwrapRawTx(amount) {
     if (typeof amount !== 'string') {
-      const err = new TypeError('Invalid amount.');
+      const err = new TypeError(`Invalid amount: ${amount}.`);
       return Promise.reject(err);
     }
     const tx = this.contract.methods.unwrap(amount);
@@ -214,19 +225,22 @@ class OSTPrime {
   /**
    * Unwrap amount.
    *
-   * @param {string} amount Amount to unwrap.
+   * @param {Object} txOptions Transaction options.
+   * @returns {Promise<Object>} Promise that resolves to transaction receipt.
    */
   wrap(txOptions) {
     if (!txOptions) {
-      const err = new TypeError('Invalid transaction options.');
+      const err = new TypeError(`Invalid transaction options: ${txOptions}.`);
       return Promise.reject(err);
     }
     if (new BN(txOptions.value).eqn(0)) {
-      const err = new TypeError('Transaction value amount must not be zero.');
+      const err = new TypeError(
+        `Transaction value amount must not be zero: ${txOptions.value}.`,
+      );
       return Promise.reject(err);
     }
     if (!Web3.utils.isAddress(txOptions.from)) {
-      const err = new TypeError('Invalid address.');
+      const err = new TypeError(`Invalid address: ${txOptions.from}.`);
       return Promise.reject(err);
     }
     return this._wrapRawTx().then((tx) =>
@@ -237,7 +251,7 @@ class OSTPrime {
   /**
    * wrap amount raw tansaction.
    *
-   * @return {Promise} Promise object.
+   * @returns {Promise<Object>} Promise that resolves to raw transaction object.
    */
   _wrapRawTx() {
     const tx = this.contract.methods.wrap();

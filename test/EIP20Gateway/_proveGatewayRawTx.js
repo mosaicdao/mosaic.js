@@ -68,7 +68,7 @@ describe('EIP20Gateway._proveGatewayRawTx()', () => {
   });
 
   it('should throw error when block height is invalid', async () => {
-    const expectedErrorMessage = 'Invalid block height.';
+    const expectedErrorMessage = `Invalid block height: ${undefined}.`;
     await gateway
       ._proveGatewayRawTx(undefined, encodedAccount, accountProof)
       .catch((exception) => {
@@ -81,7 +81,7 @@ describe('EIP20Gateway._proveGatewayRawTx()', () => {
   });
 
   it('should throw error when encoded account is invalid', () => {
-    const expectedErrorMessage = 'Invalid account data.';
+    const expectedErrorMessage = `Invalid account data: ${undefined}.`;
     gateway
       ._proveGatewayRawTx(blockHeight, undefined, accountProof)
       .catch((exception) => {
@@ -94,7 +94,7 @@ describe('EIP20Gateway._proveGatewayRawTx()', () => {
   });
 
   it('should throw error when account proof is invalid', () => {
-    const expectedErrorMessage = 'Invalid account proof.';
+    const expectedErrorMessage = `Invalid account proof: ${undefined}.`;
     gateway
       ._proveGatewayRawTx(blockHeight, encodedAccount, undefined)
       .catch((exception) => {

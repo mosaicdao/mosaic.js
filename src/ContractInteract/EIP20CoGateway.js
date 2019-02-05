@@ -98,11 +98,11 @@ class EIP20CoGateway {
    * @param {string} accountProof Account proof data.
    * @param {Object} txOptions Transaction options.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<Object>} Promise that resolves to transaction receipt.
    */
   proveGateway(blockHeight, encodedAccount, accountProof, txOptions) {
     if (!txOptions) {
-      const err = new TypeError('Invalid transaction options.');
+      const err = new TypeError(`Invalid transaction options: ${txOptions}.`);
       return Promise.reject(err);
     }
     return this._proveGatewayRawTx(
@@ -113,27 +113,27 @@ class EIP20CoGateway {
   }
 
   /**
-   * Get raw transaction object for prove gateway.
+   * Get raw transaction object for prove Gateway contract.
    *
    * @param {string} blockHeight Block number.
    * @param {string} encodedAccount Encoded account data.
    * @param {string} accountProof Account proof data.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<Object>} Promise that resolves to raw transaction object.
    */
   _proveGatewayRawTx(blockHeight, encodedAccount, accountProof) {
-    if (blockHeight === undefined) {
-      const err = new TypeError('Invalid block height.');
+    if (typeof blockHeight !== 'string') {
+      const err = new TypeError(`Invalid block height: ${blockHeight}.`);
       return Promise.reject(err);
     }
 
     if (typeof encodedAccount !== 'string') {
-      const err = new TypeError('Invalid account data.');
+      const err = new TypeError(`Invalid account data: ${encodedAccount}.`);
       return Promise.reject(err);
     }
 
     if (typeof accountProof !== 'string') {
-      const err = new TypeError('Invalid account proof.');
+      const err = new TypeError(`Invalid account proof: ${accountProof}.`);
       return Promise.reject(err);
     }
 
@@ -159,7 +159,7 @@ class EIP20CoGateway {
    * @param {string} storageProof Storage proof.
    * @param {Object} txOptions Transaction options.
    *
-   * @returns {Object} Raw transaction object.
+   * @returns {Promise<Object>} Promise that resolves to transaction receipt.
    */
   confirmStakeIntent(
     staker,
@@ -174,7 +174,7 @@ class EIP20CoGateway {
     txOptions,
   ) {
     if (!txOptions) {
-      const err = new TypeError('Invalid transaction options.');
+      const err = new TypeError(`Invalid transaction options: ${txOptions}.`);
       return Promise.reject(err);
     }
     return this._confirmStakeIntentRawTx(
@@ -203,7 +203,7 @@ class EIP20CoGateway {
    * @param {string} blockHeight Block number.
    * @param {string} storageProof Storage proof.
    *
-   * @returns {Object} Raw transaction object.
+   * @returns {Promise<Object>} Promise that resolves to raw transaction object.
    */
   _confirmStakeIntentRawTx(
     staker,
@@ -217,42 +217,46 @@ class EIP20CoGateway {
     storageProof,
   ) {
     if (!Web3.utils.isAddress(staker)) {
-      const err = new TypeError('Invalid staker address.');
+      const err = new TypeError(`Invalid staker address: ${staker}.`);
       return Promise.reject(err);
     }
 
     if (typeof nonce !== 'string') {
-      const err = new TypeError('Invalid nonce.');
+      const err = new TypeError(`Invalid nonce: ${nonce}.`);
       return Promise.reject(err);
     }
 
     if (!Web3.utils.isAddress(beneficiary)) {
-      const err = new TypeError('Invalid beneficiary address.');
+      const err = new TypeError(
+        `Invalid beneficiary address: ${beneficiary}.`,
+      );
       return Promise.reject(err);
     }
 
     if (typeof amount !== 'string') {
-      const err = new TypeError('Invalid stake amount.');
+      const err = new TypeError(`Invalid stake amount: ${amount}.`);
       return Promise.reject(err);
     }
 
     if (typeof gasPrice !== 'string') {
-      const err = new TypeError('Invalid gas price.');
+      const err = new TypeError(`Invalid gas price: ${gasPrice}.`);
       return Promise.reject(err);
     }
 
     if (typeof gasLimit !== 'string') {
-      const err = new TypeError('Invalid gas limit.');
+      const err = new TypeError(`Invalid gas limit: ${gasLimit}.`);
       return Promise.reject(err);
     }
 
     if (typeof blockHeight !== 'string') {
-      const err = new TypeError('Invalid block height.');
+      const err = new TypeError(`Invalid block height: ${blockHeight}.`);
       return Promise.reject(err);
     }
 
     if (typeof storageProof !== 'string') {
-      const err = new TypeError('Invalid storage proof data.');
+      const err = new TypeError(
+        `Invalid storage proof data: ${storageProof}.`,
+      );
       return Promise.reject(err);
     }
 
@@ -277,11 +281,11 @@ class EIP20CoGateway {
    * @param {string} unlockSecret Unlock secret.
    * @param {Object} txOptions Transaction options.
    *
-   * @returns {Promise} promise object.
+   * @returns {Promise<Object>} Promise that resolves to transaction receipt.
    */
   progressMint(messageHash, unlockSecret, txOptions) {
     if (!txOptions) {
-      const err = new TypeError('Invalid transaction options.');
+      const err = new TypeError(`Invalid transaction options: ${txOptions}.`);
       return Promise.reject(err);
     }
     return this._progressMintRawTx(messageHash, unlockSecret).then((tx) =>
@@ -295,16 +299,16 @@ class EIP20CoGateway {
    * @param {string} messageHash Message hash.
    * @param {string} unlockSecret Unlock secret.
    *
-   * @returns {Promise} promise object.
+   * @returns {Promise<Object>} Promise that resolves to raw transaction object.
    */
   _progressMintRawTx(messageHash, unlockSecret) {
     if (typeof messageHash !== 'string') {
-      const err = new TypeError('Invalid message hash.');
+      const err = new TypeError(`Invalid message hash: ${messageHash}.`);
       return Promise.reject(err);
     }
 
     if (typeof unlockSecret !== 'string') {
-      const err = new TypeError('Invalid unlock secret.');
+      const err = new TypeError(`Invalid unlock secret: ${unlockSecret}.`);
       return Promise.reject(err);
     }
 
@@ -355,9 +359,9 @@ class EIP20CoGateway {
   }
 
   /**
-   * Returns the bounty amount.
+   * Return the bounty amount.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<string>} Promise that resolves to bounty amount.
    */
   getBounty() {
     if (this._bountyAmount) {
@@ -375,7 +379,7 @@ class EIP20CoGateway {
   /**
    * Returns the utility token address.
    *
-   * @return {string} utilityToken Utility token address
+   * @returns {Promise<string>} Promise that resolves to utility token contract address.
    */
   getUtilityToken() {
     if (this._utilityToken) {
@@ -395,19 +399,19 @@ class EIP20CoGateway {
    *
    * @param {string} accountAddress Account address for which the nonce is to be fetched.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<Object>} Promise that resolves to nonce
    */
   getNonce(accountAddress) {
     if (!Web3.utils.isAddress(accountAddress)) {
-      throw new TypeError('Invalid account address.');
+      throw new TypeError(`Invalid account address: ${accountAddress}.`);
     }
     return this.contract.methods.getNonce(accountAddress).call();
   }
 
   /**
-   * Returns the auxiliary chain state root provider contract address.
+   * Returns the state root provider contract address.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<Object>} Promise that resolves to state root provider contract's address.
    */
   async getStateRootProviderAddress() {
     if (this._stateRootProviderAddress) {
@@ -427,11 +431,11 @@ class EIP20CoGateway {
    *
    * @param {string} messageHash Message hash.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<Object>} Promise that resolves to message status.
    */
   getInboxMessageStatus(messageHash) {
     if (typeof messageHash !== 'string') {
-      const err = new TypeError('Invalid message hash.');
+      const err = new TypeError(`Invalid message hash: ${messageHash}.`);
       return Promise.reject(err);
     }
     return this.contract.methods.getInboxMessageStatus(messageHash).call();
@@ -442,11 +446,11 @@ class EIP20CoGateway {
    *
    * @param {string} messageHash Message hash.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<Object>} Promise that resolves to message status.
    */
   getOutboxMessageStatus(messageHash) {
     if (typeof messageHash !== 'string') {
-      const err = new TypeError('Invalid message hash.');
+      const err = new TypeError(`Invalid message hash: ${messageHash}.`);
       return Promise.reject(err);
     }
     return this.contract.methods.getOutboxMessageStatus(messageHash).call();
@@ -463,15 +467,17 @@ class EIP20CoGateway {
    * @param {string} hashLock Hash lock.
    * @param {Object} txOptions Transaction options.
    *
-   * @returns {Object} Raw transaction object.
+   * @returns {Promise<Object>} Promise that resolves to transaction receipt.
    */
   redeem(amount, beneficiary, gasPrice, gasLimit, nonce, hashLock, txOptions) {
     if (!txOptions) {
-      const err = new TypeError('Invalid transaction options.');
+      const err = new TypeError(`Invalid transaction options: ${txOptions}.`);
       return Promise.reject(err);
     }
     if (!Web3.utils.isAddress(txOptions.from)) {
-      const err = new TypeError('Invalid redeemer address.');
+      const err = new TypeError(
+        `Invalid redeemer address: ${txOptions.from}.`,
+      );
       return Promise.reject(err);
     }
 
@@ -495,23 +501,35 @@ class EIP20CoGateway {
    * @param {string} nonce Redeemer's nonce.
    * @param {string} hashLock Hash lock.
    *
-   * @returns {Object} Raw transaction object.
+   * @returns {Promise<Object>} Promise that resolves to raw transaction object.
    */
   _redeemRawTx(amount, beneficiary, gasPrice, gasLimit, nonce, hashLock) {
-    if (new BN(amount).eqn(0)) {
-      const err = new TypeError('Redeem amount must not be zero.');
+    if (!new BN(amount).gtn(0)) {
+      const err = new TypeError(
+        `Redeem amount must be greater than zero: ${amount}.`,
+      );
       return Promise.reject(err);
     }
     if (!Web3.utils.isAddress(beneficiary)) {
-      const err = new TypeError('Invalid beneficiary address.');
+      const err = new TypeError(
+        `Invalid beneficiary address: ${beneficiary}.`,
+      );
       return Promise.reject(err);
     }
-    if (gasPrice === undefined) {
-      const err = new TypeError('Invalid gas price.');
+    if (typeof gasPrice !== 'string') {
+      const err = new TypeError(`Invalid gas price: ${gasPrice}.`);
       return Promise.reject(err);
     }
-    if (gasLimit === undefined) {
-      const err = new TypeError('Invalid gas limit.');
+    if (typeof gasLimit !== 'string') {
+      const err = new TypeError(`Invalid gas limit: ${gasLimit}.`);
+      return Promise.reject(err);
+    }
+    if (typeof nonce !== 'string') {
+      const err = new TypeError(`Invalid nonce: ${nonce}.`);
+      return Promise.reject(err);
+    }
+    if (typeof hashLock !== 'string') {
+      const err = new TypeError(`Invalid hash lock: ${hashLock}.`);
       return Promise.reject(err);
     }
     const tx = this.contract.methods.redeem(
@@ -531,11 +549,15 @@ class EIP20CoGateway {
    * @param {string} redmeer Redeemer account address.
    * @param {string} amount Approval amount.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<boolean>} Promise that resolves to `true` if approved.
    */
   isRedeemAmountApproved(redeemer, amount) {
     if (!Web3.utils.isAddress(redeemer)) {
-      const err = new TypeError('Invalid redemeer address.');
+      const err = new TypeError(`Invalid redemeer address: ${redeemer}.`);
+      return Promise.reject(err);
+    }
+    if (typeof amount != 'string') {
+      const err = new TypeError(`Invalid redeem amount: ${amount}.`);
       return Promise.reject(err);
     }
     return this.getEIP20UtilityToken().then((eip20ValueToken) => {
@@ -553,19 +575,19 @@ class EIP20CoGateway {
    * @param {string} amount Approve amount.
    * @param {string} txOptions Transaction options.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<Object>} Promise that resolves to transaction receipt.
    */
   approveRedeemAmount(amount, txOptions) {
     if (!txOptions) {
-      const err = new TypeError('Invalid transaction options.');
+      const err = new TypeError(`Invalid transaction options: ${txOptions}.`);
       return Promise.reject(err);
     }
     if (!Web3.utils.isAddress(txOptions.from)) {
-      const err = new TypeError('Invalid from address.');
+      const err = new TypeError(`Invalid from address: ${txOptions.from}.`);
       return Promise.reject(err);
     }
     if (typeof amount !== 'string') {
-      const err = new TypeError('Invalid stake amount.');
+      const err = new TypeError(`Invalid stake amount: ${amount}.`);
       return Promise.reject(err);
     }
     return this.getEIP20UtilityToken().then((eip20Token) => {
@@ -576,7 +598,7 @@ class EIP20CoGateway {
   /**
    * Returns Anchor object.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<string>} Promise object that resolves to anchor contract address.
    */
   getAnchor() {
     if (this._anchor) {
@@ -590,9 +612,9 @@ class EIP20CoGateway {
   }
 
   /**
-   * Get the state root for given block height.
+   * Get the latest state root and block height.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<Object>} Promise object that resolves to object containing state root and block height.
    */
   getLatestAnchorInfo() {
     return this.getAnchor().then((anchor) => {
@@ -608,9 +630,9 @@ class EIP20CoGateway {
   }
 
   /**
-   * Returns base token object.
+   * Returns utitity token object.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<Object>} Promise that resolves to utility token object.
    */
   getEIP20UtilityToken() {
     if (this._eip20UtilityToken) {

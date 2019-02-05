@@ -65,7 +65,7 @@ describe('EIP20CoGateway.getNonce()', () => {
   it('should throw an error when account address is undefined', async () => {
     assert.throws(() => {
       coGateway.getNonce();
-    }, /Invalid account address./);
+    }, `Invalid account address: ${undefined}.`);
   });
 
   it('should return correct mocked nonce', async () => {

@@ -87,7 +87,7 @@ describe('EIP20CoGateway.progressMint()', () => {
       .catch((exception) => {
         assert.strictEqual(
           exception.message,
-          'Invalid transaction options.',
+          `Invalid transaction options: ${undefined}.`,
           'Exeception message should match',
         );
       });
