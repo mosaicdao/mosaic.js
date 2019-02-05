@@ -61,11 +61,11 @@
 module.exports = {
   origin: {
     web3: {},
-    addresses: {}
+    addresses: {},
   },
   auxiliary: {
     web3: {},
-    addresses: {}
+    addresses: {},
   },
-  setupConfig: {}
+  setupConfig: {},
 };

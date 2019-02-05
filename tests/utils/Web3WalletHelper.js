@@ -33,7 +33,10 @@ Web3WalletHelper.prototype = {
           continue;
         }
 
-        fs.readFile(keystoreFolder + '/' + items[i], 'utf8', function(err, fileContent) {
+        fs.readFile(keystoreFolder + '/' + items[i], 'utf8', function(
+          err,
+          fileContent,
+        ) {
           if (err) {
             isRejected = true;
             console.log('Error Reading file!\n', err);
@@ -44,7 +47,10 @@ Web3WalletHelper.prototype = {
             return;
           }
 
-          let account = oThis.web3Object.eth.accounts.decrypt(fileContent, passphrase);
+          let account = oThis.web3Object.eth.accounts.decrypt(
+            fileContent,
+            passphrase,
+          );
           oThis.web3Object.eth.accounts.wallet.add(account);
           resolved--;
           if (!resolved) {
@@ -55,7 +61,7 @@ Web3WalletHelper.prototype = {
         });
       }
     });
-  }
+  },
 };
 
 module.exports = Web3WalletHelper;

@@ -1,9 +1,27 @@
+// Copyright 2019 OpenST Ltd.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// ----------------------------------------------------------------------------
+//
+// http://www.simpletoken.org/
+//
+// ----------------------------------------------------------------------------
+
 'use strict';
 
-//__NOT_FOR_WEB__BEGIN__
-const fs = require('fs'),
-  path = require('path');
-//__NOT_FOR_WEB__END__
+const fs = require('fs');
+const path = require('path');
 
 const Package = require('../../index');
 const AbiBinProvider = Package.AbiBinProvider;
@@ -34,7 +52,7 @@ class MockContractsDeployer {
     let defaultOptions = {
       from: oThis.deployer,
       gas: '7500000',
-      gasPrice: '0x5B9ACA00'
+      gasPrice: '0x5B9ACA00',
     };
 
     if (txOptions) {
@@ -47,9 +65,9 @@ class MockContractsDeployer {
     let tx = contract.deploy(
       {
         data: bin,
-        arguments: args
+        arguments: args,
       },
-      txOptions
+      txOptions,
     );
 
     console.log(`* Deploying ${contractName} Contract`);
@@ -65,7 +83,11 @@ class MockContractsDeployer {
       })
       .on('receipt', function(receipt) {
         txReceipt = receipt;
-        console.log('\t - Receipt:\n\x1b[2m', JSON.stringify(receipt), '\x1b[0m\n');
+        console.log(
+          '\t - Receipt:\n\x1b[2m',
+          JSON.stringify(receipt),
+          '\x1b[0m\n',
+        );
       })
       .then(function(instace) {
         oThis.addresses[contractName] = instace.options.address;
@@ -77,8 +99,13 @@ class MockContractsDeployer {
   static abiBinProvider() {
     const provider = new AbiBinProvider();
 
-    const MockTokenAbi = JSON.parse(fs.readFileSync(path.join(mockAbiFolder, 'MockToken.abi')));
-    const MockTokenBin = fs.readFileSync(path.join(mockBinFolder, 'MockToken.bin'), 'utf8');
+    const MockTokenAbi = JSON.parse(
+      fs.readFileSync(path.join(mockAbiFolder, 'MockToken.abi')),
+    );
+    const MockTokenBin = fs.readFileSync(
+      path.join(mockBinFolder, 'MockToken.bin'),
+      'utf8',
+    );
     provider.addABI('MockToken', MockTokenAbi);
     provider.addBIN('MockToken', MockTokenBin);
 

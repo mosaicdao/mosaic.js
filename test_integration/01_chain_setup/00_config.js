@@ -32,7 +32,7 @@ describe('Setup Helpers - Config', () => {
       deployerAddress: accountsOrigin[0],
       organizationOwner: accountsOrigin[1],
       organizationAdmin: accountsOrigin[2],
-      organizationWorker: accountsOrigin[0]
+      organizationWorker: accountsOrigin[0],
     };
   });
 });

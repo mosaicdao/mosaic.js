@@ -20,23 +20,21 @@
 
 const chai = require('chai');
 const sinon = require('sinon');
-const Web3 = require('web3');
 const StakeHelper = require('../../src/helpers/StakeHelper');
 const Contracts = require('../../src/Contracts');
 const SpyAssert = require('../../test_utils/SpyAssert');
+const TestMosaic = require('../../test_utils/GetTestMosaic');
 
 const assert = chai.assert;
 
 describe('StakeHelper.getBounty()', () => {
   let stakeHelper;
-  let web3;
-  let gatewayAddress;
+  let mosaic;
 
   beforeEach(() => {
     // runs before each test in this block
-    web3 = new Web3('http://localhost:8545');
-    gatewayAddress = '0x0000000000000000000000000000000000000001';
-    stakeHelper = new StakeHelper(web3, gatewayAddress);
+    mosaic = TestMosaic.mosaic();
+    stakeHelper = new StakeHelper(mosaic);
   });
 
   it('should return correct bounty value', async function() {
@@ -44,7 +42,10 @@ describe('StakeHelper.getBounty()', () => {
 
     // Mock an instance of gateway contract.
     const mockContract = sinon.mock(
-      Contracts.getEIP20Gateway(web3, gatewayAddress),
+      Contracts.getEIP20Gateway(
+        mosaic.origin.web3,
+        mosaic.origin.contractAddresses.EIP20Gateway,
+      ),
     );
     const gatewayContract = mockContract.object;
 
@@ -77,7 +78,9 @@ describe('StakeHelper.getBounty()', () => {
     );
 
     SpyAssert.assert(spyBounty, 1, [[]]);
-    SpyAssert.assert(spyContract, 1, [[web3, gatewayAddress]]);
+    SpyAssert.assert(spyContract, 1, [
+      [mosaic.origin.web3, mosaic.origin.contractAddresses.EIP20Gateway],
+    ]);
     SpyAssert.assert(spy, 1, [[]]);
 
     // Restore all mocked and spy objects.

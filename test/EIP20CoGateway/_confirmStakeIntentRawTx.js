@@ -18,89 +18,44 @@
 //
 // ----------------------------------------------------------------------------
 
-const BN = require('bn.js');
 const chai = require('chai');
-const sinon = require('sinon');
 const Web3 = require('web3');
-const StakeHelper = require('../../src/helpers/StakeHelper');
-const Contracts = require('../../src/Contracts');
-const SpyAssert = require('../../test_utils/SpyAssert');
+const sinon = require('sinon');
 
 const assert = chai.assert;
+const EIP20CoGateway = require('../../src/ContractInteract/EIP20CoGateway');
+const SpyAssert = require('../../test_utils/SpyAssert');
 
-describe('StakeHelper.stake()', () => {
+describe('EIP20CoGateway._confirmStakeIntentRawTx()', () => {
   let web3;
-  let gatewayAddress;
-  let stakeParams = {};
-  let txOption;
-  let stakeHelper;
+  let coGatewayAddress;
+  let coGateway;
 
-  let hashLockObj;
+  let stakeParams;
+  let mockedTx;
 
-  let mockTx;
-  let spyContract;
-  let spyStakeMethod;
-  let spySendTransaction;
-  let spyStake;
+  let spyMethod;
+  let spyCall;
 
-  const setup = function() {
-    // Mock an instance of gateway contract.
-    const mockContract = sinon.mock(
-      Contracts.getEIP20Gateway(web3, gatewayAddress),
-    );
-    const gatewayContract = mockContract.object;
-
-    spyContract = sinon.replace(
-      Contracts,
-      'getEIP20Gateway',
-      sinon.fake.returns(gatewayContract),
+  const setup = () => {
+    spyMethod = sinon.replace(
+      coGateway.contract.methods,
+      'confirmStakeIntent',
+      sinon.fake.resolves(mockedTx),
     );
 
-    // Mock stake transaction object.
-    mockTx = sinon.mock(
-      gatewayContract.methods.stake(
-        stakeParams.amount,
-        stakeParams.beneficiary,
-        stakeParams.gasPrice,
-        stakeParams.gasLimit,
-        stakeParams.nonce,
-        stakeParams.hashLock,
-      ),
-    );
-
-    spyStakeMethod = sinon.replace(
-      gatewayContract.methods,
-      'stake',
-      sinon.fake.returns(mockTx.object),
-    );
-
-    spySendTransaction = sinon.replace(
-      StakeHelper,
-      'sendTransaction',
-      sinon.fake.returns(true),
-    );
-
-    // Add spy on stakeHelper.stake.
-    spyStake = sinon.spy(stakeHelper, 'stake');
+    spyCall = sinon.spy(coGateway, '_confirmStakeIntentRawTx');
   };
 
-  const tearDown = function() {
-    mockTx.restore();
-    spyStake.restore();
+  const tearDown = () => {
     sinon.restore();
+    spyCall.restore();
   };
 
   beforeEach(() => {
     web3 = new Web3();
-    gatewayAddress = '0x0000000000000000000000000000000000000001';
-    stakeHelper = new StakeHelper(web3, gatewayAddress);
-
-    hashLockObj = {
-      secret: 'secret',
-      unlockSecret: '0x736563726574',
-      hashLock:
-        '0x65462b0520ef7d3df61b9992ed3bea0c56ead753be7c8b3614e0ce01e4cac41b',
-    };
+    coGatewayAddress = '0x0000000000000000000000000000000000000002';
+    coGateway = new EIP20CoGateway(web3, coGatewayAddress);
 
     stakeParams = {
       staker: '0x0000000000000000000000000000000000000005',
@@ -109,30 +64,26 @@ describe('StakeHelper.stake()', () => {
       gasPrice: '1',
       gasLimit: '1000000',
       nonce: '1',
-      hashLock: hashLockObj.hashLock,
+      hashLock: '0xhashlock',
+      blockHeight: '12345',
+      storageProof: '0x123',
     };
-
-    txOption = {
-      from: stakeParams.staker,
-      to: gatewayAddress,
-      gasLimit: 0,
-      gasPrice: 0,
-      value: 0,
-    };
+    mockedTx = 'MockedTx';
   });
 
-  it('should throw error when staker address is invalid', async function() {
+  it('should throw error when staker address is invalid', async () => {
     const expectedErrorMessage = 'Invalid staker address.';
-    await stakeHelper
-      .stake(
-        '0x123',
+    await coGateway
+      ._confirmStakeIntentRawTx(
+        undefined,
+        stakeParams.nonce,
+        stakeParams.beneficiary,
         stakeParams.amount,
-        stakeParams.beneficiary,
         stakeParams.gasPrice,
         stakeParams.gasLimit,
-        stakeParams.nonce,
         stakeParams.hashLock,
-        txOption,
+        stakeParams.blockHeight,
+        stakeParams.storageProof,
       )
       .catch((exception) => {
         assert.strictEqual(
@@ -143,18 +94,19 @@ describe('StakeHelper.stake()', () => {
       });
   });
 
-  it('should throw error when stake amount is zero', async function() {
-    const expectedErrorMessage = 'Stake amount must not be zero.';
-    await stakeHelper
-      .stake(
+  it('should throw error when nonce is invalid', async () => {
+    const expectedErrorMessage = 'Invalid nonce.';
+    await coGateway
+      ._confirmStakeIntentRawTx(
         stakeParams.staker,
-        '0',
+        undefined,
         stakeParams.beneficiary,
+        stakeParams.amount,
         stakeParams.gasPrice,
         stakeParams.gasLimit,
-        stakeParams.nonce,
         stakeParams.hashLock,
-        txOption,
+        stakeParams.blockHeight,
+        stakeParams.storageProof,
       )
       .catch((exception) => {
         assert.strictEqual(
@@ -165,18 +117,19 @@ describe('StakeHelper.stake()', () => {
       });
   });
 
-  it('should throw error when beneficiary address is invalid', async function() {
+  it('should throw error when beneficiary address is invalid', async () => {
     const expectedErrorMessage = 'Invalid beneficiary address.';
-    await stakeHelper
-      .stake(
+    await coGateway
+      ._confirmStakeIntentRawTx(
         stakeParams.staker,
+        stakeParams.nonce,
+        undefined,
         stakeParams.amount,
-        '0x123',
         stakeParams.gasPrice,
         stakeParams.gasLimit,
-        stakeParams.nonce,
         stakeParams.hashLock,
-        txOption,
+        stakeParams.blockHeight,
+        stakeParams.storageProof,
       )
       .catch((exception) => {
         assert.strictEqual(
@@ -187,18 +140,42 @@ describe('StakeHelper.stake()', () => {
       });
   });
 
-  it('should throw error when gas price is undefined', async function() {
+  it('should throw error when stake amount is invalid', async () => {
+    const expectedErrorMessage = 'Invalid stake amount.';
+    await coGateway
+      ._confirmStakeIntentRawTx(
+        stakeParams.staker,
+        stakeParams.nonce,
+        stakeParams.beneficiary,
+        undefined,
+        stakeParams.gasPrice,
+        stakeParams.gasLimit,
+        stakeParams.hashLock,
+        stakeParams.blockHeight,
+        stakeParams.storageProof,
+      )
+      .catch((exception) => {
+        assert.strictEqual(
+          exception.message,
+          expectedErrorMessage,
+          `Exception reason must be "${expectedErrorMessage}"`,
+        );
+      });
+  });
+
+  it('should throw error when gas price is invalid', async () => {
     const expectedErrorMessage = 'Invalid gas price.';
-    await stakeHelper
-      .stake(
+    await coGateway
+      ._confirmStakeIntentRawTx(
         stakeParams.staker,
-        stakeParams.amount,
+        stakeParams.nonce,
         stakeParams.beneficiary,
+        stakeParams.amount,
         undefined,
         stakeParams.gasLimit,
-        stakeParams.nonce,
         stakeParams.hashLock,
-        txOption,
+        stakeParams.blockHeight,
+        stakeParams.storageProof,
       )
       .catch((exception) => {
         assert.strictEqual(
@@ -209,18 +186,19 @@ describe('StakeHelper.stake()', () => {
       });
   });
 
-  it('should throw error when gas limit is undefined', async function() {
+  it('should throw error when gas limit is invalid', async () => {
     const expectedErrorMessage = 'Invalid gas limit.';
-    await stakeHelper
-      .stake(
+    await coGateway
+      ._confirmStakeIntentRawTx(
         stakeParams.staker,
-        stakeParams.amount,
+        stakeParams.nonce,
         stakeParams.beneficiary,
+        stakeParams.amount,
         stakeParams.gasPrice,
         undefined,
-        stakeParams.nonce,
         stakeParams.hashLock,
-        txOption,
+        stakeParams.blockHeight,
+        stakeParams.storageProof,
       )
       .catch((exception) => {
         assert.strictEqual(
@@ -231,17 +209,41 @@ describe('StakeHelper.stake()', () => {
       });
   });
 
-  it('should throw error when transaction option is undefined', async function() {
-    const expectedErrorMessage = 'Invalid transaction options.';
-    await stakeHelper
-      .stake(
+  it('should throw error when block height is invalid', async () => {
+    const expectedErrorMessage = 'Invalid block height.';
+    await coGateway
+      ._confirmStakeIntentRawTx(
         stakeParams.staker,
-        stakeParams.amount,
+        stakeParams.nonce,
         stakeParams.beneficiary,
+        stakeParams.amount,
         stakeParams.gasPrice,
         stakeParams.gasLimit,
-        stakeParams.nonce,
         stakeParams.hashLock,
+        undefined,
+        stakeParams.storageProof,
+      )
+      .catch((exception) => {
+        assert.strictEqual(
+          exception.message,
+          expectedErrorMessage,
+          `Exception reason must be "${expectedErrorMessage}"`,
+        );
+      });
+  });
+
+  it('should throw error when storage proof is invalid', async () => {
+    const expectedErrorMessage = 'Invalid storage proof data.';
+    await coGateway
+      ._confirmStakeIntentRawTx(
+        stakeParams.staker,
+        stakeParams.nonce,
+        stakeParams.beneficiary,
+        stakeParams.amount,
+        stakeParams.gasPrice,
+        stakeParams.gasLimit,
+        stakeParams.hashLock,
+        stakeParams.blockHeight,
         undefined,
       )
       .catch((exception) => {
@@ -253,72 +255,52 @@ describe('StakeHelper.stake()', () => {
       });
   });
 
-  it('should throw error when facilitator address is invalid', async function() {
-    const expectedErrorMessage = 'Invalid facilitator address.';
-    txOption.from = '0x233';
-    await stakeHelper
-      .stake(
-        stakeParams.staker,
-        stakeParams.amount,
-        stakeParams.beneficiary,
-        stakeParams.gasPrice,
-        stakeParams.gasLimit,
-        stakeParams.nonce,
-        stakeParams.hashLock,
-        txOption,
-      )
-      .catch((exception) => {
-        assert.strictEqual(
-          exception.message,
-          expectedErrorMessage,
-          `Exception reason must be "${expectedErrorMessage}"`,
-        );
-      });
-  });
-
-  it('should pass when all the function arguments are correct', async function() {
+  it('should return correct mocked transaction object', async () => {
     setup();
-
-    const result = await stakeHelper.stake(
+    const result = await coGateway._confirmStakeIntentRawTx(
       stakeParams.staker,
-      stakeParams.amount,
+      stakeParams.nonce,
       stakeParams.beneficiary,
+      stakeParams.amount,
       stakeParams.gasPrice,
       stakeParams.gasLimit,
-      stakeParams.nonce,
       stakeParams.hashLock,
-      txOption,
+      stakeParams.blockHeight,
+      stakeParams.storageProof,
+    );
+    assert.strictEqual(
+      result,
+      mockedTx,
+      'Function should return mocked transaction object.',
     );
 
-    // Assert the result/
-    assert.strictEqual(result, true, 'Transaction result must be true.');
-
-    // Assert the spy calls.
-    SpyAssert.assert(spyContract, 1, [[web3, gatewayAddress]]);
-    SpyAssert.assert(spyStakeMethod, 1, [
-      [
-        stakeParams.amount,
-        stakeParams.beneficiary,
-        stakeParams.gasPrice,
-        stakeParams.gasLimit,
-        stakeParams.nonce,
-        stakeParams.hashLock,
-      ],
-    ]);
-    SpyAssert.assert(spyStake, 1, [
+    SpyAssert.assert(spyMethod, 1, [
       [
         stakeParams.staker,
-        stakeParams.amount,
+        stakeParams.nonce,
         stakeParams.beneficiary,
+        stakeParams.amount,
         stakeParams.gasPrice,
         stakeParams.gasLimit,
-        stakeParams.nonce,
         stakeParams.hashLock,
-        txOption,
+        stakeParams.blockHeight,
+        stakeParams.storageProof,
       ],
     ]);
-    SpyAssert.assert(spySendTransaction, 1, [[mockTx.object, txOption]]);
 
+    SpyAssert.assert(spyCall, 1, [
+      [
+        stakeParams.staker,
+        stakeParams.nonce,
+        stakeParams.beneficiary,
+        stakeParams.amount,
+        stakeParams.gasPrice,
+        stakeParams.gasLimit,
+        stakeParams.hashLock,
+        stakeParams.blockHeight,
+        stakeParams.storageProof,
+      ],
+    ]);
     tearDown();
   });
 });
