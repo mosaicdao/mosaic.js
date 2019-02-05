@@ -793,6 +793,7 @@ class ChainSetup {
   }
 
   static get CoGatewayHelper() {
+    deprecationNoticeChainSetup('ChainSetup.CoGatewayHelper');
     return CoGatewayHelper;
   }
 }

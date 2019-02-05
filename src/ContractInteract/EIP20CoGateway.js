@@ -2,11 +2,18 @@
 
 const Web3 = require('web3');
 const BN = require('bn.js');
+
+const AbiBinProvider = require('../AbiBinProvider');
 const Contracts = require('../Contracts');
 const Utils = require('../utils/Utils');
 const Anchor = require('../ContractInteract/Anchor');
 const EIP20Token = require('../ContractInteract/EIP20Token');
+const {
+  validateConfigExists,
+  validateConfigKeyExists,
+} = require('../helpers/setup/validation');
 
+const ContractName = 'EIP20CoGateway';
 /**
  * Contract interact for EIP20CoGateway.
  */
@@ -34,16 +41,13 @@ class EIP20CoGateway {
       throw err;
     }
 
-    this.coGatewayAddress = coGatewayAddress;
+    this.address = coGatewayAddress;
 
-    this.contract = Contracts.getEIP20CoGateway(
-      this.web3,
-      this.coGatewayAddress,
-    );
+    this.contract = Contracts.getEIP20CoGateway(this.web3, this.address);
 
     if (!this.contract) {
       const err = new Error(
-        `Could not load EIP20CoGateway contract for: ${this.coGatewayAddress}`,
+        `Could not load EIP20CoGateway contract for: ${this.address}`,
       );
       throw err;
     }
@@ -71,6 +75,128 @@ class EIP20CoGateway {
     this.progressRedeemRawTx = this.progressRedeemRawTx.bind(this);
     this.approveRedeemAmount = this.approveRedeemAmount.bind(this);
     this.progressRedeem = this.progressRedeem.bind(this);
+  }
+
+  // TODO: docs
+  static setup(web3, config, txOptions = {}) {
+    EIP20CoGateway.validateSetupConfig(config);
+    validateConfigKeyExists(config, 'gateway', 'config');
+
+    const deployParams = Object.assign({}, txOptions);
+    deployParams.from = txOptions.from || config.deployer;
+
+    return EIP20CoGateway.deploy(
+      web3,
+      config.valueToken, // TODO: valueToken -> baseToken
+      config.utilityToken,
+      config.anchor,
+      config.bounty,
+      config.organization,
+      config.gateway,
+      config.burner,
+      config.messageBus,
+      config.gatewayLib,
+      deployParams,
+    );
+  }
+
+  // TODO: docs
+  static validateSetupConfig(config) {
+    validateConfigExists(config);
+    validateConfigKeyExists(config, 'deployer', 'config');
+    validateConfigKeyExists(config, 'bounty', 'config');
+    validateConfigKeyExists(config, 'organization', 'config');
+    validateConfigKeyExists(config, 'anchor', 'config');
+    validateConfigKeyExists(config, 'messageBus', 'config');
+    validateConfigKeyExists(config, 'gatewayLib', 'config');
+    validateConfigKeyExists(config, 'valueToken', 'config');
+    validateConfigKeyExists(config, 'utilityToken', 'config');
+    validateConfigKeyExists(config, 'burner', 'config');
+  }
+
+  // TODO: docs
+  static async deploy(
+    web3,
+    valueToken,
+    utilityToken,
+    anchor,
+    bounty,
+    membersManager,
+    gateway,
+    burner,
+    messageBus,
+    gatewayLib,
+    txOptions,
+  ) {
+    const tx = EIP20CoGateway.deployRawTx(
+      web3,
+      valueToken,
+      utilityToken,
+      anchor,
+      bounty,
+      membersManager,
+      gateway,
+      burner,
+      messageBus,
+      gatewayLib,
+    );
+
+    const _txOptions = txOptions;
+    if (!_txOptions.gas) {
+      _txOptions.gas = await tx.estimateGas();
+    }
+
+    return Utils.sendTransaction(tx, _txOptions).then((txReceipt) => {
+      const address = txReceipt.contractAddress;
+      return new EIP20CoGateway(web3, address);
+    });
+  }
+
+  // TODO: docs
+  static deployRawTx(
+    web3,
+    valueToken,
+    utilityToken,
+    anchor,
+    bounty,
+    membersManager,
+    gateway,
+    burner,
+    messageBus,
+    gatewayLib,
+  ) {
+    const messageBusLibInfo = {
+      address: messageBus,
+      name: 'MessageBus',
+    };
+    const gatewayLibInfo = {
+      address: gatewayLib,
+      name: 'GatewayLib',
+    };
+
+    const abiBinProvider = new AbiBinProvider();
+    const abi = abiBinProvider.getABI(ContractName);
+    const bin = abiBinProvider.getLinkedBIN(
+      ContractName,
+      messageBusLibInfo,
+      gatewayLibInfo,
+    );
+
+    const contract = new web3.eth.Contract(abi, null, null);
+    const args = [
+      valueToken,
+      utilityToken,
+      anchor,
+      bounty,
+      membersManager,
+      gateway,
+      burner,
+    ];
+
+    return contract.deploy({
+      data: bin,
+      arguments: args,
+    });
   }
 
   /**

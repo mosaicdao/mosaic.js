@@ -1,8 +1,8 @@
 'use strict';
 
-const Web3 = require('web3');
 const AbiBinProvider = require('../../AbiBinProvider');
 const CoGatewayHelper = require('./CoGatewayHelper');
+const EIP20CoGateway = require('../../ContractInteract/EIP20CoGateway');
 
 const ContractName = 'EIP20Gateway';
 class GatewayHelper {
@@ -77,7 +77,7 @@ class GatewayHelper {
     }
 
     GatewayHelper.validateSetupConfig(gatewayConfig);
-    CoGatewayHelper.validateSetupConfig(coGatewayConfig);
+    EIP20CoGateway.validateSetupConfig(coGatewayConfig);
 
     if (!gatewayTxOptions) {
       gatewayTxOptions = gatewayTxOptions || {};
@@ -89,8 +89,6 @@ class GatewayHelper {
 
     let gatewayDeployParams = Object.assign({}, gatewayTxOptions);
     gatewayDeployParams.from = gatewayConfig.deployer;
-
-    let coGatewayHelper = new CoGatewayHelper(auxiliaryWeb3);
 
     let promiseChain = oThis.deploy(
       gatewayConfig.token,
@@ -107,17 +105,17 @@ class GatewayHelper {
     promiseChain = promiseChain.then(function() {
       let gatewayAddress = oThis.address;
       coGatewayConfig.gateway = gatewayAddress;
-      return coGatewayHelper.setup(
+      return EIP20CoGateway.setup(
+        auxiliaryWeb3,
         coGatewayConfig,
         coGatewayTxOptions,
-        auxiliaryWeb3,
       );
     });
 
-    promiseChain = promiseChain.then(function() {
+    promiseChain = promiseChain.then(function(coGateway) {
       let ownerTxParams = Object.assign({}, gatewayDeployParams);
       ownerTxParams.from = gatewayConfig.organizationOwner;
-      let coGatewayAddress = coGatewayHelper.address;
+      let coGatewayAddress = coGateway.address;
       let gatewayAddress = oThis.address;
       oThis.cogateway = coGatewayAddress;
       return oThis.activateGateway(

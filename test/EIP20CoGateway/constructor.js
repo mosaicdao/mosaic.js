@@ -73,7 +73,7 @@ describe('EIP20CoGateway.constructor()', () => {
 
     const contractObject = new EIP20CoGateway(web3, coGatewayAddress);
     assert.strictEqual(
-      contractObject.coGatewayAddress,
+      contractObject.address,
       coGatewayAddress,
       'Cogateway contract address from contract must be equal to expected address',
     );

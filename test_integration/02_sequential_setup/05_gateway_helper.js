@@ -87,6 +87,7 @@ describe('GatewayHelper', () => {
       organization: shared.auxiliary.addresses.Organization,
       anchor: shared.auxiliary.addresses.Anchor,
       bounty: '123456',
+      burner: '0x0000000000000000000000000000000000000000',
       messageBus: shared.auxiliary.addresses.MessageBus,
       gatewayLib: shared.auxiliary.addresses.GatewayLib,
     };
