@@ -19,14 +19,13 @@
 // ----------------------------------------------------------------------------
 
 const Web3 = require('web3');
-const EIP20Gateway = require('../../src/ContractInteract/EIP20Gateway');
-const EIP20Token = require('../../src/ContractInteract/EIP20Token');
+const EIP20CoGateway = require('../../src/ContractInteract/EIP20CoGateway');
 const Mosaic = require('../Mosaic');
 
 /**
- * Staker class
+ * Redeemer class
  */
-class Staker {
+class Redeemer {
   /**
    * Constructor for staker.
    *
@@ -37,64 +36,56 @@ class Staker {
       const err = new TypeError('Invalid mosaic object.');
       throw err;
     }
-    if (!(mosaic.origin.web3 instanceof Web3)) {
+    if (!(mosaic.auxiliary.web3 instanceof Web3)) {
       const err = new TypeError('Invalid origin web3 object.');
       throw err;
     }
-    if (!Web3.utils.isAddress(mosaic.origin.contractAddresses.EIP20Gateway)) {
-      const err = new TypeError('Invalid Gateway address.');
+    if (
+      !Web3.utils.isAddress(mosaic.auxiliary.contractAddresses.EIP20CoGateway)
+    ) {
+      const err = new TypeError('Invalid CoGateway address.');
       throw err;
     }
 
-    this.web3 = mosaic.origin.web3;
-    this.gatewayAddress = mosaic.origin.contractAddresses.EIP20Gateway;
-    this.gatewayContract = new EIP20Gateway(this.web3, this.gatewayAddress);
+    this.web3 = mosaic.auxiliary.web3;
+    this.coGatewayAddress = mosaic.auxiliary.contractAddresses.EIP20CoGateway;
+    this.coGatewayContract = new EIP20CoGateway(
+      this.web3,
+      this.coGatewayAddress,
+    );
 
-    this.approveStakeAmount = this.approveStakeAmount.bind(this);
-    this.getValueToken = this.getValueToken.bind(this);
+    this.approveRedeemAmount = this.approveRedeemAmount.bind(this);
+    this.getUtilityToken = this.getUtilityToken.bind(this);
   }
 
   /**
    * Approve gateway contract for token transfer.
    *
-   * @param {string} amount Stake amount
+   * @param {string} amount Redeem amount
    * @param {Object} txOptions Transaction options.
    *
    * @returns {Promise} Promise object.
    */
-  approveStakeAmount(amount, txOptions) {
+  approveRedeemAmount(amount, txOptions) {
     if (typeof amount !== 'string') {
       const err = new Error('Invalid stake amount.');
-      throw err;
+      return Promise.reject(err);
     }
     if (!txOptions) {
       const err = new Error('Invalid transaction options.');
-      throw err;
+      return Promise.reject(err);
     }
     if (!Web3.utils.isAddress(txOptions.from)) {
       const err = new Error('Invalid staker address.');
-      throw err;
+      return Promise.reject(err);
     }
 
-    // Get value token address.
-    let approvalChain = this.gatewayContract.getValueToken();
-
-    // Create an instance of value token
-    approvalChain = approvalChain.then((valueTokenAddress) =>
-      this.getValueToken(valueTokenAddress),
-    );
-
-    // Call approve on value token.
-    approvalChain = approvalChain.then((valueToken) =>
-      valueToken.approve(this.gatewayAddress, amount, txOptions),
-    );
-
-    return approvalChain;
-  }
-
-  getValueToken(tokenAddress) {
-    return new EIP20Token(this.web3, tokenAddress);
+    return this.coGatewayContract
+      .getEIP20UtilityToken()
+      .then((utilityToken) => {
+        return utilityToken.approve(this.coGatewayAddress, amount, txOptions);
+      });
   }
 }
 
-module.exports = Staker;
+module.exports = Redeemer;

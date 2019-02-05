@@ -24,6 +24,7 @@ const Web3 = require('web3');
 const Contracts = require('../Contracts');
 const Utils = require('../utils/Utils');
 const Anchor = require('../ContractInteract/Anchor');
+const EIP20Token = require('../ContractInteract/EIP20Token');
 
 /**
  * Contract interact for EIP20CoGateway.
@@ -324,6 +325,24 @@ class EIP20CoGateway {
   }
 
   /**
+   * Returns the utility token address.
+   *
+   * @return {string} utilityToken Utility token address
+   */
+  getUtilityToken() {
+    if (this._utilityToken) {
+      return Promise.resolve(this._utilityToken);
+    }
+    return this.contract.methods
+      .utilityToken()
+      .call()
+      .then((utilityToken) => {
+        this._utilityToken = utilityToken;
+        return utilityToken;
+      });
+  }
+
+  /**
    * Returns the nonce for the given account address.
    *
    * @param {string} accountAddress Account address for which the nonce is to be fetched.
@@ -416,6 +435,22 @@ class EIP20CoGateway {
           };
         });
       });
+    });
+  }
+
+  /**
+   * Returns base token object.
+   *
+   * @returns {Promise} Promise object.
+   */
+  getEIP20UtilityToken() {
+    if (this._eip20UtilityToken) {
+      return Promise.resolve(this._eip20UtilityToken);
+    }
+    return this.getUtilityToken().then((utilityToken) => {
+      const token = new EIP20Token(this.web3, utilityToken);
+      this._eip20UtilityToken = token;
+      return token;
     });
   }
 }
