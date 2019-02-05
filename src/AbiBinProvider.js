@@ -35,8 +35,10 @@ class AbiBinProvider {
   constructor(abiFolderPath, binFolderPath) {
     const oThis = this;
 
-    // only does something on nodejs
     if (abiFolderPath && binFolderPath) {
+      // This only loads the contract on node.js and is currently being
+      // deprecated (see issue #50). For the web target this is replaced
+      // by a noop.
       loadContracts(this, abiFolderPath, binFolderPath);
     }
 
@@ -76,7 +78,6 @@ class AbiBinProvider {
     oThis.custom = oThis.custom || {};
 
     if (typeof binFileContent !== 'string') {
-      // Parse it.
       const err = new Error('Bin should be a string');
       throw err;
     }
