@@ -19,6 +19,7 @@
 // ----------------------------------------------------------------------------
 
 const Web3Utils = require('web3-utils');
+const Web3 = require('web3');
 const Crypto = require('crypto');
 
 /**
@@ -60,13 +61,37 @@ class Utils {
    * @returns {HashLock} HashLock object.
    */
   static toHashLock(secretString) {
-    const secretBytes = Buffer.from(secretString);
-
+    const unlockSecret = Web3Utils.keccak256(secretString);
+    const hashLock = Web3Utils.keccak256(unlockSecret);
     return {
       secret: secretString,
-      unlockSecret: `0x${secretBytes.toString('hex')}`,
-      hashLock: Web3Utils.keccak256(secretString),
+      unlockSecret,
+      hashLock,
     };
+  }
+
+  /**
+   * Helper function to send ethereum transaction.
+   *
+   * @param {Object} tx Transaction object.
+   * @param {Object} tx Transaction options.
+   *
+   * @returns {Promise} Promise object.
+   */
+  static sendTransaction(tx, txOption) {
+    return new Promise((onResolve, onReject) => {
+      tx.send(txOption)
+        .on('transactionHash', (transactionHash) => {})
+        .on('receipt', (receipt) => {
+          return onResolve(receipt);
+        })
+        .on('error', (error) => {
+          return onReject(error);
+        })
+        .catch((exception) => {
+          return onReject(exception);
+        });
+    });
   }
 }
 

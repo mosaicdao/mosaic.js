@@ -46,6 +46,11 @@ class SpyAssert {
       for (let i = 0; i < callCount; i += 1) {
         const expectedArguments = inputArgs[i];
         const actualArguments = spy.args[i];
+        assert.strictEqual(
+          expectedArguments.length,
+          actualArguments.length,
+          'Expected and actual argument counts should be same',
+        );
         for (let params = 0; params < actualArguments.length; params += 1) {
           assert.strictEqual(
             actualArguments[params],

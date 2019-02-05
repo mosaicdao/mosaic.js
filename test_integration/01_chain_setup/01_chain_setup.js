@@ -29,7 +29,10 @@ describe('ChainSetup', () => {
   let addressMockToken;
 
   before(async () => {
-    const deployer = new MockContractsDeployer(shared.setupConfig.deployerAddress, shared.origin.web3);
+    const deployer = new MockContractsDeployer(
+      shared.setupConfig.deployerAddress,
+      shared.origin.web3,
+    );
     return deployer.deployMockToken().then(() => {
       addressMockToken = deployer.addresses.MockToken;
     });
@@ -46,27 +49,27 @@ describe('ChainSetup', () => {
         deployer: config.deployerAddress,
         owner: config.organizationOwner,
         admin: config.organizationAdmin,
-        workers: [config.organizationWorker]
+        workers: [config.organizationWorker],
       },
       anchorOrganization: {
         deployer: config.deployerAddress,
         owner: config.organizationOwner,
         admin: config.organizationAdmin,
-        workers: [config.organizationWorker]
+        workers: [config.organizationWorker],
       },
       libs: {
-        deployer: config.deployerAddress
+        deployer: config.deployerAddress,
       },
       anchor: {
         remoteChainId: '12345',
         deployer: config.deployerAddress,
-        organizationOwner: config.organizationOwner
+        organizationOwner: config.organizationOwner,
       },
 
       gateway: {
         deployer: config.deployerAddress,
-        bounty: '100'
-      }
+        bounty: '100',
+      },
     };
 
     let auxiliaryConfig = {
@@ -75,30 +78,30 @@ describe('ChainSetup', () => {
         deployer: config.deployerAddress,
         owner: config.organizationOwner,
         admin: config.organizationAdmin,
-        workers: [config.organizationWorker]
+        workers: [config.organizationWorker],
       },
       ostPrime: {
         deployer: config.deployerAddress,
-        chainOwner: config.chainOwner
+        chainOwner: config.chainOwner,
       },
       anchorOrganization: {
         deployer: config.deployerAddress,
         owner: config.organizationOwner,
         admin: config.organizationAdmin,
-        workers: [config.organizationWorker]
+        workers: [config.organizationWorker],
       },
       anchor: {
         remoteChainId: '12345',
         deployer: config.deployerAddress,
-        organizationOwner: config.organizationOwner
+        organizationOwner: config.organizationOwner,
       },
       libs: {
-        deployer: config.deployerAddress
+        deployer: config.deployerAddress,
       },
       cogateway: {
         deployer: config.deployerAddress,
-        bounty: '100'
-      }
+        bounty: '100',
+      },
     };
 
     return subject.setup(valueToken, originConfig, auxiliaryConfig);

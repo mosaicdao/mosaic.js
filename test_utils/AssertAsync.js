@@ -18,21 +18,26 @@
 //
 // ----------------------------------------------------------------------------
 
-'use strict';
+const chai = require('chai');
 
-const shared = require('../shared');
+const assert = chai.assert;
 
-describe('Setup Helpers - Config', () => {
-  // doing this in a test instead of before hook,
-  // because before hook doesn't trigger when there are no tests
-  it('should set setupConfig', async () => {
-    const accountsOrigin = await shared.origin.web3.eth.getAccounts();
-    shared.setupConfig = {
-      chainOwner: accountsOrigin[0],
-      deployerAddress: accountsOrigin[0],
-      organizationOwner: accountsOrigin[1],
-      organizationAdmin: accountsOrigin[2],
-      organizationWorker: accountsOrigin[0],
-    };
-  });
-});
+/**
+ * This class includes the utitity assert function
+ */
+class AssertAsync {
+  static async throws(fn, regExp) {
+    let f = () => {};
+    try {
+      await fn();
+    } catch (e) {
+      f = () => {
+        throw e;
+      };
+    } finally {
+      assert.throws(f, regExp);
+    }
+  }
+}
+
+module.exports = AssertAsync;

@@ -19,49 +19,35 @@
 // ----------------------------------------------------------------------------
 
 const chai = require('chai');
-const StakeHelper = require('../../src/helpers/StakeHelper');
-const TestMosaic = require('../../test_utils/GetTestMosaic');
 
 const assert = chai.assert;
+const Staker = require('../../src/Staker/Staker');
+const TestMosaic = require('../../test_utils/GetTestMosaic');
 
-describe('StakeHelper.constructor()', () => {
+describe('Staker.constructor()', () => {
   let mosaic;
+
   beforeEach(() => {
     mosaic = TestMosaic.mosaic();
   });
 
-  it('should throw an error when mosaic object is undefined', async function() {
-    const expectedErrorMessage = 'Invalid mosaic object.';
-    try {
-      new StakeHelper();
-    } catch (exception) {
-      assert.strictEqual(
-        exception.message,
-        expectedErrorMessage,
-        `Exception reason must be "${expectedErrorMessage}"`,
-      );
-    }
+  it('should throw an error when mosaic object is undefined', async () => {
+    assert.throws(() => {
+      new Staker();
+    }, /Invalid mosaic object./);
   });
 
-  it('should pass with valid constructor arguments', async function() {
-    const stakeHelper = new StakeHelper(mosaic);
-
+  it('should pass when called with correct arguments', async () => {
+    const staker = new Staker(mosaic);
     assert.strictEqual(
-      stakeHelper.mosaic,
-      mosaic,
-      'Mosaic object must be same.',
-    );
-
-    assert.strictEqual(
-      stakeHelper.originWeb3,
+      staker.web3,
       mosaic.origin.web3,
-      'Origin web3 object is different than the expected object.',
+      'Web3 object is not set.',
     );
-
     assert.strictEqual(
-      stakeHelper.gatewayAddress,
+      staker.gatewayAddress,
       mosaic.origin.contractAddresses.EIP20Gateway,
-      'Gateway contract address is different than the expected object.',
+      'Gateway address is not set',
     );
   });
 });

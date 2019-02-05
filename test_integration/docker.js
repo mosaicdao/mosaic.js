@@ -29,7 +29,12 @@ const asyncSleep = (ms) => {
 };
 
 const dockerSetup = () => {
-  const dockerCompose = childProcess.spawn('docker-compose', ['-f', composeFilePath, 'up', '--force-recreate']);
+  const dockerCompose = childProcess.spawn('docker-compose', [
+    '-f',
+    composeFilePath,
+    'up',
+    '--force-recreate',
+  ]);
 
   if (process.env.TEST_STDOUT) {
     dockerCompose.stdout.on('data', (data) => {
@@ -41,7 +46,9 @@ const dockerSetup = () => {
   }
   dockerCompose.on('close', (code) => {
     if (code !== 0) {
-      throw new Error(`docker-compose up failed with code ${code}\nRun again with TEST_STDOUT=1 for more information.`);
+      throw new Error(
+        `docker-compose up failed with code ${code}\nRun again with TEST_STDOUT=1 for more information.`,
+      );
     }
   });
 
@@ -49,7 +56,10 @@ const dockerSetup = () => {
   const auxiliaryPort = 8547;
 
   const waitForOriginNode = waitPort({ port: originPort, output: 'silent' });
-  const waitForAuxiliaryNode = waitPort({ port: auxiliaryPort, output: 'silent' });
+  const waitForAuxiliaryNode = waitPort({
+    port: auxiliaryPort,
+    output: 'silent',
+  });
   return Promise.all([waitForOriginNode, waitForAuxiliaryNode])
     .then(() => {
       // even after the ports are available the nodes need a bit of time to get online
@@ -57,12 +67,16 @@ const dockerSetup = () => {
     })
     .then(() => ({
       originRpcEndpoint: `http://localhost:${originPort}`,
-      auxiliaryRpcEndpoint: `http://localhost:${auxiliaryPort}`
+      auxiliaryRpcEndpoint: `http://localhost:${auxiliaryPort}`,
     }));
 };
 
 const dockerTeardown = () => {
-  const dockerComposeDown = childProcess.spawnSync('docker-compose', ['-f', composeFilePath, 'down']);
+  const dockerComposeDown = childProcess.spawnSync('docker-compose', [
+    '-f',
+    composeFilePath,
+    'down',
+  ]);
   if (process.env.TEST_STDOUT) {
     process.stdout.write(dockerComposeDown.stdout);
     process.stderr.write(dockerComposeDown.stderr);
@@ -72,5 +86,5 @@ const dockerTeardown = () => {
 module.exports = {
   asyncSleep,
   dockerSetup,
-  dockerTeardown
+  dockerTeardown,
 };
