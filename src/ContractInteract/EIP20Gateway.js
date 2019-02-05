@@ -194,7 +194,9 @@ class EIP20Gateway {
    */
   _stakeRawTx(amount, beneficiary, gasPrice, gasLimit, nonce, hashLock) {
     if (!new BN(amount).gtn(0)) {
-      const err = new TypeError('Stake amount must be greater than zero.');
+      const err = new TypeError(
+        `Stake amount must be greater than zero: ${amount}.`,
+      );
       return Promise.reject(err);
     }
     if (!Web3.utils.isAddress(beneficiary)) {

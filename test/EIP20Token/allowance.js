@@ -67,13 +67,13 @@ describe('EIP20Token.allowance()', () => {
   it('should throw an error when owner account address is undefined', async () => {
     AssertAsync.throws(async () => {
       await token.allowance(undefined, spenderAccountAddress);
-    }, /Owner address is invalid or missing/);
+    }, `Owner address is invalid or missing: ${undefined}`);
   });
 
   it('should throw an error when account address is undefined', async () => {
     AssertAsync.throws(async () => {
       await token.allowance(ownerAccountAddress, undefined);
-    }, /Spender address is invalid or missing/);
+    }, `Spender address is invalid or missing: ${undefined}`);
   });
 
   it('should return mocked allowance value', async () => {

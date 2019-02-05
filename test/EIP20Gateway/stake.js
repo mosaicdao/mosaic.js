@@ -97,7 +97,7 @@ describe('EIP20Gateway.stake()', () => {
         stakeParams.hashLock,
         undefined,
       );
-    }, /Invalid transaction options./);
+    }, `Invalid transaction options: ${undefined}.`);
   });
 
   it('should throw error when from address is invalid', async () => {
@@ -112,7 +112,7 @@ describe('EIP20Gateway.stake()', () => {
         stakeParams.hashLock,
         txOptions,
       );
-    }, /Invalid facilitator address./);
+    }, `Invalid facilitator address: ${undefined}.`);
   });
 
   it('should return correct mocked transaction object', async () => {

@@ -84,14 +84,14 @@ describe('EIP20Token.approve()', () => {
   it('should throw an error when transaction options is undefined', async () => {
     AssertAsync.throws(async () => {
       await token.approve(spenderAddress, amount, undefined);
-    }, /Invalid transaction options./);
+    }, `Invalid transaction options: ${undefined}.`);
   });
 
   it('should throw an error when account address is undefined', async () => {
     delete txOptions.from;
     AssertAsync.throws(async () => {
       await token.approve(spenderAddress, amount, txOptions);
-    }, /Invalid from address./);
+    }, `Invalid from address: ${undefined}.`);
   });
 
   it('should return mocked allowance value', async () => {
