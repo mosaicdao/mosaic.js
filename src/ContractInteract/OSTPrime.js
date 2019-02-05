@@ -142,10 +142,7 @@ class OSTPrime {
     }
     return this.contract.methods
       .allowance(ownerAddress, spenderAddress)
-      .call()
-      .then((allowance) => {
-        return allowance;
-      });
+      .call();
   }
 
   /**

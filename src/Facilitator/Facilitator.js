@@ -174,7 +174,7 @@ class Facilitator {
     const isStakeAmountApproved = await this.gateway
       .isStakeAmountApproved(staker, amount)
       .catch((exception) => {
-        logger.info('  - Exception while checking stake amount approval');
+        logger.error('  - Exception while checking stake amount approval');
         return Promise.reject(exception);
       });
 
@@ -188,13 +188,13 @@ class Facilitator {
         await this.gateway
           .approveStakeAmount(amount, txOption)
           .catch((exception) => {
-            logger.info(
+            logger.error(
               '  - Failed to approve gateway contract for token transfer',
             );
             return Promise.reject(exception);
           });
       } else {
-        logger.info('  - Cannot perform stake.');
+        logger.error('  - Cannot perform stake.');
         const err = new Error('Transfer of stake amount must be approved.');
         return Promise.reject(err);
       }
@@ -206,7 +206,7 @@ class Facilitator {
     const isBountyAmountApproved = await this.gateway
       .isBountyAmountApproved(facilitatorAddress)
       .catch((exception) => {
-        logger.info('  - Exception while checking bounty amount approval');
+        logger.error('  - Exception while checking bounty amount approval');
         return Promise.reject(exception);
       });
 
@@ -215,7 +215,7 @@ class Facilitator {
     if (!isBountyAmountApproved) {
       logger.info('  - Approving gateway contract for bounty transfer');
       await this.gateway.approveBountyAmount(txOption).catch((exception) => {
-        logger.info(
+        logger.error(
           '  - Failed to approve gateway contract for bounty transfer',
         );
         return Promise.reject(exception);
@@ -224,7 +224,7 @@ class Facilitator {
 
     logger.info('* Getting nonce for the staker account *');
     const nonce = await this.gateway.getNonce(staker).catch((exception) => {
-      logger.info('  - Failed to get staker nonce');
+      logger.error('  - Failed to get staker nonce');
       return Promise.reject(exception);
     });
     logger.info(`  - Staker's nonce is ${nonce}`);
@@ -241,11 +241,11 @@ class Facilitator {
         txOption,
       )
       .then((stakeResult) => {
-        logger.info('  - Succcessfully performed stake.');
+        logger.win('  - Succcessfully performed stake.');
         return Promise.resolve(stakeResult);
       })
       .catch((exception) => {
-        logger.info('  - Failed to performed stake.');
+        logger.error('  - Failed to performed stake.');
         return Promise.reject(exception);
       });
   }
@@ -455,7 +455,7 @@ class Facilitator {
     const stakeMessageStatus = await this.gateway
       .getOutboxMessageStatus(messageHash)
       .catch((exception) => {
-        logger.info('  - Exception while getting outbox message status');
+        logger.error('  - Exception while getting outbox message status');
         return Promise.reject(exception);
       });
 
@@ -469,7 +469,7 @@ class Facilitator {
     const mintMessageStatus = await this.coGateway
       .getInboxMessageStatus(messageHash)
       .catch((exception) => {
-        logger.info('  - Exception while getting inbox message status');
+        logger.error('  - Exception while getting inbox message status');
         return Promise.reject(exception);
       });
 
@@ -480,7 +480,7 @@ class Facilitator {
       mintMessageStatus === MessageStatus.PROGRESSED ||
       mintMessageStatus === MessageStatus.REVOKED
     ) {
-      logger.info('  - Stake intent already confirmed on CoGateway');
+      logger.win('  - Stake intent already confirmed on CoGateway');
       return Promise.resolve(true);
     }
 
@@ -496,7 +496,7 @@ class Facilitator {
             txOptions,
           )
           .then(() => {
-            logger.info('  - Gateway was proven on CoGateway');
+            logger.win('  - Gateway was proven on CoGateway');
             return this.coGateway
               .confirmStakeIntent(
                 staker,
@@ -516,7 +516,7 @@ class Facilitator {
               });
           })
           .catch((exception) => {
-            logger.info('  - Failed to prove gateway account on CoGateway');
+            logger.error('  - Failed to prove gateway account on CoGateway');
             return Promise.reject(exception);
           });
       },
@@ -606,24 +606,24 @@ class Facilitator {
       stakeMessageStatus === MessageStatus.REVOCATION_DECLARED ||
       stakeMessageStatus === MessageStatus.REVOKED
     ) {
-      logger.info('  - Cannot perform progress stake.');
+      logger.error('  - Cannot perform progress stake.');
       const err = Error('Message cannot be progressed.');
       return Promise.reject(err);
     }
 
     if (stakeMessageStatus === MessageStatus.PROGRESSED) {
-      logger.info('  - Progress stake is already done.');
+      logger.win('  - Progress stake is already done.');
       return Promise.resolve(true);
     }
 
     return this.gateway
       .progressStake(messageHash, unlockSecret, txOption)
       .then((progressStakeResult) => {
-        logger.info('  - Progress stake successful.');
+        logger.win('  - Progress stake successful.');
         return Promise.resolve(progressStakeResult);
       })
       .catch((exception) => {
-        logger.info('  - Failed to progress stake.');
+        logger.error('  - Failed to progress stake.');
         return Promise.reject(exception);
       });
   }
@@ -666,24 +666,24 @@ class Facilitator {
       mintMessageStatus === MessageStatus.REVOKED ||
       mintMessageStatus === MessageStatus.REVOCATION_DECLARED
     ) {
-      logger.info('  - Cannot perform progress mint.');
+      logger.error('  - Cannot perform progress mint.');
       const err = new TypeError('Message cannot be progressed.');
       return Promise.reject(err);
     }
 
     if (mintMessageStatus === MessageStatus.PROGRESSED) {
-      logger.info('  - Progress mint is already done.');
+      logger.win('  - Progress mint is already done.');
       return Promise.resolve(true);
     }
 
     return this.coGateway
       .progressMint(messageHash, unlockSecret, txOption)
       .then((progressMintResult) => {
-        logger.info('  - Progress mint successful.');
+        logger.win('  - Progress mint successful.');
         return Promise.resolve(progressMintResult);
       })
       .catch((exception) => {
-        logger.info('  - Failed to progress mint.');
+        logger.error('  - Failed to progress mint.');
         return Promise.reject(exception);
       });
   }
@@ -748,12 +748,12 @@ class Facilitator {
 
     logger.info('* Getting bounty amount *');
     const bounty = await this.coGateway.getBounty().catch((exception) => {
-      logger.info('  - Exception while getting bounty amount');
+      logger.error('  - Exception while getting bounty amount');
       return Promise.reject(exception);
     });
 
     if (!new BN(txOptions.value).eq(new BN(bounty))) {
-      logger.info(
+      logger.error(
         '  - Value in transaction option is not equal to the bounty amount',
       );
       return Promise.reject(false);
@@ -766,7 +766,7 @@ class Facilitator {
     const isRedeemAmountApproved = await this.coGateway
       .isRedeemAmountApproved(redeemer, amount)
       .catch((exception) => {
-        logger.info('  - Exception while checking redeem amount approval');
+        logger.error('  - Exception while checking redeem amount approval');
         return Promise.reject(exception);
       });
 
@@ -786,7 +786,7 @@ class Facilitator {
       await this.coGateway
         .approveRedeemAmount(amount, approvalTxOption)
         .catch((exception) => {
-          logger.info(
+          logger.error(
             '  - Failed to approve CoGateway contract for token transfer',
           );
           return Promise.reject(exception);
@@ -798,7 +798,7 @@ class Facilitator {
     const nonce = await this.coGateway
       .getNonce(redeemer)
       .catch((exception) => {
-        logger.info('  - Failed to get redeemer nonce');
+        logger.error('  - Failed to get redeemer nonce');
         return Promise.reject(exception);
       });
     logger.info(`  - Redeemer's nonce is ${nonce}`);
@@ -815,11 +815,11 @@ class Facilitator {
         txOptions,
       )
       .then((redeemResult) => {
-        logger.info('  - Succcessfully performed redeem.');
+        logger.win('  - Succcessfully performed redeem.');
         return Promise.resolve(redeemResult);
       })
       .catch((exception) => {
-        logger.info('  - Failed to performed redeem.');
+        logger.error('  - Failed to performed redeem.');
         return Promise.reject(exception);
       });
   }
@@ -863,7 +863,7 @@ class Facilitator {
       .getOutboxProof(this.gateway.gatewayAddress, [messageHash], blockHeight)
       .then((proof) => {
         // TODO: validate proofdata for the status and gateway address.
-        logger.info('  - Proof generation successful');
+        logger.win('  - Proof generation successful');
         return Promise.resolve({
           accountData: proof.encodedAccountValue,
           accountProof: proof.serializedAccountProof,
@@ -873,7 +873,7 @@ class Facilitator {
         });
       })
       .catch((exception) => {
-        logger.info('  - Failed to generate proof');
+        logger.error('  - Failed to generate proof');
         return Promise.reject(exception);
       });
   }
