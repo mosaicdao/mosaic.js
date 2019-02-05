@@ -23,7 +23,8 @@ const EIP20CoGateway = require('../../src/ContractInteract/EIP20CoGateway');
 const Mosaic = require('../Mosaic');
 
 /**
- * Redeemer class
+ * This can be used by redeemer to perform redeem related tasks like approving
+ * CoGateway contract and to initiate revert the redeem flow.
  */
 class Redeemer {
   /**
@@ -37,13 +38,17 @@ class Redeemer {
       throw err;
     }
     if (!(mosaic.auxiliary.web3 instanceof Web3)) {
-      const err = new TypeError('Invalid origin web3 object.');
+      const err = new TypeError('Invalid auxiliary web3 object.');
       throw err;
     }
     if (
       !Web3.utils.isAddress(mosaic.auxiliary.contractAddresses.EIP20CoGateway)
     ) {
-      const err = new TypeError('Invalid CoGateway address.');
+      const err = new TypeError(
+        `Invalid CoGateway address: ${
+          mosaic.auxiliary.contractAddresses.EIP20CoGateway
+        }.`,
+      );
       throw err;
     }
 
@@ -55,28 +60,27 @@ class Redeemer {
     );
 
     this.approveRedeemAmount = this.approveRedeemAmount.bind(this);
-    this.getUtilityToken = this.getUtilityToken.bind(this);
   }
 
   /**
-   * Approve gateway contract for token transfer.
+   * Approve CoGateway contract for token transfer.
    *
    * @param {string} amount Redeem amount
    * @param {Object} txOptions Transaction options.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<object>} Promise that resolves to transaction receipt.
    */
   approveRedeemAmount(amount, txOptions) {
     if (typeof amount !== 'string') {
-      const err = new Error('Invalid stake amount.');
+      const err = new Error(`Invalid redeem amount: ${amount}.`);
       return Promise.reject(err);
     }
     if (!txOptions) {
-      const err = new Error('Invalid transaction options.');
+      const err = new Error(`Invalid transaction options: ${txOptions}.`);
       return Promise.reject(err);
     }
     if (!Web3.utils.isAddress(txOptions.from)) {
-      const err = new Error('Invalid staker address.');
+      const err = new Error(`Invalid redeemer address: ${txOptions.from}.`);
       return Promise.reject(err);
     }
 

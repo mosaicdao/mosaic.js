@@ -72,16 +72,21 @@ class Anchor {
   /**
    * Get the state root for given block height.
    *
-   * @returns {Promise} Promise object.
+   * @param {string} blockHeight Block height.
+   * @returns {Promise<string>} Promise that resolves to state root.
    */
   getStateRoot(blockHeight) {
+    if (typeof blockHeight !== 'string') {
+      const err = new TypeError(`Invalid block height: ${blockHeight}.`);
+      return Promise.reject(err);
+    }
     return this.contract.methods.getStateRoot(blockHeight).call();
   }
 
   /**
    * Get the latest committed block height.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<string>} Promise that resolves to block height.
    */
   getLatestStateRootBlockHeight() {
     return this.contract.methods.getLatestStateRootBlockHeight().call();
@@ -94,15 +99,23 @@ class Anchor {
    * @param {string} stateRoot Storage root.
    * @param {Object} txOptions Transaction options.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<Object>} Promise that resolves to transaction receipt.
    */
   anchorStateRoot(blockHeight, stateRoot, txOptions) {
+    if (typeof blockHeight !== 'string') {
+      const err = new TypeError(`Invalid block height: ${blockHeight}.`);
+      return Promise.reject(err);
+    }
+    if (typeof stateRoot !== 'string') {
+      const err = new TypeError(`Invalid state root: ${stateRoot}.`);
+      return Promise.reject(err);
+    }
     if (!txOptions) {
-      const err = new TypeError('Invalid transaction options.');
+      const err = new TypeError(`Invalid transaction options: ${txOptions}.`);
       return Promise.reject(err);
     }
     if (!Web3.utils.isAddress(txOptions.from)) {
-      const err = new TypeError('Invalid from address.');
+      const err = new TypeError(`Invalid from address: ${txOptions.from}.`);
       return Promise.reject(err);
     }
     const tx = this.contract.methods.anchorStateRoot(blockHeight, stateRoot);

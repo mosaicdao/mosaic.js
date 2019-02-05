@@ -20,11 +20,11 @@
 
 const Web3 = require('web3');
 const EIP20Gateway = require('../../src/ContractInteract/EIP20Gateway');
-const EIP20Token = require('../../src/ContractInteract/EIP20Token');
 const Mosaic = require('../Mosaic');
 
 /**
- * Staker class
+ * This can be used by staker to perform stake related tasks like approving
+ * Gateway contract and to initiate the revert stake flow.
  */
 class Staker {
   /**
@@ -42,7 +42,11 @@ class Staker {
       throw err;
     }
     if (!Web3.utils.isAddress(mosaic.origin.contractAddresses.EIP20Gateway)) {
-      const err = new TypeError('Invalid Gateway address.');
+      const err = new TypeError(
+        `Invalid Gateway address: ${
+          mosaic.origin.contractAddresses.EIP20Gateway
+        }.`,
+      );
       throw err;
     }
 
@@ -51,49 +55,33 @@ class Staker {
     this.gatewayContract = new EIP20Gateway(this.web3, this.gatewayAddress);
 
     this.approveStakeAmount = this.approveStakeAmount.bind(this);
-    this.getValueToken = this.getValueToken.bind(this);
   }
 
   /**
-   * Approve gateway contract for token transfer.
+   * Approve Gateway contract for token transfer.
    *
-   * @param {string} amount Stake amount
+   * @param {string} amount Redeem amount
    * @param {Object} txOptions Transaction options.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<Object>} Promise that resolves to transaction receipt.
    */
   approveStakeAmount(amount, txOptions) {
     if (typeof amount !== 'string') {
-      const err = new Error('Invalid stake amount.');
-      throw err;
+      const err = new Error(`Invalid stake amount: ${amount}.`);
+      return Promise.reject(err);
     }
     if (!txOptions) {
-      const err = new Error('Invalid transaction options.');
-      throw err;
+      const err = new Error(`Invalid transaction options: ${txOptions}.`);
+      return Promise.reject(err);
     }
     if (!Web3.utils.isAddress(txOptions.from)) {
-      const err = new Error('Invalid staker address.');
-      throw err;
+      const err = new Error(`Invalid staker address: ${txOptions.from}.`);
+      return Promise.reject(err);
     }
 
-    // Get value token address.
-    let approvalChain = this.gatewayContract.getValueToken();
-
-    // Create an instance of value token
-    approvalChain = approvalChain.then((valueTokenAddress) =>
-      this.getValueToken(valueTokenAddress),
-    );
-
-    // Call approve on value token.
-    approvalChain = approvalChain.then((valueToken) =>
-      valueToken.approve(this.gatewayAddress, amount, txOptions),
-    );
-
-    return approvalChain;
-  }
-
-  getValueToken(tokenAddress) {
-    return new EIP20Token(this.web3, tokenAddress);
+    return this.gatewayContract.getEIP20ValueToken().then((token) => {
+      return token.approve(this.gatewayAddress, amount, txOptions);
+    });
   }
 }
 

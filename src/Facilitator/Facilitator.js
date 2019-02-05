@@ -54,13 +54,21 @@ class Facilitator {
       throw err;
     }
     if (!Web3.utils.isAddress(mosaic.origin.contractAddresses.EIP20Gateway)) {
-      const err = new TypeError('Invalid Gateway address.');
+      const err = new TypeError(
+        `Invalid Gateway address: ${
+          mosaic.origin.contractAddresses.EIP20Gateway
+        }.`,
+      );
       throw err;
     }
     if (
       !Web3.utils.isAddress(mosaic.auxiliary.contractAddresses.EIP20CoGateway)
     ) {
-      const err = new TypeError('Invalid CoGateway address.');
+      const err = new TypeError(
+        `Invalid CoGateway address: ${
+          mosaic.auxiliary.contractAddresses.EIP20CoGateway
+        }.`,
+      );
       throw err;
     }
 
@@ -95,7 +103,7 @@ class Facilitator {
    * @param {string} hashLock Hash lock.
    * @param {Object} txOption Transaction options.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<Object>} Promise that resolves to transaction receipt.
    */
   async stake(
     staker,
@@ -109,37 +117,41 @@ class Facilitator {
     logger.info('Stake');
     logger.info('-----------------------');
     if (!Web3.utils.isAddress(staker)) {
-      const err = new TypeError('Invalid staker address.');
+      const err = new TypeError(`Invalid staker address: ${staker}.`);
       return Promise.reject(err);
     }
 
     if (new BN(amount).eqn(0)) {
-      const err = new TypeError('Stake amount must not be zero.');
+      const err = new TypeError(`Stake amount must not be zero: ${amount}.`);
       return Promise.reject(err);
     }
 
     if (!Web3.utils.isAddress(beneficiary)) {
-      const err = new TypeError('Invalid beneficiary address.');
+      const err = new TypeError(
+        `Invalid beneficiary address: ${beneficiary}.`,
+      );
       return Promise.reject(err);
     }
 
-    if (gasPrice === undefined) {
-      const err = new TypeError('Invalid gas price.');
+    if (typeof gasPrice !== 'string') {
+      const err = new TypeError(`Invalid gas price: ${gasPrice}.`);
       return Promise.reject(err);
     }
 
-    if (gasLimit === undefined) {
-      const err = new TypeError('Invalid gas limit.');
+    if (typeof gasLimit !== 'string') {
+      const err = new TypeError(`Invalid gas limit: ${gasLimit}.`);
       return Promise.reject(err);
     }
 
     if (!txOption) {
-      const err = new TypeError('Invalid transaction options.');
+      const err = new TypeError(`Invalid transaction options: ${txOption}.`);
       return Promise.reject(err);
     }
 
     if (!Web3.utils.isAddress(txOption.from)) {
-      const err = new TypeError('Invalid facilitator address.');
+      const err = new TypeError(
+        `Invalid facilitator address: ${txOption.from}.`,
+      );
       return Promise.reject(err);
     }
 
@@ -252,7 +264,7 @@ class Facilitator {
    * @param {Object} txOptionOrigin Transaction options for origin chain.
    * @param {Object} txOptionAuxiliary Transaction options for auxiliary chain.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<Object>} Promise that resolves to transaction receipt.
    */
   progressStake(
     staker,
@@ -269,57 +281,63 @@ class Facilitator {
     logger.info('Performing stake and mint');
     logger.info('-----------------------');
     if (!Web3.utils.isAddress(staker)) {
-      const err = new TypeError('Invalid staker address.');
+      const err = new TypeError(`Invalid staker address: ${staker}.`);
       return Promise.reject(err);
     }
 
     if (new BN(amount).eqn(0)) {
-      const err = new TypeError('Stake amount must not be zero.');
+      const err = new TypeError(`Stake amount must not be zero: ${amount}.`);
       return Promise.reject(err);
     }
 
     if (!Web3.utils.isAddress(beneficiary)) {
-      const err = new TypeError('Invalid beneficiary address.');
+      const err = new TypeError(
+        `Invalid beneficiary address: ${beneficiary}.`,
+      );
       return Promise.reject(err);
     }
 
-    if (gasPrice === undefined) {
-      const err = new TypeError('Invalid gas price.');
+    if (typeof gasPrice !== 'string') {
+      const err = new TypeError(`Invalid gas price: ${gasPrice}.`);
       return Promise.reject(err);
     }
 
-    if (gasLimit === undefined) {
-      const err = new TypeError('Invalid gas limit.');
+    if (typeof gasLimit !== 'string') {
+      const err = new TypeError(`Invalid gas limit: ${gasLimit}.`);
       return Promise.reject(err);
     }
 
-    if (nonce === undefined) {
-      const err = new TypeError('Invalid staker nonce.');
+    if (typeof nonce !== 'string') {
+      const err = new TypeError(`Invalid staker nonce: ${nonce}.`);
       return Promise.reject(err);
     }
 
     if (!txOptionOrigin) {
       const err = new TypeError(
-        'Invalid transaction options for origin chain.',
+        `Invalid transaction options for origin chain: ${txOptionOrigin}.`,
       );
       return Promise.reject(err);
     }
 
     if (!txOptionAuxiliary) {
       const err = new TypeError(
-        'Invalid transaction options for auxiliary chain.',
+        `Invalid transaction options for auxiliary chain: ${txOptionAuxiliary}.`,
       );
       return Promise.reject(err);
     }
 
     if (!Web3.utils.isAddress(txOptionOrigin.from)) {
-      const err = new TypeError('Invalid origin chain facilitator address.');
+      const err = new TypeError(
+        `Invalid origin chain facilitator address: ${txOptionOrigin.from}.`,
+      );
       return Promise.reject(err);
     }
 
     if (!Web3.utils.isAddress(txOptionAuxiliary.from)) {
       const err = new TypeError(
-        'Invalid auxiliary chain facilitator address.',
+        `Invalid auxiliary chain facilitator address: ${
+          txOptionAuxiliary.from
+        }.`,
       );
       return Promise.reject(err);
     }
@@ -368,7 +386,7 @@ class Facilitator {
    * @param {string} unlockSecret Unlock secret.
    * @param {Object} txOptions Transaction options.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<Object>} Promise that resolves to transaction receipt.
    */
   async confirmStakeIntent(
     staker,
@@ -384,35 +402,39 @@ class Facilitator {
     logger.info('Confirming stake intent');
     logger.info('-----------------------');
     if (!Web3.utils.isAddress(staker)) {
-      const err = new TypeError('Invalid staker address.');
+      const err = new TypeError(`Invalid staker address: ${staker}.`);
       return Promise.reject(err);
     }
     if (new BN(amount).eqn(0)) {
-      const err = new TypeError('Stake amount must not be zero.');
+      const err = new TypeError(`Stake amount must not be zero: ${amount}.`);
       return Promise.reject(err);
     }
     if (!Web3.utils.isAddress(beneficiary)) {
-      const err = new TypeError('Invalid beneficiary address.');
+      const err = new TypeError(
+        `Invalid beneficiary address: ${beneficiary}.`,
+      );
       return Promise.reject(err);
     }
     if (typeof gasPrice !== 'string') {
-      const err = new TypeError('Invalid gas price.');
+      const err = new TypeError(`Invalid gas price: ${gasPrice}.`);
       return Promise.reject(err);
     }
     if (typeof gasLimit !== 'string') {
-      const err = new TypeError('Invalid gas limit.');
+      const err = new TypeError(`Invalid gas limit: ${gasLimit}.`);
       return Promise.reject(err);
     }
     if (typeof nonce !== 'string') {
-      const err = new TypeError('Invalid staker nonce.');
+      const err = new TypeError(`Invalid staker nonce: ${nonce}.`);
       return Promise.reject(err);
     }
     if (!txOptions) {
-      const err = new TypeError('Invalid transaction options.');
+      const err = new TypeError(`Invalid transaction options: ${txOptions}.`);
       return Promise.reject(err);
     }
     if (!Web3.utils.isAddress(txOptions.from)) {
-      const err = new TypeError('Invalid facilitator address.');
+      const err = new TypeError(
+        `Invalid facilitator address: ${txOptions.from}.`,
+      );
       return Promise.reject(err);
     }
 
@@ -509,7 +531,7 @@ class Facilitator {
    * @param {Object} txOptionOrigin Transaction options for origin chain.
    * @param {Object} txOptionAuxiliary Transaction options for auxiliary chain.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<Object>} Promise that resolves to transaction receipt.
    */
   async performProgress(
     messageHash,
@@ -520,19 +542,23 @@ class Facilitator {
     logger.info('Performing progress stake and progress mint');
     logger.info('-----------------------');
     if (typeof messageHash !== 'string') {
-      const err = new TypeError('Invalid message hash.');
+      const err = new TypeError(`Invalid message hash: ${messageHash}.`);
       return Promise.reject(err);
     }
     if (typeof unlockSecret !== 'string') {
-      const err = new TypeError('Invalid unlock secret.');
+      const err = new TypeError(`Invalid unlock secret: ${unlockSecret}.`);
       return Promise.reject(err);
     }
     if (txOptionOrigin === undefined) {
-      const err = new TypeError('Invalid origin transaction option.');
+      const err = new TypeError(
+        `Invalid origin transaction option: ${txOptionOrigin}.`,
+      );
       return Promise.reject(err);
     }
     if (txOptionAuxiliary === undefined) {
-      const err = new TypeError('Invalid auxiliary transaction option.');
+      const err = new TypeError(
+        `Invalid auxiliary transaction option: ${txOptionAuxiliary}.`,
+      );
       return Promise.reject(err);
     }
 
@@ -549,19 +575,19 @@ class Facilitator {
    * @param {string} unlockSecret Unlock secret for progress stake.
    * @param {Object} txOption Transaction options.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<Object>} Promise that resolves to transaction receipt.
    */
   async performProgressStake(messageHash, unlockSecret, txOption) {
     if (typeof messageHash !== 'string') {
-      const err = new TypeError('Invalid message hash.');
+      const err = new TypeError(`Invalid message hash: ${messageHash}.`);
       return Promise.reject(err);
     }
     if (typeof unlockSecret !== 'string') {
-      const err = new TypeError('Invalid unlock secret.');
+      const err = new TypeError(`Invalid unlock secret: ${unlockSecret}.`);
       return Promise.reject(err);
     }
     if (txOption === undefined) {
-      const err = new TypeError('Invalid transaction option.');
+      const err = new TypeError(`Invalid transaction option: ${txOption}.`);
       return Promise.reject(err);
     }
 
@@ -609,19 +635,19 @@ class Facilitator {
    * @param {string} unlockSecret Unlock secret for progress stake.
    * @param {Object} txOption Transaction options.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<Object>} Promise that resolves to transaction receipt.
    */
   async performProgressMint(messageHash, unlockSecret, txOption) {
     if (typeof messageHash !== 'string') {
-      const err = new TypeError('Invalid message hash.');
+      const err = new TypeError(`Invalid message hash: ${messageHash}.`);
       return Promise.reject(err);
     }
     if (typeof unlockSecret !== 'string') {
-      const err = new TypeError('Invalid unlock secret.');
+      const err = new TypeError(`Invalid unlock secret: ${unlockSecret}.`);
       return Promise.reject(err);
     }
     if (txOption === undefined) {
-      const err = new TypeError('Invalid transaction option.');
+      const err = new TypeError(`Invalid transaction option: ${txOption}.`);
       return Promise.reject(err);
     }
 
@@ -672,43 +698,49 @@ class Facilitator {
    * @param {string} nonce Redeemer's nonce.
    * @param {string} hashLock Hash lock;
    * @param {Object} txOptions Transaction options.
-   * @return {Promise} Promise object
+   * @returns {Promise<Object>} Promise that resolves to transaction receipt.
    */
   async redeem(amount, beneficiary, gasPrice, gasLimit, hashLock, txOptions) {
     logger.info('Redeem');
     logger.info('-----------------------');
-    if (new BN(amount).eqn(0)) {
-      const err = new TypeError('Redeem amount must not be zero.');
+    if (!new BN(amount).gtn(0)) {
+      const err = new TypeError(
+        `Redeem amount must be greater than zero: ${amount}.`,
+      );
       return Promise.reject(err);
     }
 
     if (!Web3.utils.isAddress(beneficiary)) {
-      const err = new TypeError('Invalid beneficiary address.');
+      const err = new TypeError(
+        `Invalid beneficiary address: ${beneficiary}.`,
+      );
       return Promise.reject(err);
     }
 
     if (typeof gasPrice !== 'string') {
-      const err = new TypeError('Invalid gas price.');
+      const err = new TypeError(`Invalid gas price: ${gasPrice}.`);
       return Promise.reject(err);
     }
 
     if (typeof gasLimit !== 'string') {
-      const err = new TypeError('Invalid gas limit.');
+      const err = new TypeError(`Invalid gas limit: ${gasLimit}.`);
       return Promise.reject(err);
     }
 
     if (typeof hashLock !== 'string') {
-      const err = new TypeError('Invalid hash lock.');
+      const err = new TypeError(`Invalid hash lock: ${hashLock}.`);
       return Promise.reject(err);
     }
 
     if (!txOptions) {
-      const err = new TypeError('Invalid transaction options.');
+      const err = new TypeError(`Invalid transaction options: ${txOptions}.`);
       return Promise.reject(err);
     }
 
     if (!Web3.utils.isAddress(txOptions.from)) {
-      const err = new TypeError('Invalid redeemer address.');
+      const err = new TypeError(
+        `Invalid redeemer address: ${txOptions.from}.`,
+      );
       return Promise.reject(err);
     }
 
@@ -798,7 +830,7 @@ class Facilitator {
    * @param {string} messageHash Message hash.
    * @param {MessageStatus} status Message status.
    *
-   * @returns {Object} Proof data.
+   * @returns {Promise<Object>} Promise that resolves to proof data.
    */
   async getProof(messageHash, messageStatus) {
     logger.info('* Generating proof data *');
