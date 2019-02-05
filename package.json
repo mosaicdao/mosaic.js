@@ -1,7 +1,7 @@
 {
   "name": "@openstfoundation/mosaic.js",
   "version": "0.10.0",
-  "description": "NPM package that provides mosaic contract abis and bins. This package also helps in mosaic chain setup and interaction with mosaic contracts.",
+  "description": "Provides mosaic contract ABIs and BINs. This package also provides an API to interact with existing mosaic contracts and to deploy new ones on existing chains.",
   "main": "lib/mosaic.node.js",
   "browser": "lib/mosaic.web.js",
   "repository": {
