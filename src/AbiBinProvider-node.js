@@ -26,6 +26,10 @@ const Logger = require('../logger/Logger');
 
 const logger = new Logger('AbiBinProvider');
 
+/**
+ * @deprecated since version 0.10.0.
+ *              See {@link https://github.com/OpenSTFoundation/mosaic.js/issues/50}
+ */
 const loadContracts = (provider, abiFolderPath, binFolderPath) => {
   logger.warn(
     'Providing the `abiFolderPath` and `binFolderPath` parameter to the AbiBinProvider is deperecated and support for it will be removed in the future. See https://github.com/OpenSTFoundation/mosaic.js/issues/50 for migration recommendations.',
