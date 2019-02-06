@@ -143,6 +143,11 @@ class Facilitator {
       return Promise.reject(err);
     }
 
+    if (typeof hashLock !== 'string') {
+      const err = new TypeError(`Invalid hash lock: ${hashLock}.`);
+      return Promise.reject(err);
+    }
+
     if (!txOption) {
       const err = new TypeError(`Invalid transaction options: ${txOption}.`);
       return Promise.reject(err);
@@ -153,17 +158,6 @@ class Facilitator {
         `Invalid facilitator address: ${txOption.from}.`,
       );
       return Promise.reject(err);
-    }
-
-    let stakeHashLock = hashLock;
-    if (hashLock === undefined) {
-      logger.info('Generating hash lock and unlock secret');
-      const hashLockObj = await this.getHashLock();
-      stakeHashLock = hashLockObj.hashLock;
-      logger.info(`  - hash lock generated is ${stakeHashLock}`);
-      logger.info(
-        `  - unlock secrete generated is ${hashLockObj.unlockSecret}`,
-      );
     }
 
     const facilitatorAddress = txOption.from;
