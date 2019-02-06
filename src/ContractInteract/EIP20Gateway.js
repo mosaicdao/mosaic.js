@@ -60,7 +60,7 @@ class EIP20Gateway {
 
     if (!this.contract) {
       const err = new Error(
-        `Could not load Gateway contract for: ${this.gatewayAddress}`,
+        `Could not load EIP20Gateway contract for: ${this.gatewayAddress}`,
       );
       throw err;
     }
@@ -102,7 +102,7 @@ class EIP20Gateway {
    */
   proveGateway(blockHeight, encodedAccount, accountProof, txOptions) {
     if (!txOptions) {
-      const err = new TypeError('Invalid transaction options.');
+      const err = new TypeError(`Invalid transaction options: ${txOptions}.`);
       return Promise.reject(err);
     }
     return this._proveGatewayRawTx(

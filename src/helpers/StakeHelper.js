@@ -42,7 +42,7 @@ class StakeHelper {
       throw err;
     }
     if (!Web3.utils.isAddress(mosaic.origin.contractAddresses.EIP20Gateway)) {
-      const err = new TypeError('Invalid Gateway address.');
+      const err = new TypeError('Invalid EIP20Gateway address.');
       throw err;
     }
 
@@ -125,7 +125,7 @@ class StakeHelper {
    *
    * @param {string} stakerAddress Staker address.
    * @param {Object} originWeb3 Origin web3 object.
-   * @param {string} gateway Gateway contract address.
+   * @param {string} gateway EIP20Gateway contract address.
    *
    * @returns {Promise} Promise object represents the nonce of staker address.
    */
@@ -176,7 +176,7 @@ class StakeHelper {
    * @param {Object} txOptions Transaction options.
    * @param {Object} web3 Web3 object.
    * @param {string} valueToken Value token contract address.
-   * @param {string} gateway Gateway contract address.
+   * @param {string} gateway EIP20Gateway contract address.
    * @param {string} staker Staker address.
    *
    * @returns {Object} Raw transaction object.
@@ -220,7 +220,7 @@ class StakeHelper {
    * @param {string} hashLock Hash lock.
    * @param {Object} txOptions Transaction options.
    * @param {Object} web3 Web3 object.
-   * @param {string} gateway Gateway contract address.
+   * @param {string} gateway EIP20Gateway contract address.
    * @param {string} staker Staker address.
    *
    * @returns {Object} Raw transaction object.

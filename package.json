@@ -1,6 +1,6 @@
 {
   "name": "@openstfoundation/mosaic.js",
-  "version": "0.10.0-alpha.1",
+  "version": "0.10.0-alpha.3",
   "description": "Provides mosaic contract ABIs and BINs. This package also provides an API to interact with existing mosaic contracts and to deploy new ones on existing chains.",
   "main": "lib/mosaic.node.js",
   "browser": "lib/mosaic.web.js",
@@ -28,7 +28,8 @@
     "test": "mocha --recursive --timeout 5000",
     "test:integration": "node test_integration/integration_tests.js",
     "pre-commit": "lint-staged",
-    "build": "webpack --mode=production"
+    "build": "webpack --mode=production",
+    "prepare": "npm run build"
   },
   "dependencies": {
     "@openstfoundation/mosaic-contracts": "^0.10.0-alpha.1",

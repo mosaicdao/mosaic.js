@@ -87,8 +87,8 @@ describe('EIP20Gateway.stake()', () => {
   });
 
   it('should throw error when transaction object is invalid', async () => {
-    AssertAsync.throws(async () => {
-      await gateway.stake(
+    await AssertAsync.reject(
+      gateway.stake(
         stakeParams.amount,
         stakeParams.beneficiary,
         stakeParams.gasPrice,
@@ -96,14 +96,15 @@ describe('EIP20Gateway.stake()', () => {
         stakeParams.nonce,
         stakeParams.hashLock,
         undefined,
-      );
-    }, `Invalid transaction options: ${undefined}.`);
+      ),
+      `Invalid transaction options: ${undefined}.`,
+    );
   });
 
   it('should throw error when from address is invalid', async () => {
     delete txOptions.from;
-    AssertAsync.throws(async () => {
-      await gateway.stake(
+    await AssertAsync.reject(
+      gateway.stake(
         stakeParams.amount,
         stakeParams.beneficiary,
         stakeParams.gasPrice,
@@ -111,8 +112,9 @@ describe('EIP20Gateway.stake()', () => {
         stakeParams.nonce,
         stakeParams.hashLock,
         txOptions,
-      );
-    }, `Invalid facilitator address: ${undefined}.`);
+      ),
+      `Invalid facilitator address: ${undefined}.`,
+    );
   });
 
   it('should return correct mocked transaction object', async () => {

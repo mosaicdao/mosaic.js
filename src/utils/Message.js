@@ -68,7 +68,7 @@ class Message {
    *
    * @param {string} amount Stake amount.
    * @param {string} beneficiary Beneficiary address.
-   * @param {string} gatewayAddress Gateway contract address.
+   * @param {string} gatewayAddress EIP20Gateway contract address.
    *
    * @returns {string} stake intent hash.
    */
@@ -96,7 +96,7 @@ class Message {
    *
    * @param {string} amount Stake amount.
    * @param {string} beneficiary Beneficiary address.
-   * @param {string} gatewayAddress Gateway contract address.
+   * @param {string} gatewayAddress EIP20Gateway contract address.
    * @param {nonce} nonce Nonce.
    * @param {string} gasPrice Gas price.
    * @param {string} gasLimit Gas limit.
