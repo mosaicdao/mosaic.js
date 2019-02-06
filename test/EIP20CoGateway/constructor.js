@@ -72,7 +72,7 @@ describe('EIP20CoGateway.constructor()', () => {
     setup();
 
     mockedCoGatewayObject = undefined;
-    const errorMessage = `Could not load CoGateway contract for: ${coGatewayAddress}`;
+    const errorMessage = `Could not load EIP20CoGateway contract for: ${coGatewayAddress}`;
 
     assert.throws(() => {
       new EIP20CoGateway(web3, coGatewayAddress);

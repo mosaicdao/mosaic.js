@@ -24,7 +24,7 @@ Please follow these steps in sequence.
 let originWeb3 = new Web3('http://127.0.0.1:8545');
 let auxiliaryWeb3 = new Web3('http://127.0.0.1:8546');
 let helper = new ChainSetup(originWeb3, auxiliaryWeb3);
-let simpleToken = "0x..."; /* SimpleToken Contract Address deployed on origin chain */
+let valueToken = "0x..."; /* EIP20 value token Contract Address deployed on origin chain */
 ```
 
 ## Create configurations. 

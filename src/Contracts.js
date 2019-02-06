@@ -1,52 +1,88 @@
 const Web3 = require('web3');
 const AbiBinProvider = require('./AbiBinProvider');
+const Mosaic = require('./Mosaic');
 
 const abProvider = new AbiBinProvider();
 
 class Contracts {
-  constructor(originWeb3, auxiliaryWeb3) {
-    this.originWeb3 = Contracts._getWeb3(originWeb3);
-    this.auxiliaryWeb3 = Contracts._getWeb3(auxiliaryWeb3);
+  constructor(mosaic) {
+    if (!(mosaic instanceof Mosaic)) {
+      const err = new TypeError('Invalid mosaic object.');
+      throw err;
+    }
+    this.mosaic = mosaic;
   }
 
-  ValueToken(address, options) {
-    return Contracts.getEIP20Token(this.originWeb3, address, options);
+  ValueToken(options) {
+    return Contracts.getEIP20Token(
+      this.mosaic.origin.web3,
+      this.mosaic.origin.contractAddresses.ValueToken,
+      options,
+    );
   }
 
-  BaseToken(address, options) {
-    return Contracts.getEIP20Token(this.originWeb3, address, options);
+  BaseToken(options) {
+    return Contracts.getEIP20Token(
+      this.mosaic.origin.web3,
+      this.mosaic.origin.contractAddresses.BaseToken,
+      options,
+    );
   }
 
-  SimpleToken(address, options) {
-    return Contracts.getEIP20Token(this.originWeb3, address, options);
+  OSTPrime(options) {
+    return Contracts.getOSTPrime(
+      this.mosaic.auxiliary.web3,
+      this.mosaic.auxiliary.contractAddresses.OSTPrime,
+      options,
+    );
   }
 
-  OSTPrime(address, options) {
-    return Contracts.getOSTPrime(this.auxiliaryWeb3, address, options);
+  OriginAnchor(options) {
+    return Contracts.getAnchor(
+      this.mosaic.origin.web3,
+      this.mosaic.origin.contractAddresses.Anchor,
+      options,
+    );
   }
 
-  OriginAnchor(address, options) {
-    return Contracts.getAnchor(this.originWeb3, address, options);
+  AuxiliaryAnchor(options) {
+    return Contracts.getAnchor(
+      this.mosaic.auxiliary.web3,
+      this.mosaic.auxiliary.contractAddresses.Anchor,
+      options,
+    );
   }
 
-  AuxiliaryAnchor(address, options) {
-    return Contracts.getAnchor(this.auxiliaryWeb3, address, options);
+  EIP20CoGateway(options) {
+    return Contracts.getEIP20CoGateway(
+      this.mosaic.auxiliary.web3,
+      this.mosaic.auxiliary.contractAddresses.EIP20CoGateway,
+      options,
+    );
   }
 
-  CoGateway(address, options) {
-    return Contracts.getEIP20CoGateway(this.auxiliaryWeb3, address, options);
+  EIP20Gateway(options) {
+    return Contracts.getEIP20Gateway(
+      this.mosaic.origin.web3,
+      this.mosaic.origin.contractAddresses.EIP20Gateway,
+      options,
+    );
   }
 
-  Gateway(address, options) {
-    return Contracts.getEIP20Gateway(this.originWeb3, address, options);
+  OriginOrganization(options) {
+    return Contracts.getOrganization(
+      this.mosaic.origin.web3,
+      this.mosaic.origin.contractAddresses.Organization,
+      options,
+    );
   }
 
-  OriginOrganization(address, options) {
-    return Contracts.getOrganization(this.originWeb3, address, options);
-  }
-
-  AuxiliaryOrganization(address, options) {
-    return Contracts.getOrganization(this.auxiliaryWeb3, address, options);
+  AuxiliaryOrganization(options) {
+    return Contracts.getOrganization(
+      this.mosaic.auxiliary.web3,
+      this.mosaic.auxiliary.contractAddresses.Organization,
+      options,
+    );
   }
 
   static getAnchor(web3, address, options) {
@@ -103,11 +139,8 @@ class Contracts {
     }
     if (typeof web3 === 'string') {
       return new Web3(web3);
-    } else {
-      return web3;
     }
-    // TODO - following is a temporary commit. Please revert this commit.
-    // throw 'Invalid web3. Please provide an instanceof Web3(version: ' + Web3.version + ' )';
+    return web3;
   }
 }
 
