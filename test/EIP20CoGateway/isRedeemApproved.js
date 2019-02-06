@@ -38,7 +38,6 @@ describe('EIP20CoGateway.isRedeemAmountApproved()', () => {
 
   let spyMethod;
   let mockUtilityToken;
-  let spyIsAmountApproved;
 
   const setup = async () => {
     mockUtilityToken = sinon.createStubInstance(EIP20Token);
@@ -56,7 +55,6 @@ describe('EIP20CoGateway.isRedeemAmountApproved()', () => {
     );
 
     spyMethod = sinon.spy(coGateway, 'isRedeemAmountApproved');
-    spyIsAmountApproved = sinon.spy(mockUtilityToken.isAmountApproved);
   };
 
   beforeEach(() => {
@@ -90,7 +88,6 @@ describe('EIP20CoGateway.isRedeemAmountApproved()', () => {
     );
   });
 
-  it('should throw for invalid amount', async function() {});
   it('should return correct mocked result', async () => {
     await setup();
 
@@ -103,6 +100,10 @@ describe('EIP20CoGateway.isRedeemAmountApproved()', () => {
 
     SpyAssert.assert(spyMethod, 1, [
       [redeemParams.redeemer, redeemParams.amount],
+    ]);
+
+    SpyAssert.assert(mockUtilityToken.isAmountApproved, 1, [
+      [redeemParams.redeemer, coGatewayAddress, redeemParams.amount],
     ]);
   });
 });
