@@ -79,7 +79,7 @@ class Utils {
   // TODO: docs and correct issue number
   static deprecationNoticeChainSetup(method) {
     console.warn(
-      `${method} has been deprecated. See #TODO for migration instructions.`,
+      `${method} has been deprecated. See https://github.com/OpenSTFoundation/mosaic.js/issues/57 for migration instructions.`,
     );
   }
 }

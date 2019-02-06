@@ -3,7 +3,10 @@
 const { assert } = require('chai');
 const Web3 = require('web3');
 
-const GatewayHelper = require('../../src/helpers/setup/GatewayHelper');
+const { ChainSetup } = require('../../index');
+const EIP20Gateway = require('../../src/ContractInteract/EIP20Gateway');
+
+const GatewayHelper = ChainSetup.GatewayHelper;
 
 const shared = require('../shared');
 
@@ -31,8 +34,6 @@ const assertDeploymentReceipt = (receipt) => {
 describe('GatewayHelper', () => {
   let deployParams;
 
-  const subject = new GatewayHelper(shared.origin.web3);
-
   before(() => {
     deployParams = {
       from: shared.setupConfig.deployerAddress,
@@ -46,6 +47,8 @@ describe('GatewayHelper', () => {
     const _baseToken = someValidAddress;
     const _anchor = someValidAddress;
     const _bounty = 1000;
+
+    const subject = new GatewayHelper(shared.origin.web3);
 
     return subject
       .deploy(
@@ -76,6 +79,7 @@ describe('GatewayHelper', () => {
       organizationOwner: shared.setupConfig.organizationOwner,
       anchor: shared.origin.addresses.Anchor,
       bounty: '123456',
+      burner: '0x0000000000000000000000000000000000000000',
       messageBus: shared.origin.addresses.MessageBus,
       gatewayLib: shared.origin.addresses.GatewayLib,
     };
@@ -92,13 +96,13 @@ describe('GatewayHelper', () => {
       gatewayLib: shared.auxiliary.addresses.GatewayLib,
     };
 
-    return subject.setup(
+    return EIP20Gateway.setup(
+      shared.origin.web3,
+      shared.auxiliary.web3,
       gatewayConfig,
       coGatewayConfig,
       deployParams,
       deployParams,
-      shared.origin.web3,
-      shared.auxiliary.web3,
     );
   });
 });

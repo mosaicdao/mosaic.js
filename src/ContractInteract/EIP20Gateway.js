@@ -2,10 +2,16 @@
 
 const Web3 = require('web3');
 const BN = require('bn.js');
+
+const AbiBinProvider = require('../AbiBinProvider');
 const Contracts = require('../Contracts');
 const Utils = require('../utils/Utils');
-const EIP20Token = require('../ContractInteract/EIP20Token');
-const Anchor = require('../ContractInteract/Anchor');
+const EIP20CoGateway = require('./EIP20CoGateway');
+const EIP20Token = require('./EIP20Token');
+const Anchor = require('./Anchor');
+const { validateConfigKeyExists } = require('../helpers/setup/validation');
+
+const ContractName = 'EIP20Gateway';
 
 /**
  * Contract interact for EIP20Gateway.
@@ -34,13 +40,13 @@ class EIP20Gateway {
       throw err;
     }
 
-    this.gatewayAddress = gatewayAddress;
+    this.address = gatewayAddress;
 
-    this.contract = Contracts.getEIP20Gateway(this.web3, this.gatewayAddress);
+    this.contract = Contracts.getEIP20Gateway(this.web3, this.address);
 
     if (!this.contract) {
       const err = new Error(
-        `Could not load EIP20Gateway contract for: ${this.gatewayAddress}`,
+        `Could not load EIP20Gateway contract for: ${this.address}`,
       );
       throw err;
     }
@@ -68,10 +74,207 @@ class EIP20Gateway {
     this.getValueTokenContract = this.getValueTokenContract.bind(this);
     this.isBountyAmountApproved = this.isBountyAmountApproved.bind(this);
     this.isStakeAmountApproved = this.isStakeAmountApproved.bind(this);
-    this.confirmRedeemIntentRawTx = this.confirmRedeemIntentRawTx.bind(this);
-    this.progressUnstakeRawTx = this.progressUnstakeRawTx.bind(this);
-    this.confirmRedeemIntent = this.confirmRedeemIntent.bind(this);
-    this.progressUnstake = this.progressUnstake.bind(this);
+    this.getStakeVault = this.getStakeVault.bind(this);
+    this.activateGateway = this.activateGateway.bind(this);
+    this.activateGatewayRawTx = this.activateGatewayRawTx.bind(this);
+  }
+
+  /*
+  //gatewayConfig
+  {
+    "deployer": "0x...",
+    "organization": "0x...",
+    "anchor": "0x....",
+    "bounty": "123456",
+    "messageBus": "0x....",
+    "gatewayLib": "0x....",
+    "simpleToken": "0x....",
+    "organizationOwner": "0x....",
+  }
+  //coGatewayConfig
+  {
+    "deployer": "0x...",
+    "token": "0x...",
+    "baseToken": "0x...",
+    "organization": "0x...",
+    "anchor": "0x....",
+    "bounty": "123456",
+    "messageBus": "0x....",
+    "gatewayLib": "0x....",
+    "ostPrime": "0x...."
+  }
+*/
+
+  // TODO: docs
+  static setup(
+    originWeb3,
+    auxiliaryWeb3,
+    gatewayConfig,
+    coGatewayConfig,
+    gatewayTxOptions = {},
+    coGatewayTxOptions = {},
+  ) {
+    if (!gatewayConfig) {
+      throw new Error('Mandatory parameter "gatewayConfig" missing. ');
+    }
+    if (!coGatewayConfig) {
+      throw new Error('Mandatory parameter "coGatewayConfig" missing. ');
+    }
+
+    gatewayConfig = gatewayConfig || {};
+    gatewayConfig.messageBus = gatewayConfig.messageBus || this.messageBus;
+    gatewayConfig.gatewayLib = gatewayConfig.gatewayLib || this.gatewayLib;
+
+    if (!originWeb3) {
+      throw new Error('Mandatory parameter "originWeb3" missing.');
+    }
+
+    if (!auxiliaryWeb3) {
+      throw new Error('Mandatory parameter "auxiliaryWeb3" missing.');
+    }
+
+    if (!gatewayConfig.baseToken) {
+      throw new Error(
+        'Mandatory configuration "baseToken" missing. Set gatewayConfig.baseToken address',
+      );
+    }
+
+    EIP20Gateway.validateSetupConfig(gatewayConfig);
+    EIP20CoGateway.validateSetupConfig(coGatewayConfig);
+
+    const gatewayDeployParams = Object.assign({}, gatewayTxOptions);
+    gatewayDeployParams.from = gatewayConfig.deployer;
+
+    let gatewayDeploy = EIP20Gateway.deploy(
+      originWeb3,
+      gatewayConfig.token,
+      gatewayConfig.baseToken,
+      gatewayConfig.anchor,
+      gatewayConfig.bounty,
+      gatewayConfig.organization,
+      gatewayConfig.burner,
+      gatewayConfig.messageBus,
+      gatewayConfig.gatewayLib,
+      gatewayDeployParams,
+    );
+
+    const coGatewayDeploy = gatewayDeploy.then((gateway) => {
+      const gatewayAddress = gateway.address;
+      coGatewayConfig.gateway = gatewayAddress;
+
+      return EIP20CoGateway.setup(
+        auxiliaryWeb3,
+        coGatewayConfig,
+        coGatewayTxOptions,
+      );
+    });
+
+    const gatewayActivation = Promise.all([
+      gatewayDeploy,
+      coGatewayDeploy,
+    ]).then(([gateway, coGateway]) => {
+      const ownerTxParams = Object.assign({}, gatewayDeployParams);
+      ownerTxParams.from = gatewayConfig.organizationOwner;
+
+      const coGatewayAddress = coGateway.address;
+
+      return gateway
+        .activateGateway(coGatewayAddress, ownerTxParams)
+        .then(() => gateway);
+    });
+
+    return gatewayActivation;
+  }
+
+  // TODO: docs
+  static validateSetupConfig(gatewayConfig) {
+    validateConfigKeyExists(gatewayConfig, 'deployer', 'gatewayConfig');
+    validateConfigKeyExists(gatewayConfig, 'organization', 'gatewayConfig');
+    validateConfigKeyExists(gatewayConfig, 'anchor', 'gatewayConfig');
+    validateConfigKeyExists(gatewayConfig, 'bounty', 'gatewayConfig');
+    validateConfigKeyExists(gatewayConfig, 'burner', 'gatewayConfig');
+    validateConfigKeyExists(gatewayConfig, 'messageBus', 'gatewayConfig');
+    validateConfigKeyExists(gatewayConfig, 'gatewayLib', 'gatewayConfig');
+    validateConfigKeyExists(gatewayConfig, 'token', 'gatewayConfig');
+    validateConfigKeyExists(
+      gatewayConfig,
+      'organizationOwner',
+      'gatewayConfig',
+    );
+  }
+
+  // TODO: docs
+  static async deploy(
+    web3,
+    token,
+    baseToken,
+    anchor,
+    bounty,
+    membersManager,
+    burner,
+    messageBusAddress,
+    gatewayLibAddress,
+    txOptions,
+  ) {
+    const tx = EIP20Gateway.deployRawTx(
+      web3,
+      token,
+      baseToken,
+      anchor,
+      bounty,
+      membersManager,
+      burner,
+      messageBusAddress,
+      gatewayLibAddress,
+    );
+
+    const _txOptions = txOptions;
+    if (!_txOptions.gas) {
+      _txOptions.gas = await tx.estimateGas();
+    }
+
+    return Utils.sendTransaction(tx, _txOptions).then((txReceipt) => {
+      const address = txReceipt.contractAddress;
+      return new EIP20Gateway(web3, address);
+    });
+  }
+
+  // TODO: docs
+  static deployRawTx(
+    web3,
+    token,
+    baseToken,
+    anchor,
+    bounty,
+    membersManager,
+    burner,
+    messageBusAddress,
+    gatewayLibAddress,
+  ) {
+    const messageBusLibInfo = {
+      address: messageBusAddress,
+      name: 'MessageBus',
+    };
+    const gatewayLibInfo = {
+      address: gatewayLibAddress,
+      name: 'GatewayLib',
+    };
+
+    const abiBinProvider = new AbiBinProvider();
+    const abi = abiBinProvider.getABI(ContractName);
+    const bin = abiBinProvider.getLinkedBIN(
+      ContractName,
+      messageBusLibInfo,
+      gatewayLibInfo,
+    );
+
+    const contract = new web3.eth.Contract(abi, null, null);
+    const args = [token, baseToken, anchor, bounty, membersManager, burner];
+
+    return contract.deploy({
+      data: bin,
+      arguments: args,
+    });
   }
 
   /**
@@ -734,6 +937,34 @@ class EIP20Gateway {
    */
   async getLatestAnchorInfo() {
     return this.getAnchor().then((anchor) => anchor.getLatestInfo());
+  }
+
+  // TODO
+  getStakeVault() {
+    return this.contract.methods.stakeVault().call();
+  }
+
+  // TODO
+  activateGateway(coGatewayAddress, txOptions) {
+    if (!txOptions) {
+      const err = new TypeError('Invalid transaction options.');
+      return Promise.reject(err);
+    }
+
+    return this.activateGatewayRawTx(coGatewayAddress).then((tx) =>
+      Utils.sendTransaction(tx, txOptions),
+    );
+  }
+
+  // TODO
+  activateGatewayRawTx(coGatewayAddress) {
+    if (!Web3.utils.isAddress(coGatewayAddress)) {
+      const err = new TypeError('Invalid coGateway address.');
+      return Promise.reject(err);
+    }
+
+    const tx = this.contract.methods.activateGateway(coGatewayAddress);
+    return Promise.resolve(tx);
   }
 }
 

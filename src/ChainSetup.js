@@ -789,6 +789,7 @@ class ChainSetup {
   }
 
   static get GatewayHelper() {
+    deprecationNoticeChainSetup('ChainSetup.GatewayHelper');
     return GatewayHelper;
   }
 
