@@ -60,7 +60,7 @@ class EIP20Gateway {
 
     if (!this.contract) {
       const err = new Error(
-        `Could not load Gateway contract for: ${this.gatewayAddress}`,
+        `Could not load EIP20Gateway contract for: ${this.gatewayAddress}`,
       );
       throw err;
     }
