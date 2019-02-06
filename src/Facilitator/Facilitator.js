@@ -1305,6 +1305,10 @@ class Facilitator {
    */
   getGatewayProof(messageHash) {
     logger.info('Generating Gateway proof data');
+    if (typeof messageHash !== 'string') {
+      const err = new TypeError(`Invalid message hash: ${messageHash}.`);
+      return Promise.reject(err);
+    }
     return this.coGateway.getLatestAnchorInfo().then((latestAnchorInfo) => {
       const proofGenerator = new Proof(
         this.mosaic.origin.web3,
@@ -1328,6 +1332,10 @@ class Facilitator {
    */
   getCoGatewayProof(messageHash) {
     logger.info('Generating CoGateway proof data');
+    if (typeof messageHash !== 'string') {
+      const err = new TypeError(`Invalid message hash: ${messageHash}.`);
+      return Promise.reject(err);
+    }
     return this.gateway.getLatestAnchorInfo().then((latestAnchorInfo) => {
       const proofGenerator = new Proof(
         this.mosaic.auxiliary.web3,
