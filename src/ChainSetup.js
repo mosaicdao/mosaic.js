@@ -785,6 +785,7 @@ class ChainSetup {
   }
 
   static get LibsHelper() {
+    deprecationNoticeChainSetup('ChainSetup.LibsHelper');
     return LibsHelper;
   }
 

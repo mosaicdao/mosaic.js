@@ -8,7 +8,7 @@ const Utils = require('../utils/Utils');
 const {
   validateConfigExists,
   validateConfigKeyExists,
-} = require('../helpers/setup/validation');
+} = require('./validation');
 
 const ContractName = 'Anchor';
 

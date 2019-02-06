@@ -11,7 +11,7 @@ const EIP20Token = require('../ContractInteract/EIP20Token');
 const {
   validateConfigExists,
   validateConfigKeyExists,
-} = require('../helpers/setup/validation');
+} = require('./validation');
 
 const ContractName = 'EIP20CoGateway';
 /**

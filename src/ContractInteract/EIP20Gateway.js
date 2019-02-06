@@ -9,7 +9,7 @@ const Utils = require('../utils/Utils');
 const EIP20CoGateway = require('./EIP20CoGateway');
 const EIP20Token = require('./EIP20Token');
 const Anchor = require('./Anchor');
-const { validateConfigKeyExists } = require('../helpers/setup/validation');
+const { validateConfigKeyExists } = require('./validation');
 
 const ContractName = 'EIP20Gateway';
 
