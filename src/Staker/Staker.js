@@ -30,7 +30,7 @@ class Staker {
   /**
    * Constructor for staker.
    *
-   * @param {Object} mosaic Mosaic object.
+   * @param {Mosaic} mosaic Mosaic object.
    */
   constructor(mosaic) {
     if (!(mosaic instanceof Mosaic)) {
