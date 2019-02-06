@@ -67,9 +67,10 @@ describe('EIP20Gateway.getInboxMessageStatus()', () => {
   });
 
   it('should throw an error when message hash is undefined', async () => {
-    AssertAsync.throws(async () => {
-      await gateway.getInboxMessageStatus();
-    }, `Invalid message hash: ${undefined}.`);
+    await AssertAsync.reject(
+      gateway.getInboxMessageStatus(),
+      `Invalid message hash: ${undefined}.`,
+    );
   });
 
   it('should return correct mocked message status', async () => {

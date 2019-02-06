@@ -83,22 +83,25 @@ describe('Staker.approveStakeAmount()', () => {
   });
 
   it('should throw an error when stake amount undefined', async () => {
-    AssertAsync.throws(async () => {
-      await staker.approveStakeAmount(undefined, txOptions);
-    }, `Invalid stake amount: ${undefined}.`);
+    await AssertAsync.reject(
+      staker.approveStakeAmount(undefined, txOptions),
+      `Invalid stake amount: ${undefined}.`,
+    );
   });
 
   it('should throw an error when transaction options is undefined', async () => {
-    AssertAsync.throws(async () => {
-      await staker.approveStakeAmount(stakeAmount, undefined);
-    }, `Invalid transaction options: ${undefined}.`);
+    await AssertAsync.reject(
+      staker.approveStakeAmount(stakeAmount, undefined),
+      `Invalid transaction options: ${undefined}.`,
+    );
   });
 
   it('should throw an error when transaction options do not have staker address', async () => {
     delete txOptions.from;
-    AssertAsync.throws(async () => {
-      await staker.approveStakeAmount(stakeAmount, txOptions);
-    }, `Invalid staker address: ${undefined}.`);
+    await AssertAsync.reject(
+      staker.approveStakeAmount(stakeAmount, txOptions),
+      `Invalid staker address: ${undefined}.`,
+    );
   });
 
   it('should pass when called with correct arguments', async () => {

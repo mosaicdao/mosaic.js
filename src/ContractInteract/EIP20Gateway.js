@@ -102,7 +102,7 @@ class EIP20Gateway {
    */
   proveGateway(blockHeight, encodedAccount, accountProof, txOptions) {
     if (!txOptions) {
-      const err = new TypeError('Invalid transaction options.');
+      const err = new TypeError(`Invalid transaction options: ${txOptions}.`);
       return Promise.reject(err);
     }
     return this._proveGatewayRawTx(
