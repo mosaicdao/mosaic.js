@@ -27,7 +27,7 @@ const EIP20CoGateway = require('../../src/ContractInteract/EIP20CoGateway');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const AssertAsync = require('../../test_utils/AssertAsync');
 
-describe('EIP20CoGateway._confirmStakeIntentRawTx()', () => {
+describe('EIP20CoGateway._redeemRawTx()', () => {
   let web3;
   let coGatewayAddress;
   let coGateway;
