@@ -64,9 +64,10 @@ describe('EIP20Gateway.getNonce()', () => {
   });
 
   it('should throw an error when account address is undefined', async () => {
-    AssertAsync.throws(async () => {
-      await gateway.getNonce();
-    }, /Invalid account address./);
+    await AssertAsync.reject(
+      gateway.getNonce(),
+      `Invalid account address: ${undefined}.`,
+    );
   });
 
   it('should return correct mocked nonce', async () => {

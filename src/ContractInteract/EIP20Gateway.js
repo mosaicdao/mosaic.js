@@ -98,11 +98,11 @@ class EIP20Gateway {
    * @param {string} accountProof Account proof data.
    * @param {Object} txOptions Transaction options.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<Object>} Promise that resolves to transaction receipt.
    */
   proveGateway(blockHeight, encodedAccount, accountProof, txOptions) {
     if (!txOptions) {
-      const err = new TypeError('Invalid transaction options.');
+      const err = new TypeError(`Invalid transaction options: ${txOptions}.`);
       return Promise.reject(err);
     }
     return this._proveGatewayRawTx(
@@ -113,27 +113,27 @@ class EIP20Gateway {
   }
 
   /**
-   * Get raw transaction object for prove cogateway.
+   * Get raw transaction object for prove CoGateway contract.
    *
    * @param {string} blockHeight Block number.
    * @param {string} encodedAccount Encoded account data.
    * @param {string} accountProof Account proof data.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<Object>} Promise that resolves to raw transaction object.
    */
   _proveGatewayRawTx(blockHeight, encodedAccount, accountProof) {
-    if (blockHeight === undefined) {
-      const err = new TypeError('Invalid block height.');
+    if (typeof blockHeight !== 'string') {
+      const err = new TypeError(`Invalid block height: ${blockHeight}.`);
       return Promise.reject(err);
     }
 
     if (typeof encodedAccount !== 'string') {
-      const err = new TypeError('Invalid account data.');
+      const err = new TypeError(`Invalid account data: ${encodedAccount}.`);
       return Promise.reject(err);
     }
 
     if (typeof accountProof !== 'string') {
-      const err = new TypeError('Invalid account proof.');
+      const err = new TypeError(`Invalid account proof: ${accountProof}.`);
       return Promise.reject(err);
     }
 
@@ -156,15 +156,17 @@ class EIP20Gateway {
    * @param {string} hashLock Hash lock.
    * @param {Object} txOptions Transaction options.
    *
-   * @returns {Object} Raw transaction object.
+   * @returns {Promise<Object>} Promise that resolves to transaction receipt.
    */
   stake(amount, beneficiary, gasPrice, gasLimit, nonce, hashLock, txOptions) {
     if (!txOptions) {
-      const err = new TypeError('Invalid transaction options.');
+      const err = new TypeError(`Invalid transaction options: ${txOptions}.`);
       return Promise.reject(err);
     }
     if (!Web3.utils.isAddress(txOptions.from)) {
-      const err = new TypeError('Invalid facilitator address.');
+      const err = new TypeError(
+        `Invalid facilitator address: ${txOptions.from}.`,
+      );
       return Promise.reject(err);
     }
 
@@ -187,25 +189,28 @@ class EIP20Gateway {
    * @param {string} gasLimit Maximum gas limit for reward calculation.
    * @param {string} nonce Staker nonce.
    * @param {string} hashLock Hash lock.
-   * @param {Object} txOptions Transaction options.
    *
-   * @returns {Object} Raw transaction object.
+   * @returns {Promise<Object>} Promise that resolves to raw transaction object.
    */
   _stakeRawTx(amount, beneficiary, gasPrice, gasLimit, nonce, hashLock) {
-    if (new BN(amount).eqn(0)) {
-      const err = new TypeError('Stake amount must not be zero.');
+    if (!new BN(amount).gtn(0)) {
+      const err = new TypeError(
+        `Stake amount must be greater than zero: ${amount}.`,
+      );
       return Promise.reject(err);
     }
     if (!Web3.utils.isAddress(beneficiary)) {
-      const err = new TypeError('Invalid beneficiary address.');
+      const err = new TypeError(
+        `Invalid beneficiary address: ${beneficiary}.`,
+      );
       return Promise.reject(err);
     }
     if (gasPrice === undefined) {
-      const err = new TypeError('Invalid gas price.');
+      const err = new TypeError(`Invalid gas price: ${gasPrice}.`);
       return Promise.reject(err);
     }
     if (gasLimit === undefined) {
-      const err = new TypeError('Invalid gas limit.');
+      const err = new TypeError(`Invalid gas limit: ${gasLimit}.`);
       return Promise.reject(err);
     }
     const tx = this.contract.methods.stake(
@@ -226,11 +231,11 @@ class EIP20Gateway {
    * @param {string} unlockSecret Unlock secret.
    * @param {Object} txOptions Transaction options.
    *
-   * @returns {Promise} promise object.
+   * @returns {Promise<Object>} Promise that resolves to transaction receipt.
    */
   progressStake(messageHash, unlockSecret, txOptions) {
     if (!txOptions) {
-      const err = new TypeError('Invalid transaction options.');
+      const err = new TypeError(`Invalid transaction options: ${txOptions}.`);
       return Promise.reject(err);
     }
     return this._progressStakeRawTx(messageHash, unlockSecret).then((tx) =>
@@ -244,16 +249,16 @@ class EIP20Gateway {
    * @param {string} messageHash Message hash.
    * @param {string} unlockSecret Unlock secret.
    *
-   * @returns {Promise} promise object.
+   * @returns {Promise<Object>} Promise that resolves to raw transaction object.
    */
   _progressStakeRawTx(messageHash, unlockSecret) {
     if (typeof messageHash !== 'string') {
-      const err = new TypeError('Invalid message hash.');
+      const err = new TypeError(`Invalid message hash: ${messageHash}.`);
       return Promise.reject(err);
     }
 
     if (typeof unlockSecret !== 'string') {
-      const err = new TypeError('Invalid unlock secret.');
+      const err = new TypeError(`Invalid unlock secret: ${unlockSecret}.`);
       return Promise.reject(err);
     }
 
@@ -264,7 +269,7 @@ class EIP20Gateway {
   /**
    * Returns the bounty amount.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<string>} Promise that resolves to bounty amount.
    */
   getBounty() {
     if (this._bountyAmount) {
@@ -282,7 +287,7 @@ class EIP20Gateway {
   /**
    * Returns the ERC20 base token address.
    *
-   * @returns {Promise} Promise object
+   * @returns {Promise<string>} Promise that resolves to base token contract address.
    */
   getBaseToken() {
     if (this._baseTokenAddress) {
@@ -300,7 +305,7 @@ class EIP20Gateway {
   /**
    * Returns the EIP20 token address.
    *
-   * @returns {Promise} Promise object represents EIP20 token address.
+   * @returns {Promise<string>} Promise that resolves to value token contract address.
    */
   getValueToken() {
     if (this._valueTokenAddress) {
@@ -320,11 +325,11 @@ class EIP20Gateway {
    *
    * @param {string} accountAddress Account address for which the nonce is to be fetched.
    *
-   * @returns {Promise} Promise object.
+   *  @returns {Promise<Object>} Promise that resolves to nonce
    */
   getNonce(accountAddress) {
     if (!Web3.utils.isAddress(accountAddress)) {
-      const err = TypeError('Invalid account address.');
+      const err = TypeError(`Invalid account address: ${accountAddress}.`);
       return Promise.reject(err);
     }
     return this.contract.methods.getNonce(accountAddress).call();
@@ -333,7 +338,7 @@ class EIP20Gateway {
   /**
    * Returns the origin chain state root provider contract address.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<Object>} Promise that resolves to state root provider contract's address.
    */
   getStateRootProviderAddress() {
     if (this._stateRootProviderAddress) {
@@ -353,11 +358,11 @@ class EIP20Gateway {
    *
    * @param {string} messageHash Message hash.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<Object>} Promise that resolves to message status.
    */
   getInboxMessageStatus(messageHash) {
     if (typeof messageHash !== 'string') {
-      const err = new TypeError('Invalid message hash.');
+      const err = new TypeError(`Invalid message hash: ${messageHash}.`);
       return Promise.reject(err);
     }
     return this.contract.methods.getInboxMessageStatus(messageHash).call();
@@ -368,11 +373,11 @@ class EIP20Gateway {
    *
    * @param {string} messageHash Message hash.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<Object>} Promise that resolves to message status.
    */
   getOutboxMessageStatus(messageHash) {
     if (typeof messageHash !== 'string') {
-      const err = new TypeError('Invalid message hash.');
+      const err = new TypeError(`Invalid message hash: ${messageHash}.`);
       return Promise.reject(err);
     }
     return this.contract.methods.getOutboxMessageStatus(messageHash).call();
@@ -384,11 +389,11 @@ class EIP20Gateway {
    * @param {string} stakerAddress Staker account address.
    * @param {string} amount Approval amount.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<boolean>} Promise that resolves to `true` if approved.
    */
   isStakeAmountApproved(stakerAddress, amount) {
     if (!Web3.utils.isAddress(stakerAddress)) {
-      const err = new TypeError('Invalid staker address.');
+      const err = new TypeError(`Invalid staker address: ${stakerAddress}.`);
       return Promise.reject(err);
     }
     return this.getEIP20ValueToken().then((eip20ValueToken) => {
@@ -403,13 +408,15 @@ class EIP20Gateway {
   /**
    * Check if the account has approved gateway contract for bounty amount transfer.
    *
-   * @param {string} facilityAddress Owner account address.
+   * @param {string} facilityAddress Facilitator address.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<boolean>} Promise that resolves to `true` if approved.
    */
   isBountyAmountApproved(facilityAddress) {
     if (!Web3.utils.isAddress(facilityAddress)) {
-      const err = new TypeError('Invalid facility address.');
+      const err = new TypeError(
+        `Invalid facility address: ${facilityAddress}.`,
+      );
       return Promise.reject(err);
     }
     return this.getEIP20BaseToken().then((eip20BaseToken) => {
@@ -426,7 +433,7 @@ class EIP20Gateway {
   /**
    * Returns value token object.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<Object>} Promise that resolves to EIP20Token object.
    */
   getEIP20ValueToken() {
     if (this._eip20ValueToken) {
@@ -442,7 +449,7 @@ class EIP20Gateway {
   /**
    * Returns base token object.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<Object>} Promise that resolves to EIP20Token object.
    */
   getEIP20BaseToken() {
     if (this._eip20BaseToken) {
@@ -461,19 +468,19 @@ class EIP20Gateway {
    * @param {string} amount Approve amount.
    * @param {string} txOptions Transaction options.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<Object>} Promise that resolves to transaction receipt.
    */
   approveStakeAmount(amount, txOptions) {
     if (!txOptions) {
-      const err = new TypeError('Invalid transaction options.');
+      const err = new TypeError(`Invalid transaction options: ${txOptions}.`);
       return Promise.reject(err);
     }
     if (!Web3.utils.isAddress(txOptions.from)) {
-      const err = new TypeError('Invalid from address.');
+      const err = new TypeError(`Invalid from address: ${txOptions.from}.`);
       return Promise.reject(err);
     }
     if (typeof amount !== 'string') {
-      const err = new TypeError('Invalid stake amount.');
+      const err = new TypeError(`Invalid stake amount: ${amount}.`);
       return Promise.reject(err);
     }
     return this.getEIP20ValueToken().then((eip20Token) => {
@@ -482,33 +489,33 @@ class EIP20Gateway {
   }
 
   /**
-   * Approves gateway contract address for the amount transfer.
+   * Approves Gateway contract address for the amount transfer.
    *
    * @param {string} amount Approve amount.
    * @param {string} txOptions Transaction options.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<Object>} Promise that resolves to transaction receipt.
    */
   approveBountyAmount(txOptions) {
     if (!txOptions) {
-      const err = new TypeError('Invalid transaction options.');
+      const err = new TypeError(`Invalid transaction options: ${txOptions}.`);
       return Promise.reject(err);
     }
     if (!Web3.utils.isAddress(txOptions.from)) {
-      const err = new TypeError('Invalid from address.');
+      const err = new TypeError(`Invalid from address: ${txOptions.from}.`);
       return Promise.reject(err);
     }
     return this.getEIP20BaseToken().then((eip20BaseToken) => {
-      this.getBounty().then((bounty) => {
-        eip20BaseToken.approve(this.gatewayAddress, bounty, txOptions);
-      });
+      return this.getBounty().then((bounty) =>
+        eip20BaseToken.approve(this.gatewayAddress, bounty, txOptions),
+      );
     });
   }
 
   /**
    * Returns Anchor object.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<string>} Promise object that resolves to anchor contract address.
    */
   getAnchor() {
     if (this._anchor) {
@@ -522,9 +529,9 @@ class EIP20Gateway {
   }
 
   /**
-   * Get the state root for given block height.
+   * Get the latest state root and block height.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<Object>} Promise object that resolves to object containing state root and block height.
    */
   getLatestAnchorInfo() {
     return this.getAnchor().then((anchor) => {

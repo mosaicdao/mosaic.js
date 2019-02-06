@@ -67,9 +67,10 @@ describe('EIP20CoGateway.getInboxMessageStatus()', () => {
   });
 
   it('should throw an error when message hash is undefined', async () => {
-    AssertAsync.throws(async () => {
-      await coGateway.getInboxMessageStatus();
-    }, /Invalid message hash./);
+    await AssertAsync.reject(
+      coGateway.getInboxMessageStatus(),
+      `Invalid message hash: ${undefined}.`,
+    );
   });
 
   it('should return correct mocked message status', async () => {

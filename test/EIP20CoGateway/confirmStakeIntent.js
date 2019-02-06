@@ -90,8 +90,8 @@ describe('EIP20CoGateway.confirmStakeIntent()', () => {
   });
 
   it('should throw error transaction object is invalid', async () => {
-    AssertAsync.throws(async () => {
-      await coGateway.confirmStakeIntent(
+    await AssertAsync.reject(
+      coGateway.confirmStakeIntent(
         stakeParams.staker,
         stakeParams.nonce,
         stakeParams.beneficiary,
@@ -102,8 +102,9 @@ describe('EIP20CoGateway.confirmStakeIntent()', () => {
         stakeParams.blockHeight,
         stakeParams.storageProof,
         undefined,
-      );
-    }, /Invalid transaction options./);
+      ),
+      `Invalid transaction options: ${undefined}.`,
+    );
   });
 
   it('should return correct mocked transaction object', async () => {
