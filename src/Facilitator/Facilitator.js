@@ -324,7 +324,12 @@ class Facilitator {
       logger.error(
         '  - Value in transaction option is not equal to the bounty amount',
       );
-      return Promise.reject(false);
+      const err = new Error(
+        `Value passed in transaction object ${
+          txOptions.value
+        } must be equal to bounty amount ${bounty}`,
+      );
+      return Promise.reject(err);
     }
 
     logger.info(
