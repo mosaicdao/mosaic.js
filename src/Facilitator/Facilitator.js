@@ -658,7 +658,6 @@ class Facilitator {
    * @param {string} gasLimit Maximum gas for reward calculation.
    * @param {string} nonce Stake nonce.
    * @param {string} hashLock Hash lock.
-   * @param {string} unlockSecret Unlock secret.
    * @param {Object} txOptions Transaction options.
    *
    * @returns {Promise<Object>} Promise that resolves to transaction receipt.
@@ -671,7 +670,6 @@ class Facilitator {
     gasLimit,
     nonce,
     hashLock,
-    unlockSecret,
     txOptions,
   ) {
     logger.info('Confirming stake intent');
@@ -681,7 +679,9 @@ class Facilitator {
       return Promise.reject(err);
     }
     if (new BN(amount).eqn(0)) {
-      const err = new TypeError(`Stake amount must not be zero: ${amount}.`);
+      const err = new TypeError(
+        `Stake amount must be greater than be zero: ${amount}.`,
+      );
       return Promise.reject(err);
     }
     if (!Web3.utils.isAddress(beneficiary)) {
@@ -700,6 +700,10 @@ class Facilitator {
     }
     if (typeof nonce !== 'string') {
       const err = new TypeError(`Invalid staker nonce: ${nonce}.`);
+      return Promise.reject(err);
+    }
+    if (typeof hashLock !== 'string') {
+      const err = new TypeError(`Invalid hash lock: ${hashLock}.`);
       return Promise.reject(err);
     }
     if (!txOptions) {
@@ -831,7 +835,9 @@ class Facilitator {
       return Promise.reject(err);
     }
     if (new BN(amount).eqn(0)) {
-      const err = new TypeError(`Redeem amount must not be zero: ${amount}.`);
+      const err = new TypeError(
+        `Redeem amount must be greater than zero: ${amount}.`,
+      );
       return Promise.reject(err);
     }
     if (!Web3.utils.isAddress(beneficiary)) {
@@ -850,6 +856,10 @@ class Facilitator {
     }
     if (typeof nonce !== 'string') {
       const err = new TypeError(`Invalid redeemer nonce: ${nonce}.`);
+      return Promise.reject(err);
+    }
+    if (typeof hashLock !== 'string') {
+      const err = new TypeError(`Invalid hash lock: ${hashLock}.`);
       return Promise.reject(err);
     }
     if (!txOptions) {
