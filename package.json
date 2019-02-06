@@ -1,6 +1,6 @@
 {
   "name": "@openstfoundation/mosaic.js",
-  "version": "0.10.0-alpha.2",
+  "version": "0.10.0-alpha.3",
   "description": "Provides mosaic contract ABIs and BINs. This package also provides an API to interact with existing mosaic contracts and to deploy new ones on existing chains.",
   "main": "lib/mosaic.node.js",
   "browser": "lib/mosaic.web.js",
