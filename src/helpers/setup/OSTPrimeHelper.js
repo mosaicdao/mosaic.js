@@ -19,18 +19,18 @@ class OSTPrimeHelper {
   {
     deployer: config.deployerAddress,
     chainOwner: chainOwner,
-    valueToken: config.simpleTokenContractAddress
+    valueToken: config.valueTokenContractAddress
   }
   Both deployer, chainOwner & valueToken are mandatory configurations.
 */
 
-  setup(simpleToken, config, txOptions, web3) {
+  setup(valueToken, config, txOptions, web3) {
     const oThis = this;
     web3 = web3 || oThis.web3;
 
-    if (!simpleToken) {
+    if (!valueToken) {
       throw new Error(
-        'Mandatory configuration "simpleToken" missing. Provide SimpleToken contract address.',
+        'Mandatory configuration "valueToken" missing. Provide EIP20 token contract address.',
       );
     }
 
@@ -53,7 +53,7 @@ class OSTPrimeHelper {
 
     //1. Deploy the Contract
     let promiseChain = oThis.deploy(
-      simpleToken,
+      valueToken,
       config.organization,
       deployParams,
     );
