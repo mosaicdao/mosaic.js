@@ -2,8 +2,16 @@
 
 const BN = require('bn.js');
 const Web3 = require('web3');
+
+const AbiBinProvider = require('../AbiBinProvider');
 const Contracts = require('../Contracts');
 const Utils = require('../utils/Utils');
+const {
+  validateConfigExists,
+  validateConfigKeyExists,
+} = require('./validation');
+
+const ContractName = 'OSTPrime';
 
 /**
  * Contract interact for OSTPrime contract.
@@ -13,26 +21,25 @@ class OSTPrime {
    * Constructor for OSTPrime.
    *
    * @param {Object} web3 Web3 object.
-   * @param {string} contractAddress OSTPrime contract address.
+   * @param {string} address OSTPrime contract address.
    */
-  constructor(web3, contractAddress) {
+  constructor(web3, address) {
     if (!(web3 instanceof Web3)) {
       throw new TypeError("Mandatory Parameter 'web3' is missing or invalid");
     }
-    if (!Web3.utils.isAddress(contractAddress)) {
+    if (!Web3.utils.isAddress(address)) {
       throw new TypeError(
-        "Mandatory Parameter 'contractAddress' is missing or invalid.",
+        "Mandatory Parameter 'address' is missing or invalid.",
       );
     }
-    this.web3 = web3;
-    this.contractAddress = contractAddress;
 
-    this.contract = Contracts.getOSTPrime(this.web3, this.contractAddress);
+    this.web3 = web3;
+    this.address = address;
+
+    this.contract = Contracts.getOSTPrime(this.web3, this.address);
 
     if (!this.contract) {
-      throw new Error(
-        `Could not load OSTPrime contract for: ${this.contractAddress}`,
-      );
+      throw new Error(`Could not load OSTPrime contract for: ${this.address}`);
     }
 
     this.approve = this.approve.bind(this);
@@ -44,6 +51,99 @@ class OSTPrime {
     this.unwrap = this.unwrap.bind(this);
     this.unwrapRawTx = this.unwrapRawTx.bind(this);
     this.balanceOf = this.balanceOf.bind(this);
+    this.setCoGateway = this.setCoGateway.bind(this);
+    this.setCoGatewayRawTx = this.setCoGatewayRawTx.bind(this);
+    this.initialize = this.initialize.bind(this);
+    this.initializeRawTx = this.initializeRawTx.bind(this);
+  }
+
+  /*
+  //Supported Configurations for setup
+  {
+    deployer: config.deployerAddress,
+    chainOwner: chainOwner,
+    valueToken: config.valueTokenContractAddress
+  }
+  Both deployer, chainOwner & valueToken are mandatory configurations.
+*/
+
+  // TODO: docs
+  static setup(web3, valueToken, config, txOptions) {
+    if (!valueToken) {
+      throw new Error(
+        'Mandatory configuration "valueToken" missing. Provide EIP20 token contract address.',
+      );
+    }
+
+    if (!config.organization) {
+      throw new Error(
+        'Mandatory configuration "organization" missing. Set config.organization address.',
+      );
+    }
+
+    OSTPrime.validateSetupConfig(config);
+
+    const deployParams = Object.assign({}, txOptions);
+    deployParams.from = config.deployer;
+    deployParams.gasPrice = 0;
+
+    // 1. Deploy the Contract
+    const ostPrime = OSTPrime.deploy(
+      web3,
+      valueToken,
+      config.organization,
+      deployParams,
+    );
+
+    // 2. Initialize.
+    const initializedOstPrime = ostPrime.then((contract) => {
+      const valueToTransfer = Web3.utils.toWei('800000000');
+      const ownerParams = Object.assign({}, deployParams);
+      ownerParams.from = config.chainOwner;
+      ownerParams.value = valueToTransfer;
+
+      return contract.initialize(ownerParams).then(() => contract);
+    });
+
+    return initializedOstPrime;
+  }
+
+  // TODO: docs
+  static validateSetupConfig(config) {
+    validateConfigExists(config);
+    validateConfigKeyExists(config, 'deployer', 'config');
+    validateConfigKeyExists(config, 'chainOwner', 'config');
+
+    return true;
+  }
+
+  // TODO: docs
+  static async deploy(web3, valueToken, organization, txOptions) {
+    const tx = OSTPrime.deployRawTx(web3, valueToken, organization);
+
+    const _txOptions = txOptions;
+    if (!_txOptions.gas) {
+      _txOptions.gas = await tx.estimateGas();
+    }
+
+    return Utils.sendTransaction(tx, _txOptions).then((txReceipt) => {
+      const address = txReceipt.contractAddress;
+      return new OSTPrime(web3, address);
+    });
+  }
+
+  // TODO: docs
+  static deployRawTx(web3, valueToken, organization) {
+    const abiBinProvider = new AbiBinProvider();
+    const contract = Contracts.getOSTPrime(web3, null, null);
+
+    const bin = abiBinProvider.getBIN(ContractName);
+    const args = [valueToken, organization];
+
+    return contract.deploy({
+      data: bin,
+      arguments: args,
+    });
   }
 
   /**
@@ -183,7 +283,35 @@ class OSTPrime {
   }
 
   /**
-   * Unwrap amount raw transaction.
+   * Initialize OSTPrime by transfering all base tokens to it.
+   *
+   * @param {Object} txOptions Transaction options.
+   *
+   * @returns {Promise} Promise object.
+   */
+  initialize(txOptions) {
+    if (!txOptions) {
+      const err = new TypeError('Invalid transaction options.');
+      return Promise.reject(err);
+    }
+
+    return this.initializeRawTx().then((tx) =>
+      Utils.sendTransaction(tx, txOptions),
+    );
+  }
+
+  /**
+   * Raw transaction object for {@link OSTPrime#initialize}
+   *
+   * @returns {Promise} Promise object.
+   */
+  initializeRawTx() {
+    const tx = this.contract.methods.initialize();
+    return Promise.resolve(tx);
+  }
+
+  /**
+   * Unwrap amount raw tansaction.
    *
    * @param {string} amount Amount to unwrap.
    *
@@ -229,6 +357,42 @@ class OSTPrime {
    */
   wrapRawTx() {
     const tx = this.contract.methods.wrap();
+    return Promise.resolve(tx);
+  }
+
+  /**
+   * Sets the CoGateway contract address. This can be called only by$
+   * an organization address.
+   *
+   * @param {string} coGateway EIP20CoGateway contract address.
+   *
+   * @returns {Promise} Promise object.
+   */
+  setCoGateway(coGateway, txOptions) {
+    if (!txOptions) {
+      const err = new TypeError('Invalid transaction options.');
+      return Promise.reject(err);
+    }
+
+    return this.setCoGatewayRawTx(coGateway).then((tx) =>
+      Utils.sendTransaction(tx, txOptions),
+    );
+  }
+
+  /**
+   * Raw transaction object for {@link OSTPrime#setCoGateway}
+   *
+   * @param {string} coGateway EIP20CoGateway contract address.
+   *
+   * @returns {Promise} Promise object.
+   */
+  setCoGatewayRawTx(coGateway) {
+    if (!Web3.utils.isAddress(coGateway)) {
+      const err = new TypeError('Invalid coGateway address.');
+      return Promise.reject(err);
+    }
+
+    const tx = this.contract.methods.setCoGateway(coGateway);
     return Promise.resolve(tx);
   }
 }

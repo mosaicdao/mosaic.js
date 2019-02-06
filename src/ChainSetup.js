@@ -21,6 +21,7 @@ class ChainSetup {
   }
 
   static get OSTPrimeHelper() {
+    deprecationNoticeChainSetup('ChainSetup.OSTPrimeHelper');
     return OSTPrimeHelper;
   }
 

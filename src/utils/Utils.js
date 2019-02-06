@@ -76,7 +76,10 @@ class Utils {
     });
   }
 
-  // TODO: docs and correct issue number
+  /**
+   * Prints a deprecation warning for deprecated ChainSetup methods.
+   * See {@link https://github.com/OpenSTFoundation/mosaic.js/issues/57}.
+   */
   static deprecationNoticeChainSetup(method) {
     console.warn(
       `${method} has been deprecated. See https://github.com/OpenSTFoundation/mosaic.js/issues/57 for migration instructions.`,
