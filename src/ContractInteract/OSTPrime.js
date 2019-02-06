@@ -84,9 +84,7 @@ class OSTPrime {
    */
   approve(spenderAddress, amount, txOptions) {
     if (!txOptions) {
-      const err = new TypeError(
-        `Invalid transaction options: ${spenderAddress}.`,
-      );
+      const err = new TypeError(`Invalid transaction options: ${txOptions}.`);
       return Promise.reject(err);
     }
     if (!Web3.utils.isAddress(txOptions.from)) {
