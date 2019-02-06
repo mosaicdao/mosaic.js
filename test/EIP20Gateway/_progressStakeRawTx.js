@@ -65,7 +65,7 @@ describe('EIP20Gateway._progressStakeRawTx()', () => {
   });
 
   it('should throw error when message hash is invalid', async () => {
-    const expectedErrorMessage = 'Invalid message hash.';
+    const expectedErrorMessage = `Invalid message hash: ${undefined}.`;
     await gateway
       ._progressStakeRawTx(undefined, unlockSecret)
       .catch((exception) => {
@@ -78,7 +78,7 @@ describe('EIP20Gateway._progressStakeRawTx()', () => {
   });
 
   it('should throw error when unlock secret is invalid', async () => {
-    const expectedErrorMessage = 'Invalid unlock secret.';
+    const expectedErrorMessage = `Invalid unlock secret: ${undefined}.`;
     await gateway
       ._progressStakeRawTx(messageHash, undefined)
       .catch((exception) => {

@@ -70,7 +70,7 @@ describe('EIP20Gateway._stakeRawTx()', () => {
   });
 
   it('should throw error when stake amount is zero', async function() {
-    const expectedErrorMessage = 'Stake amount must not be zero.';
+    const expectedErrorMessage = `Stake amount must be greater than zero: 0.`;
     await gateway
       ._stakeRawTx(
         '0',
@@ -90,7 +90,7 @@ describe('EIP20Gateway._stakeRawTx()', () => {
   });
 
   it('should throw error when beneficiary address is invalid', async function() {
-    const expectedErrorMessage = 'Invalid beneficiary address.';
+    const expectedErrorMessage = `Invalid beneficiary address: 0x123.`;
     await gateway
       ._stakeRawTx(
         stakeParams.amount,
@@ -110,7 +110,7 @@ describe('EIP20Gateway._stakeRawTx()', () => {
   });
 
   it('should throw error when gas price is undefined', async function() {
-    const expectedErrorMessage = 'Invalid gas price.';
+    const expectedErrorMessage = `Invalid gas price: ${undefined}.`;
     await gateway
       ._stakeRawTx(
         stakeParams.amount,
@@ -130,7 +130,7 @@ describe('EIP20Gateway._stakeRawTx()', () => {
   });
 
   it('should throw error when gas limit is undefined', async function() {
-    const expectedErrorMessage = 'Invalid gas limit.';
+    const expectedErrorMessage = `Invalid gas limit: ${undefined}.`;
     await gateway
       ._stakeRawTx(
         stakeParams.amount,

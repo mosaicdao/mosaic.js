@@ -86,14 +86,15 @@ describe('EIP20Gateway.proveGateway()', () => {
   });
 
   it('should throw error transaction object is invalid', async () => {
-    AssertAsync.throws(async () => {
-      await gateway.proveGateway(
+    await AssertAsync.reject(
+      gateway.proveGateway(
         blockHeight,
         encodedAccount,
         accountProof,
         undefined,
-      );
-    }, /Invalid transaction options./);
+      ),
+      `Invalid transaction options: ${undefined}.`,
+    );
   });
 
   it('should return correct mocked transaction object', async () => {

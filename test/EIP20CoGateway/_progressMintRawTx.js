@@ -65,7 +65,7 @@ describe('EIP20CoGateway._progressMintRawTx()', () => {
   });
 
   it('should throw error when message hash is invalid', async () => {
-    const expectedErrorMessage = 'Invalid message hash.';
+    const expectedErrorMessage = `Invalid message hash: ${undefined}.`;
     await coGateway
       ._progressMintRawTx(undefined, unlockSecret)
       .catch((exception) => {
@@ -78,7 +78,7 @@ describe('EIP20CoGateway._progressMintRawTx()', () => {
   });
 
   it('should throw error when unlock secret is invalid', async () => {
-    const expectedErrorMessage = 'Invalid unlock secret.';
+    const expectedErrorMessage = `Invalid unlock secret: ${undefined}.`;
     await coGateway
       ._progressMintRawTx(messageHash, undefined)
       .catch((exception) => {

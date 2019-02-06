@@ -26,6 +26,7 @@ const assert = chai.assert;
 const Staker = require('../../src/Staker/Staker');
 const EIP20Token = require('../../src/ContractInteract/EIP20Token');
 const SpyAssert = require('../../test_utils/SpyAssert');
+const AssertAsync = require('../../test_utils/AssertAsync');
 const TestMosaic = require('../../test_utils/GetTestMosaic');
 
 describe('Staker.approveStakeAmount()', () => {
@@ -34,20 +35,12 @@ describe('Staker.approveStakeAmount()', () => {
   let stakeAmount;
   let txOptions;
 
-  let mockedValueTokenAdress;
-  let spyGetValueToken;
+  let spyGetEIP20ValueToken;
   let mockEIP20Token;
-  let spyToken;
   let spyApprove;
   let spyCall;
 
   const setup = () => {
-    spyGetValueToken = sinon.replace(
-      staker.gatewayContract,
-      'getValueToken',
-      sinon.fake.resolves(mockedValueTokenAdress),
-    );
-
     mockEIP20Token = sinon.mock(
       new EIP20Token(
         mosaic.origin.web3,
@@ -56,9 +49,9 @@ describe('Staker.approveStakeAmount()', () => {
     );
     const eip20TokenContract = mockEIP20Token.object;
 
-    spyToken = sinon.replace(
-      staker,
-      'getValueToken',
+    spyGetEIP20ValueToken = sinon.replace(
+      staker.gatewayContract,
+      'getEIP20ValueToken',
       sinon.fake.resolves(eip20TokenContract),
     );
 
@@ -87,26 +80,28 @@ describe('Staker.approveStakeAmount()', () => {
       gasPrice: 0,
       value: 0,
     };
-    mockedValueTokenAdress = '0x0000000000000000000000000000000000000023';
   });
 
   it('should throw an error when stake amount undefined', async () => {
-    assert.throws(() => {
-      staker.approveStakeAmount(undefined, txOptions);
-    }, /Invalid stake amount./);
+    await AssertAsync.reject(
+      staker.approveStakeAmount(undefined, txOptions),
+      `Invalid stake amount: ${undefined}.`,
+    );
   });
 
   it('should throw an error when transaction options is undefined', async () => {
-    assert.throws(() => {
-      staker.approveStakeAmount(stakeAmount, undefined);
-    }, /Invalid transaction options./);
+    await AssertAsync.reject(
+      staker.approveStakeAmount(stakeAmount, undefined),
+      `Invalid transaction options: ${undefined}.`,
+    );
   });
 
   it('should throw an error when transaction options do not have staker address', async () => {
     delete txOptions.from;
-    assert.throws(() => {
-      staker.approveStakeAmount(stakeAmount, txOptions);
-    }, /Invalid staker address./);
+    await AssertAsync.reject(
+      staker.approveStakeAmount(stakeAmount, txOptions),
+      `Invalid staker address: ${undefined}.`,
+    );
   });
 
   it('should pass when called with correct arguments', async () => {
@@ -114,8 +109,7 @@ describe('Staker.approveStakeAmount()', () => {
     const result = await staker.approveStakeAmount(stakeAmount, txOptions);
     assert.strictEqual(result, true, 'Result must be true');
 
-    SpyAssert.assert(spyGetValueToken, 1, [[]]);
-    SpyAssert.assert(spyToken, 1, [[mockedValueTokenAdress]]);
+    SpyAssert.assert(spyGetEIP20ValueToken, 1, [[]]);
     SpyAssert.assert(spyApprove, 1, [
       [mosaic.origin.contractAddresses.EIP20Gateway, stakeAmount, txOptions],
     ]);
