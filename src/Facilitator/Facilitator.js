@@ -561,7 +561,7 @@ class Facilitator {
 
     if (!new BN(amount).gtn(0)) {
       const err = new TypeError(
-        `Redeemer amount must not be zero: ${amount}.`,
+        `Redeem amount must be greater than zero: ${amount}.`,
       );
       return Promise.reject(err);
     }
