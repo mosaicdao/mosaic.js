@@ -1366,6 +1366,26 @@ class Facilitator {
     latestAnchorInfo,
     messageHash,
   ) {
+    if (proofGenerator === undefined) {
+      const err = new TypeError(
+        `Invalid proof generator object: ${proofGenerator}`,
+      );
+      return Promise.reject(err);
+    }
+    if (typeof accountAddress !== 'string') {
+      const err = new TypeError(`Invalid account address: ${accountAddress}`);
+      return Promise.reject(err);
+    }
+    if (latestAnchorInfo === undefined) {
+      const err = new TypeError(
+        `Invalid anchor info object: ${latestAnchorInfo}`,
+      );
+      return Promise.reject(err);
+    }
+    if (typeof messageHash !== 'string') {
+      const err = new TypeError(`Invalid message hash: ${messageHash}`);
+      return Promise.reject(err);
+    }
     logger.info(
       `  - Last committed block height is ${latestAnchorInfo.blockHeight}`,
     );
