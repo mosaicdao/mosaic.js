@@ -39,7 +39,7 @@ describe('EIP20CoGateway.isRedeemAmountApproved()', () => {
   let spyMethod;
   let mockUtilityToken;
 
-  const setup = async () => {
+  const setup = () => {
     mockUtilityToken = sinon.createStubInstance(EIP20Token);
 
     sinon.replace(
@@ -70,7 +70,7 @@ describe('EIP20CoGateway.isRedeemAmountApproved()', () => {
     mockedResult = true;
   });
 
-  it('should throw for wrong address', async function() {
+  it('should throw for invalid address', async () => {
     const message = `Invalid redemeer address: ${'0x123'}.`;
 
     await AssertAsync.reject(
@@ -79,7 +79,7 @@ describe('EIP20CoGateway.isRedeemAmountApproved()', () => {
     );
   });
 
-  it('should throw for wrong amount', async function() {
+  it('should throw for invalid amount', async () => {
     const message = `Invalid redeem amount: ${undefined}.`;
 
     await AssertAsync.reject(
@@ -88,8 +88,8 @@ describe('EIP20CoGateway.isRedeemAmountApproved()', () => {
     );
   });
 
-  it('should return correct mocked result', async () => {
-    await setup();
+  it('should return correct result', async () => {
+    setup();
 
     const result = await coGateway.isRedeemAmountApproved(
       redeemParams.redeemer,
