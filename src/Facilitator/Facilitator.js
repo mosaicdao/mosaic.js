@@ -245,6 +245,7 @@ class Facilitator {
   /**
    * Perform redeem.
    *
+   * @param {string} redeemer Redeemer address.
    * @param {string} amount Redeem amount
    * @param {string} beneficiary Beneficiary address.
    * @param {string} gasPrice Gas price.
@@ -254,9 +255,22 @@ class Facilitator {
    * @param {Object} txOptions Transaction options.
    * @returns {Promise<Object>} Promise that resolves to transaction receipt.
    */
-  async redeem(amount, beneficiary, gasPrice, gasLimit, hashLock, txOptions) {
+  async redeem(
+    redeemer,
+    amount,
+    beneficiary,
+    gasPrice,
+    gasLimit,
+    hashLock,
+    txOptions,
+  ) {
     logger.info('Redeem');
     logger.info('-----------------------');
+    if (!Web3.utils.isAddress(redeemer)) {
+      const err = new TypeError(`Invalid redeemer address: ${redeemer}.`);
+      return Promise.reject(err);
+    }
+
     if (!new BN(amount).gtn(0)) {
       const err = new TypeError(
         `Redeem amount must be greater than zero: ${amount}.`,
@@ -293,14 +307,14 @@ class Facilitator {
 
     if (!Web3.utils.isAddress(txOptions.from)) {
       const err = new TypeError(
-        `Invalid redeemer address: ${txOptions.from}.`,
+        `Invalid facilitator address: ${txOptions.from}.`,
       );
       return Promise.reject(err);
     }
 
-    const redeemer = txOptions.from;
+    const facilitatorAddress = txOptions.from;
 
-    logger.info('Getting bounty amount');
+    logger.info('* Getting bounty amount *');
     const bounty = await this.coGateway.getBounty().catch((exception) => {
       logger.error('  - Exception while getting bounty amount');
       return Promise.reject(exception);
@@ -314,7 +328,7 @@ class Facilitator {
     }
 
     logger.info(
-      'Checking if redeemer has approved CoGateway for token transfer',
+      '* Checking if redeemer has approved CoGateway for token transfer *',
     );
 
     const isRedeemAmountApproved = await this.coGateway
@@ -327,28 +341,29 @@ class Facilitator {
     logger.info(`  - Approval status is ${isRedeemAmountApproved}`);
 
     if (!isRedeemAmountApproved) {
-      /*
-       * If a redeemer is initiating the redeem process through this,
-       * then redeemer is the facilitator and its correct to assume that approval
-       * can be done.
-       */
-      logger.info(
-        '  - As Redeemer is facilitator, approving CoGateway for token transfer',
-      );
-      const approvalTxOption = Object.assign({}, txOptions);
-      delete approvalTxOption.value;
-      await this.coGateway
-        .approveRedeemAmount(amount, approvalTxOption)
-        .catch((exception) => {
-          logger.error(
-            '  - Failed to approve CoGateway contract for token transfer',
-          );
-          return Promise.reject(exception);
-        });
-      logger.info('  - Approval done.');
+      if (redeemer === facilitatorAddress) {
+        logger.info(
+          '  - As Redeemer is facilitator, approving CoGateway for token transfer',
+        );
+        const approvalTxOption = Object.assign({}, txOptions);
+        delete approvalTxOption.value;
+        await this.coGateway
+          .approveRedeemAmount(amount, approvalTxOption)
+          .catch((exception) => {
+            logger.error(
+              '  - Failed to approve CoGateway contract for token transfer',
+            );
+            return Promise.reject(exception);
+          });
+        logger.info('  - Approval done.');
+      } else {
+        logger.error('  - Cannot perform redeem.');
+        const err = new Error('Transfer of redeem amount must be approved.');
+        return Promise.reject(err);
+      }
     }
 
-    logger.info('Getting nonce for the redeemer account');
+    logger.info('* Getting nonce for the redeemer account *');
     const nonce = await this.coGateway
       .getNonce(redeemer)
       .catch((exception) => {
@@ -357,7 +372,7 @@ class Facilitator {
       });
     logger.info(`  - Redeemer's nonce is ${nonce}`);
 
-    logger.info('Performing Redeem');
+    logger.info('* Performing Redeem *');
     return this.coGateway
       .redeem(
         amount,
