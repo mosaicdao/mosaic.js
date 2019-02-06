@@ -49,7 +49,7 @@ const assertDeploymentReceipt = (receipt) => {
 };
 
 describe('OSTPrimeHelper', () => {
-  const SimpleTokenAddress = '0x2c4e8f2d746113d0696ce89b35f0d8bf88e0aeca';
+  const ValueTokenAddress = '0x2c4e8f2d746113d0696ce89b35f0d8bf88e0aeca';
 
   let chainOwner;
   let deployParams;
@@ -71,7 +71,7 @@ describe('OSTPrimeHelper', () => {
 
   it('should deploy new OSTPrime contract', () => {
     return subject
-      .deploy(SimpleTokenAddress, addressOrganization, deployParams)
+      .deploy(ValueTokenAddress, addressOrganization, deployParams)
       .then(assertDeploymentReceipt);
   });
 
@@ -91,7 +91,7 @@ describe('OSTPrimeHelper', () => {
       chainOwner: chainOwner,
     };
     return subject
-      .setup(SimpleTokenAddress, ostPrimeConfig, deployParams)
+      .setup(ValueTokenAddress, ostPrimeConfig, deployParams)
       .then(() => {
         shared.auxiliary.addresses.OSTPrime = subject.address;
       });

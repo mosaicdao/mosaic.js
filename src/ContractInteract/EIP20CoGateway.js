@@ -33,7 +33,7 @@ class EIP20CoGateway {
    * Constructor for EIP20CoGateway.
    *
    * @param {Object} web3 Web3 object.
-   * @param {string} coGatewayAddress CoGateway contract address.
+   * @param {string} coGatewayAddress EIP20CoGateway contract address.
    */
   constructor(web3, coGatewayAddress) {
     if (web3 instanceof Web3) {
@@ -61,7 +61,7 @@ class EIP20CoGateway {
 
     if (!this.contract) {
       const err = new Error(
-        `Could not load CoGateway contract for: ${this.coGatewayAddress}`,
+        `Could not load EIP20CoGateway contract for: ${this.coGatewayAddress}`,
       );
       throw err;
     }
