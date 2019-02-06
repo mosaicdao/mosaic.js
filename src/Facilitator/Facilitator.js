@@ -434,7 +434,9 @@ class Facilitator {
     }
 
     if (new BN(amount).eqn(0)) {
-      const err = new TypeError(`Stake amount must not be zero: ${amount}.`);
+      const err = new TypeError(
+        `Stake amount must be greater than zero: ${amount}.`,
+      );
       return Promise.reject(err);
     }
 
