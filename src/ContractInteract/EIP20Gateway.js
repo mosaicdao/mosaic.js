@@ -377,7 +377,6 @@ class EIP20Gateway {
       return Promise.reject(err);
     }
 
-    console.log('blockHeight: ', blockHeight);
     if (typeof blockHeight !== 'string') {
       const err = new TypeError(`Invalid block height: ${blockHeight}.`);
       return Promise.reject(err);
