@@ -35,31 +35,24 @@ class Anchor {
    * @param {string} anchorAddress Anchor contract address.
    */
   constructor(web3, anchorAddress) {
-    if (web3 instanceof Web3) {
-      this.web3 = web3;
-    } else {
-      const err = new TypeError(
-        "Mandatory Parameter 'web3' is missing or invalid",
-      );
-      throw err;
+    if (!(web3 instanceof Web3)) {
+      throw new TypeError("Mandatory Parameter 'web3' is missing or invalid");
     }
-
     if (!Web3.utils.isAddress(anchorAddress)) {
-      const err = new TypeError(
+      throw new TypeError(
         "Mandatory Parameter 'anchorAddress' is missing or invalid.",
       );
-      throw err;
     }
 
+    this.web3 = web3;
     this.anchorAddress = anchorAddress;
 
     this.contract = Contracts.getAnchor(this.web3, this.anchorAddress);
 
     if (!this.contract) {
-      const err = new TypeError(
+      throw new TypeError(
         `Could not load anchor contract for: ${this.anchorAddress}`,
       );
-      throw err;
     }
 
     this.getStateRoot = this.getStateRoot.bind(this);
