@@ -4,8 +4,8 @@ const Chain = require('./Chain');
 
 /**
  * Mosaic stores access to two chains of a mosaic set-up: origin and auxiliary.
- * @param {Chain} origin The origin chain of this mosaic set-up.
- * @param {Chain} auxiliary The auxiliary chain of this mosaic set-up.
+ * @property {Chain} origin The origin chain of this mosaic set-up.
+ * @property {Chain} auxiliary The auxiliary chain of this mosaic set-up.
  */
 class Mosaic {
   /**

@@ -80,7 +80,12 @@ describe('StakeHelper.approveStakeAmount()', () => {
   beforeEach(() => {
     // runs before each test in this block
     mosaic = TestMosaic.mosaic();
-    stakeHelper = new StakeHelper(mosaic);
+    stakeHelper = new StakeHelper(
+      mosaic.origin.web3,
+      mosaic.auxiliary.web3,
+      mosaic.origin.contractAddresses.EIP20Gateway,
+      mosaic.auxiliary.contractAddresses.EIP20CoGateway,
+    );
 
     valueTokenAddress = '0x0000000000000000000000000000000000000003';
     stakerAddress = '0x0000000000000000000000000000000000000004';

@@ -1,7 +1,6 @@
 const Web3 = require('web3');
 const Contracts = require('../Contracts');
 const Utils = require('../utils/Utils.js');
-const Mosaic = require('../Mosaic');
 
 /**
  * Class for stake helper methods
@@ -10,27 +9,35 @@ class StakeHelper {
   /**
    * Constructor for stake helper.
    *
-   * @param {Object} mosaic Mosaic object.
+   * @param {Object} originWeb3 Origin chain web3 object.
+   * @param {Object} auxiliaryWeb3 Auxiliary chain web3 object.
+   * @param {string} gatewayAddress Gateway contract address.
+   * @param {string} coGatewayAddress CoGateway contract address.
    */
-  constructor(mosaic) {
-    if (!(mosaic instanceof Mosaic)) {
-      const err = new TypeError('Invalid mosaic object.');
-      throw err;
-    }
-    if (!(mosaic.origin.web3 instanceof Web3)) {
-      const err = new TypeError('Invalid origin web3 object.');
-      throw err;
-    }
-    if (!Web3.utils.isAddress(mosaic.origin.contractAddresses.EIP20Gateway)) {
-      const err = new TypeError('Invalid EIP20Gateway address.');
-      throw err;
+  constructor(originWeb3, auxiliaryWeb3, gatewayAddress, coGatewayAddress) {
+    if (originWeb3 === undefined) {
+      throw new TypeError('invalid origin web3 object');
     }
 
-    this.mosaic = mosaic;
-    this.originWeb3 = mosaic.origin.web3;
-    this.gatewayAddress = mosaic.origin.contractAddresses.EIP20Gateway;
+    if (auxiliaryWeb3 === undefined) {
+      throw new TypeError('invalid auxiliary web3 object');
+    }
+
+    if (!Web3.utils.isAddress(gatewayAddress)) {
+      throw new TypeError(`invalid Gateway address: ${gatewayAddress}`);
+    }
+
+    if (!Web3.utils.isAddress(coGatewayAddress)) {
+      throw new TypeError(`invalid Cogateway address: ${coGatewayAddress}`);
+    }
+
+    this.originWeb3 = originWeb3;
+    this.auxiliaryWeb3 = auxiliaryWeb3;
+    this.gatewayAddress = gatewayAddress;
+    this.coGatewayAddress = coGatewayAddress;
 
     this.getBounty = this.getBounty.bind(this);
+    this.getValueToken = this.getValueToken.bind(this);
     this.getNonce = this.getNonce.bind(this);
     this.approveStakeAmount = this.approveStakeAmount.bind(this);
     this._getNonce = this._getNonce.bind(this);

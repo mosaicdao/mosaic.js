@@ -12,7 +12,12 @@ describe('StakeHelper.getNonce()', () => {
   beforeEach(() => {
     // runs before each test in this block
     mosaic = TestMosaic.mosaic();
-    stakeHelper = new StakeHelper(mosaic);
+    stakeHelper = new StakeHelper(
+      mosaic.origin.web3,
+      mosaic.auxiliary.web3,
+      mosaic.origin.contractAddresses.EIP20Gateway,
+      mosaic.auxiliary.contractAddresses.EIP20CoGateway,
+    );
   });
 
   it('should throw error when account address is not string', async function() {

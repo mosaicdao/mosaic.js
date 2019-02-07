@@ -12,7 +12,12 @@ describe('StakeHelper.getBounty()', () => {
   beforeEach(() => {
     // runs before each test in this block
     mosaic = TestMosaic.mosaic();
-    stakeHelper = new StakeHelper(mosaic);
+    stakeHelper = new StakeHelper(
+      mosaic.origin.web3,
+      mosaic.auxiliary.web3,
+      mosaic.origin.contractAddresses.EIP20Gateway,
+      mosaic.auxiliary.contractAddresses.EIP20CoGateway,
+    );
   });
 
   it('should return correct bounty value', async function() {
