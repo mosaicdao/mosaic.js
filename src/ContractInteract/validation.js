@@ -1,9 +1,11 @@
+// TODO: docs
 const validateConfigExists = (config) => {
   if (!config) {
     throw new Error('Mandatory parameter "config" missing.');
   }
 };
 
+// TODO: docs
 const validateConfigKeyExists = (config, key, configName) => {
   if (!config[key]) {
     throw new Error(

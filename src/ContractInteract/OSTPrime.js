@@ -1,3 +1,13 @@
+/**
+ * @typedef {Object} OSTPrimeSetupConfig
+ *
+ * @property {string} deployer Address to be used to send deployment transactions.
+ * @property {string} chainOwner Address that holds all the base token funds
+ *                    for initializing the OSTPrime contract.
+ * @property {string} valueToken Address of EIP20 Token on Origin chain.
+ * @property {string} organization Address of Organization contract managing OSTPrime.
+ */
+
 'use strict';
 
 const BN = require('bn.js');
@@ -67,9 +77,19 @@ class OSTPrime {
   Both deployer, chainOwner & valueToken are mandatory configurations.
 */
 
-  // TODO: docs
-  static setup(web3, valueToken, config, txOptions) {
-    if (!valueToken) {
+  /**
+   * Setup for OSTPrime contract. Deploys the contract and initializes
+   * it. See {@link OSTPrime#initialize}.
+   *
+   * @param {Web3} web3 Web3 object.
+   * @param {OSTPrimeSetupConfig} config OSTPrime setup configuration.
+   * @param {Object} txOptions Transaction options.
+   *
+   * @parm {Promise<OSTPrime>} Promise containing the OSTPrime instance that
+   *                           has been set up.
+   */
+  static setup(web3, config, txOptions) {
+    if (!config.valueToken) {
       throw new Error(
         'Mandatory configuration "valueToken" missing. Provide EIP20 token contract address.',
       );
@@ -90,7 +110,7 @@ class OSTPrime {
     // 1. Deploy the Contract
     const ostPrime = OSTPrime.deploy(
       web3,
-      valueToken,
+      config.valueToken,
       config.organization,
       deployParams,
     );
@@ -108,16 +128,30 @@ class OSTPrime {
     return initializedOstPrime;
   }
 
-  // TODO: docs
+  /**
+   * Validate the setup configuration.
+   *
+   * @param {OSTPrimeSetupConfig} config OSTPrime setup configuration.
+   *
+   * @throws Will throw an error if setup configuration is incomplete.
+   */
   static validateSetupConfig(config) {
     validateConfigExists(config);
     validateConfigKeyExists(config, 'deployer', 'config');
     validateConfigKeyExists(config, 'chainOwner', 'config');
-
-    return true;
   }
 
-  // TODO: docs
+  /**
+   * Deploys an OSTPrime contract.
+   *
+   * @param {Web3} web3 Web3 object.
+   * @param {string} valueToken Address of EIP20 Token on Origin chain.
+   * @param {string} organization Address of Organization contract managing OSTPrime.
+   * @param {Object} txOptions Transaction options.
+   *
+   * @parm {Promise<OSTPrime>} Promise containing the OSTPrime instance that
+   *                           has been deployed.
+   */
   static async deploy(web3, valueToken, organization, txOptions) {
     const tx = OSTPrime.deployRawTx(web3, valueToken, organization);
 
@@ -132,7 +166,15 @@ class OSTPrime {
     });
   }
 
-  // TODO: docs
+  /**
+   * Raw transaction for {@link OSTPrime#setup}.
+   *
+   * @param {Web3} web3 Web3 object.
+   * @param {string} valueToken Address of EIP20 Token on Origin chain.
+   * @param {string} organization Address of Organization contract managing OSTPrime.
+   *
+   * @returns {Promise} Promise object.
+   */
   static deployRawTx(web3, valueToken, organization) {
     const abiBinProvider = new AbiBinProvider();
     const contract = Contracts.getOSTPrime(web3, null, null);
@@ -365,6 +407,7 @@ class OSTPrime {
    * an organization address.
    *
    * @param {string} coGateway EIP20CoGateway contract address.
+   * @param {Object} txOptions Transaction options.
    *
    * @returns {Promise} Promise object.
    */

@@ -72,10 +72,10 @@ describe('OSTPrimeHelper', () => {
       deployer: shared.setupConfig.deployerAddress,
       organization: addressOrganization,
       chainOwner: chainOwner,
+      valueToken: ValueTokenAddress,
     };
     return OSTPrime.setup(
       shared.auxiliary.web3,
-      ValueTokenAddress,
       ostPrimeConfig,
       deployParams,
     ).then((instance) => {
