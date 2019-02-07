@@ -68,16 +68,9 @@ class Utils {
       }
 
       tx.send(txOptions)
-        .on('transactionHash', (transactionHash) => {})
-        .on('receipt', (receipt) => {
-          return onResolve(receipt);
-        })
-        .on('error', (error) => {
-          return onReject(error);
-        })
-        .catch((exception) => {
-          return onReject(exception);
-        });
+        .on('receipt', receipt => onResolve(receipt))
+        .on('error', error => onReject(error))
+        .catch(exception => onReject(exception));
     });
   }
 
@@ -85,9 +78,37 @@ class Utils {
    * Prints a deprecation warning for deprecated ChainSetup methods.
    * See {@link https://github.com/OpenSTFoundation/mosaic.js/issues/57}.
    */
-  static deprecationNoticeChainSetup(method) {
+  static deprecationNoticeChainSetup(object) {
+    const issueNumber = '57';
+    Utils.deprecationNotice(object, issueNumber);
+  }
+
+  /**
+   * Prints a deprecation warning for deprecated StakeHelper.
+   * See {@link https://github.com/OpenSTFoundation/mosaic.js/issues/86}.
+   *
+   * @param {string} [method] The method on the StakeHelper that is deprecated.
+   */
+  static deprecationNoticeStakeHelper(method) {
+    const issueNumber = '86';
+
+    let object = 'StakeHelper';
+    if (method !== undefined) {
+      object = `${object}::${method}()`;
+    }
+
+    Utils.deprecationNotice(object, issueNumber);
+  }
+
+  /**
+   * Prints a deprecation warning for deprecated code.
+   *
+   * @param {string} object Identifier of what has been deprecated.
+   * @param {string} issueNumber Issue number on GitHub that has instructions on how to migrate.
+   */
+  static deprecationNotice(object, issueNumber) {
     console.warn(
-      `${method} has been deprecated. See https://github.com/OpenSTFoundation/mosaic.js/issues/57 for migration instructions.`,
+      `⚠️ '${object}' has been deprecated. See https://github.com/OpenSTFoundation/mosaic.js/issues/${issueNumber} for migration instructions.`,
     );
   }
 }

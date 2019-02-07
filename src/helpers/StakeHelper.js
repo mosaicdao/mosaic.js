@@ -15,6 +15,8 @@ class StakeHelper {
    * @param {string} coGatewayAddress CoGateway contract address.
    */
   constructor(originWeb3, auxiliaryWeb3, gatewayAddress, coGatewayAddress) {
+    Utils.deprecationNoticeStakeHelper();
+
     if (originWeb3 === undefined) {
       throw new TypeError('invalid origin web3 object');
     }
@@ -51,6 +53,8 @@ class StakeHelper {
    * @returns {Promise} Promise object represents the bounty.
    */
   async getBounty() {
+    Utils.deprecationNoticeStakeHelper('getBounty');
+
     if (this.bountyAmount) {
       return Promise.resolve(this.bountyAmount);
     }
@@ -75,6 +79,8 @@ class StakeHelper {
    * @returns {Promise} Promise object represents EIP20 token address.
    */
   async getValueToken() {
+    Utils.deprecationNoticeStakeHelper('getValueToken');
+
     if (this.valueTokenAddress) {
       return Promise.resolve(this.valueTokenAddress);
     }
@@ -101,6 +107,8 @@ class StakeHelper {
    * @returns {Promise} Promise object represents the nonce of account address.
    */
   async getNonce(staker) {
+    Utils.deprecationNoticeStakeHelper('getNonce');
+
     if (!Web3.utils.isAddress(staker)) {
       throw new TypeError(`Invalid account address: ${staker}.`);
     }
@@ -137,6 +145,8 @@ class StakeHelper {
    * @returns {Promise} Promise object.
    */
   async approveStakeAmount(stakeAmount, txOptions) {
+    Utils.deprecationNoticeStakeHelper('approveStakeAmount');
+
     if (!txOptions) {
       const err = new TypeError(`Invalid transaction options: ${txOptions}.`);
       return Promise.reject(err);
@@ -257,6 +267,8 @@ class StakeHelper {
    * @returns {HashLock} HashLock object.
    */
   static createSecretHashLock() {
+    Utils.deprecationNoticeStakeHelper('createSecretHashLock');
+
     return Utils.createSecretHashLock();
   }
 
@@ -268,6 +280,8 @@ class StakeHelper {
    * @returns {HashLock} HashLock object.
    */
   static toHashLock(secretString) {
+    Utils.deprecationNoticeStakeHelper('toHashLock');
+
     return Utils.toHashLock(secretString);
   }
 }
