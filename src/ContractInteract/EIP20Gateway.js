@@ -213,6 +213,14 @@ class EIP20Gateway {
       const err = new TypeError(`Invalid gas limit: ${gasLimit}.`);
       return Promise.reject(err);
     }
+    if (typeof nonce !== 'string') {
+      const err = new TypeError(`Invalid nonce: ${nonce}.`);
+      return Promise.reject(err);
+    }
+    if (typeof hashLock !== 'string') {
+      const err = new TypeError(`Invalid hash lock: ${hashLock}.`);
+      return Promise.reject(err);
+    }
     const tx = this.contract.methods.stake(
       amount,
       beneficiary,

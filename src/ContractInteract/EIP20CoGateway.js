@@ -327,7 +327,7 @@ class EIP20CoGateway {
    */
   progressRedeem(messageHash, unlockSecret, txOptions) {
     if (!txOptions) {
-      const err = new TypeError('Invalid transaction options.');
+      const err = new TypeError(`Invalid transaction options: ${txOptions}.`);
       return Promise.reject(err);
     }
     return this._progressRedeemRawTx(messageHash, unlockSecret).then((tx) =>
@@ -345,12 +345,12 @@ class EIP20CoGateway {
    */
   _progressRedeemRawTx(messageHash, unlockSecret) {
     if (typeof messageHash !== 'string') {
-      const err = new TypeError('Invalid message hash.');
+      const err = new TypeError(`Invalid message hash: ${messageHash}.`);
       return Promise.reject(err);
     }
 
     if (typeof unlockSecret !== 'string') {
-      const err = new TypeError('Invalid unlock secret.');
+      const err = new TypeError(`Invalid unlock secret: ${unlockSecret}.`);
       return Promise.reject(err);
     }
 
@@ -553,10 +553,10 @@ class EIP20CoGateway {
    */
   isRedeemAmountApproved(redeemer, amount) {
     if (!Web3.utils.isAddress(redeemer)) {
-      const err = new TypeError(`Invalid redemeer address: ${redeemer}.`);
+      const err = new TypeError(`Invalid redeemer address: ${redeemer}.`);
       return Promise.reject(err);
     }
-    if (typeof amount != 'string') {
+    if (typeof amount !== 'string') {
       const err = new TypeError(`Invalid redeem amount: ${amount}.`);
       return Promise.reject(err);
     }
@@ -587,7 +587,7 @@ class EIP20CoGateway {
       return Promise.reject(err);
     }
     if (typeof amount !== 'string') {
-      const err = new TypeError(`Invalid stake amount: ${amount}.`);
+      const err = new TypeError(`Invalid redeem amount: ${amount}.`);
       return Promise.reject(err);
     }
     return this.getEIP20UtilityToken().then((eip20Token) => {

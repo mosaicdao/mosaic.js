@@ -28,14 +28,13 @@ const SpyAssert = require('../../test_utils/SpyAssert');
 const AssertAsync = require('../../test_utils/AssertAsync');
 const Utils = require('../../src/utils/Utils');
 
-describe('EIP20CoGateway.progressMint()', () => {
+describe('EIP20CoGateway.redeem()', () => {
   let web3;
   let coGatewayAddress;
   let coGateway;
 
   let txOptions;
-  let messageHash;
-  let unlockSecret;
+  let redeemParams;
   let mockedTx;
 
   let spyRawTx;
@@ -45,11 +44,11 @@ describe('EIP20CoGateway.progressMint()', () => {
   const setup = () => {
     spyRawTx = sinon.replace(
       coGateway,
-      '_progressMintRawTx',
+      '_redeemRawTx',
       sinon.fake.resolves(mockedTx),
     );
 
-    spyCall = sinon.spy(coGateway, 'progressMint');
+    spyCall = sinon.spy(coGateway, 'redeem');
 
     spySendTransaction = sinon.replace(
       Utils,
@@ -76,30 +75,82 @@ describe('EIP20CoGateway.progressMint()', () => {
       value: 0,
     };
 
-    messageHash =
-      '0x0000000000000000000000000000000000000000000000000000000000000222';
-    unlockSecret = '0xunlocksecret';
+    redeemParams = {
+      amount: '1000000000000',
+      beneficiary: '0x0000000000000000000000000000000000000004',
+      gasPrice: '1',
+      gasLimit: '1000000',
+      nonce: '1',
+      hashLock: '0xhashlock',
+    };
     mockedTx = 'MockedTx';
   });
 
-  it('should throw an error when transaction object is undefined', async () => {
+  it('should throw error when transaction object is invalid', async () => {
     await AssertAsync.reject(
-      coGateway.progressMint(messageHash, unlockSecret, undefined),
+      coGateway.redeem(
+        redeemParams.amount,
+        redeemParams.beneficiary,
+        redeemParams.gasPrice,
+        redeemParams.gasLimit,
+        redeemParams.nonce,
+        redeemParams.hashLock,
+        undefined,
+      ),
       `Invalid transaction options: ${undefined}.`,
+    );
+  });
+
+  it('should throw error when from address is invalid', async () => {
+    delete txOptions.from;
+    await AssertAsync.reject(
+      coGateway.redeem(
+        redeemParams.amount,
+        redeemParams.beneficiary,
+        redeemParams.gasPrice,
+        redeemParams.gasLimit,
+        redeemParams.nonce,
+        redeemParams.hashLock,
+        txOptions,
+      ),
+      `Invalid redeemer address: ${undefined}.`,
     );
   });
 
   it('should return correct mocked transaction object', async () => {
     setup();
-    const result = await coGateway.progressMint(
-      messageHash,
-      unlockSecret,
+    const result = await coGateway.redeem(
+      redeemParams.amount,
+      redeemParams.beneficiary,
+      redeemParams.gasPrice,
+      redeemParams.gasLimit,
+      redeemParams.nonce,
+      redeemParams.hashLock,
       txOptions,
     );
     assert.strictEqual(result, true, 'Result must be true.');
 
-    SpyAssert.assert(spyRawTx, 1, [[messageHash, unlockSecret]]);
-    SpyAssert.assert(spyCall, 1, [[messageHash, unlockSecret, txOptions]]);
+    SpyAssert.assert(spyRawTx, 1, [
+      [
+        redeemParams.amount,
+        redeemParams.beneficiary,
+        redeemParams.gasPrice,
+        redeemParams.gasLimit,
+        redeemParams.nonce,
+        redeemParams.hashLock,
+      ],
+    ]);
+    SpyAssert.assert(spyCall, 1, [
+      [
+        redeemParams.amount,
+        redeemParams.beneficiary,
+        redeemParams.gasPrice,
+        redeemParams.gasLimit,
+        redeemParams.nonce,
+        redeemParams.hashLock,
+        txOptions,
+      ],
+    ]);
     SpyAssert.assert(spySendTransaction, 1, [[mockedTx, txOptions]]);
     tearDown();
   });

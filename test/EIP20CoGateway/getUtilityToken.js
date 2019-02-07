@@ -21,20 +21,17 @@
 const chai = require('chai');
 const Web3 = require('web3');
 const sinon = require('sinon');
-
-const assert = chai.assert;
 const EIP20CoGateway = require('../../src/ContractInteract/EIP20CoGateway');
 const SpyAssert = require('../../test_utils/SpyAssert');
-const AssertAsync = require('../../test_utils/AssertAsync');
 
-describe('EIP20CoGateway._progressMintRawTx()', () => {
+const assert = chai.assert;
+
+describe('EIP20CoGateway.getValueToken()', () => {
   let web3;
   let coGatewayAddress;
   let coGateway;
 
-  let messageHash;
-  let unlockSecret;
-  let mockedTx;
+  let mockedUtilityTokenAddress;
 
   let spyMethod;
   let spyCall;
@@ -42,11 +39,13 @@ describe('EIP20CoGateway._progressMintRawTx()', () => {
   const setup = () => {
     spyMethod = sinon.replace(
       coGateway.contract.methods,
-      'progressMint',
-      sinon.fake.resolves(mockedTx),
+      'utilityToken',
+      sinon.fake.returns(() => {
+        return Promise.resolve(mockedUtilityTokenAddress);
+      }),
     );
 
-    spyCall = sinon.spy(coGateway, '_progressMintRawTx');
+    spyCall = sinon.spy(coGateway, 'getUtilityToken');
   };
 
   const tearDown = () => {
@@ -58,41 +57,45 @@ describe('EIP20CoGateway._progressMintRawTx()', () => {
     web3 = new Web3();
     coGatewayAddress = '0x0000000000000000000000000000000000000002';
     coGateway = new EIP20CoGateway(web3, coGatewayAddress);
-
-    messageHash =
-      '0x0000000000000000000000000000000000000000000000000000000000000001';
-    unlockSecret = '0x1111111111';
-    mockedTx = 'MockedTx';
+    mockedUtilityTokenAddress = '0x0000000000000000000000000000000000000003';
   });
 
-  it('should throw an error when message hash is undefined', async () => {
-    await AssertAsync.reject(
-      coGateway._progressMintRawTx(undefined, unlockSecret),
-      `Invalid message hash: ${undefined}.`,
-    );
-  });
-
-  it('should throw an error when unlock secret is undefined', async () => {
-    await AssertAsync.reject(
-      coGateway._progressMintRawTx(messageHash, undefined),
-      `Invalid unlock secret: ${undefined}.`,
-    );
-  });
-
-  it('should return correct mocked transaction object', async () => {
+  it('should return correct mocked utility token address', async () => {
     setup();
-    const result = await coGateway._progressMintRawTx(
-      messageHash,
-      unlockSecret,
-    );
+    const result = await coGateway.getUtilityToken();
     assert.strictEqual(
       result,
-      mockedTx,
-      'Function should return mocked transaction object.',
+      mockedUtilityTokenAddress,
+      'Function should return mocked utility token address.',
     );
 
-    SpyAssert.assert(spyMethod, 1, [[messageHash, unlockSecret]]);
-    SpyAssert.assert(spyCall, 1, [[messageHash, unlockSecret]]);
+    SpyAssert.assert(spyMethod, 1, [[]]);
+    SpyAssert.assert(spyCall, 1, [[]]);
+    tearDown();
+  });
+
+  it('should return correct utility token address from instance variable', async () => {
+    setup();
+    const firstCallResult = await coGateway.getUtilityToken();
+    assert.strictEqual(
+      firstCallResult,
+      mockedUtilityTokenAddress,
+      'Function should return mocked utility token address.',
+    );
+
+    SpyAssert.assert(spyMethod, 1, [[]]);
+    SpyAssert.assert(spyCall, 1, [[]]);
+
+    const secondCallResult = await coGateway.getUtilityToken();
+    assert.strictEqual(
+      secondCallResult,
+      mockedUtilityTokenAddress,
+      'Function should return mocked utility token address.',
+    );
+
+    // Check if the method was not called this time.
+    SpyAssert.assert(spyMethod, 1, [[]]);
+    SpyAssert.assert(spyCall, 2, [[], []]);
     tearDown();
   });
 });
