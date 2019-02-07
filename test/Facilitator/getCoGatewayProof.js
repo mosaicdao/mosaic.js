@@ -93,7 +93,6 @@ describe('Facilitator.getCoGatewayProof()', () => {
       'First argument for get proof call must be object',
     );
 
-    console.log('spyGetProof.args[1]: ', spyGetProof.args[1]);
     assert.strictEqual(
       spyGetProof.args[0][1],
       facilitator.coGateway.coGatewayAddress,

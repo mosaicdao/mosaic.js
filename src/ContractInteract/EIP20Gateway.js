@@ -303,7 +303,7 @@ class EIP20Gateway {
     txOptions,
   ) {
     if (!txOptions) {
-      const err = new TypeError('Invalid transaction options.');
+      const err = new TypeError(`Invalid transaction options: ${txOptions}.`);
       return Promise.reject(err);
     }
     return this._confirmRedeemIntentRawTx(
@@ -346,42 +346,47 @@ class EIP20Gateway {
     storageProof,
   ) {
     if (!Web3.utils.isAddress(redeemer)) {
-      const err = new TypeError('Invalid redeemer address.');
+      const err = new TypeError(`Invalid redeemer address: ${redeemer}.`);
       return Promise.reject(err);
     }
 
     if (typeof nonce !== 'string') {
-      const err = new TypeError('Invalid nonce.');
+      const err = new TypeError(`Invalid nonce: ${nonce}.`);
       return Promise.reject(err);
     }
 
     if (!Web3.utils.isAddress(beneficiary)) {
-      const err = new TypeError('Invalid beneficiary address.');
+      const err = new TypeError(
+        `Invalid beneficiary address: ${beneficiary}.`,
+      );
       return Promise.reject(err);
     }
 
     if (typeof amount !== 'string') {
-      const err = new TypeError('Invalid redeem amount.');
+      const err = new TypeError(`Invalid redeem amount: ${amount}.`);
       return Promise.reject(err);
     }
 
     if (typeof gasPrice !== 'string') {
-      const err = new TypeError('Invalid gas price.');
+      const err = new TypeError(`Invalid gas price: ${gasPrice}.`);
       return Promise.reject(err);
     }
 
     if (typeof gasLimit !== 'string') {
-      const err = new TypeError('Invalid gas limit.');
+      const err = new TypeError(`Invalid gas limit: ${gasLimit}.`);
       return Promise.reject(err);
     }
 
+    console.log('blockHeight: ', blockHeight);
     if (typeof blockHeight !== 'string') {
-      const err = new TypeError('Invalid block height.');
+      const err = new TypeError(`Invalid block height: ${blockHeight}.`);
       return Promise.reject(err);
     }
 
     if (typeof storageProof !== 'string') {
-      const err = new TypeError('Invalid storage proof data.');
+      const err = new TypeError(
+        `Invalid storage proof data: ${storageProof}.`,
+      );
       return Promise.reject(err);
     }
 
@@ -410,7 +415,7 @@ class EIP20Gateway {
    */
   progressUnstake(messageHash, unlockSecret, txOptions) {
     if (!txOptions) {
-      const err = new TypeError('Invalid transaction options.');
+      const err = new TypeError(`Invalid transaction options: ${txOptions}.`);
       return Promise.reject(err);
     }
     return this._progressUnstakeRawTx(messageHash, unlockSecret).then((tx) =>
@@ -428,12 +433,12 @@ class EIP20Gateway {
    */
   _progressUnstakeRawTx(messageHash, unlockSecret) {
     if (typeof messageHash !== 'string') {
-      const err = new TypeError('Invalid message hash.');
+      const err = new TypeError(`Invalid message hash: ${messageHash}.`);
       return Promise.reject(err);
     }
 
     if (typeof unlockSecret !== 'string') {
-      const err = new TypeError('Invalid unlock secret.');
+      const err = new TypeError(`Invalid unlock secret: ${unlockSecret}.`);
       return Promise.reject(err);
     }
 
@@ -574,6 +579,10 @@ class EIP20Gateway {
       const err = new TypeError(`Invalid staker address: ${stakerAddress}.`);
       return Promise.reject(err);
     }
+    if (typeof amount !== 'string') {
+      const err = new TypeError(`Invalid stake amount: ${amount}.`);
+      return Promise.reject(err);
+    }
     return this.getEIP20ValueToken().then((eip20ValueToken) => {
       return eip20ValueToken.isAmountApproved(
         stakerAddress,
@@ -593,7 +602,7 @@ class EIP20Gateway {
   isBountyAmountApproved(facilityAddress) {
     if (!Web3.utils.isAddress(facilityAddress)) {
       const err = new TypeError(
-        `Invalid facility address: ${facilityAddress}.`,
+        `Invalid facilitator address: ${facilityAddress}.`,
       );
       return Promise.reject(err);
     }
@@ -661,9 +670,9 @@ class EIP20Gateway {
       const err = new TypeError(`Invalid stake amount: ${amount}.`);
       return Promise.reject(err);
     }
-    return this.getEIP20ValueToken().then((eip20Token) => {
-      eip20Token.approve(this.gatewayAddress, amount, txOptions);
-    });
+    return this.getEIP20ValueToken().then((eip20Token) =>
+      eip20Token.approve(this.gatewayAddress, amount, txOptions),
+    );
   }
 
   /**
