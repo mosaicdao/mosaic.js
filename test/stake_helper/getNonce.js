@@ -23,6 +23,7 @@ const sinon = require('sinon');
 const StakeHelper = require('../../src/helpers/StakeHelper');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const TestMosaic = require('../../test_utils/GetTestMosaic');
+const AssertAsync = require('../../test_utils/AssertAsync');
 
 const assert = chai.assert;
 
@@ -40,24 +41,10 @@ describe('StakeHelper.getNonce()', () => {
     this.timeout(5000);
 
     const accountAddress = 0x0000000000000000000000000000000000000003;
-    const expectedErrorMessage = 'Invalid account address.';
-    // Call getGatewayNonce.
-    await stakeHelper.getNonce(accountAddress).catch((exception) => {
-      assert.strictEqual(
-        exception.message,
-        expectedErrorMessage,
-        `Exception reason must be "${expectedErrorMessage}"`,
-      );
-    });
-
-    // Call with undefined account address.
-    await stakeHelper.getNonce().catch((exception) => {
-      assert.strictEqual(
-        exception.message,
-        expectedErrorMessage,
-        `Exception reason must be "${expectedErrorMessage}"`,
-      );
-    });
+    await AssertAsync.reject(
+      stakeHelper.getNonce(accountAddress),
+      `Invalid account address: ${accountAddress}.`,
+    );
   });
 
   it('should return correct nonce value', async function() {

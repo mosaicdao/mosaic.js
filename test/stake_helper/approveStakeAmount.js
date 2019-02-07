@@ -25,6 +25,7 @@ const Contracts = require('../../src/Contracts');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const Utils = require('../../src/utils/Utils');
 const TestMosaic = require('../../test_utils/GetTestMosaic');
+const AssertAsync = require('../../test_utils/AssertAsync');
 
 const assert = chai.assert;
 
@@ -116,32 +117,22 @@ describe('StakeHelper.approveStakeAmount()', () => {
     };
   });
 
-  it('should fail when staker address is invalid', async function() {
+  it('should fail when staker address is invalid', async () => {
     txOption.from = '0x123';
-    const expectedErrorMessage = 'Invalid staker address.';
-    await stakeHelper
-      .approveStakeAmount(stakeAmount, txOption)
-      .catch((exception) => {
-        assert.strictEqual(
-          exception.message,
-          expectedErrorMessage,
-          `Exception reason must be "${expectedErrorMessage}"`,
-        );
-      });
+    await AssertAsync.reject(
+      stakeHelper.approveStakeAmount(stakeAmount, txOption),
+      `Invalid staker address: ${txOption.from}.`,
+    );
   });
 
-  it('should fail when transaction option is undefined', async function() {
-    const expectedErrorMessage = 'Invalid transaction options.';
-    await stakeHelper.approveStakeAmount(stakeAmount).catch((exception) => {
-      assert.strictEqual(
-        exception.message,
-        expectedErrorMessage,
-        `Exception reason must be "${expectedErrorMessage}"`,
-      );
-    });
+  it('should fail when transaction option is undefined', async () => {
+    await AssertAsync.reject(
+      stakeHelper.approveStakeAmount(stakeAmount),
+      `Invalid transaction options: ${undefined}.`,
+    );
   });
 
-  it('should approve stake amount with default gas value', async function() {
+  it('should approve stake amount with default gas value', async () => {
     setup();
 
     // Call approve.
