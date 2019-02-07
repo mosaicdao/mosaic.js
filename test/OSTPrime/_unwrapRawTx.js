@@ -26,9 +26,8 @@ const assert = chai.assert;
 const OSTPrime = require('../../src/ContractInteract/OSTPrime');
 const AssertAsync = require('../../test_utils/AssertAsync');
 const SpyAssert = require('../../test_utils/SpyAssert');
-const Utils = require('../../src/utils/Utils');
 
-describe('OSTPrime.unwrap()', () => {
+describe('OSTPrime._unwrapRawTx()', () => {
   let web3;
   let ostPrimeAddress;
   let ostPrime;
@@ -40,58 +39,32 @@ describe('OSTPrime.unwrap()', () => {
   });
 
   it('should pass with correct params', async () => {
-    const mockTX = 'mockTX';
+    let mockTx = 'tx';
+    const spyUnwrap = sinon.replace(
+      ostPrime.contract.methods,
+      'unwrap',
+      sinon.fake.resolves(Promise.resolve(mockTx)),
+    );
 
-    const spySendTransaction = sinon.replace(
-      Utils,
-      'sendTransaction',
-      sinon.fake.resolves(true),
-    );
-    const unwrapRawTxSpy = sinon.replace(
-      ostPrime,
-      '_unwrapRawTx',
-      sinon.fake.resolves(mockTX),
-    );
+    const spyMethod = sinon.spy(ostPrime, '_unwrapRawTx');
     const amount = '100';
-    const txOptions = { from: '0x0000000000000000000000000000000000000004' };
 
-    const result = await ostPrime.unwrap(amount, txOptions);
+    const result = await ostPrime._unwrapRawTx(amount);
 
-    assert.isTrue(result, 'Unwrap should return true');
+    assert.strictEqual(result, mockTx, 'It must return expected tx');
 
-    SpyAssert.assert(unwrapRawTxSpy, 1, [[amount]]);
+    SpyAssert.assert(spyUnwrap, 1, [[amount]]);
+    SpyAssert.assert(spyMethod, 1, [[amount]]);
 
-    SpyAssert.assert(spySendTransaction, 1, [[mockTX, txOptions]]);
     sinon.restore();
   });
 
-  it('should throw for invalid from address in tx options', async () => {
-    const amount = '100';
-    const txOptions = { from: '0x1234' };
+  it('should throw an error when amount is undefined', async () => {
+    const amount = undefined;
 
     await AssertAsync.reject(
-      ostPrime.unwrap(amount, txOptions),
-      `Invalid from address: ${txOptions.from}.`,
-    );
-  });
-
-  it('should throw for undefined address in tx options', async () => {
-    const amount = '100';
-    const txOptions = { from: undefined };
-
-    await AssertAsync.reject(
-      ostPrime.unwrap(amount, txOptions),
-      `Invalid from address: ${txOptions.from}.`,
-    );
-  });
-
-  it('should throw for undefined tx options', async () => {
-    const amount = '100';
-    const txOptions = undefined;
-
-    await AssertAsync.reject(
-      ostPrime.unwrap(amount, txOptions),
-      `Invalid transaction options: ${txOptions}.`,
+      ostPrime._unwrapRawTx(amount),
+      `Invalid amount: ${amount}.`,
     );
   });
 });

@@ -36,31 +36,23 @@ class OSTPrime {
    * @param {string} contractAddress OSTPrime contract address.
    */
   constructor(web3, contractAddress) {
-    if (web3 instanceof Web3) {
-      this.web3 = web3;
-    } else {
-      const err = new TypeError(
-        "Mandatory Parameter 'web3' is missing or invalid",
-      );
-      throw err;
+    if (!(web3 instanceof Web3)) {
+      throw new TypeError("Mandatory Parameter 'web3' is missing or invalid");
     }
-
     if (!Web3.utils.isAddress(contractAddress)) {
-      const err = new TypeError(
+      throw new TypeError(
         "Mandatory Parameter 'contractAddress' is missing or invalid.",
       );
-      throw err;
     }
-
+    this.web3 = web3;
     this.contractAddress = contractAddress;
 
     this.contract = Contracts.getOSTPrime(this.web3, this.contractAddress);
 
     if (!this.contract) {
-      const err = new Error(
+      throw new Error(
         `Could not load OSTPrime contract for: ${this.contractAddress}`,
       );
-      throw err;
     }
 
     this.approve = this.approve.bind(this);
@@ -74,10 +66,10 @@ class OSTPrime {
   }
 
   /**
-   * Approves account address for the amount transfer.
+   * Approves spender address for the amount transfer.
    *
    * @param {string} spenderAddress Spender account address.
-   * @param {string} amount Approve amount.
+   * @param {string} amount Amount to be approved.
    * @param {string} txOptions Transaction options.
    *
    * @returns {Promise<boolean>} Promise that resolves to transaction receipt.
@@ -97,7 +89,7 @@ class OSTPrime {
   }
 
   /**
-   * Get raw transaction object for aprove amount.
+   * Get raw transaction object for approve amount.
    *
    * @param {string} spenderAddress Spender address.
    * @param {string} amount Approve amount.
@@ -150,7 +142,8 @@ class OSTPrime {
    * @param {string} spenderAddress Spender account address.
    * @param {string} amount Approval amount.
    *
-   * @returns {Promise<boolean>} Promise that resolves to `true` when its approved.
+   * @returns {Promise<boolean>} Promise that resolves to `true` when it's
+   *                             approved otherwise false.
    */
   isAmountApproved(ownerAddress, spenderAddress, amount) {
     if (!Web3.utils.isAddress(ownerAddress)) {
@@ -176,7 +169,7 @@ class OSTPrime {
    * Returns the balance of an account.
    *
    * @param {string} accountAddress Account address
-   * @returns {Promise<Object>} Promise that resolves to balance amount.
+   * @returns {Promise<string>} Promise that resolves to balance amount.
    */
   balanceOf(accountAddress) {
     if (!Web3.utils.isAddress(accountAddress)) {
@@ -203,17 +196,13 @@ class OSTPrime {
       const err = new TypeError(`Invalid from address: ${txOptions.from}.`);
       return Promise.reject(err);
     }
-    if (typeof amount !== 'string') {
-      const err = new TypeError(`Invalid unwrap amount: ${amount}.`);
-      return Promise.reject(err);
-    }
     return this._unwrapRawTx(amount).then((tx) =>
       Utils.sendTransaction(tx, txOptions),
     );
   }
 
   /**
-   * Unwrap amount raw tansaction.
+   * Unwrap amount raw transaction.
    *
    * @param {string} amount Amount to unwrap.
    *
@@ -229,7 +218,7 @@ class OSTPrime {
   }
 
   /**
-   * Unwrap amount.
+   * Wrap amount.
    *
    * @param {Object} txOptions Transaction options.
    * @returns {Promise<Object>} Promise that resolves to transaction receipt.
@@ -239,7 +228,7 @@ class OSTPrime {
       const err = new TypeError(`Invalid transaction options: ${txOptions}.`);
       return Promise.reject(err);
     }
-    if (new BN(txOptions.value).eqn(0)) {
+    if (new BN(txOptions.value).lten(0)) {
       const err = new TypeError(
         `Transaction value amount must not be zero: ${txOptions.value}.`,
       );
@@ -255,7 +244,7 @@ class OSTPrime {
   }
 
   /**
-   * wrap amount raw tansaction.
+   * Wrap amount raw transaction.
    *
    * @returns {Promise<Object>} Promise that resolves to raw transaction object.
    */

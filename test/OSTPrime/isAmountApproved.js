@@ -26,7 +26,6 @@ const assert = chai.assert;
 const OSTPrime = require('../../src/ContractInteract/OSTPrime');
 const AssertAsync = require('../../test_utils/AssertAsync');
 const SpyAssert = require('../../test_utils/SpyAssert');
-const Utils = require('../../src/utils/Utils');
 
 describe('OSTPrime.isAmountApproved()', () => {
   let web3;
@@ -86,6 +85,7 @@ describe('OSTPrime.isAmountApproved()', () => {
       assert.isTrue(result, 'Approve should return true');
 
       SpyAssert.assert(allowanceSpy, 1, [[ownerAddress, spenderAddress]]);
+      sinon.restore();
     },
   );
 
@@ -112,6 +112,7 @@ describe('OSTPrime.isAmountApproved()', () => {
       assert.isFalse(result, 'Approve should return false');
 
       SpyAssert.assert(allowanceSpy, 1, [[ownerAddress, spenderAddress]]);
+      sinon.restore();
     },
   );
 

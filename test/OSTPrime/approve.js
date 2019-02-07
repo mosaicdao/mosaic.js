@@ -63,6 +63,7 @@ describe('OSTPrime.approve()', () => {
     SpyAssert.assert(approveRawTxSpy, 1, [[spenderAddress, amount]]);
 
     SpyAssert.assert(spySendTransaction, 1, [[mockTX, txOptions]]);
+    sinon.restore();
   });
 
   it('should throw for invalid from address in tx options', async () => {

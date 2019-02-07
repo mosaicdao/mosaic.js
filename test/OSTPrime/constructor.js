@@ -98,5 +98,6 @@ describe('OSTPrime.constructor()', () => {
       () => new OSTPrime(web3, ostPrimeAddress),
       `Could not load OSTPrime contract for: ${ostPrimeAddress}`,
     );
+    sinon.restore();
   });
 });
