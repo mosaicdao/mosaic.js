@@ -219,7 +219,7 @@ class Facilitator {
         txOption,
       )
       .then((stakeResult) => {
-        logger.win('  - Succcessfully performed stake.');
+        logger.win('  - Successfully performed stake.');
         return Promise.resolve(stakeResult);
       })
       .catch((exception) => {
@@ -300,7 +300,7 @@ class Facilitator {
 
     const facilitatorAddress = txOptions.from;
 
-    logger.info('* Getting bounty amount *');
+    logger.info('Getting bounty amount');
     const bounty = await this.coGateway.getBounty().catch((exception) => {
       logger.error('  - Exception while getting bounty amount');
       return Promise.reject(exception);
@@ -308,13 +308,15 @@ class Facilitator {
 
     if (!new BN(txOptions.value).eq(new BN(bounty))) {
       logger.error(
-        '  - Value in transaction option is not equal to the bounty amount',
+        `  - Value in transaction option ${
+          txOptions.value
+        } is not equal to the bounty amount ${bounty}`,
       );
       return Promise.reject(false);
     }
 
     logger.info(
-      '* Checking if redeemer has approved CoGateway for token transfer *',
+      'Checking if redeemer has approved CoGateway for token transfer',
     );
 
     const isRedeemAmountApproved = await this.coGateway
@@ -349,7 +351,7 @@ class Facilitator {
       }
     }
 
-    logger.info('* Getting nonce for the redeemer account *');
+    logger.info('Getting nonce for the redeemer account');
     const nonce = await this.coGateway
       .getNonce(redeemer)
       .catch((exception) => {
@@ -358,7 +360,7 @@ class Facilitator {
       });
     logger.info(`  - Redeemer's nonce is ${nonce}`);
 
-    logger.info('* Performing Redeem *');
+    logger.info('Performing Redeem');
     return this.coGateway
       .redeem(
         amount,
@@ -370,7 +372,7 @@ class Facilitator {
         txOptions,
       )
       .then((redeemResult) => {
-        logger.win('  - Succcessfully performed redeem.');
+        logger.win('  - Successfully performed redeem.');
         return Promise.resolve(redeemResult);
       })
       .catch((exception) => {
