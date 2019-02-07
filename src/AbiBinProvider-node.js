@@ -51,14 +51,19 @@ const loadContracts = (provider, abiFolderPath, binFolderPath) => {
   // add all ABIs from abiFolderPath
   fs.readdirSync(abiFolderPath).forEach((abiFile) => {
     const contractName = path.basename(abiFile, path.extname(abiFile));
-    const contractAbi = JSON.parse(fs.readFileSync(abiFile));
+    const contractAbi = JSON.parse(
+      fs.readFileSync(path.join(abiFolderPath, abiFile)),
+    );
     provider.addABI(contractName, contractAbi);
   });
 
   // add all bins from binFolderPath
   fs.readdirSync(binFolderPath).forEach((binFile) => {
     const contractName = path.basename(binFile, path.extname(binFile));
-    const contractBin = fs.readFileSync(binFile, 'utf8');
+    const contractBin = fs.readFileSync(
+      path.join(binFolderPath, binFile),
+      'utf8',
+    );
     provider.addBIN(contractName, contractBin);
   });
 };
