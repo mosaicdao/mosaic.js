@@ -144,7 +144,7 @@ class OSTPrime {
   }
 
   /**
-   * Check if the account has approved gateway contract.
+   * Check if the account has approved spender account for a given amount.
    *
    * @param {string} ownerAddress Owner account address.
    * @param {string} spenderAddress Spender account address.
