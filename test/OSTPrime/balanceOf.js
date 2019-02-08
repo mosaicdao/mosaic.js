@@ -1,8 +1,7 @@
-const chai = require('chai');
+const { assert } = require('chai');
 const Web3 = require('web3');
 const sinon = require('sinon');
 
-const assert = chai.assert;
 const OSTPrime = require('../../src/ContractInteract/OSTPrime');
 const AssertAsync = require('../../test_utils/AssertAsync');
 const SpyAssert = require('../../test_utils/SpyAssert');
@@ -21,7 +20,7 @@ describe('OSTPrime.balanceOf()', () => {
   it('should pass with correct params', async () => {
     let balance = '100';
 
-    const spyBalanceOf = sinon.replace(
+    const spyContractBalanceOf = sinon.replace(
       ostPrime.contract.methods,
       'balanceOf',
       sinon.fake.returns({
@@ -29,7 +28,7 @@ describe('OSTPrime.balanceOf()', () => {
       }),
     );
 
-    const spyMethod = sinon.spy(ostPrime, 'balanceOf');
+    const spyOSTPrimeBalanceOf = sinon.spy(ostPrime, 'balanceOf');
 
     const accountAddress = '0x0000000000000000000000000000000000000003';
 
@@ -37,8 +36,8 @@ describe('OSTPrime.balanceOf()', () => {
 
     assert.strictEqual(result, balance, 'It must return expected balance');
 
-    SpyAssert.assert(spyBalanceOf, 1, [[accountAddress]]);
-    SpyAssert.assert(spyMethod, 1, [[accountAddress]]);
+    SpyAssert.assert(spyContractBalanceOf, 1, [[accountAddress]]);
+    SpyAssert.assert(spyOSTPrimeBalanceOf, 1, [[accountAddress]]);
 
     sinon.restore();
   });

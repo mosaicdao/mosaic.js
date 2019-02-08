@@ -1,8 +1,7 @@
-const chai = require('chai');
+const { assert } = require('chai');
 const Web3 = require('web3');
 const sinon = require('sinon');
 
-const assert = chai.assert;
 const OSTPrime = require('../../src/ContractInteract/OSTPrime');
 const AssertAsync = require('../../test_utils/AssertAsync');
 const SpyAssert = require('../../test_utils/SpyAssert');
@@ -18,35 +17,32 @@ describe('OSTPrime.isAmountApproved()', () => {
     ostPrime = new OSTPrime(web3, ostPrimeAddress);
   });
 
-  it(
-    'should return true if account approval is equal to expected' + ' amount',
-    async () => {
-      const allowanceSpy = sinon.replace(
-        ostPrime,
-        'allowance',
-        sinon.fake.resolves(100),
-      );
+  it('should return true if account approval is equal to expected amount', async () => {
+    const allowanceSpy = sinon.replace(
+      ostPrime,
+      'allowance',
+      sinon.fake.resolves(100),
+    );
 
-      const ownerAddress = '0x0000000000000000000000000000000000000002';
-      const spenderAddress = '0x0000000000000000000000000000000000000003';
-      const amount = '100';
+    const ownerAddress = '0x0000000000000000000000000000000000000002';
+    const spenderAddress = '0x0000000000000000000000000000000000000003';
+    const amount = '100';
 
-      const result = await ostPrime.isAmountApproved(
-        ownerAddress,
-        spenderAddress,
-        amount,
-      );
+    const isApproved = await ostPrime.isAmountApproved(
+      ownerAddress,
+      spenderAddress,
+      amount,
+    );
 
-      assert.isTrue(result, 'Approve should return true');
+    assert.isTrue(isApproved, 'Approve should return true');
 
-      SpyAssert.assert(allowanceSpy, 1, [[ownerAddress, spenderAddress]]);
-    },
-  );
+    SpyAssert.assert(allowanceSpy, 1, [[ownerAddress, spenderAddress]]);
+  });
 
   it(
     'should return true if account approval is more than expected' + ' amount',
     async () => {
-      const allowanceSpy = sinon.replace(
+      const spyAllowance = sinon.replace(
         ostPrime,
         'allowance',
         sinon.fake.resolves(200),
@@ -56,15 +52,15 @@ describe('OSTPrime.isAmountApproved()', () => {
       const spenderAddress = '0x0000000000000000000000000000000000000003';
       const amount = '100';
 
-      const result = await ostPrime.isAmountApproved(
+      const isApproved = await ostPrime.isAmountApproved(
         ownerAddress,
         spenderAddress,
         amount,
       );
 
-      assert.isTrue(result, 'Approve should return true');
+      assert.isTrue(isApproved, 'Approve should return true');
 
-      SpyAssert.assert(allowanceSpy, 1, [[ownerAddress, spenderAddress]]);
+      SpyAssert.assert(spyAllowance, 1, [[ownerAddress, spenderAddress]]);
       sinon.restore();
     },
   );
@@ -73,7 +69,7 @@ describe('OSTPrime.isAmountApproved()', () => {
     'should return false if account approval is less than expected' +
       ' amount',
     async () => {
-      const allowanceSpy = sinon.replace(
+      const spyAllowance = sinon.replace(
         ostPrime,
         'allowance',
         sinon.fake.resolves(50),
@@ -83,15 +79,15 @@ describe('OSTPrime.isAmountApproved()', () => {
       const spenderAddress = '0x0000000000000000000000000000000000000003';
       const amount = '100';
 
-      const result = await ostPrime.isAmountApproved(
+      const isApproved = await ostPrime.isAmountApproved(
         ownerAddress,
         spenderAddress,
         amount,
       );
 
-      assert.isFalse(result, 'Approve should return false');
+      assert.isFalse(isApproved, 'Approve should return false');
 
-      SpyAssert.assert(allowanceSpy, 1, [[ownerAddress, spenderAddress]]);
+      SpyAssert.assert(spyAllowance, 1, [[ownerAddress, spenderAddress]]);
       sinon.restore();
     },
   );

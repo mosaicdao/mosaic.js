@@ -1,8 +1,7 @@
-const chai = require('chai');
+const { assert } = require('chai');
 const Web3 = require('web3');
 const sinon = require('sinon');
 
-const assert = chai.assert;
 const OSTPrime = require('../../src/ContractInteract/OSTPrime');
 const AssertAsync = require('../../test_utils/AssertAsync');
 const SpyAssert = require('../../test_utils/SpyAssert');
@@ -21,7 +20,7 @@ describe('OSTPrime.allowance()', () => {
 
   it('should pass with correct params', async () => {
     let expectedAllowance = '100';
-    const spyAllowance = sinon.replace(
+    const spyContractAllowance = sinon.replace(
       ostPrime.contract.methods,
       'allowance',
       sinon.fake.returns({
@@ -29,7 +28,7 @@ describe('OSTPrime.allowance()', () => {
       }),
     );
 
-    const spyMethod = sinon.spy(ostPrime, 'allowance');
+    const spyOstPrimeAllowance = sinon.spy(ostPrime, 'allowance');
 
     const ownerAddress = '0x0000000000000000000000000000000000000003';
     const spenderAddress = '0x0000000000000000000000000000000000000004';
@@ -42,8 +41,12 @@ describe('OSTPrime.allowance()', () => {
       'It must return expected allowance',
     );
 
-    SpyAssert.assert(spyAllowance, 1, [[ownerAddress, spenderAddress]]);
-    SpyAssert.assert(spyMethod, 1, [[ownerAddress, spenderAddress]]);
+    SpyAssert.assert(spyContractAllowance, 1, [
+      [ownerAddress, spenderAddress],
+    ]);
+    SpyAssert.assert(spyOstPrimeAllowance, 1, [
+      [ownerAddress, spenderAddress],
+    ]);
 
     sinon.restore();
   });

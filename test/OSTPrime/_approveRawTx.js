@@ -1,13 +1,12 @@
-const chai = require('chai');
+const { assert } = require('chai');
 const Web3 = require('web3');
 const sinon = require('sinon');
 
-const assert = chai.assert;
 const OSTPrime = require('../../src/ContractInteract/OSTPrime');
 const AssertAsync = require('../../test_utils/AssertAsync');
 const SpyAssert = require('../../test_utils/SpyAssert');
 
-describe('OSTPrime.allowance()', () => {
+describe('OSTPrime._approveRawTx()', () => {
   let web3;
   let ostPrimeAddress;
   let ostPrime;
@@ -26,17 +25,17 @@ describe('OSTPrime.allowance()', () => {
       sinon.fake.resolves(Promise.resolve(mockTx)),
     );
 
-    const spyMethod = sinon.spy(ostPrime, '_approveRawTx');
+    const spyApproveRawTx = sinon.spy(ostPrime, '_approveRawTx');
 
     const spenderAddress = '0x0000000000000000000000000000000000000004';
     const amount = '100';
 
-    const result = await ostPrime._approveRawTx(spenderAddress, amount);
+    const tx = await ostPrime._approveRawTx(spenderAddress, amount);
 
-    assert.strictEqual(result, mockTx, 'It must return expected tx');
+    assert.strictEqual(tx, mockTx, 'It must return expected tx');
 
     SpyAssert.assert(spyApprove, 1, [[spenderAddress, amount]]);
-    SpyAssert.assert(spyMethod, 1, [[spenderAddress, amount]]);
+    SpyAssert.assert(spyApproveRawTx, 1, [[spenderAddress, amount]]);
 
     sinon.restore();
   });

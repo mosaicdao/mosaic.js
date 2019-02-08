@@ -1,8 +1,7 @@
-const chai = require('chai');
+const { assert } = require('chai');
 const Web3 = require('web3');
 const sinon = require('sinon');
 
-const assert = chai.assert;
 const OSTPrime = require('../../src/ContractInteract/OSTPrime');
 const AssertAsync = require('../../test_utils/AssertAsync');
 const SpyAssert = require('../../test_utils/SpyAssert');
@@ -26,7 +25,7 @@ describe('OSTPrime._unwrapRawTx()', () => {
       sinon.fake.resolves(Promise.resolve(mockTx)),
     );
 
-    const spyMethod = sinon.spy(ostPrime, '_unwrapRawTx');
+    const spyUnwrapRawTx = sinon.spy(ostPrime, '_unwrapRawTx');
     const amount = '100';
 
     const result = await ostPrime._unwrapRawTx(amount);
@@ -34,7 +33,7 @@ describe('OSTPrime._unwrapRawTx()', () => {
     assert.strictEqual(result, mockTx, 'It must return expected tx');
 
     SpyAssert.assert(spyUnwrap, 1, [[amount]]);
-    SpyAssert.assert(spyMethod, 1, [[amount]]);
+    SpyAssert.assert(spyUnwrapRawTx, 1, [[amount]]);
 
     sinon.restore();
   });
