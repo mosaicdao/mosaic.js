@@ -86,7 +86,7 @@ describe('EIP20Gateway._confirmRedeemIntentRawTx()', () => {
     );
   });
 
-  it('should throw error when beneficiary address is invalid', async () => {
+  it('should throw error when beneficiary address is undefined', async () => {
     await AssertAsync.reject(
       gateway._confirmRedeemIntentRawTx(
         redeemParams.redeemer,

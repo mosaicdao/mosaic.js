@@ -1,14 +1,11 @@
-const chai = require('chai');
 const Web3 = require('web3');
 const Chain = require('../src/Chain');
 const Mosaic = require('../src/Mosaic');
 
-const { assert } = chai;
-
 /**
  * This class returns Mosaic object used for unit testing.
  */
-class GetTestMosaic {
+class TestMosaic {
   static mosaic() {
     const originContractAddresses = {
       EIP20Gateway: '0x0000000000000000000000000000000000001111',
@@ -30,4 +27,4 @@ class GetTestMosaic {
   }
 }
 
-module.exports = GetTestMosaic;
+module.exports = TestMosaic;

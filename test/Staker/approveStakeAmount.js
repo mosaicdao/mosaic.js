@@ -4,7 +4,7 @@ const Staker = require('../../src/Staker');
 const EIP20Token = require('../../src/ContractInteract/EIP20Token');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const AssertAsync = require('../../test_utils/AssertAsync');
-const TestMosaic = require('../../test_utils/GetTestMosaic');
+const TestMosaic = require('../../test_utils/TestMosaic');
 
 const { assert } = chai;
 
@@ -20,13 +20,8 @@ describe('Staker.approveStakeAmount()', () => {
   let spyCall;
 
   const setup = () => {
-    mockEIP20Token = sinon.mock(
-      new EIP20Token(
-        mosaic.origin.web3,
-        '0x0000000000000000000000000000000000000004',
-      ),
-    );
-    const eip20TokenContract = mockEIP20Token.object;
+    mockEIP20Token = sinon.createStubInstance(EIP20Token);
+    const eip20TokenContract = mockEIP20Token;
 
     spyGetEIP20ValueToken = sinon.replace(
       staker.gatewayContract,
@@ -44,7 +39,6 @@ describe('Staker.approveStakeAmount()', () => {
   };
   const tearDown = () => {
     sinon.restore();
-    mockEIP20Token.restore();
     spyCall.restore();
   };
 

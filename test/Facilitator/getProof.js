@@ -2,14 +2,14 @@ const chai = require('chai');
 const BN = require('bn.js');
 const sinon = require('sinon');
 const Facilitator = require('../../src/Facilitator');
-const TestMosaic = require('../../test_utils/GetTestMosaic');
+const TestMosaic = require('../../test_utils/TestMosaic');
 const Proof = require('../../src/utils/Proof');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const AssertAsync = require('../../test_utils/AssertAsync');
 
 const { assert } = chai;
 
-describe('Facilitator.getProof()', () => {
+describe('Facilitator._getProof()', () => {
   let mosaic;
   let facilitator;
 
@@ -25,7 +25,7 @@ describe('Facilitator.getProof()', () => {
   let spyCall;
 
   let setup = () => {
-    spyCall = sinon.spy(facilitator, 'getProof');
+    spyCall = sinon.spy(facilitator, '_getProof');
     mockProofGenerator = sinon.mock(proofGenerator);
     spyGetOutboxProof = sinon.replace(
       mockProofGenerator.object,
@@ -59,7 +59,7 @@ describe('Facilitator.getProof()', () => {
 
   it('should throw an error when proofGenerator object is undefined', async () => {
     await AssertAsync.reject(
-      facilitator.getProof(
+      facilitator._getProof(
         undefined,
         accountAddress,
         latestAnchorInfo,
@@ -71,7 +71,7 @@ describe('Facilitator.getProof()', () => {
 
   it('should throw an error when account address is undefined', async () => {
     await AssertAsync.reject(
-      facilitator.getProof(
+      facilitator._getProof(
         proofGenerator,
         undefined,
         latestAnchorInfo,
@@ -83,7 +83,7 @@ describe('Facilitator.getProof()', () => {
 
   it('should throw an error when anchor info object is undefined', async () => {
     await AssertAsync.reject(
-      facilitator.getProof(
+      facilitator._getProof(
         proofGenerator,
         accountAddress,
         undefined,
@@ -95,7 +95,7 @@ describe('Facilitator.getProof()', () => {
 
   it('should throw an error when anchor info object is undefined', async () => {
     await AssertAsync.reject(
-      facilitator.getProof(
+      facilitator._getProof(
         proofGenerator,
         accountAddress,
         latestAnchorInfo,
@@ -107,7 +107,7 @@ describe('Facilitator.getProof()', () => {
 
   it('should pass when correct params are passed', async () => {
     setup();
-    const result = await facilitator.getProof(
+    const result = await facilitator._getProof(
       mockProofGenerator.object,
       accountAddress,
       latestAnchorInfo,

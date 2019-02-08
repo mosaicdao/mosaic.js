@@ -1,6 +1,6 @@
 const chai = require('chai');
 const Staker = require('../../src/Staker');
-const TestMosaic = require('../../test_utils/GetTestMosaic');
+const TestMosaic = require('../../test_utils/TestMosaic');
 
 const { assert } = chai;
 

@@ -4,7 +4,7 @@ const EIP20CoGateway = require('../../src/ContractInteract/EIP20CoGateway');
 const EIP20Token = require('../../src/ContractInteract/EIP20Token');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const AssertAsync = require('../../test_utils/AssertAsync');
-const TestMosaic = require('../../test_utils/GetTestMosaic');
+const TestMosaic = require('../../test_utils/TestMosaic');
 
 const { assert } = chai;
 
@@ -20,22 +20,16 @@ describe('EIP20CoGateway.approveRedeemAmount()', () => {
   let spyCall;
 
   const setup = () => {
-    mockEIP20UtilityToken = sinon.mock(
-      new EIP20Token(
-        mosaic.origin.web3,
-        '0x0000000000000000000000000000000000000004',
-      ),
-    );
-    const eip20UtilityTokenContract = mockEIP20UtilityToken.object;
+    mockEIP20UtilityToken = sinon.createStubInstance(EIP20Token);
 
     spyGetEIP20UtilityToken = sinon.replace(
       coGateway,
       'getEIP20UtilityToken',
-      sinon.fake.resolves(eip20UtilityTokenContract),
+      sinon.fake.resolves(mockEIP20UtilityToken),
     );
 
     spyApprove = sinon.replace(
-      eip20UtilityTokenContract,
+      mockEIP20UtilityToken,
       'approve',
       sinon.fake.resolves(true),
     );
@@ -44,7 +38,6 @@ describe('EIP20CoGateway.approveRedeemAmount()', () => {
   };
   const tearDown = () => {
     sinon.restore();
-    mockEIP20UtilityToken.restore();
     spyCall.restore();
   };
 
@@ -93,7 +86,7 @@ describe('EIP20CoGateway.approveRedeemAmount()', () => {
       txOptions,
     );
 
-    assert.strictEqual(result, true, 'Result must be true');
+    assert.isTrue(result, 'Result must be true');
 
     SpyAssert.assert(spyGetEIP20UtilityToken, 1, [[]]);
     SpyAssert.assert(spyApprove, 1, [

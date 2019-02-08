@@ -65,7 +65,7 @@ class Facilitator {
     this.stake = this.stake.bind(this);
     this.progressStake = this.progressStake.bind(this);
     this.confirmStakeIntent = this.confirmStakeIntent.bind(this);
-    this.getProof = this.getProof.bind(this);
+    this._getProof = this._getProof.bind(this);
     this.progressStakeMessage = this.progressStakeMessage.bind(this);
     this.performProgressStake = this.performProgressStake.bind(this);
     this.performProgressMint = this.performProgressMint.bind(this);
@@ -1334,7 +1334,7 @@ class Facilitator {
         this.mosaic.origin.web3,
         this.mosaic.auxiliary.web3,
       );
-      return this.getProof(
+      return this._getProof(
         proofGenerator,
         this.gateway.gatewayAddress,
         latestAnchorInfo,
@@ -1361,7 +1361,7 @@ class Facilitator {
         this.mosaic.auxiliary.web3,
         this.mosaic.origin.web3,
       );
-      return this.getProof(
+      return this._getProof(
         proofGenerator,
         this.coGateway.coGatewayAddress,
         latestAnchorInfo,
@@ -1372,7 +1372,7 @@ class Facilitator {
 
   /**
    * Gets the proof and validates it.
-   *
+   * @private
    * @param {Object} proofGenerator Proof generator object
    * @param {string} accountAddress Account address.
    * @param {Object} latestAnchorInfo Object containing state root and block height.
@@ -1380,7 +1380,7 @@ class Facilitator {
    *
    * @returns {Promise<Object>} Promise that resolves to proof data.
    */
-  async getProof(
+  async _getProof(
     proofGenerator,
     accountAddress,
     latestAnchorInfo,

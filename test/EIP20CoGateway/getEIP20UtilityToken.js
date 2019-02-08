@@ -57,7 +57,7 @@ describe('EIP20CoGateway.getEIP20UtilityToken()', () => {
     tearDown();
   });
 
-  it('should return EIP20UtilityToken object from the instance variable', async () => {
+  it('should return already created EIP20UtilityToken object instead of creating new object', async () => {
     setup();
     const firstCallResult = await coGateway.getEIP20UtilityToken();
     assert.strictEqual(

@@ -64,7 +64,7 @@ describe('EIP20Gateway._stakeRawTx()', () => {
     );
   });
 
-  it('should throw error when beneficiary address is invalid', async function() {
+  it('should throw error when beneficiary address is undefined', async function() {
     await AssertAsync.reject(
       gateway._stakeRawTx(
         stakeParams.amount,

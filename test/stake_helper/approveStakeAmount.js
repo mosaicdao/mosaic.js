@@ -4,7 +4,7 @@ const StakeHelper = require('../../src/helpers/StakeHelper');
 const Contracts = require('../../src/Contracts');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const Utils = require('../../src/utils/Utils');
-const TestMosaic = require('../../test_utils/GetTestMosaic');
+const TestMosaic = require('../../test_utils/TestMosaic');
 const AssertAsync = require('../../test_utils/AssertAsync');
 
 const { assert } = chai;

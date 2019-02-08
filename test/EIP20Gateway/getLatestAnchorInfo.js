@@ -23,10 +23,8 @@ describe('EIP20Gateway.getLatestAnchorInfo()', () => {
   let spyCall;
 
   const setup = () => {
-    mockAnchorContract = sinon.mock(
-      new Anchor(web3, '0x0000000000000000000000000000000000000020'),
-    );
-    getAnchorResult = mockAnchorContract.object;
+    mockAnchorContract = sinon.createStubInstance(Anchor);
+    getAnchorResult = mockAnchorContract;
     getLatestStateRootBlockHeightResult = '12345';
     getStateRootResult =
       '0x0000000000000000000000000000000000000000000000000000000000000001';
@@ -37,12 +35,12 @@ describe('EIP20Gateway.getLatestAnchorInfo()', () => {
       sinon.fake.resolves(getAnchorResult),
     );
     spyGetLatestStateRootBlockHeight = sinon.replace(
-      mockAnchorContract.object,
+      mockAnchorContract,
       'getLatestStateRootBlockHeight',
       sinon.fake.resolves(getLatestStateRootBlockHeightResult),
     );
     spyGetStateRootResult = sinon.replace(
-      mockAnchorContract.object,
+      mockAnchorContract,
       'getStateRoot',
       sinon.fake.resolves(getStateRootResult),
     );
@@ -52,7 +50,6 @@ describe('EIP20Gateway.getLatestAnchorInfo()', () => {
   const tearDown = () => {
     sinon.restore();
     spyCall.restore();
-    mockAnchorContract.restore();
   };
 
   beforeEach(() => {

@@ -1,7 +1,7 @@
 const chai = require('chai');
 const sinon = require('sinon');
 const Facilitator = require('../../src/Facilitator');
-const TestMosaic = require('../../test_utils/GetTestMosaic');
+const TestMosaic = require('../../test_utils/TestMosaic');
 const AssertAsync = require('../../test_utils/AssertAsync');
 const SpyAssert = require('../../test_utils/SpyAssert');
 
@@ -28,7 +28,7 @@ describe('Facilitator.getGatewayProof()', () => {
     );
     spyGetProof = sinon.replace(
       facilitator,
-      'getProof',
+      '_getProof',
       sinon.fake.resolves(getProofResult),
     );
   };

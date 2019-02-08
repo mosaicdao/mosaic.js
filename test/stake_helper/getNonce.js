@@ -2,7 +2,7 @@ const chai = require('chai');
 const sinon = require('sinon');
 const StakeHelper = require('../../src/helpers/StakeHelper');
 const SpyAssert = require('../../test_utils/SpyAssert');
-const TestMosaic = require('../../test_utils/GetTestMosaic');
+const TestMosaic = require('../../test_utils/TestMosaic');
 const AssertAsync = require('../../test_utils/AssertAsync');
 
 const { assert } = chai;

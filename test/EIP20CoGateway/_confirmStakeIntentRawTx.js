@@ -86,7 +86,7 @@ describe('EIP20CoGateway._confirmStakeIntentRawTx()', () => {
     );
   });
 
-  it('should throw error when beneficiary address is invalid', async () => {
+  it('should throw error when beneficiary address is undefined', async () => {
     await AssertAsync.reject(
       coGateway._confirmStakeIntentRawTx(
         stakeParams.staker,
