@@ -6,7 +6,7 @@ const Web3 = require('web3');
 const { ChainSetup } = require('../../index');
 const EIP20Gateway = require('../../src/ContractInteract/EIP20Gateway');
 
-const GatewayHelper = ChainSetup.GatewayHelper;
+const { GatewayHelper } = ChainSetup;
 
 const shared = require('../shared');
 

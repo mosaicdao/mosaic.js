@@ -6,7 +6,7 @@ const Web3 = require('web3');
 const { ChainSetup } = require('../../index');
 const Anchor = require('../../src/ContractInteract/Anchor');
 
-const AnchorHelper = ChainSetup.AnchorHelper;
+const { AnchorHelper } = ChainSetup;
 
 const shared = require('../shared');
 

@@ -5,7 +5,7 @@ const Web3 = require('web3');
 
 const { ChainSetup } = require('../../index');
 
-const CoGatewayHelper = ChainSetup.CoGatewayHelper;
+const { CoGatewayHelper } = ChainSetup;
 
 const shared = require('../shared');
 

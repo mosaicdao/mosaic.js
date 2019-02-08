@@ -6,7 +6,7 @@ const Web3 = require('web3');
 const { ChainSetup } = require('../../index');
 const Organization = require('../../src/ContractInteract/Organization');
 
-const OrganizationHelper = ChainSetup.OrganizationHelper;
+const { OrganizationHelper } = ChainSetup;
 
 const shared = require('../shared');
 

@@ -8,7 +8,7 @@ const GatewayLib = require('../../src/ContractInteract/GatewayLib');
 const MerklePatriciaProof = require('../../src/ContractInteract/MerklePatriciaProof');
 const MessageBus = require('../../src/ContractInteract/MessageBus');
 
-const LibsHelper = ChainSetup.LibsHelper;
+const { LibsHelper } = ChainSetup;
 
 const shared = require('../shared');
 
@@ -136,33 +136,5 @@ describe('LibsHelper', () => {
           'GatewayLib contract was not deployed correctly.',
         );
       });
-  });
-
-  it.skip('should setup all Libs', () => {
-    let deployParams = {
-      from: shared.setupConfig.deployerAddress,
-      gasPrice: shared.setupConfig.gasPrice,
-    };
-    let libsHelperConfig = {
-      deployer: shared.setupConfig.deployerAddress,
-    };
-    return subject.setup(libsHelperConfig, deployParams).then(() => {
-      addressMerklePatriciaProof = subject.merklePatriciaProof;
-      addressMessageBus = subject.messageBus;
-      addressGatewayLib = subject.gatewayLib;
-
-      assert.isTrue(
-        Web3.utils.isAddress(addressMerklePatriciaProof),
-        'MerklePatriciaProof contract was not deployed correctly.',
-      );
-      assert.isTrue(
-        Web3.utils.isAddress(addressMessageBus),
-        'MessageBus contract was not deployed correctly.',
-      );
-      assert.isTrue(
-        Web3.utils.isAddress(addressGatewayLib),
-        'GatewayLib contract was not deployed correctly.',
-      );
-    });
   });
 });

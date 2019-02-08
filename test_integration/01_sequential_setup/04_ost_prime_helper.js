@@ -6,7 +6,7 @@ const Web3 = require('web3');
 const { ChainSetup } = require('../../index');
 const OSTPrime = require('../../src/ContractInteract/OSTPrime');
 
-const OSTPrimeHelper = ChainSetup.OSTPrimeHelper;
+const { OSTPrimeHelper } = ChainSetup;
 
 const shared = require('../shared');
 
