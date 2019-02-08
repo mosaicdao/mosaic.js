@@ -257,7 +257,7 @@ class EIP20CoGateway {
   /**
    * Performs progress mint.
    *
-   * @param {string} messageHash Message hash.
+   * @param {string} messageHash Hash to identify mint message.
    * @param {string} unlockSecret Unlock secret.
    * @param {Object} txOptions Transaction options.
    *
@@ -276,7 +276,7 @@ class EIP20CoGateway {
   /**
    * Get the raw transaction for progress mint.
    *
-   * @param {string} messageHash Message hash.
+   * @param {string} messageHash Hash to identify mint message.
    * @param {string} unlockSecret Unlock secret.
    *
    * @returns {Promise<Object>} Promise that resolves to raw transaction object.
@@ -293,6 +293,48 @@ class EIP20CoGateway {
     }
 
     const tx = this.contract.methods.progressMint(messageHash, unlockSecret);
+    return Promise.resolve(tx);
+  }
+
+  /**
+   * Performs progress redeem.
+   *
+   * @param {string} messageHash Hash to identify redeem message.
+   * @param {string} unlockSecret Unlock secret.
+   * @param {Object} txOptions Transaction options.
+   *
+   * @returns {Promise<Object>} Promise that resolves to transaction receipt.
+   */
+  progressRedeem(messageHash, unlockSecret, txOptions) {
+    if (!txOptions) {
+      const err = new TypeError('Invalid transaction options.');
+      return Promise.reject(err);
+    }
+    return this._progressRedeemRawTx(messageHash, unlockSecret).then((tx) =>
+      Utils.sendTransaction(tx, txOptions),
+    );
+  }
+
+  /**
+   * Get the raw transaction for progress redeem.
+   *
+   * @param {string} messageHash Hash to identify redeem message.
+   * @param {string} unlockSecret Unlock secret.
+   *
+   * @returns {Promise<Object>} Promise that resolves to raw transaction object.
+   */
+  _progressRedeemRawTx(messageHash, unlockSecret) {
+    if (typeof messageHash !== 'string') {
+      const err = new TypeError('Invalid message hash.');
+      return Promise.reject(err);
+    }
+
+    if (typeof unlockSecret !== 'string') {
+      const err = new TypeError('Invalid unlock secret.');
+      return Promise.reject(err);
+    }
+
+    const tx = this.contract.methods.progressRedeem(messageHash, unlockSecret);
     return Promise.resolve(tx);
   }
 
@@ -554,17 +596,15 @@ class EIP20CoGateway {
    *
    * @returns {Promise<Object>} Promise object that resolves to object containing state root and block height.
    */
-  getLatestAnchorInfo() {
-    return this.getAnchor().then((anchor) => {
-      return anchor.getLatestStateRootBlockHeight().then((blockHeight) => {
-        return anchor.getStateRoot(blockHeight).then((stateRoot) => {
-          return {
-            blockHeight,
-            stateRoot,
-          };
-        });
-      });
-    });
+  async getLatestAnchorInfo() {
+    const anchor = await this.getAnchor();
+    const blockHeight = await anchor.getLatestStateRootBlockHeight();
+    const stateRoot = await anchor.getStateRoot(blockHeight);
+
+    return {
+      blockHeight,
+      stateRoot,
+    };
   }
 
   /**
