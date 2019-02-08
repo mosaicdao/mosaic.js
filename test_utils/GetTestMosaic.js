@@ -3,7 +3,7 @@ const Web3 = require('web3');
 const Chain = require('../src/Chain');
 const Mosaic = require('../src/Mosaic');
 
-const assert = chai.assert;
+const { assert } = chai;
 
 /**
  * This class returns Mosaic object used for unit testing.

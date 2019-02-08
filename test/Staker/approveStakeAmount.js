@@ -1,13 +1,12 @@
 const chai = require('chai');
-const Web3 = require('web3');
 const sinon = require('sinon');
-
-const assert = chai.assert;
-const Staker = require('../../src/Staker/Staker');
+const Staker = require('../../src/Staker');
 const EIP20Token = require('../../src/ContractInteract/EIP20Token');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const AssertAsync = require('../../test_utils/AssertAsync');
 const TestMosaic = require('../../test_utils/GetTestMosaic');
+
+const { assert } = chai;
 
 describe('Staker.approveStakeAmount()', () => {
   let mosaic;

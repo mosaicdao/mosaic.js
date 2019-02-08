@@ -4,7 +4,7 @@ const StakeHelper = require('../../src/helpers/StakeHelper');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const TestMosaic = require('../../test_utils/GetTestMosaic');
 
-const assert = chai.assert;
+const { assert } = chai;
 
 describe('StakeHelper.getNonce()', () => {
   let stakeHelper;

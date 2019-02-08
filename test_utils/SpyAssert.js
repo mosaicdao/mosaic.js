@@ -1,6 +1,6 @@
 const chai = require('chai');
 
-const assert = chai.assert;
+const { assert } = chai;
 
 /**
  * This class includes the utitity functions to assert spy data.

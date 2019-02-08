@@ -207,7 +207,7 @@ class EIP20Gateway {
   /**
    * Performs progress stake.
    *
-   * @param {string} messageHash Message hash.
+   * @param {string} messageHash Hash to identify stake message.
    * @param {string} unlockSecret Unlock secret.
    * @param {Object} txOptions Transaction options.
    *
@@ -226,7 +226,7 @@ class EIP20Gateway {
   /**
    * Get the raw transaction for progress stake
    *
-   * @param {string} messageHash Message hash.
+   * @param {string} messageHash Hash to identify stake message.
    * @param {string} unlockSecret Unlock secret.
    *
    * @returns {Promise<Object>} Promise that resolves to raw transaction object.
@@ -243,6 +243,176 @@ class EIP20Gateway {
     }
 
     const tx = this.contract.methods.progressStake(messageHash, unlockSecret);
+    return Promise.resolve(tx);
+  }
+
+  /**
+   * Confirm redeem intent
+   *
+   * @param {string} redeemer Redeemer address.
+   * @param {string} nonce Redeemer nonce.
+   * @param {string} beneficiary Beneficiary address.
+   * @param {string} amount Redeem amount.
+   * @param {string} gasPrice Gas price that redeemer is willing to pay for the reward.
+   * @param {string} gasLimit Maximum gas limit for reward calculation.
+   * @param {string} blockNumber Block number.
+   * @param {string} hashLock Hash lock.
+   * @param {string} storageProof Storage proof.
+   * @param {Object} txOptions Transaction option.
+   *
+   * @returns {Promise<Object>} Promise that resolves to transaction receipt.
+   */
+  confirmRedeemIntent(
+    redeemer,
+    nonce,
+    beneficiary,
+    amount,
+    gasPrice,
+    gasLimit,
+    blockNumber,
+    hashLock,
+    storageProof,
+    txOptions,
+  ) {
+    if (!txOptions) {
+      const err = new TypeError('Invalid transaction options.');
+      return Promise.reject(err);
+    }
+    return this._confirmRedeemIntentRawTx(
+      redeemer,
+      nonce,
+      beneficiary,
+      amount,
+      gasPrice,
+      gasLimit,
+      blockNumber,
+      hashLock,
+      storageProof,
+    ).then((tx) => Utils.sendTransaction(tx, txOptions));
+  }
+
+  /**
+   * Get confirm redeem intent raw transaction object
+   *
+   * @param {string} redeemer Redeemer address.
+   * @param {string} nonce Redeemer nonce.
+   * @param {string} beneficiary Beneficiary address.
+   * @param {string} amount Redeem amount.
+   * @param {string} gasPrice Gas price that redeemer is willing to pay for the reward.
+   * @param {string} gasLimit Maximum gas limit for reward calculation.
+   * @param {string} blockHeight Block height.
+   * @param {string} hashLock Hash lock.
+   * @param {string} storageProof Storage proof.
+   *
+   * @returns {Promise<Object>} Promise that resolves to raw transaction object.
+   */
+  _confirmRedeemIntentRawTx(
+    redeemer,
+    nonce,
+    beneficiary,
+    amount,
+    gasPrice,
+    gasLimit,
+    blockHeight,
+    hashLock,
+    storageProof,
+  ) {
+    if (!Web3.utils.isAddress(redeemer)) {
+      const err = new TypeError('Invalid redeemer address.');
+      return Promise.reject(err);
+    }
+
+    if (typeof nonce !== 'string') {
+      const err = new TypeError('Invalid nonce.');
+      return Promise.reject(err);
+    }
+
+    if (!Web3.utils.isAddress(beneficiary)) {
+      const err = new TypeError('Invalid beneficiary address.');
+      return Promise.reject(err);
+    }
+
+    if (typeof amount !== 'string') {
+      const err = new TypeError('Invalid redeem amount.');
+      return Promise.reject(err);
+    }
+
+    if (typeof gasPrice !== 'string') {
+      const err = new TypeError('Invalid gas price.');
+      return Promise.reject(err);
+    }
+
+    if (typeof gasLimit !== 'string') {
+      const err = new TypeError('Invalid gas limit.');
+      return Promise.reject(err);
+    }
+
+    if (typeof blockHeight !== 'string') {
+      const err = new TypeError('Invalid block height.');
+      return Promise.reject(err);
+    }
+
+    if (typeof storageProof !== 'string') {
+      const err = new TypeError('Invalid storage proof data.');
+      return Promise.reject(err);
+    }
+
+    const tx = this.contract.methods.confirmRedeemIntent(
+      redeemer,
+      nonce,
+      beneficiary,
+      amount,
+      gasPrice,
+      gasLimit,
+      blockHeight,
+      hashLock,
+      storageProof,
+    );
+    return Promise.resolve(tx);
+  }
+
+  /**
+   * Performs progress unstake.
+   *
+   * @param {string} messageHash Hash to identify unstake message.
+   * @param {string} unlockSecret Unlock secret.
+   * @param {Object} txOptions Transaction options.
+   *
+   * @returns {Promise<Object>} Promise that resolves to transaction receipt.
+   */
+  progressUnstake(messageHash, unlockSecret, txOptions) {
+    if (!txOptions) {
+      const err = new TypeError('Invalid transaction options.');
+      return Promise.reject(err);
+    }
+    return this._progressUnstakeRawTx(messageHash, unlockSecret).then((tx) =>
+      Utils.sendTransaction(tx, txOptions),
+    );
+  }
+
+  /**
+   * Get the raw transaction for progress unstake.
+   *
+   * @param {string} messageHash Hash to identify unstake message.
+   * @param {string} unlockSecret Unlock secret.
+   *
+   * @returns {Promise<Object>} Promise that resolves to raw transaction object.
+   */
+  _progressUnstakeRawTx(messageHash, unlockSecret) {
+    if (typeof messageHash !== 'string') {
+      const err = new TypeError('Invalid message hash.');
+      return Promise.reject(err);
+    }
+
+    if (typeof unlockSecret !== 'string') {
+      const err = new TypeError('Invalid unlock secret.');
+      return Promise.reject(err);
+    }
+
+    const tx = this.contract.methods.progressUnstake(
+      messageHash,
+      unlockSecret,
+    );
     return Promise.resolve(tx);
   }
 
@@ -513,17 +683,15 @@ class EIP20Gateway {
    *
    * @returns {Promise<Object>} Promise object that resolves to object containing state root and block height.
    */
-  getLatestAnchorInfo() {
-    return this.getAnchor().then((anchor) => {
-      anchor.getLatestStateRootBlockHeight().then((blockHeight) => {
-        anchor.getStateRoot(blockHeight).then((stateRoot) => {
-          return {
-            blockHeight,
-            stateRoot,
-          };
-        });
-      });
-    });
+  async getLatestAnchorInfo() {
+    const anchor = await this.getAnchor();
+    const blockHeight = await anchor.getLatestStateRootBlockHeight();
+    const stateRoot = await anchor.getStateRoot(blockHeight);
+
+    return {
+      blockHeight,
+      stateRoot,
+    };
   }
 }
 

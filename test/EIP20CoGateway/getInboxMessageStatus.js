@@ -6,7 +6,7 @@ const SpyAssert = require('../../test_utils/SpyAssert');
 const AssertAsync = require('../../test_utils/AssertAsync');
 const Message = require('../../src/utils/Message');
 
-const assert = chai.assert;
+const { assert } = chai;
 const MessageStatus = Message.messageStatus();
 
 describe('EIP20CoGateway.getInboxMessageStatus()', () => {

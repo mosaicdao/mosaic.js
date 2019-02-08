@@ -70,7 +70,7 @@ class Message {
    * @param {string} beneficiary Beneficiary address.
    * @param {string} gatewayAddress EIP20Gateway contract address.
    *
-   * @returns {string} stake intent hash.
+   * @returns {string} Stake intent hash.
    */
   static getStakeIntentHash(amount, beneficiary, gatewayAddress) {
     const web3Obj = new Web3();
@@ -89,6 +89,34 @@ class Message {
       ),
     );
     return stakeIntentHash;
+  }
+
+  /**
+   * Generate the redeem intent hash from the redeem request params.
+   *
+   * @param {string} amount Redeem amount.
+   * @param {string} beneficiary Beneficiary address.
+   * @param {string} coGatewayAddress CoGateway contract address.
+   *
+   * @returns {string} Redeem intent hash.
+   */
+  static getRedeemIntentHash(amount, beneficiary, coGatewayAddress) {
+    const web3Obj = new Web3();
+
+    const redeemTypeHash = Web3.utils.sha3(
+      web3Obj.eth.abi.encodeParameter(
+        'string',
+        'RedeemIntent(uint256 amount,address beneficiary,address gateway)',
+      ),
+    );
+
+    const redeemIntentHash = web3Obj.utils.sha3(
+      web3Obj.eth.abi.encodeParameters(
+        ['bytes32', 'uint256', 'address', 'address'],
+        [redeemTypeHash, amount, beneficiary, coGatewayAddress],
+      ),
+    );
+    return redeemIntentHash;
   }
 
   /**
@@ -122,6 +150,46 @@ class Message {
     );
     const messageHash = Message.getMessageHash(
       stakeIntentHash,
+      nonce,
+      gasPrice,
+      gasLimit,
+      sender,
+      hashLock,
+    );
+    return messageHash;
+  }
+
+  /**
+   * Generate the redeem message hash.
+   *
+   * @param {string} amount Redeem amount.
+   * @param {string} beneficiary Beneficiary address.
+   * @param {string} coGatewayAddress Gateway contract address.
+   * @param {nonce} nonce Nonce.
+   * @param {string} gasPrice Gas price.
+   * @param {string} gasLimit Gas limit.
+   * @param {string} sender Sender address.
+   * @param {string} hashLock Hash lock.
+   *
+   * @returns {string} message hash.
+   */
+  static getRedeemMessageHash(
+    amount,
+    beneficiary,
+    coGatewayAddress,
+    nonce,
+    gasPrice,
+    gasLimit,
+    sender,
+    hashLock,
+  ) {
+    const redeemIntentHash = Message.getRedeemIntentHash(
+      amount,
+      beneficiary,
+      coGatewayAddress,
+    );
+    const messageHash = Message.getMessageHash(
+      redeemIntentHash,
       nonce,
       gasPrice,
       gasLimit,

@@ -5,7 +5,7 @@ const Contracts = require('../../src/Contracts');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const TestMosaic = require('../../test_utils/GetTestMosaic');
 
-const assert = chai.assert;
+const { assert } = chai;
 
 describe('StakeHelper.getBounty()', () => {
   let stakeHelper;

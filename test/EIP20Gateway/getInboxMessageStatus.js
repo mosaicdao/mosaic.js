@@ -7,7 +7,7 @@ const AssertAsync = require('../../test_utils/AssertAsync');
 const Message = require('../../src/utils/Message');
 
 const MessageStatus = Message.messageStatus();
-const assert = chai.assert;
+const { assert } = chai;
 
 describe('EIP20Gateway.getInboxMessageStatus()', () => {
   let web3;
