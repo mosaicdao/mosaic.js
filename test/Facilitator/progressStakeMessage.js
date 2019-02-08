@@ -59,43 +59,38 @@ describe('Facilitator.progressStakeMessage()', () => {
   });
 
   it('should throw an error when message hash is undefined', async () => {
-    delete progressStakeMessageParams.messageHash;
     await AssertAsync.reject(
       facilitator.progressStakeMessage(
-        progressStakeMessageParams.messageHash,
+        undefined,
         progressStakeMessageParams.unlockSecret,
         progressStakeMessageParams.txOptionOrigin,
         progressStakeMessageParams.txOptionAuxiliary,
       ),
-      `Invalid message hash: ${progressStakeMessageParams.messageHash}.`,
+      `Invalid message hash: ${undefined}.`,
     );
   });
 
   it('should throw an error when unlock secret is undefined', async () => {
-    delete progressStakeMessageParams.unlockSecret;
     await AssertAsync.reject(
       facilitator.progressStakeMessage(
         progressStakeMessageParams.messageHash,
-        progressStakeMessageParams.unlockSecret,
+        undefined,
         progressStakeMessageParams.txOptionOrigin,
         progressStakeMessageParams.txOptionAuxiliary,
       ),
-      `Invalid unlock secret: ${progressStakeMessageParams.unlockSecret}.`,
+      `Invalid unlock secret: ${undefined}.`,
     );
   });
 
   it('should throw an error when origin transaction option is undefined', async () => {
-    delete progressStakeMessageParams.txOptionOrigin;
     await AssertAsync.reject(
       facilitator.progressStakeMessage(
         progressStakeMessageParams.messageHash,
         progressStakeMessageParams.unlockSecret,
-        progressStakeMessageParams.txOptionOrigin,
+        undefined,
         progressStakeMessageParams.txOptionAuxiliary,
       ),
-      `Invalid origin transaction option: ${
-        progressStakeMessageParams.txOptionOrigin
-      }.`,
+      `Invalid origin transaction option: ${undefined}.`,
     );
   });
 
@@ -115,17 +110,14 @@ describe('Facilitator.progressStakeMessage()', () => {
   });
 
   it('should throw an error when auxiliary transaction option is undefined', async () => {
-    delete progressStakeMessageParams.txOptionAuxiliary;
     await AssertAsync.reject(
       facilitator.progressStakeMessage(
         progressStakeMessageParams.messageHash,
         progressStakeMessageParams.unlockSecret,
         progressStakeMessageParams.txOptionOrigin,
-        progressStakeMessageParams.txOptionAuxiliary,
+        undefined,
       ),
-      `Invalid auxiliary transaction option: ${
-        progressStakeMessageParams.txOptionAuxiliary
-      }.`,
+      `Invalid auxiliary transaction option: ${undefined}.`,
     );
   });
 

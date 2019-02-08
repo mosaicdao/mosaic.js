@@ -86,10 +86,9 @@ describe('Facilitator.redeem()', () => {
   });
 
   it('should throw an error when redeemer address is undefined', async () => {
-    delete redeemParams.redeemer;
     await AssertAsync.reject(
       facilitator.redeem(
-        redeemParams.redeemer,
+        undefined,
         redeemParams.amount,
         redeemParams.beneficiary,
         redeemParams.gasPrice,
@@ -97,71 +96,67 @@ describe('Facilitator.redeem()', () => {
         redeemParams.hashLock,
         txOptions,
       ),
-      `Invalid redeemer address: ${redeemParams.redeemer}.`,
+      `Invalid redeemer address: ${undefined}.`,
     );
   });
 
   it('should throw an error when redeem amount is zero', async () => {
-    redeemParams.amount = '0';
     await AssertAsync.reject(
       facilitator.redeem(
         redeemParams.redeemer,
-        redeemParams.amount,
+        '0',
         redeemParams.beneficiary,
         redeemParams.gasPrice,
         redeemParams.gasLimit,
         redeemParams.hashLock,
         txOptions,
       ),
-      `Redeem amount must be greater than zero: ${redeemParams.amount}.`,
+      `Redeem amount must be greater than zero: ${'0'}.`,
     );
   });
 
   it('should throw an error when beneficiary address is undefined', async () => {
-    delete redeemParams.beneficiary;
     await AssertAsync.reject(
       facilitator.redeem(
         redeemParams.redeemer,
         redeemParams.amount,
-        redeemParams.beneficiary,
+        undefined,
         redeemParams.gasPrice,
         redeemParams.gasLimit,
         redeemParams.hashLock,
         txOptions,
       ),
-      `Invalid beneficiary address: ${redeemParams.beneficiary}.`,
+      `Invalid beneficiary address: ${undefined}.`,
     );
   });
 
   it('should throw an error when gas price is undefined', async () => {
-    delete redeemParams.gasPrice;
     await AssertAsync.reject(
       facilitator.redeem(
         redeemParams.redeemer,
         redeemParams.amount,
         redeemParams.beneficiary,
-        redeemParams.gasPrice,
+        undefined,
         redeemParams.gasLimit,
         redeemParams.hashLock,
         txOptions,
       ),
-      `Invalid gas price: ${redeemParams.gasPrice}.`,
+      `Invalid gas price: ${undefined}.`,
     );
   });
 
   it('should throw an error when gas limit is undefined', async () => {
-    delete redeemParams.gasLimit;
     await AssertAsync.reject(
       facilitator.redeem(
         redeemParams.redeemer,
         redeemParams.amount,
         redeemParams.beneficiary,
         redeemParams.gasPrice,
-        redeemParams.gasLimit,
+        undefined,
         redeemParams.hashLock,
         txOptions,
       ),
-      `Invalid gas limit: ${redeemParams.gasLimit}.`,
+      `Invalid gas limit: ${undefined}.`,
     );
   });
 

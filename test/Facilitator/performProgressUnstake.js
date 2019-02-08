@@ -58,38 +58,35 @@ describe('Facilitator.performProgressUnstake()', () => {
   });
 
   it('should throw an error when message hash is undefined', async () => {
-    delete progressUnstakeParams.messageHash;
     await AssertAsync.reject(
       facilitator.performProgressUnstake(
-        progressUnstakeParams.messageHash,
+        undefined,
         progressUnstakeParams.unlockSecret,
         progressUnstakeParams.txOptions,
       ),
-      `Invalid message hash: ${progressUnstakeParams.messageHash}.`,
+      `Invalid message hash: ${undefined}.`,
     );
   });
 
   it('should throw an error when unlock secret is undefined', async () => {
-    delete progressUnstakeParams.unlockSecret;
     await AssertAsync.reject(
       facilitator.performProgressUnstake(
         progressUnstakeParams.messageHash,
-        progressUnstakeParams.unlockSecret,
+        undefined,
         progressUnstakeParams.txOptions,
       ),
-      `Invalid unlock secret: ${progressUnstakeParams.unlockSecret}.`,
+      `Invalid unlock secret: ${undefined}.`,
     );
   });
 
   it('should throw an error when transaction options is undefined', async () => {
-    delete progressUnstakeParams.txOptions;
     await AssertAsync.reject(
       facilitator.performProgressUnstake(
         progressUnstakeParams.messageHash,
         progressUnstakeParams.unlockSecret,
-        progressUnstakeParams.txOptions,
+        undefined,
       ),
-      `Invalid transaction option: ${progressUnstakeParams.txOptions}.`,
+      `Invalid transaction option: ${undefined}.`,
     );
   });
 

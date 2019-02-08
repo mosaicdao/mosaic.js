@@ -54,7 +54,7 @@ describe('Facilitator.getGatewayProof()', () => {
     );
   });
 
-  it('should pass with valid constructor arguments', async () => {
+  it('should pass with valid arguments', async () => {
     setup();
     const result = await facilitator.getGatewayProof(messageHash);
     assert.strictEqual(

@@ -622,14 +622,7 @@ class EIP20CoGateway {
    * @returns {Promise<Object>} Promise object that resolves to object containing state root and block height.
    */
   async getLatestAnchorInfo() {
-    const anchor = await this.getAnchor();
-    const blockHeight = await anchor.getLatestStateRootBlockHeight();
-    const stateRoot = await anchor.getStateRoot(blockHeight);
-
-    return {
-      blockHeight,
-      stateRoot,
-    };
+    return this.getAnchor().then((anchor) => anchor.getLatestAnchorInfo());
   }
 
   /**

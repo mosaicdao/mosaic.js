@@ -12,42 +12,34 @@ describe('EIP20Gateway.getLatestAnchorInfo()', () => {
   let gatewayAddress;
   let gateway;
 
-  let mockAnchorContract;
-  let getAnchorResult;
-  let getLatestStateRootBlockHeightResult;
-  let getStateRootResult;
+  let mockedAnchor;
+  let getLatestAnchorInfoResult;
 
-  let spyGetAnchor;
-  let spyGetLatestStateRootBlockHeight;
-  let spyGetStateRootResult;
   let spyCall;
+  let spyGetAnchor;
+  let spyGetLatestAnchorInfo;
 
   const setup = () => {
-    mockAnchorContract = sinon.createStubInstance(Anchor);
-    getAnchorResult = mockAnchorContract;
-    getLatestStateRootBlockHeightResult = '12345';
-    getStateRootResult =
-      '0x0000000000000000000000000000000000000000000000000000000000000001';
-
+    const anchor = new Anchor(
+      web3,
+      '0x0000000000000000000000000000000000000003',
+    );
+    mockedAnchor = sinon.mock(anchor);
+    spyGetLatestAnchorInfo = sinon.replace(
+      mockedAnchor.object,
+      'getLatestAnchorInfo',
+      sinon.fake.resolves(getLatestAnchorInfoResult),
+    );
     spyGetAnchor = sinon.replace(
       gateway,
       'getAnchor',
-      sinon.fake.resolves(getAnchorResult),
-    );
-    spyGetLatestStateRootBlockHeight = sinon.replace(
-      mockAnchorContract,
-      'getLatestStateRootBlockHeight',
-      sinon.fake.resolves(getLatestStateRootBlockHeightResult),
-    );
-    spyGetStateRootResult = sinon.replace(
-      mockAnchorContract,
-      'getStateRoot',
-      sinon.fake.resolves(getStateRootResult),
+      sinon.fake.resolves(mockedAnchor.object),
     );
     spyCall = sinon.spy(gateway, 'getLatestAnchorInfo');
   };
 
   const tearDown = () => {
+    mockedAnchor.restore();
     sinon.restore();
     spyCall.restore();
   };
@@ -56,28 +48,17 @@ describe('EIP20Gateway.getLatestAnchorInfo()', () => {
     web3 = new Web3();
     gatewayAddress = '0x0000000000000000000000000000000000000002';
     gateway = new EIP20Gateway(web3, gatewayAddress);
+    getLatestAnchorInfoResult = true;
   });
 
   it('should return anchor object', async () => {
     setup();
     const result = await gateway.getLatestAnchorInfo();
-    assert.strictEqual(
-      result.blockHeight,
-      getLatestStateRootBlockHeightResult,
-      'Result.blockHeight of getLatestAnchorInfo must be equal to mocked block height',
-    );
-    assert.strictEqual(
-      result.stateRoot,
-      getStateRootResult,
-      'Result.stateRoot of getLatestAnchorInfo must be equal to mocked state root height',
-    );
+    assert.isTrue(result, 'Result of getLatestAnchorInfo must be true');
 
     SpyAssert.assert(spyCall, 1, [[]]);
     SpyAssert.assert(spyGetAnchor, 1, [[]]);
-    SpyAssert.assert(spyGetLatestStateRootBlockHeight, 1, [[]]);
-    SpyAssert.assert(spyGetStateRootResult, 1, [
-      [getLatestStateRootBlockHeightResult],
-    ]);
+    SpyAssert.assert(spyGetLatestAnchorInfo, 1, [[]]);
 
     tearDown();
   });

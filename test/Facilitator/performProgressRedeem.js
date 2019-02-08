@@ -58,38 +58,35 @@ describe('Facilitator.performProgressRedeem()', () => {
   });
 
   it('should throw an error when message hash is undefined', async () => {
-    delete progressRedeemParams.messageHash;
     await AssertAsync.reject(
       facilitator.performProgressRedeem(
-        progressRedeemParams.messageHash,
+        undefined,
         progressRedeemParams.unlockSecret,
         progressRedeemParams.txOptions,
       ),
-      `Invalid message hash: ${progressRedeemParams.messageHash}.`,
+      `Invalid message hash: ${undefined}.`,
     );
   });
 
   it('should throw an error when unlock secret is undefined', async () => {
-    delete progressRedeemParams.unlockSecret;
     await AssertAsync.reject(
       facilitator.performProgressRedeem(
         progressRedeemParams.messageHash,
-        progressRedeemParams.unlockSecret,
+        undefined,
         progressRedeemParams.txOptions,
       ),
-      `Invalid unlock secret: ${progressRedeemParams.unlockSecret}.`,
+      `Invalid unlock secret: ${undefined}.`,
     );
   });
 
   it('should throw an error when transaction options is undefined', async () => {
-    delete progressRedeemParams.txOptions;
     await AssertAsync.reject(
       facilitator.performProgressRedeem(
         progressRedeemParams.messageHash,
         progressRedeemParams.unlockSecret,
-        progressRedeemParams.txOptions,
+        undefined,
       ),
-      `Invalid transaction option: ${progressRedeemParams.txOptions}.`,
+      `Invalid transaction option: ${undefined}.`,
     );
   });
 

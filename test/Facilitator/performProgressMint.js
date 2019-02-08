@@ -58,38 +58,35 @@ describe('Facilitator.performProgressMint()', () => {
   });
 
   it('should throw an error when message hash is undefined', async () => {
-    delete progressMintParams.messageHash;
     await AssertAsync.reject(
       facilitator.performProgressMint(
-        progressMintParams.messageHash,
+        undefined,
         progressMintParams.unlockSecret,
         progressMintParams.txOptions,
       ),
-      `Invalid message hash: ${progressMintParams.messageHash}.`,
+      `Invalid message hash: ${undefined}.`,
     );
   });
 
   it('should throw an error when unlock secret is undefined', async () => {
-    delete progressMintParams.unlockSecret;
     await AssertAsync.reject(
       facilitator.performProgressMint(
         progressMintParams.messageHash,
-        progressMintParams.unlockSecret,
+        undefined,
         progressMintParams.txOptions,
       ),
-      `Invalid unlock secret: ${progressMintParams.unlockSecret}.`,
+      `Invalid unlock secret: ${undefined}.`,
     );
   });
 
   it('should throw an error when transaction options is undefined', async () => {
-    delete progressMintParams.txOptions;
     await AssertAsync.reject(
       facilitator.performProgressMint(
         progressMintParams.messageHash,
         progressMintParams.unlockSecret,
-        progressMintParams.txOptions,
+        undefined,
       ),
-      `Invalid transaction option: ${progressMintParams.txOptions}.`,
+      `Invalid transaction option: ${undefined}.`,
     );
   });
 

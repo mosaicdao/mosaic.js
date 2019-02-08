@@ -23,7 +23,7 @@ describe('StakeHelper.constructor()', () => {
     }
   });
 
-  it('should pass with valid constructor arguments', async function() {
+  it('should pass with valid arguments', async function() {
     const stakeHelper = new StakeHelper(mosaic);
 
     assert.strictEqual(

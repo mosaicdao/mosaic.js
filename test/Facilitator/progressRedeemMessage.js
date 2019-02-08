@@ -59,58 +59,50 @@ describe('Facilitator.progressRedeemMessage()', () => {
   });
 
   it('should throw an error when message hash is undefined', async () => {
-    delete progressRedeemMessageParams.messageHash;
     await AssertAsync.reject(
       facilitator.progressRedeemMessage(
-        progressRedeemMessageParams.messageHash,
+        undefined,
         progressRedeemMessageParams.unlockSecret,
         progressRedeemMessageParams.txOptionOrigin,
         progressRedeemMessageParams.txOptionAuxiliary,
       ),
-      `Invalid message hash: ${progressRedeemMessageParams.messageHash}.`,
+      `Invalid message hash: ${undefined}.`,
     );
   });
 
   it('should throw an error when unlock secret is undefined', async () => {
-    delete progressRedeemMessageParams.unlockSecret;
     await AssertAsync.reject(
       facilitator.progressRedeemMessage(
         progressRedeemMessageParams.messageHash,
-        progressRedeemMessageParams.unlockSecret,
+        undefined,
         progressRedeemMessageParams.txOptionOrigin,
         progressRedeemMessageParams.txOptionAuxiliary,
       ),
-      `Invalid unlock secret: ${progressRedeemMessageParams.unlockSecret}.`,
+      `Invalid unlock secret: ${undefined}.`,
     );
   });
 
   it('should throw an error when origin transaction option is undefined', async () => {
-    delete progressRedeemMessageParams.txOptionOrigin;
     await AssertAsync.reject(
       facilitator.progressRedeemMessage(
         progressRedeemMessageParams.messageHash,
         progressRedeemMessageParams.unlockSecret,
-        progressRedeemMessageParams.txOptionOrigin,
+        undefined,
         progressRedeemMessageParams.txOptionAuxiliary,
       ),
-      `Invalid origin transaction option: ${
-        progressRedeemMessageParams.txOptionOrigin
-      }.`,
+      `Invalid origin transaction option: ${undefined}.`,
     );
   });
 
   it('should throw an error when auxiliary transaction option is undefined', async () => {
-    delete progressRedeemMessageParams.txOptionAuxiliary;
     await AssertAsync.reject(
       facilitator.progressRedeemMessage(
         progressRedeemMessageParams.messageHash,
         progressRedeemMessageParams.unlockSecret,
         progressRedeemMessageParams.txOptionOrigin,
-        progressRedeemMessageParams.txOptionAuxiliary,
+        undefined,
       ),
-      `Invalid auxiliary transaction option: ${
-        progressRedeemMessageParams.txOptionAuxiliary
-      }.`,
+      `Invalid auxiliary transaction option: ${undefined}.`,
     );
   });
 

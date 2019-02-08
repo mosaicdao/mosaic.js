@@ -23,7 +23,7 @@ describe('Facilitator.constructor()', () => {
     }
   });
 
-  it('should pass with valid constructor arguments', async () => {
+  it('should pass with valid arguments', async () => {
     const facilitator = new Facilitator(mosaic);
 
     assert.strictEqual(

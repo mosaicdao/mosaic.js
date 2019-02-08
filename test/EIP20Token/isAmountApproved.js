@@ -82,24 +82,6 @@ describe('EIP20Token.isAmountApproved()', () => {
     tearDown();
   });
 
-  it('should return true when allowance amount is less than the given amount', async () => {
-    setup();
-    const result = await token.isAmountApproved(
-      ownerAddress,
-      spenderAddress,
-      amount,
-    );
-    assert.strictEqual(
-      result,
-      true,
-      'Result of isAmountApproved must be true.',
-    );
-
-    SpyAssert.assert(spyAllowance, 1, [[ownerAddress, spenderAddress]]);
-    SpyAssert.assert(spyCall, 1, [[ownerAddress, spenderAddress, amount]]);
-    tearDown();
-  });
-
   it('should return true when allowance amount is equal to the given amount', async () => {
     mockedAllowance = amount;
     setup();

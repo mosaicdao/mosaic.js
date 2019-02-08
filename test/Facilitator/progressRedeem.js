@@ -76,10 +76,9 @@ describe('Facilitator.progressRedeem()', () => {
   });
 
   it('should throw an error when redeemer address is undefined', async () => {
-    delete redeemParams.redeemer;
     await AssertAsync.reject(
       facilitator.progressRedeem(
-        redeemParams.redeemer,
+        undefined,
         redeemParams.nonce,
         redeemParams.beneficiary,
         redeemParams.amount,
@@ -90,18 +89,17 @@ describe('Facilitator.progressRedeem()', () => {
         txOptionsOrigin,
         txOptionsAuxiliary,
       ),
-      `Invalid redeemer address: ${redeemParams.redeemer}.`,
+      `Invalid redeemer address: ${undefined}.`,
     );
   });
 
   it('should throw an error when redeem amount is zero', async () => {
-    delete redeemParams.amount;
     await AssertAsync.reject(
       facilitator.progressRedeem(
         redeemParams.redeemer,
         redeemParams.nonce,
         redeemParams.beneficiary,
-        redeemParams.amount,
+        undefined,
         redeemParams.gasPrice,
         redeemParams.gasLimit,
         redeemParams.hashLock,
@@ -109,17 +107,16 @@ describe('Facilitator.progressRedeem()', () => {
         txOptionsOrigin,
         txOptionsAuxiliary,
       ),
-      `Redeem amount must be greater than zero: ${redeemParams.amount}.`,
+      `Redeem amount must be greater than zero: ${undefined}.`,
     );
   });
 
   it('should throw an error when beneficiary address is undefined', async () => {
-    delete redeemParams.beneficiary;
     await AssertAsync.reject(
       facilitator.progressRedeem(
         redeemParams.redeemer,
         redeemParams.nonce,
-        redeemParams.beneficiary,
+        undefined,
         redeemParams.amount,
         redeemParams.gasPrice,
         redeemParams.gasLimit,
@@ -128,31 +125,29 @@ describe('Facilitator.progressRedeem()', () => {
         txOptionsOrigin,
         txOptionsAuxiliary,
       ),
-      `Invalid beneficiary address: ${redeemParams.beneficiary}.`,
+      `Invalid beneficiary address: ${undefined}.`,
     );
   });
 
   it('should throw an error when gas price is undefined', async () => {
-    delete redeemParams.gasPrice;
     await AssertAsync.reject(
       facilitator.progressRedeem(
         redeemParams.redeemer,
         redeemParams.nonce,
         redeemParams.beneficiary,
         redeemParams.amount,
-        redeemParams.gasPrice,
+        undefined,
         redeemParams.gasLimit,
         redeemParams.hashLock,
         redeemParams.unlockSecret,
         txOptionsOrigin,
         txOptionsAuxiliary,
       ),
-      `Invalid gas price: ${redeemParams.gasPrice}.`,
+      `Invalid gas price: ${undefined}.`,
     );
   });
 
   it('should throw an error when gas limit is undefined', async () => {
-    delete redeemParams.gasLimit;
     await AssertAsync.reject(
       facilitator.progressRedeem(
         redeemParams.redeemer,
@@ -160,22 +155,21 @@ describe('Facilitator.progressRedeem()', () => {
         redeemParams.beneficiary,
         redeemParams.amount,
         redeemParams.gasPrice,
-        redeemParams.gasLimit,
+        undefined,
         redeemParams.hashLock,
         redeemParams.unlockSecret,
         txOptionsOrigin,
         txOptionsAuxiliary,
       ),
-      `Invalid gas limit: ${redeemParams.gasLimit}.`,
+      `Invalid gas limit: ${undefined}.`,
     );
   });
 
   it('should throw an error when nonce is undefined', async () => {
-    delete redeemParams.nonce;
     await AssertAsync.reject(
       facilitator.progressRedeem(
         redeemParams.redeemer,
-        redeemParams.nonce,
+        undefined,
         redeemParams.beneficiary,
         redeemParams.amount,
         redeemParams.gasPrice,
@@ -185,7 +179,7 @@ describe('Facilitator.progressRedeem()', () => {
         txOptionsOrigin,
         txOptionsAuxiliary,
       ),
-      `Invalid redeemer nonce: ${redeemParams.nonce}.`,
+      `Invalid redeemer nonce: ${undefined}.`,
     );
   });
 
