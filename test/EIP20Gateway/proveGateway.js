@@ -1,3 +1,5 @@
+'use strict';
+
 const chai = require('chai');
 const Web3 = require('web3');
 const sinon = require('sinon');

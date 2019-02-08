@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * @file `shared` exists so that integration tests can share data among each other.
  *

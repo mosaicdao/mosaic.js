@@ -1,3 +1,5 @@
+'use strict';
+
 const Web3Utils = require('web3-utils');
 const Web3 = require('web3');
 const Crypto = require('crypto');

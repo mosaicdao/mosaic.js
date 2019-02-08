@@ -1,3 +1,5 @@
+'use strict';
+
 const Web3 = require('web3');
 const Chain = require('../src/Chain');
 const Mosaic = require('../src/Mosaic');

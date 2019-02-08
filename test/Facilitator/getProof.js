@@ -1,3 +1,5 @@
+'use strict';
+
 const chai = require('chai');
 const BN = require('bn.js');
 const sinon = require('sinon');

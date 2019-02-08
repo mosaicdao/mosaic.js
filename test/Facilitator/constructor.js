@@ -1,3 +1,5 @@
+'use strict';
+
 const chai = require('chai');
 const Facilitator = require('../../src/Facilitator');
 const TestMosaic = require('../../test_utils/TestMosaic');
