@@ -310,7 +310,6 @@ describe('Facilitator.progressStake()', () => {
         stakeParams.gasLimit,
         stakeParams.nonce,
         stakeParams.hashLock,
-        stakeParams.unlockSecret,
         txOptionsAuxiliary,
       ],
     ]);

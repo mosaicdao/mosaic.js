@@ -481,7 +481,6 @@ class Facilitator {
       gasLimit,
       nonce,
       hashLock,
-      unlockSecret,
       txOptionAuxiliary,
     ).then(() => {
       const messageHash = Message.getStakeMessageHash(
@@ -975,9 +974,25 @@ class Facilitator {
       );
       return Promise.reject(err);
     }
+    if (!Web3.utils.isAddress(txOptionOrigin.from)) {
+      const err = new TypeError(
+        `Invalid from address ${
+          txOptionOrigin.from
+        } in origin transaction options.`,
+      );
+      return Promise.reject(err);
+    }
     if (txOptionAuxiliary === undefined) {
       const err = new TypeError(
         `Invalid auxiliary transaction option: ${txOptionAuxiliary}.`,
+      );
+      return Promise.reject(err);
+    }
+    if (!Web3.utils.isAddress(txOptionAuxiliary.from)) {
+      const err = new TypeError(
+        `Invalid from address ${
+          txOptionAuxiliary.from
+        } in auxiliary transaction options.`,
       );
       return Promise.reject(err);
     }
@@ -1059,6 +1074,12 @@ class Facilitator {
       const err = new TypeError(`Invalid transaction option: ${txOption}.`);
       return Promise.reject(err);
     }
+    if (!Web3.utils.isAddress(txOption.from)) {
+      const err = new TypeError(
+        `Invalid from address ${txOption.from} in transaction options.`,
+      );
+      return Promise.reject(err);
+    }
 
     const stakeMessageStatus = await this.gateway
       .getOutboxMessageStatus(messageHash)
@@ -1117,6 +1138,12 @@ class Facilitator {
     }
     if (txOption === undefined) {
       const err = new TypeError(`Invalid transaction option: ${txOption}.`);
+      return Promise.reject(err);
+    }
+    if (!Web3.utils.isAddress(txOption.from)) {
+      const err = new TypeError(
+        `Invalid from address ${txOption.from} in transaction options.`,
+      );
       return Promise.reject(err);
     }
 
@@ -1179,6 +1206,12 @@ class Facilitator {
       const err = new TypeError(`Invalid transaction option: ${txOption}.`);
       return Promise.reject(err);
     }
+    if (!Web3.utils.isAddress(txOption.from)) {
+      const err = new TypeError(
+        `Invalid from address ${txOption.from} in transaction options.`,
+      );
+      return Promise.reject(err);
+    }
 
     const unstakeMessageStatus = await this.gateway
       .getInboxMessageStatus(messageHash)
@@ -1237,6 +1270,12 @@ class Facilitator {
     }
     if (txOption === undefined) {
       const err = new TypeError(`Invalid transaction option: ${txOption}.`);
+      return Promise.reject(err);
+    }
+    if (!Web3.utils.isAddress(txOption.from)) {
+      const err = new TypeError(
+        `Invalid from address ${txOption.from} in transaction options.`,
+      );
       return Promise.reject(err);
     }
 

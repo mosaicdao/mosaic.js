@@ -181,6 +181,12 @@ class OSTPrime {
       const err = new TypeError(`Invalid transaction options: ${txOptions}.`);
       return Promise.reject(err);
     }
+    if (!Web3.utils.isAddress(txOptions.from)) {
+      const err = new TypeError(
+        `Invalid from address ${txOptions.from} in transaction options.`,
+      );
+      return Promise.reject(err);
+    }
     return this._unwrapRawTx(amount).then((tx) =>
       Utils.sendTransaction(tx, txOptions),
     );

@@ -85,6 +85,12 @@ class EIP20CoGateway {
       const err = new TypeError(`Invalid transaction options: ${txOptions}.`);
       return Promise.reject(err);
     }
+    if (!Web3.utils.isAddress(txOptions.from)) {
+      const err = new TypeError(
+        `Invalid from address ${txOptions.from} in transaction options.`,
+      );
+      return Promise.reject(err);
+    }
     return this._proveGatewayRawTx(
       blockHeight,
       encodedAccount,
@@ -157,6 +163,13 @@ class EIP20CoGateway {
       const err = new TypeError(`Invalid transaction options: ${txOptions}.`);
       return Promise.reject(err);
     }
+    if (!Web3.utils.isAddress(txOptions.from)) {
+      const err = new TypeError(
+        `Invalid from address ${txOptions.from} in transaction options.`,
+      );
+      return Promise.reject(err);
+    }
+
     return this._confirmStakeIntentRawTx(
       staker,
       nonce,
@@ -268,6 +281,12 @@ class EIP20CoGateway {
       const err = new TypeError(`Invalid transaction options: ${txOptions}.`);
       return Promise.reject(err);
     }
+    if (!Web3.utils.isAddress(txOptions.from)) {
+      const err = new TypeError(
+        `Invalid from address ${txOptions.from} in transaction options.`,
+      );
+      return Promise.reject(err);
+    }
     return this._progressMintRawTx(messageHash, unlockSecret).then((tx) =>
       Utils.sendTransaction(tx, txOptions),
     );
@@ -308,6 +327,12 @@ class EIP20CoGateway {
   progressRedeem(messageHash, unlockSecret, txOptions) {
     if (!txOptions) {
       const err = new TypeError(`Invalid transaction options: ${txOptions}.`);
+      return Promise.reject(err);
+    }
+    if (!Web3.utils.isAddress(txOptions.from)) {
+      const err = new TypeError(
+        `Invalid from address ${txOptions.from} in transaction options.`,
+      );
       return Promise.reject(err);
     }
     return this._progressRedeemRawTx(messageHash, unlockSecret).then((tx) =>
