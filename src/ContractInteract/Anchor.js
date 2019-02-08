@@ -1,3 +1,20 @@
+/**
+ * @typedef AnchorSetupConfig
+ *
+ * @property {string} remoteChainId The chain id of the chain that is tracked
+ *                    by this Anchor.
+ * @property {string} maxStateRoots The max number of state roots to store in
+ *                    the circular buffer of Anchor.
+ * @property {string} organization Address of Organization contract managing
+ *                    Anchor.
+ * @property [string] coAnchorAddress Address of the corresponding Anchor on
+ *                    the remote chain.
+ * @property {string} deployer Address to be used to send deployment
+ *                    transactions.
+ * @property {string} organizationOwner Address of owner of `organization`.
+
+ */
+
 'use strict';
 
 const Web3 = require('web3');
@@ -50,19 +67,19 @@ class Anchor {
     this.anchorStateRoot = this.anchorStateRoot.bind(this);
   }
 
-  /*
-    //Supported Configurations for setup
-    {
-      "remoteChainId": 123456,
-      "deployer": config.deployerAddress,
-      "organization": caOrganization,
-      "coAnchorAddress": caAnchor,
-      "maxStateRoots": maxStateRoots,
-      "organizationOwner": organizationOwner
-    }
-  */
-
-  // TODO: docs
+  /**
+   * Setup for Anchor contract. Retrieves information about the remote chain,
+   * deploys the Anchor contract, and sets its coAnchor address (if provided).
+   *
+   *
+   * @param {Web3} web3 Web3 object.
+   * @param {Web3} coWeb3 Web3 object for remote chain.
+   * @param {AnchorSetupConfig} config Anchor setup configuration.
+   * @param {Object} txOptions Transaction options.
+   *
+   * @param {Promise<Anchor>} Promise containing the Anchor instance that
+   *                         has been set up.
+   */
   static setup(web3, coWeb3, config, txOptions = {}) {
     Anchor.validateSetupConfig(config);
 
@@ -98,13 +115,22 @@ class Anchor {
         const ownerParams = Object.assign({}, deployParams);
         ownerParams.from = config.organizationOwner;
 
-        return anchor.setCoAnchorAddress(config.coAnchorAddress, ownerParams);
+        return anchor
+          .setCoAnchorAddress(config.coAnchorAddress, ownerParams)
+          .then(() => anchor);
       });
     }
 
     return promiseChain;
   }
 
+  /**
+   * Validate the setup configuration.
+   *
+   * @param {AnchorSetupConfig} config Anchor setup configuration.
+   *
+   * @throws Will throw an error if setup configuration is incomplete.
+   */
   static validateSetupConfig(config) {
     validateConfigExists(config);
     validateConfigKeyExists(config, 'deployer', 'config');
@@ -118,7 +144,23 @@ class Anchor {
     }
   }
 
-  // TODO: docs
+  /**
+   * Deploys an Anchor contract.
+   *
+   * @param {Web3} web3 Web3 object.
+   * @param {string} remoteChainId The chain id of the chain that is tracked
+   *                 by this Anchor.
+   * @param {string} blockHeight Block height.
+   * @param {string} stateRoot Storage root.
+   * @param {string} maxStateRoots The max number of state roots to store in
+   *                 the circular buffer of Anchor.
+   * @param {string} organization Address of Organization contract managing
+   *                 Anchor.
+   * @param {Object} txOptions Transaction options.
+   *
+   * @param {Promise<Anchor>} Promise containing the Anchor instance that
+   *                          has been deployed.
+   */
   static async deploy(
     web3,
     remoteChainId,
@@ -148,7 +190,21 @@ class Anchor {
     });
   }
 
-  // TODO: docs
+  /**
+   * Raw transaction for {@link Anchor#deploy}.
+   *
+   * @param {Web3} web3 Web3 object.
+   * @param {string} remoteChainId The chain id of the chain that is tracked
+   *                 by this Anchor.
+   * @param {string} blockHeight Block height.
+   * @param {string} stateRoot Storage root.
+   * @param {string} maxStateRoots The max number of state roots to store in
+   *                 the circular buffer of Anchor.
+   * @param {string} organization Address of Organization contract managing
+   *                 Anchor.
+   *
+   * @returns {Object} Raw transaction.
+   */
   static deployRawTx(
     web3,
     remoteChainId,
@@ -243,7 +299,15 @@ class Anchor {
     };
   }
 
-  // TODO: docs
+  /**
+   * Set the address of the corresponding Anchor on the remote chain.
+   *
+   * @param {string} coAnchorAddress The Co-Anchor address is the address
+   *                 of the anchor that is deployed on the other
+   *                 (origin/auxiliary) chain.
+   *
+   * @returns {Promise<Object>} Promise that resolves to transaction receipt.
+   */
   setCoAnchorAddress(coAnchorAddress, txOptions) {
     if (!txOptions) {
       const err = new TypeError('Invalid transaction options.');
@@ -259,7 +323,11 @@ class Anchor {
     );
   }
 
-  // TODO: docs
+  /**
+   * Raw transaction object for {@link Anchor#setCoAnchorAddress}
+   *
+   * @returns {Promise<Object>} Promise that resolves to raw transaction object.
+   */
   setCoAnchorAddressRawTx(coAnchorAddress) {
     if (!Web3.utils.isAddress(coAnchorAddress)) {
       const err = new TypeError('Invalid coAnchor address.');

@@ -67,16 +67,6 @@ class OSTPrime {
     this.initializeRawTx = this.initializeRawTx.bind(this);
   }
 
-  /*
-  //Supported Configurations for setup
-  {
-    deployer: config.deployerAddress,
-    chainOwner: chainOwner,
-    valueToken: config.valueTokenContractAddress
-  }
-  Both deployer, chainOwner & valueToken are mandatory configurations.
-*/
-
   /**
    * Setup for OSTPrime contract. Deploys the contract and initializes
    * it. See {@link OSTPrime#initialize}.
@@ -85,7 +75,7 @@ class OSTPrime {
    * @param {OSTPrimeSetupConfig} config OSTPrime setup configuration.
    * @param {Object} txOptions Transaction options.
    *
-   * @parm {Promise<OSTPrime>} Promise containing the OSTPrime instance that
+   * @param {Promise<OSTPrime>} Promise containing the OSTPrime instance that
    *                           has been set up.
    */
   static setup(web3, config, txOptions) {
@@ -149,7 +139,7 @@ class OSTPrime {
    * @param {string} organization Address of Organization contract managing OSTPrime.
    * @param {Object} txOptions Transaction options.
    *
-   * @parm {Promise<OSTPrime>} Promise containing the OSTPrime instance that
+   * @param {Promise<OSTPrime>} Promise containing the OSTPrime instance that
    *                           has been deployed.
    */
   static async deploy(web3, valueToken, organization, txOptions) {
@@ -173,7 +163,7 @@ class OSTPrime {
    * @param {string} valueToken Address of EIP20 Token on Origin chain.
    * @param {string} organization Address of Organization contract managing OSTPrime.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Object} Raw transaction.
    */
   static deployRawTx(web3, valueToken, organization) {
     const abiBinProvider = new AbiBinProvider();
@@ -329,7 +319,7 @@ class OSTPrime {
    *
    * @param {Object} txOptions Transaction options.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<Object>} Promise that resolves to transaction receipt.
    */
   initialize(txOptions) {
     if (!txOptions) {
@@ -345,7 +335,7 @@ class OSTPrime {
   /**
    * Raw transaction object for {@link OSTPrime#initialize}
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<Object>} Promise that resolves to raw transaction object.
    */
   initializeRawTx() {
     const tx = this.contract.methods.initialize();
@@ -409,7 +399,7 @@ class OSTPrime {
    * @param {string} coGateway EIP20CoGateway contract address.
    * @param {Object} txOptions Transaction options.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<Object>} Promise that resolves to transaction receipt.
    */
   setCoGateway(coGateway, txOptions) {
     if (!txOptions) {
@@ -427,7 +417,7 @@ class OSTPrime {
    *
    * @param {string} coGateway EIP20CoGateway contract address.
    *
-   * @returns {Promise} Promise object.
+   * @returns {Promise<Object>} Promise that resolves to raw transaction object.
    */
   setCoGatewayRawTx(coGateway) {
     if (!Web3.utils.isAddress(coGateway)) {
