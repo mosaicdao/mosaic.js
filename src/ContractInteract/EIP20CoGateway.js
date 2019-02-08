@@ -700,11 +700,7 @@ class EIP20CoGateway {
       return Promise.reject(err);
     }
     return this.getUtilityTokenContract().then((eip20ValueToken) => {
-      return eip20ValueToken.isAmountApproved(
-        redeemer,
-        this.coGatewayAddress,
-        amount,
-      );
+      return eip20ValueToken.isAmountApproved(redeemer, this.address, amount);
     });
   }
 
@@ -730,7 +726,7 @@ class EIP20CoGateway {
       return Promise.reject(err);
     }
     return this.getUtilityTokenContract().then((eip20Token) => {
-      return eip20Token.approve(this.coGatewayAddress, amount, txOptions);
+      return eip20Token.approve(this.address, amount, txOptions);
     });
   }
 
