@@ -62,10 +62,18 @@ describe('EIP20Gateway.progressStake()', () => {
     mockedTx = 'MockedTx';
   });
 
-  it('should throw error transaction object is invalid', async () => {
+  it('should throw error when transaction object is invalid', async () => {
     await AssertAsync.reject(
       gateway.progressStake(messageHash, unlockSecret, undefined),
       `Invalid transaction options: ${undefined}.`,
+    );
+  });
+
+  it('should throw error when from address transaction object is undefined', async () => {
+    delete txOptions.from;
+    await AssertAsync.reject(
+      gateway.progressStake(messageHash, unlockSecret, txOptions),
+      `Invalid from address ${txOptions.from} in transaction options.`,
     );
   });
 

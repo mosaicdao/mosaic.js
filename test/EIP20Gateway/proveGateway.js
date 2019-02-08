@@ -65,7 +65,7 @@ describe('EIP20Gateway.proveGateway()', () => {
     mockedTx = 'MockedTx';
   });
 
-  it('should throw error transaction object is invalid', async () => {
+  it('should throw error when transaction object is invalid', async () => {
     await AssertAsync.reject(
       gateway.proveGateway(
         blockHeight,
@@ -74,6 +74,19 @@ describe('EIP20Gateway.proveGateway()', () => {
         undefined,
       ),
       `Invalid transaction options: ${undefined}.`,
+    );
+  });
+
+  it('should throw error when from address in transaction object is undefined', async () => {
+    delete txOptions.from;
+    await AssertAsync.reject(
+      gateway.proveGateway(
+        blockHeight,
+        encodedAccount,
+        accountProof,
+        txOptions,
+      ),
+      `Invalid from address ${txOptions.from} in transaction options.`,
     );
   });
 

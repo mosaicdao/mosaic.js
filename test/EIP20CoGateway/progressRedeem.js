@@ -89,6 +89,14 @@ describe('EIP20CoGateway.progressRedeem()', () => {
     );
   });
 
+  it('should throw an error when from address in transaction object is undefined', async () => {
+    delete txOptions.from;
+    await AssertAsync.reject(
+      coGateway.progressRedeem(messageHash, unlockSecret, txOptions),
+      `Invalid from address ${txOptions.from} in transaction options.`,
+    );
+  });
+
   it('should return correct mocked transaction object', async () => {
     setup();
     const result = await coGateway.progressRedeem(

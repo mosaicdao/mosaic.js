@@ -77,6 +77,19 @@ describe('EIP20CoGateway.proveGateway()', () => {
     );
   });
 
+  it('should throw error when `from` address is undefined in transaction object', async () => {
+    delete txOptions.from;
+    await AssertAsync.reject(
+      coGateway.proveGateway(
+        blockHeight,
+        encodedAccount,
+        accountProof,
+        txOptions,
+      ),
+      `Invalid from address ${txOptions.from} in transaction options.`,
+    );
+  });
+
   it('should return correct mocked transaction object', async () => {
     setup();
     const result = await coGateway.proveGateway(

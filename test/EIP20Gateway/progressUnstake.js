@@ -89,6 +89,14 @@ describe('EIP20Gateway.progressUnstake()', () => {
     );
   });
 
+  it('should throw error when from address in transaction object is undefined', async () => {
+    delete txOptions.from;
+    await AssertAsync.reject(
+      gateway.progressUnstake(messageHash, unlockSecret, txOptions),
+      `Invalid from address ${txOptions.from} in transaction options.`,
+    );
+  });
+
   it('should return correct mocked transaction object', async () => {
     setup();
     const result = await gateway.progressUnstake(

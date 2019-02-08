@@ -119,6 +119,21 @@ describe('Facilitator.progressStakeMessage()', () => {
     );
   });
 
+  it('should throw an error when from address in origin transaction option is undefined', async () => {
+    delete progressStakeMessageParams.txOptionOrigin.from;
+    await AssertAsync.reject(
+      facilitator.progressStakeMessage(
+        progressStakeMessageParams.messageHash,
+        progressStakeMessageParams.unlockSecret,
+        progressStakeMessageParams.txOptionOrigin,
+        progressStakeMessageParams.txOptionAuxiliary,
+      ),
+      `Invalid from address ${
+        progressStakeMessageParams.txOptionOrigin.from
+      } in origin transaction options.`,
+    );
+  });
+
   it('should throw an error when auxiliary transaction option is undefined', async () => {
     delete progressStakeMessageParams.txOptionAuxiliary;
     await AssertAsync.reject(
@@ -131,6 +146,21 @@ describe('Facilitator.progressStakeMessage()', () => {
       `Invalid auxiliary transaction option: ${
         progressStakeMessageParams.txOptionAuxiliary
       }.`,
+    );
+  });
+
+  it('should throw an error when from address in auxiliary transaction option is undefined', async () => {
+    delete progressStakeMessageParams.txOptionAuxiliary.from;
+    await AssertAsync.reject(
+      facilitator.progressStakeMessage(
+        progressStakeMessageParams.messageHash,
+        progressStakeMessageParams.unlockSecret,
+        progressStakeMessageParams.txOptionOrigin,
+        progressStakeMessageParams.txOptionAuxiliary,
+      ),
+      `Invalid from address ${
+        progressStakeMessageParams.txOptionAuxiliary.from
+      } in auxiliary transaction options.`,
     );
   });
 

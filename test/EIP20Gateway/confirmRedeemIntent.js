@@ -89,7 +89,7 @@ describe('EIP20Gateway.confirmRedeemIntent()', () => {
     mockedTx = 'MockedTx';
   });
 
-  it('should throw error transaction object is invalid', async () => {
+  it('should throw error when transaction object is invalid', async () => {
     await AssertAsync.reject(
       gateway.confirmRedeemIntent(
         redeemParams.staker,
@@ -104,6 +104,25 @@ describe('EIP20Gateway.confirmRedeemIntent()', () => {
         undefined,
       ),
       `Invalid transaction options: ${undefined}.`,
+    );
+  });
+
+  it('should throw error when from address in transaction object is undefined', async () => {
+    delete txOptions.from;
+    await AssertAsync.reject(
+      gateway.confirmRedeemIntent(
+        redeemParams.staker,
+        redeemParams.nonce,
+        redeemParams.beneficiary,
+        redeemParams.amount,
+        redeemParams.gasPrice,
+        redeemParams.gasLimit,
+        redeemParams.hashLock,
+        redeemParams.blockHeight,
+        redeemParams.storageProof,
+        txOptions,
+      ),
+      `Invalid from address ${txOptions.from} in transaction options.`,
     );
   });
 

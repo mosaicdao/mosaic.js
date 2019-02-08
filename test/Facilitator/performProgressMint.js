@@ -112,6 +112,20 @@ describe('Facilitator.performProgressMint()', () => {
     );
   });
 
+  it('should throw an error when from address in transaction options is undefined', async () => {
+    delete progressMintParams.txOptions.from;
+    await AssertAsync.reject(
+      facilitator.performProgressMint(
+        progressMintParams.messageHash,
+        progressMintParams.unlockSecret,
+        progressMintParams.txOptions,
+      ),
+      `Invalid from address ${
+        progressMintParams.txOptions.from
+      } in transaction options.`,
+    );
+  });
+
   it('should throw an error when inbox message status is undeclared', async () => {
     getInboxMessageStatusResult = MessageStatus.UNDECLARED;
     setup();

@@ -112,6 +112,20 @@ describe('Facilitator.performProgressRedeem()', () => {
     );
   });
 
+  it('should throw an error when from address in transaction options is undefined', async () => {
+    delete progressRedeemParams.txOptions.from;
+    await AssertAsync.reject(
+      facilitator.performProgressRedeem(
+        progressRedeemParams.messageHash,
+        progressRedeemParams.unlockSecret,
+        progressRedeemParams.txOptions,
+      ),
+      `Invalid from address ${
+        progressRedeemParams.txOptions.from
+      } in transaction options.`,
+    );
+  });
+
   it('should throw an error when outbox message status is undeclared', async () => {
     getOutboxMessageStatusResult = MessageStatus.UNDECLARED;
     setup();

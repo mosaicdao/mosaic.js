@@ -112,6 +112,20 @@ describe('Facilitator.performProgressUnstake()', () => {
     );
   });
 
+  it('should throw an error when from address in transaction options is undefined', async () => {
+    delete progressUnstakeParams.txOptions.from;
+    await AssertAsync.reject(
+      facilitator.performProgressUnstake(
+        progressUnstakeParams.messageHash,
+        progressUnstakeParams.unlockSecret,
+        progressUnstakeParams.txOptions,
+      ),
+      `Invalid from address ${
+        progressUnstakeParams.txOptions.from
+      } in transaction options.`,
+    );
+  });
+
   it('should throw an error when inbox message status is undeclared', async () => {
     getInboxMessageStatusResult = MessageStatus.UNDECLARED;
     setup();
