@@ -16,6 +16,10 @@ const commonConfig = (target, babelTargets) => {
       path: path.resolve(__dirname, 'lib'),
       filename: `[name].${target}.js`,
     },
+    externals: {
+      web3: 'web3',
+      'web3-eth-accounts': 'web3-eth-accounts',
+    },
     plugins: [
       new webpack.NormalModuleReplacementPlugin(
         /\.\/AbiBinProvider-node\.js/,
@@ -59,12 +63,26 @@ const commonConfig = (target, babelTargets) => {
   };
 };
 
-const webConfig = () => commonConfig('web', '> 0.25%, not dead');
+const webConfig = () => {
+  const config = commonConfig('web', '> 0.25%, not dead');
+  return {
+    ...config,
+    output: {
+      ...config.output,
+      library: 'Mosaic',
+      libraryTarget: 'var',
+    },
+  };
+};
 
 const nodeConfig = () => {
   const config = commonConfig('node', 'maintained node versions');
   return {
     ...config,
+    output: {
+      ...config.output,
+      libraryTarget: 'commonjs2',
+    },
     resolve: {
       ...config.resolve,
       alias: {
