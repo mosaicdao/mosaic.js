@@ -939,12 +939,24 @@ class EIP20Gateway {
     return this.getAnchor().then((anchor) => anchor.getLatestInfo());
   }
 
-  // TODO
+  /**
+   * Get address of the stake vault.
+   *
+   * @returns {Promise<string>} Promise object that resolves to address of the stake vault.
+   */
   getStakeVault() {
     return this.contract.methods.stakeVault().call();
   }
 
-  // TODO
+  /**
+   * Activate gateway by setting the address of the corresponding EIP20CoGateway on the
+   * remote chain.
+   *
+   * @param {coGatewayAddress} Address of cogateway.
+   * @param {Object} txOptions Transaction options.
+   *
+   * @returns {Promise<Object>} Promise object that resolves to address of the stake vault.
+   */
   activateGateway(coGatewayAddress, txOptions) {
     if (!txOptions) {
       const err = new TypeError('Invalid transaction options.');
@@ -956,7 +968,13 @@ class EIP20Gateway {
     );
   }
 
-  // TODO
+  /**
+   * Raw transaction object for {@link EIP20Gateway#activateGateway}
+   *
+   * @param {coGatewayAddress} Address of cogateway.
+   *
+   * @returns {Promise<Object>} Promise that resolves to raw transaction object.
+   */
   activateGatewayRawTx(coGatewayAddress) {
     if (!Web3.utils.isAddress(coGatewayAddress)) {
       const err = new TypeError('Invalid coGateway address.');

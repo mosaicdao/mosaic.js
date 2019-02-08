@@ -7,9 +7,18 @@ const Utils = require('../utils/Utils');
 
 const ContractName = 'GatewayLib';
 
-// TODO: docs mentioning library contract
+/**
+ * Contract interact for GatewayLib.
+ *
+ * As GatewayLib is a library contract, this only serves for deployment.
+ */
 class GatewayLib {
-  // TODO: docs
+  /**
+   * Constructor for GatewayLib.
+   *
+   * @param {Object} web3 Web3 object.
+   * @param {string} libraryAddress GatewayLib contract address.
+   */
   constructor(web3, libraryAddress) {
     if (web3 instanceof Web3) {
       this.web3 = web3;
@@ -30,7 +39,17 @@ class GatewayLib {
     this.address = libraryAddress;
   }
 
-  // TODO: docs
+  /**
+   * Deploys a GatewayLib contract.
+   *
+   * @param {Web3} web3 Web3 object.
+   * @param {string} merklePatriciaProof Address of MerklePatriciaProof contract
+   *                 to link into the contract bytecode.
+   * @param {Object} txOptions Transaction options.
+   *
+   * @returns {Promise<GatewayLib>} Promise containing the GatewayLib
+   *                                         instance that has been deployed.
+   */
   static async deploy(web3, merklePatriciaProof, txOptions) {
     const tx = GatewayLib.deployRawTx(web3, merklePatriciaProof);
 
@@ -45,7 +64,15 @@ class GatewayLib {
     });
   }
 
-  // TODO: docs
+  /**
+   * Raw transaction object for {@link GatewayLib#deploy}
+   *
+   * @param {Object} web3 Web3 object.
+   * @param {string} merklePatriciaProof Address of MerklePatriciaProof contract
+   *                 to link into the contract bytecode.
+   *
+   * @returns {Promise<Object>} Promise that resolves to raw transaction object.
+   */
   static deployRawTx(web3, merklePatriciaProof) {
     const merklePatriciaProofInfo = {
       name: 'MerklePatriciaProof',

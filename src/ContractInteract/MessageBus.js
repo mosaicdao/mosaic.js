@@ -7,9 +7,18 @@ const Utils = require('../utils/Utils');
 
 const ContractName = 'MessageBus';
 
-// TODO: docs mentioning library contract
+/**
+ * Contract interact for MessageBus.
+ *
+ * As MessageBus is a library contract, this only serves for deployment.
+ */
 class MessageBus {
-  // TODO: docs
+  /**
+   * Constructor for MessageBus.
+   *
+   * @param {Object} web3 Web3 object.
+   * @param {string} libraryAddress MessageBus contract address.
+   */
   constructor(web3, libraryAddress) {
     if (web3 instanceof Web3) {
       this.web3 = web3;
@@ -30,7 +39,17 @@ class MessageBus {
     this.address = libraryAddress;
   }
 
-  // TODO: docs
+  /**
+   * Deploys a MessageBus contract.
+   *
+   * @param {Web3} web3 Web3 object.
+   * @param {string} merklePatriciaProof Address of MerklePatriciaProof contract
+   *                 to link into the contract bytecode.
+   * @param {Object} txOptions Transaction options.
+   *
+   * @returns {Promise<MessageBus>} Promise containing the MessageBus
+   *                                         instance that has been deployed.
+   */
   static async deploy(web3, merklePatriciaProof, txOptions) {
     const tx = MessageBus.deployRawTx(web3, merklePatriciaProof);
 
@@ -45,7 +64,15 @@ class MessageBus {
     });
   }
 
-  // TODO: docs
+  /**
+   * Raw transaction object for {@link MessageBus#deploy}
+   *
+   * @param {Object} web3 Web3 object.
+   * @param {string} merklePatriciaProof Address of MerklePatriciaProof contract
+   *                 to link into the contract bytecode.
+   *
+   * @returns {Promise<Object>} Promise that resolves to raw transaction object.
+   */
   static deployRawTx(web3, merklePatriciaProof) {
     const merklePatriciaProofInfo = {
       name: 'MerklePatriciaProof',

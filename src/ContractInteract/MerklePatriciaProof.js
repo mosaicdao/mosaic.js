@@ -7,9 +7,18 @@ const Utils = require('../utils/Utils');
 
 const ContractName = 'MerklePatriciaProof';
 
-// TODO: docs mentioning library contract
+/**
+ * Contract interact for MerklePatriciaProof.
+ *
+ * As MerklePatriciaProof is a library contract, this only serves for deployment.
+ */
 class MerklePatriciaProof {
-  // TODO: docs
+  /**
+   * Constructor for MerklePatriciaProof.
+   *
+   * @param {Object} web3 Web3 object.
+   * @param {string} libraryAddress MerklePatriciaProof contract address.
+   */
   constructor(web3, libraryAddress) {
     if (web3 instanceof Web3) {
       this.web3 = web3;
@@ -30,7 +39,15 @@ class MerklePatriciaProof {
     this.address = libraryAddress;
   }
 
-  // TODO: docs
+  /**
+   * Deploys a MerklePatriciaProof contract.
+   *
+   * @param {Web3} web3 Web3 object.
+   * @param {Object} txOptions Transaction options.
+   *
+   * @returns {Promise<MerklePatriciaProof>} Promise containing the MerklePatriciaProof
+   *                                         instance that has been deployed.
+   */
   static async deploy(web3, txOptions) {
     const tx = MerklePatriciaProof.deployRawTx(web3);
 
@@ -45,7 +62,13 @@ class MerklePatriciaProof {
     });
   }
 
-  // TODO: docs
+  /**
+   * Raw transaction object for {@link MerklePatriciaProof#deploy}
+   *
+   * @param {Object} web3 Web3 object.
+   *
+   * @returns {Promise<Object>} Promise that resolves to raw transaction object.
+   */
   static deployRawTx(web3) {
     const abiBinProvider = new AbiBinProvider();
     const abi = abiBinProvider.getABI(ContractName);

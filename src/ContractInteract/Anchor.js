@@ -77,7 +77,7 @@ class Anchor {
    * @param {AnchorSetupConfig} config Anchor setup configuration.
    * @param {Object} txOptions Transaction options.
    *
-   * @param {Promise<Anchor>} Promise containing the Anchor instance that
+   * @returns {Promise<Anchor>} Promise containing the Anchor instance that
    *                         has been set up.
    */
   static setup(web3, coWeb3, config, txOptions = {}) {
@@ -158,7 +158,7 @@ class Anchor {
    *                 Anchor.
    * @param {Object} txOptions Transaction options.
    *
-   * @param {Promise<Anchor>} Promise containing the Anchor instance that
+   * @returns {Promise<Anchor>} Promise containing the Anchor instance that
    *                          has been deployed.
    */
   static async deploy(
