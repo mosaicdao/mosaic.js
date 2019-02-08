@@ -210,7 +210,7 @@ class EIP20Gateway {
     baseToken,
     anchor,
     bounty,
-    membersManager,
+    organization,
     burner,
     messageBusAddress,
     gatewayLibAddress,
@@ -222,7 +222,7 @@ class EIP20Gateway {
       baseToken,
       anchor,
       bounty,
-      membersManager,
+      organization,
       burner,
       messageBusAddress,
       gatewayLibAddress,
@@ -246,7 +246,7 @@ class EIP20Gateway {
     baseToken,
     anchor,
     bounty,
-    membersManager,
+    organization,
     burner,
     messageBusAddress,
     gatewayLibAddress,
@@ -269,7 +269,7 @@ class EIP20Gateway {
     );
 
     const contract = new web3.eth.Contract(abi, null, null);
-    const args = [token, baseToken, anchor, bounty, membersManager, burner];
+    const args = [token, baseToken, anchor, bounty, organization, burner];
 
     return contract.deploy({
       data: bin,

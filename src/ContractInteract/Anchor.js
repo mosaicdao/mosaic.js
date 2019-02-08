@@ -118,13 +118,14 @@ class Anchor {
     }
   }
 
+  // TODO: docs
   static async deploy(
     web3,
     remoteChainId,
     blockHeight,
     stateRoot,
     maxStateRoots,
-    membersManager,
+    organization,
     txOptions,
   ) {
     const tx = Anchor.deployRawTx(
@@ -133,7 +134,7 @@ class Anchor {
       blockHeight,
       stateRoot,
       maxStateRoots,
-      membersManager,
+      organization,
     );
 
     const _txOptions = txOptions;
@@ -147,13 +148,14 @@ class Anchor {
     });
   }
 
+  // TODO: docs
   static deployRawTx(
     web3,
     remoteChainId,
     blockHeight,
     stateRoot,
     maxStateRoots,
-    membersManager,
+    organization,
   ) {
     const abiBinProvider = new AbiBinProvider();
     const contract = Contracts.getAnchor(web3, null, null);
@@ -164,7 +166,7 @@ class Anchor {
       blockHeight,
       stateRoot,
       maxStateRoots,
-      membersManager,
+      organization,
     ];
 
     return contract.deploy({
