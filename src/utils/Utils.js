@@ -77,9 +77,17 @@ class Utils {
   /**
    * Prints a deprecation warning for deprecated ChainSetup methods.
    * See {@link https://github.com/OpenSTFoundation/mosaic.js/issues/57}.
+   *
+   * @param {string} [method] The method on the StakeHelper that has been deprecated.
    */
-  static deprecationNoticeChainSetup(object) {
+  static deprecationNoticeChainSetup(method) {
     const issueNumber = '57';
+
+    let object = 'ChainSetup';
+    if (method !== undefined) {
+      object = `${method}::${method}()`;
+    }
+
     Utils.deprecationNotice(object, issueNumber);
   }
 
