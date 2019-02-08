@@ -6,7 +6,7 @@ const SpyAssert = require('../../test_utils/SpyAssert');
 const AssertAsync = require('../../test_utils/AssertAsync');
 const TestMosaic = require('../../test_utils/GetTestMosaic');
 
-const assert = chai.assert;
+const { assert } = chai;
 
 describe('Staker.approveStakeAmount()', () => {
   let mosaic;

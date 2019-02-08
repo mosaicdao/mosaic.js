@@ -6,7 +6,7 @@ const SpyAssert = require('../../test_utils/SpyAssert');
 const Utils = require('../../src/utils/Utils');
 const TestMosaic = require('../../test_utils/GetTestMosaic');
 
-const assert = chai.assert;
+const { assert } = chai;
 
 describe('StakeHelper.approveStakeAmount()', () => {
   let mosaic;
