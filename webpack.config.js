@@ -16,6 +16,10 @@ const commonConfig = (target, babelTargets) => {
       path: path.resolve(__dirname, 'lib'),
       filename: `[name].${target}.js`,
     },
+    externals: {
+      web3: 'web3',
+      'web3-eth-accounts': 'web3-eth-accounts',
+    },
     plugins: [
       new webpack.NormalModuleReplacementPlugin(
         /\.\/AbiBinProvider-node\.js/,
