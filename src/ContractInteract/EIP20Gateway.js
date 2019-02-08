@@ -276,8 +276,8 @@ class EIP20Gateway {
    * @param {string} gasPrice Gas price that redeemer is willing to pay for the reward.
    * @param {string} gasLimit Maximum gas limit for reward calculation.
    * @param {string} blockNumber Block number.
-   * @param {string} storageProof Storage proof.
    * @param {string} hashLock Hash lock.
+   * @param {string} storageProof Storage proof.
    * @param {Object} txOptions Transaction option.
    *
    * @returns {Promise<Object>} Promise that resolves to transaction receipt.
@@ -327,8 +327,8 @@ class EIP20Gateway {
    * @param {string} gasPrice Gas price that redeemer is willing to pay for the reward.
    * @param {string} gasLimit Maximum gas limit for reward calculation.
    * @param {string} blockHeight Block height.
-   * @param {string} storageProof Storage proof.
    * @param {string} hashLock Hash lock.
+   * @param {string} storageProof Storage proof.
    *
    * @returns {Promise<Object>} Promise that resolves to raw transaction object.
    */
@@ -723,17 +723,15 @@ class EIP20Gateway {
    *
    * @returns {Promise<Object>} Promise object that resolves to object containing state root and block height.
    */
-  getLatestAnchorInfo() {
-    return this.getAnchor().then((anchor) => {
-      return anchor.getLatestStateRootBlockHeight().then((blockHeight) => {
-        return anchor.getStateRoot(blockHeight).then((stateRoot) => {
-          return {
-            blockHeight,
-            stateRoot,
-          };
-        });
-      });
-    });
+  async getLatestAnchorInfo() {
+    const anchor = await this.getAnchor();
+    const blockHeight = await anchor.getLatestStateRootBlockHeight();
+    const stateRoot = await anchor.getStateRoot(blockHeight);
+
+    return {
+      blockHeight,
+      stateRoot,
+    };
   }
 }
 

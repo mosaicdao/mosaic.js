@@ -1,28 +1,8 @@
-// Copyright 2019 OpenST Ltd.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//    http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
-// ----------------------------------------------------------------------------
-//
-// http://www.simpletoken.org/
-//
-// ----------------------------------------------------------------------------
-
 const chai = require('chai');
 const Web3 = require('web3');
 const sinon = require('sinon');
 
-const assert = chai.assert;
+const { assert } = chai;
 const EIP20CoGateway = require('../../src/ContractInteract/EIP20CoGateway');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const AssertAsync = require('../../test_utils/AssertAsync');
@@ -66,39 +46,60 @@ describe('EIP20CoGateway._redeemRawTx()', () => {
       nonce: '1',
       hashLock: '0xhashlock',
     };
-
     mockedTx = 'MockedTx';
   });
 
-  it('should throw error when stake amount is zero', async () => {
+  it('should throw error when redeem amount is zero', async () => {
+    const expectedErrorMessage = `Redeem amount must be greater than zero: ${0}.`;
+
     await AssertAsync.reject(
       coGateway._redeemRawTx(
-        '0',
+        0,
         redeemParams.beneficiary,
         redeemParams.gasPrice,
         redeemParams.gasLimit,
         redeemParams.nonce,
         redeemParams.hashLock,
       ),
-      `Redeem amount must be greater than zero: ${0}.`,
+      expectedErrorMessage,
+    );
+  });
+
+  it('should throw error when redeem amount is less than zero', async () => {
+    const expectedErrorMessage = `Redeem amount must be greater than zero: ${-1}.`;
+
+    await AssertAsync.reject(
+      coGateway._redeemRawTx(
+        -1,
+        redeemParams.beneficiary,
+        redeemParams.gasPrice,
+        redeemParams.gasLimit,
+        redeemParams.nonce,
+        redeemParams.hashLock,
+      ),
+      expectedErrorMessage,
     );
   });
 
   it('should throw error when beneficiary address is invalid', async () => {
+    const expectedErrorMessage = `Invalid beneficiary address: 0x123.`;
+
     await AssertAsync.reject(
       coGateway._redeemRawTx(
         redeemParams.amount,
-        '0x123',
+        `0x123`,
         redeemParams.gasPrice,
         redeemParams.gasLimit,
         redeemParams.nonce,
         redeemParams.hashLock,
       ),
-      `Invalid beneficiary address: ${'0x123'}.`,
+      expectedErrorMessage,
     );
   });
 
   it('should throw error when gas price is undefined', async () => {
+    const expectedErrorMessage = `Invalid gas price: ${undefined}.`;
+
     await AssertAsync.reject(
       coGateway._redeemRawTx(
         redeemParams.amount,
@@ -108,11 +109,13 @@ describe('EIP20CoGateway._redeemRawTx()', () => {
         redeemParams.nonce,
         redeemParams.hashLock,
       ),
-      `Invalid gas price: ${undefined}.`,
+      expectedErrorMessage,
     );
   });
 
   it('should throw error when gas limit is undefined', async () => {
+    const expectedErrorMessage = `Invalid gas limit: ${undefined}.`;
+
     await AssertAsync.reject(
       coGateway._redeemRawTx(
         redeemParams.amount,
@@ -122,11 +125,13 @@ describe('EIP20CoGateway._redeemRawTx()', () => {
         redeemParams.nonce,
         redeemParams.hashLock,
       ),
-      `Invalid gas limit: ${undefined}.`,
+      expectedErrorMessage,
     );
   });
 
   it('should throw error when nonce is undefined', async () => {
+    const expectedErrorMessage = `Invalid nonce: ${undefined}.`;
+
     await AssertAsync.reject(
       coGateway._redeemRawTx(
         redeemParams.amount,
@@ -136,21 +141,23 @@ describe('EIP20CoGateway._redeemRawTx()', () => {
         undefined,
         redeemParams.hashLock,
       ),
-      `Invalid nonce: ${undefined}.`,
+      expectedErrorMessage,
     );
   });
 
-  it('should throw error when hashlock is undefined', async () => {
+  it('should throw error when nonce is undefined', async () => {
+    const expectedErrorMessage = `Invalid hash lock: ${undefined}.`;
+
     await AssertAsync.reject(
       coGateway._redeemRawTx(
         redeemParams.amount,
         redeemParams.beneficiary,
         redeemParams.gasPrice,
         redeemParams.gasLimit,
-        redeemParams.gasPrice,
+        redeemParams.nonce,
         undefined,
       ),
-      `Invalid hash lock: ${undefined}.`,
+      expectedErrorMessage,
     );
   });
 
@@ -171,16 +178,6 @@ describe('EIP20CoGateway._redeemRawTx()', () => {
     );
 
     SpyAssert.assert(spyMethod, 1, [
-      [
-        redeemParams.amount,
-        redeemParams.beneficiary,
-        redeemParams.gasPrice,
-        redeemParams.gasLimit,
-        redeemParams.nonce,
-        redeemParams.hashLock,
-      ],
-    ]);
-    SpyAssert.assert(spyCall, 1, [
       [
         redeemParams.amount,
         redeemParams.beneficiary,

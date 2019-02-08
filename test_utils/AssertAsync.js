@@ -9,7 +9,7 @@ class AssertAsync {
   static async reject(promise, message) {
     try {
       await promise;
-      throw new TypeError('Promise must reject');
+      throw new Error('Promise must reject');
     } catch (exception) {
       assert.strictEqual(
         exception.message,
