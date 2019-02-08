@@ -257,7 +257,7 @@ class EIP20CoGateway {
   /**
    * Performs progress mint.
    *
-   * @param {string} messageHash Message hash.
+   * @param {string} messageHash Hash to identify mint message.
    * @param {string} unlockSecret Unlock secret.
    * @param {Object} txOptions Transaction options.
    *
@@ -276,7 +276,7 @@ class EIP20CoGateway {
   /**
    * Get the raw transaction for progress mint.
    *
-   * @param {string} messageHash Message hash.
+   * @param {string} messageHash Hash to identify mint message.
    * @param {string} unlockSecret Unlock secret.
    *
    * @returns {Promise<Object>} Promise that resolves to raw transaction object.
@@ -299,7 +299,7 @@ class EIP20CoGateway {
   /**
    * Performs progress redeem.
    *
-   * @param {string} messageHash Message hash.
+   * @param {string} messageHash Hash to identify redeem message.
    * @param {string} unlockSecret Unlock secret.
    * @param {Object} txOptions Transaction options.
    *
@@ -318,7 +318,7 @@ class EIP20CoGateway {
   /**
    * Get the raw transaction for progress redeem.
    *
-   * @param {string} messageHash Message hash.
+   * @param {string} messageHash Hash to identify redeem message.
    * @param {string} unlockSecret Unlock secret.
    *
    * @returns {Promise<Object>} Promise that resolves to raw transaction object.

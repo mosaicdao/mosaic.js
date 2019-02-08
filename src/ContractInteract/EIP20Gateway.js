@@ -207,7 +207,7 @@ class EIP20Gateway {
   /**
    * Performs progress stake.
    *
-   * @param {string} messageHash Message hash.
+   * @param {string} messageHash Hash to identify stake message.
    * @param {string} unlockSecret Unlock secret.
    * @param {Object} txOptions Transaction options.
    *
@@ -226,7 +226,7 @@ class EIP20Gateway {
   /**
    * Get the raw transaction for progress stake
    *
-   * @param {string} messageHash Message hash.
+   * @param {string} messageHash Hash to identify stake message.
    * @param {string} unlockSecret Unlock secret.
    *
    * @returns {Promise<Object>} Promise that resolves to raw transaction object.
@@ -253,7 +253,7 @@ class EIP20Gateway {
    * @param {string} nonce Redeemer nonce.
    * @param {string} beneficiary Beneficiary address.
    * @param {string} amount Redeem amount.
-   * @param {string} gasPrice Gas price that staker is willing to pay for the reward.
+   * @param {string} gasPrice Gas price that redeemer is willing to pay for the reward.
    * @param {string} gasLimit Maximum gas limit for reward calculation.
    * @param {string} blockNumber Block number.
    * @param {string} storageProof Storage proof.
@@ -298,7 +298,7 @@ class EIP20Gateway {
    * @param {string} nonce Redeemer nonce.
    * @param {string} beneficiary Beneficiary address.
    * @param {string} amount Redeem amount.
-   * @param {string} gasPrice Gas price that staker is willing to pay for the reward.
+   * @param {string} gasPrice Gas price that redeemer is willing to pay for the reward.
    * @param {string} gasLimit Maximum gas limit for reward calculation.
    * @param {string} blockHeight Block height.
    * @param {string} storageProof Storage proof.
@@ -374,7 +374,7 @@ class EIP20Gateway {
   /**
    * Performs progress unstake.
    *
-   * @param {string} messageHash Message hash.
+   * @param {string} messageHash Hash to identify unstake message.
    * @param {string} unlockSecret Unlock secret.
    * @param {Object} txOptions Transaction options.
    *
@@ -393,7 +393,7 @@ class EIP20Gateway {
   /**
    * Get the raw transaction for progress unstake.
    *
-   * @param {string} messageHash Message hash.
+   * @param {string} messageHash Hash to identify unstake message.
    * @param {string} unlockSecret Unlock secret.
    *
    * @returns {Promise<Object>} Promise that resolves to raw transaction object.

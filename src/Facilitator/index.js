@@ -236,7 +236,6 @@ class Facilitator {
    * @param {string} beneficiary Beneficiary address.
    * @param {string} gasPrice Gas price.
    * @param {string} gasLimit Gas limit.
-   * @param {string} nonce Redeemer's nonce.
    * @param {string} hashLock Hash lock;
    * @param {Object} txOptions Transaction options.
    * @returns {Promise<Object>} Promise that resolves to transaction receipt.
