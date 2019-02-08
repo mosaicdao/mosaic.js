@@ -1,28 +1,7 @@
-// Copyright 2019 OpenST Ltd.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//    http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
-// ----------------------------------------------------------------------------
-//
-// http://www.simpletoken.org/
-//
-// ----------------------------------------------------------------------------
-
-const chai = require('chai');
+const { assert } = require('chai');
 const Web3 = require('web3');
 const sinon = require('sinon');
 
-const assert = chai.assert;
 const Anchor = require('../../src/ContractInteract/Anchor');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const AssertAsync = require('../../test_utils/AssertAsync');
@@ -48,7 +27,7 @@ describe('Anchor.anchorStateRoot', () => {
       from: '0x0000000000000000000000000000000000000003',
     };
 
-    let spyMethod = sinon.replace(
+    let spyAnchorStateRoot = sinon.replace(
       anchor.contract.methods,
       'anchorStateRoot',
       sinon.fake.returns(mockTx),
@@ -67,7 +46,7 @@ describe('Anchor.anchorStateRoot', () => {
 
     assert.isTrue(result, 'Anchor state root should return true');
 
-    SpyAssert.assert(spyMethod, 1, [[blockHeight, stateRoot]]);
+    SpyAssert.assert(spyAnchorStateRoot, 1, [[blockHeight, stateRoot]]);
 
     SpyAssert.assert(spySendTransaction, 1, [[mockTx, txOptions]]);
   });
@@ -86,7 +65,7 @@ describe('Anchor.anchorStateRoot', () => {
     );
   });
 
-  it('should throw for undefined block height', async () => {
+  it('should throw for undefined state root', async () => {
     let blockHeight = '10';
     let stateRoot = undefined;
 
@@ -112,7 +91,7 @@ describe('Anchor.anchorStateRoot', () => {
     );
   });
 
-  it('should throw for from address in txOptions is invalid', async () => {
+  it('should throw if "from" address in txOptions is invalid', async () => {
     let blockHeight = '10';
     let stateRoot = web3.utils.sha3('1');
 
@@ -125,7 +104,7 @@ describe('Anchor.anchorStateRoot', () => {
     );
   });
 
-  it('should throw for from address in txOptions is undefined', async () => {
+  it('should throw if "from" address in txOptions is undefined', async () => {
     let blockHeight = '10';
     let stateRoot = web3.utils.sha3('1');
 
