@@ -1,23 +1,3 @@
-// Copyright 2019 OpenST Ltd.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//    http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
-// ----------------------------------------------------------------------------
-//
-// http://www.simpletoken.org/
-//
-// ----------------------------------------------------------------------------
-
 'use strict';
 
 const Web3 = require('web3');
@@ -277,7 +257,7 @@ class EIP20CoGateway {
   /**
    * Performs progress mint.
    *
-   * @param {string} messageHash Message hash.
+   * @param {string} messageHash Hash to identify mint message.
    * @param {string} unlockSecret Unlock secret.
    * @param {Object} txOptions Transaction options.
    *
@@ -296,7 +276,7 @@ class EIP20CoGateway {
   /**
    * Get the raw transaction for progress mint.
    *
-   * @param {string} messageHash Message hash.
+   * @param {string} messageHash Hash to identify mint message.
    * @param {string} unlockSecret Unlock secret.
    *
    * @returns {Promise<Object>} Promise that resolves to raw transaction object.
@@ -319,7 +299,7 @@ class EIP20CoGateway {
   /**
    * Performs progress redeem.
    *
-   * @param {string} messageHash Message hash.
+   * @param {string} messageHash Hash to identify redeem message.
    * @param {string} unlockSecret Unlock secret.
    * @param {Object} txOptions Transaction options.
    *
@@ -338,7 +318,7 @@ class EIP20CoGateway {
   /**
    * Get the raw transaction for progress redeem.
    *
-   * @param {string} messageHash Message hash.
+   * @param {string} messageHash Hash to identify redeem message.
    * @param {string} unlockSecret Unlock secret.
    *
    * @returns {Promise<Object>} Promise that resolves to raw transaction object.
@@ -616,17 +596,15 @@ class EIP20CoGateway {
    *
    * @returns {Promise<Object>} Promise object that resolves to object containing state root and block height.
    */
-  getLatestAnchorInfo() {
-    return this.getAnchor().then((anchor) => {
-      return anchor.getLatestStateRootBlockHeight().then((blockHeight) => {
-        return anchor.getStateRoot(blockHeight).then((stateRoot) => {
-          return {
-            blockHeight,
-            stateRoot,
-          };
-        });
-      });
-    });
+  async getLatestAnchorInfo() {
+    const anchor = await this.getAnchor();
+    const blockHeight = await anchor.getLatestStateRootBlockHeight();
+    const stateRoot = await anchor.getStateRoot(blockHeight);
+
+    return {
+      blockHeight,
+      stateRoot,
+    };
   }
 
   /**

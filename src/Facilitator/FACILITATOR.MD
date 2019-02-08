@@ -1,6 +1,3 @@
-
-
-
 # Using facilitator
 #### Install Package.
 ```js
@@ -13,13 +10,10 @@ const Web3 = require('web3');
 const Mosaic = require('@openstfoundation/mosaic.js');
 
 const originContractAddresses = {
-  Anchor: '0x0000000000000000000anchorcontractaddress',
   EIP20Gateway: '0x0000000000000eip20gatewaycontractaddress',
 };
 
 const auxiliaryContractAddresses = {
-  OSTPrime: '0x00000000000000000ostprimecontractaddress',
-  Anchor: '0x0000000000000000000anchorcontractaddress',
   EIP20CoGateway: '0x00000000000eip20cogatewaycontractaddress',
 };
 
@@ -106,6 +100,7 @@ const txOptionRedeem = {
 };
 
 facilitator.redeem(
+    redeemer,
     redeemAmount,
     beneficiary,
     gasPrice,
