@@ -1,3 +1,24 @@
+/**
+ * @typedef EIP20CoGatewaySetupConfig
+ *
+ * @property {string} valueToken The value token contract address.
+ * @property {string} utilityToken The utility token address that will be used for
+ *                 minting the utility token.
+ * @property {string} anchor Address of anchor to use for getting the state root of
+ *                 the auxiliary chain.
+ * @property {string} bounty The amount that facilitator will stakes to initiate the
+ *                 stake process.
+ * @property {string} organization Address of an organization contract.
+ * @property {string} gateway Address of EIP20Gateway on Origin.
+ * @property {string} burner Address where tokens will be burned.
+ * @property {string} messageBus Address of MessageBus contract
+ *                 to link into the contract bytecode.
+ * @property {string} gatewayLib Address of GatewayLib contract
+ *                 to link into the contract bytecode.
+ * @property {string} deployer Address to be used to send deployment
+ *                    transactions.
+ */
+
 'use strict';
 
 const Web3 = require('web3');
@@ -77,7 +98,16 @@ class EIP20CoGateway {
     this.progressRedeem = this.progressRedeem.bind(this);
   }
 
-  // TODO: docs
+  /**
+   * Setup for EIP20CoGateway. Deploys EIP20CoGateway.
+   *
+   * @param {Object} web3 Web3 object.
+   * @param {EIP20CoGatewaySetupConfig} config EIP20CoGateway setup configuration.
+   * @param {Object} txOptions Transaction options.
+   *
+   * @returns {Promise<EIP20CoGateway>} Promise containing the EIP20CoGateway instance that
+   *                                    has been set up.
+   */
   static setup(web3, config, txOptions = {}) {
     EIP20CoGateway.validateSetupConfig(config);
     validateConfigKeyExists(config, 'gateway', 'config');
@@ -87,7 +117,7 @@ class EIP20CoGateway {
 
     return EIP20CoGateway.deploy(
       web3,
-      config.valueToken, // TODO: valueToken -> baseToken
+      config.valueToken,
       config.utilityToken,
       config.anchor,
       config.bounty,
@@ -100,7 +130,13 @@ class EIP20CoGateway {
     );
   }
 
-  // TODO: docs
+  /**
+   * Validate the setup configuration.
+   *
+   * @param {EIP20CoGatewaySetupConfig} config EIP20CoGateway setup configuration.
+   *
+   * @throws Will throw an error if setup configuration is incomplete.
+   */
   static validateSetupConfig(config) {
     validateConfigExists(config);
     validateConfigKeyExists(config, 'deployer', 'config');
@@ -114,7 +150,29 @@ class EIP20CoGateway {
     validateConfigKeyExists(config, 'burner', 'config');
   }
 
-  // TODO: docs
+  /**
+   * Deploys an EIP20CoGateway contract.
+   *
+   * @param {Object} web3 Web3 object.
+   * @param {string} valueToken The value token contract address.
+   * @param {string} utilityToken The utility token address that will be used for
+   *                 minting the utility token.
+   * @param {string} anchor Address of anchor to use for getting the state root of
+   *                 the auxiliary chain.
+   * @param {string} bounty The amount that facilitator will stakes to initiate the
+   *                 stake process.
+   * @param {string} organization Address of an organization contract.
+   * @param {string} gateway Address of EIP20Gateway on Origin.
+   * @param {string} burner Address where tokens will be burned.
+   * @param {string} messageBus Address of MessageBus contract
+   *                 to link into the contract bytecode.
+   * @param {string} gatewayLib Address of GatewayLib contract
+   *                 to link into the contract bytecode.
+   * @param {Object} txOptions Transaction options.
+   *
+   * @returns {Promise<EIP20CoGateway>} Promise containing the EIP20CoGateway instance that
+   *                                    has been deployed.
+   */
   static async deploy(
     web3,
     valueToken,
@@ -152,7 +210,28 @@ class EIP20CoGateway {
     });
   }
 
-  // TODO: docs
+  /**
+   * Raw transaction object for {@link EIP20CoGateway#deploy}
+   *
+   * @param {Object} web3 Web3 object.
+   * @param {string} valueToken The value token contract address.
+   * @param {string} utilityToken The utility token address that will be used for
+   *                 minting the utility token.
+   * @param {string} anchor Address of anchor to use for getting the state root of
+   *                 the auxiliary chain.
+   * @param {string} bounty The amount that facilitator will stakes to initiate the
+   *                 stake process.
+   * @param {string} organization Address of an organization contract.
+   * @param {string} gateway Address of EIP20Gateway on Origin.
+   * @param {string} burner Address where tokens will be burned.
+   * @param {string} messageBus Address of MessageBus contract
+   *                 to link into the contract bytecode.
+   * @param {string} gatewayLib Address of GatewayLib contract
+   *                 to link into the contract bytecode.
+   * @param {Object} txOptions Transaction options.
+   *
+   * @returns {Promise<Object>} Promise that resolves to raw transaction object.
+   */
   static deployRawTx(
     web3,
     valueToken,

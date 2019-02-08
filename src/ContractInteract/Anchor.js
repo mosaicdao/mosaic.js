@@ -159,7 +159,7 @@ class Anchor {
    * @param {Object} txOptions Transaction options.
    *
    * @returns {Promise<Anchor>} Promise containing the Anchor instance that
-   *                          has been deployed.
+   *                            has been deployed.
    */
   static async deploy(
     web3,

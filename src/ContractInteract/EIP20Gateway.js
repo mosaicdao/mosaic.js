@@ -1,3 +1,26 @@
+/**
+ * @typedef EIP20GatewaySetupConfig
+ *
+ * @property {string} token The ERC20 token contract address that will be
+ *                 staked and corresponding utility tokens will be minted
+ *                 in auxiliary chain.
+ * @property {string} baseToken The ERC20 token address that will be used for
+ *                 staking bounty from the facilitators.
+ * @property {string} anchor Address of anchor to use for getting the state root of
+ *                 the auxiliary chain.
+ * @property {string} bounty The amount that facilitator will stakes to initiate the
+ *                 stake process.
+ * @property {string} organization Address of an organization contract.
+ * @property {string} burner Address where tokens will be burned.
+ * @property {string} messageBus Address of MessageBus contract
+ *                 to link into the contract bytecode.
+ * @property {string} gatewayLib Address of GatewayLib contract
+ *                 to link into the contract bytecode.
+ * @property {string} deployer Address to be used to send deployment
+ *                    transactions.
+ * @property {string} organizationOwner Address of owner of `organization`.
+ */
+
 'use strict';
 
 const Web3 = require('web3');
@@ -79,40 +102,27 @@ class EIP20Gateway {
     this.activateGatewayRawTx = this.activateGatewayRawTx.bind(this);
   }
 
-  /*
-  //gatewayConfig
-  {
-    "deployer": "0x...",
-    "organization": "0x...",
-    "anchor": "0x....",
-    "bounty": "123456",
-    "messageBus": "0x....",
-    "gatewayLib": "0x....",
-    "simpleToken": "0x....",
-    "organizationOwner": "0x....",
-  }
-  //coGatewayConfig
-  {
-    "deployer": "0x...",
-    "token": "0x...",
-    "baseToken": "0x...",
-    "organization": "0x...",
-    "anchor": "0x....",
-    "bounty": "123456",
-    "messageBus": "0x....",
-    "gatewayLib": "0x....",
-    "ostPrime": "0x...."
-  }
-*/
-
-  // TODO: docs
+  /**
+   * Setup for EIP20Gateway. Deploys EIP20Gateway and EIP20CoGateway,
+   * and links them.
+   *
+   * @param {Object} originWeb3 Web3 object.
+   * @param {Object} auxiliaryWeb3 Web3 object.
+   * @param {EIP20GatewaySetupConfig} gatewayConfig EIP20Gateway setup configuration.
+   * @param {EIP20CoGatewaySetupConfig} coGatewayConfig EIP20CoGateway setup configuration.
+   * @param {Object} originTxOptions Transaction options on Origin.
+   * @param {Object} auxiliaryTxOptions Transaction options on Auxiliary.
+   *
+   * @returns {Promise<EIP20Gateway>} Promise containing the EIP20Gateway instance that
+   *                                  has been set up.
+   */
   static setup(
     originWeb3,
     auxiliaryWeb3,
     gatewayConfig,
     coGatewayConfig,
-    gatewayTxOptions = {},
-    coGatewayTxOptions = {},
+    originTxOptions = {},
+    auxiliaryTxOptions = {},
   ) {
     if (!gatewayConfig) {
       throw new Error('Mandatory parameter "gatewayConfig" missing. ');
@@ -142,10 +152,10 @@ class EIP20Gateway {
     EIP20Gateway.validateSetupConfig(gatewayConfig);
     EIP20CoGateway.validateSetupConfig(coGatewayConfig);
 
-    const gatewayDeployParams = Object.assign({}, gatewayTxOptions);
+    const gatewayDeployParams = Object.assign({}, originTxOptions);
     gatewayDeployParams.from = gatewayConfig.deployer;
 
-    let gatewayDeploy = EIP20Gateway.deploy(
+    const gatewayDeploy = EIP20Gateway.deploy(
       originWeb3,
       gatewayConfig.token,
       gatewayConfig.baseToken,
@@ -165,7 +175,7 @@ class EIP20Gateway {
       return EIP20CoGateway.setup(
         auxiliaryWeb3,
         coGatewayConfig,
-        coGatewayTxOptions,
+        auxiliaryTxOptions,
       );
     });
 
@@ -186,7 +196,13 @@ class EIP20Gateway {
     return gatewayActivation;
   }
 
-  // TODO: docs
+  /**
+   * Validate the setup configuration.
+   *
+   * @param {EIP20GatewaySetupConfig} config EIP20Gateway setup configuration.
+   *
+   * @throws Will throw an error if setup configuration is incomplete.
+   */
   static validateSetupConfig(gatewayConfig) {
     validateConfigKeyExists(gatewayConfig, 'deployer', 'gatewayConfig');
     validateConfigKeyExists(gatewayConfig, 'organization', 'gatewayConfig');
@@ -203,7 +219,30 @@ class EIP20Gateway {
     );
   }
 
-  // TODO: docs
+  /**
+   * Deploys an EIP20Gateway contract.
+   *
+   * @param {Object} web3 Web3 object.
+   * @param {string} token The ERC20 token contract address that will be
+   *                 staked and corresponding utility tokens will be minted
+   *                 in auxiliary chain.
+   * @param {string} baseToken The ERC20 token address that will be used for
+   *                 staking bounty from the facilitators.
+   * @param {string} anchor Address of anchor to use for getting the state root of
+   *                 the auxiliary chain.
+   * @param {string} bounty The amount that facilitator will stakes to initiate the
+   *                 stake process.
+   * @param {string} organization Address of an organization contract.
+   * @param {string} burner Address where tokens will be burned.
+   * @param {string} messageBus Address of MessageBus contract
+   *                 to link into the contract bytecode.
+   * @param {string} gatewayLib Address of GatewayLib contract
+   *                 to link into the contract bytecode.
+   * @param {Object} txOptions Transaction options.
+   *
+   * @returns {Promise<EIP20Gateway>} Promise containing the EIP20Gateway instance that
+   *                                  has been deployed.
+   */
   static async deploy(
     web3,
     token,
@@ -212,8 +251,8 @@ class EIP20Gateway {
     bounty,
     organization,
     burner,
-    messageBusAddress,
-    gatewayLibAddress,
+    messageBus,
+    gatewayLib,
     txOptions,
   ) {
     const tx = EIP20Gateway.deployRawTx(
@@ -224,8 +263,8 @@ class EIP20Gateway {
       bounty,
       organization,
       burner,
-      messageBusAddress,
-      gatewayLibAddress,
+      messageBus,
+      gatewayLib,
     );
 
     const _txOptions = txOptions;
@@ -239,7 +278,28 @@ class EIP20Gateway {
     });
   }
 
-  // TODO: docs
+  /**
+   * Raw transaction object for {@link EIP20Gateway#deploy}
+   *
+   * @param {Object} web3 Web3 object.
+   * @param {string} token The ERC20 token contract address that will be
+   *                 staked and corresponding utility tokens will be minted
+   *                 in auxiliary chain.
+   * @param {string} baseToken The ERC20 token address that will be used for
+   *                 staking bounty from the facilitators.
+   * @param {string} anchor Address of anchor to use for getting the state root of
+   *                 the auxiliary chain.
+   * @param {string} bounty The amount that facilitator will stakes to initiate the
+   *                 stake process.
+   * @param {string} organization Address of an organization contract.
+   * @param {string} burner Address where tokens will be burned.
+   * @param {string} messageBus Address of MessageBus contract
+   *                 to link into the contract bytecode.
+   * @param {string} gatewayLib Address of GatewayLib contract
+   *                 to link into the contract bytecode.
+   *
+   * @returns {Promise<Object>} Promise that resolves to raw transaction object.
+   */
   static deployRawTx(
     web3,
     token,
@@ -248,15 +308,15 @@ class EIP20Gateway {
     bounty,
     organization,
     burner,
-    messageBusAddress,
-    gatewayLibAddress,
+    messageBus,
+    gatewayLib,
   ) {
     const messageBusLibInfo = {
-      address: messageBusAddress,
+      address: messageBus,
       name: 'MessageBus',
     };
     const gatewayLibInfo = {
-      address: gatewayLibAddress,
+      address: gatewayLib,
       name: 'GatewayLib',
     };
 

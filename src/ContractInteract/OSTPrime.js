@@ -157,7 +157,7 @@ class OSTPrime {
   }
 
   /**
-   * Raw transaction for {@link OSTPrime#setup}.
+   * Raw transaction for {@link OSTPrime#deploy}.
    *
    * @param {Web3} web3 Web3 object.
    * @param {string} valueToken Address of EIP20 Token on Origin chain.
