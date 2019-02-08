@@ -1,23 +1,3 @@
-// Copyright 2019 OpenST Ltd.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//    http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
-// ----------------------------------------------------------------------------
-//
-// http://www.simpletoken.org/
-//
-// ----------------------------------------------------------------------------
-
 'use strict';
 
 const Web3 = require('web3');
@@ -235,7 +215,7 @@ class EIP20Gateway {
   /**
    * Performs progress stake.
    *
-   * @param {string} messageHash Message hash.
+   * @param {string} messageHash Hash to identify stake message.
    * @param {string} unlockSecret Unlock secret.
    * @param {Object} txOptions Transaction options.
    *
@@ -254,7 +234,7 @@ class EIP20Gateway {
   /**
    * Get the raw transaction for progress stake
    *
-   * @param {string} messageHash Message hash.
+   * @param {string} messageHash Hash to identify stake message.
    * @param {string} unlockSecret Unlock secret.
    *
    * @returns {Promise<Object>} Promise that resolves to raw transaction object.
@@ -281,7 +261,7 @@ class EIP20Gateway {
    * @param {string} nonce Redeemer nonce.
    * @param {string} beneficiary Beneficiary address.
    * @param {string} amount Redeem amount.
-   * @param {string} gasPrice Gas price that staker is willing to pay for the reward.
+   * @param {string} gasPrice Gas price that redeemer is willing to pay for the reward.
    * @param {string} gasLimit Maximum gas limit for reward calculation.
    * @param {string} blockNumber Block number.
    * @param {string} storageProof Storage proof.
@@ -326,7 +306,7 @@ class EIP20Gateway {
    * @param {string} nonce Redeemer nonce.
    * @param {string} beneficiary Beneficiary address.
    * @param {string} amount Redeem amount.
-   * @param {string} gasPrice Gas price that staker is willing to pay for the reward.
+   * @param {string} gasPrice Gas price that redeemer is willing to pay for the reward.
    * @param {string} gasLimit Maximum gas limit for reward calculation.
    * @param {string} blockHeight Block height.
    * @param {string} storageProof Storage proof.
@@ -406,7 +386,7 @@ class EIP20Gateway {
   /**
    * Performs progress unstake.
    *
-   * @param {string} messageHash Message hash.
+   * @param {string} messageHash Hash to identify unstake message.
    * @param {string} unlockSecret Unlock secret.
    * @param {Object} txOptions Transaction options.
    *
@@ -425,7 +405,7 @@ class EIP20Gateway {
   /**
    * Get the raw transaction for progress unstake.
    *
-   * @param {string} messageHash Message hash.
+   * @param {string} messageHash Hash to identify unstake message.
    * @param {string} unlockSecret Unlock secret.
    *
    * @returns {Promise<Object>} Promise that resolves to raw transaction object.

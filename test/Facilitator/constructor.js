@@ -19,7 +19,7 @@
 // ----------------------------------------------------------------------------
 
 const chai = require('chai');
-const Facilitator = require('../../src/Facilitator/Facilitator');
+const Facilitator = require('../../src/Facilitator');
 const TestMosaic = require('../../test_utils/GetTestMosaic');
 
 const assert = chai.assert;

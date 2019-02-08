@@ -20,7 +20,7 @@
 
 const chai = require('chai');
 const sinon = require('sinon');
-const Facilitator = require('../../src/Facilitator/Facilitator');
+const Facilitator = require('../../src/Facilitator');
 const TestMosaic = require('../../test_utils/GetTestMosaic');
 const AssertAsync = require('../../test_utils/AssertAsync');
 const SpyAssert = require('../../test_utils/SpyAssert');

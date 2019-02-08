@@ -1,23 +1,3 @@
-// Copyright 2019 OpenST Ltd.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//    http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
-// ----------------------------------------------------------------------------
-//
-// http://www.simpletoken.org/
-//
-// ----------------------------------------------------------------------------
-
 const BN = require('bn.js');
 const Web3 = require('web3');
 const EIP20Gateway = require('../ContractInteract/EIP20Gateway');
@@ -233,7 +213,7 @@ class Facilitator {
         txOption,
       )
       .then((stakeResult) => {
-        logger.win('  - Succcessfully performed stake.');
+        logger.win('  - Successfully performed stake.');
         return Promise.resolve(stakeResult);
       })
       .catch((exception) => {
@@ -250,7 +230,6 @@ class Facilitator {
    * @param {string} beneficiary Beneficiary address.
    * @param {string} gasPrice Gas price.
    * @param {string} gasLimit Gas limit.
-   * @param {string} nonce Redeemer's nonce.
    * @param {string} hashLock Hash lock;
    * @param {Object} txOptions Transaction options.
    * @returns {Promise<Object>} Promise that resolves to transaction receipt.
@@ -314,7 +293,7 @@ class Facilitator {
 
     const facilitatorAddress = txOptions.from;
 
-    logger.info('* Getting bounty amount *');
+    logger.info('Getting bounty amount');
     const bounty = await this.coGateway.getBounty().catch((exception) => {
       logger.error('  - Exception while getting bounty amount');
       return Promise.reject(exception);
@@ -322,7 +301,9 @@ class Facilitator {
 
     if (!new BN(txOptions.value).eq(new BN(bounty))) {
       logger.error(
-        '  - Value in transaction option is not equal to the bounty amount',
+        `  - Value in transaction option ${
+          txOptions.value
+        } is not equal to the bounty amount ${bounty}`,
       );
       const err = new Error(
         `Value passed in transaction object ${
@@ -333,7 +314,7 @@ class Facilitator {
     }
 
     logger.info(
-      '* Checking if redeemer has approved CoGateway for token transfer *',
+      'Checking if redeemer has approved CoGateway for token transfer',
     );
 
     const isRedeemAmountApproved = await this.coGateway
@@ -368,7 +349,7 @@ class Facilitator {
       }
     }
 
-    logger.info('* Getting nonce for the redeemer account *');
+    logger.info('Getting nonce for the redeemer account');
     const nonce = await this.coGateway
       .getNonce(redeemer)
       .catch((exception) => {
@@ -377,7 +358,7 @@ class Facilitator {
       });
     logger.info(`  - Redeemer's nonce is ${nonce}`);
 
-    logger.info('* Performing Redeem *');
+    logger.info('Performing Redeem');
     return this.coGateway
       .redeem(
         amount,
@@ -389,7 +370,7 @@ class Facilitator {
         txOptions,
       )
       .then((redeemResult) => {
-        logger.win('  - Succcessfully performed redeem.');
+        logger.win('  - Successfully performed redeem.');
         return Promise.resolve(redeemResult);
       })
       .catch((exception) => {
