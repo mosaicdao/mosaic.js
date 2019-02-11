@@ -19,16 +19,16 @@ describe('EIP20CoGateway.isRedeemAmountApproved()', () => {
   let mockedResult;
 
   let mockedUtilityToken;
-  let spyGetEIP20UtilityToken;
+  let spyGetUtilityToken;
   let spyIsAmountApproved;
   let spyCall;
 
   const setup = () => {
     const token = new EIP20Token(web3, utilityTokenAddress);
     mockedUtilityToken = sinon.mock(token);
-    spyGetEIP20UtilityToken = sinon.replace(
+    spyGetUtilityToken = sinon.replace(
       coGateway,
-      'getEIP20UtilityToken',
+      'getUtilityTokenContract',
       sinon.fake.resolves(mockedUtilityToken.object),
     );
     spyIsAmountApproved = sinon.replace(
@@ -79,7 +79,7 @@ describe('EIP20CoGateway.isRedeemAmountApproved()', () => {
       'Result of isRedeemAmountApproved must be true.',
     );
 
-    SpyAssert.assert(spyGetEIP20UtilityToken, 1, [[]]);
+    SpyAssert.assert(spyGetUtilityToken, 1, [[]]);
     SpyAssert.assert(spyIsAmountApproved, 1, [
       [redeemer, coGatewayAddress, amount],
     ]);

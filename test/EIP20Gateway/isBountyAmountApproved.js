@@ -20,16 +20,16 @@ describe('EIP20Gateway.isBountyAmountApproved()', () => {
 
   let mockedValueToken;
   let spyGetBounty;
-  let spyGetEIP20BaseToken;
+  let spyGetBaseTokenContract;
   let spyIsAmountApproved;
   let spyCall;
 
   const setup = () => {
     const token = new EIP20Token(web3, baseTokenAddress);
     mockedValueToken = sinon.mock(token);
-    spyGetEIP20BaseToken = sinon.replace(
+    spyGetBaseTokenContract = sinon.replace(
       gateway,
-      'getEIP20BaseToken',
+      'getBaseTokenContract',
       sinon.fake.resolves(mockedValueToken.object),
     );
     spyIsAmountApproved = sinon.replace(
@@ -79,7 +79,7 @@ describe('EIP20Gateway.isBountyAmountApproved()', () => {
     );
 
     SpyAssert.assert(spyGetBounty, 1, [[]]);
-    SpyAssert.assert(spyGetEIP20BaseToken, 1, [[]]);
+    SpyAssert.assert(spyGetBaseTokenContract, 1, [[]]);
     SpyAssert.assert(spyIsAmountApproved, 1, [
       [facilitatorAddress, gatewayAddress, mockedBountyAmount],
     ]);

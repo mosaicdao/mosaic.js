@@ -19,16 +19,16 @@ describe('EIP20Gateway.isStakeAmountApproved()', () => {
   let mockedResult;
 
   let mockedValueToken;
-  let spyGetEIP20ValueToken;
+  let spyGetValueTokenContract;
   let spyIsAmountApproved;
   let spyCall;
 
   const setup = () => {
     const token = new EIP20Token(web3, valueTokenAddress);
     mockedValueToken = sinon.mock(token);
-    spyGetEIP20ValueToken = sinon.replace(
+    spyGetValueTokenContract = sinon.replace(
       gateway,
-      'getEIP20ValueToken',
+      'getValueTokenContract',
       sinon.fake.resolves(mockedValueToken.object),
     );
     spyIsAmountApproved = sinon.replace(
@@ -79,7 +79,7 @@ describe('EIP20Gateway.isStakeAmountApproved()', () => {
       'Result of isStakeAmountApproved must be true.',
     );
 
-    SpyAssert.assert(spyGetEIP20ValueToken, 1, [[]]);
+    SpyAssert.assert(spyGetValueTokenContract, 1, [[]]);
     SpyAssert.assert(spyIsAmountApproved, 1, [
       [staker, gatewayAddress, amount],
     ]);

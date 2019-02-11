@@ -14,22 +14,22 @@ describe('EIP20CoGateway.approveRedeemAmount()', () => {
   let txOptions;
   let coGateway;
 
-  let spyGetEIP20UtilityToken;
-  let mockEIP20UtilityToken;
+  let spyGetUtilityTokenContract;
+  let mockUtilityTokenContract;
   let spyApprove;
   let spyCall;
 
   const setup = () => {
-    mockEIP20UtilityToken = sinon.createStubInstance(EIP20Token);
+    mockUtilityTokenContract = sinon.createStubInstance(EIP20Token);
 
-    spyGetEIP20UtilityToken = sinon.replace(
+    spyGetUtilityTokenContract = sinon.replace(
       coGateway,
-      'getEIP20UtilityToken',
-      sinon.fake.resolves(mockEIP20UtilityToken),
+      'getUtilityTokenContract',
+      sinon.fake.resolves(mockUtilityTokenContract),
     );
 
     spyApprove = sinon.replace(
-      mockEIP20UtilityToken,
+      mockUtilityTokenContract,
       'approve',
       sinon.fake.resolves(true),
     );
@@ -89,7 +89,7 @@ describe('EIP20CoGateway.approveRedeemAmount()', () => {
 
     assert.isTrue(result, 'Result must be true');
 
-    SpyAssert.assert(spyGetEIP20UtilityToken, 1, [[]]);
+    SpyAssert.assert(spyGetUtilityTokenContract, 1, [[]]);
     SpyAssert.assert(spyApprove, 1, [
       [
         mosaic.auxiliary.contractAddresses.EIP20CoGateway,
