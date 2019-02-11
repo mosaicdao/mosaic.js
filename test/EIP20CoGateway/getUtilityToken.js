@@ -1,12 +1,10 @@
 'use strict';
 
-const chai = require('chai');
+const { assert } = require('chai');
 const Web3 = require('web3');
 const sinon = require('sinon');
 const EIP20CoGateway = require('../../src/ContractInteract/EIP20CoGateway');
 const SpyAssert = require('../../test_utils/SpyAssert');
-
-const { assert } = chai;
 
 describe('EIP20CoGateway.getValueToken()', () => {
   let web3;
@@ -42,7 +40,7 @@ describe('EIP20CoGateway.getValueToken()', () => {
     mockedUtilityTokenAddress = '0x0000000000000000000000000000000000000003';
   });
 
-  it('should return correct mocked utility token address', async () => {
+  it('should return correct utility token address', async () => {
     setup();
     const result = await coGateway.getUtilityToken();
     assert.strictEqual(

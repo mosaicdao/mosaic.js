@@ -1,13 +1,11 @@
 'use strict';
 
-const chai = require('chai');
+const { assert } = require('chai');
 const Web3 = require('web3');
 const sinon = require('sinon');
 const EIP20CoGateway = require('../../src/ContractInteract/EIP20CoGateway');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const AssertAsync = require('../../test_utils/AssertAsync');
-
-const { assert } = chai;
 
 describe('EIP20CoGateway._confirmStakeIntentRawTx()', () => {
   let web3;
@@ -67,7 +65,7 @@ describe('EIP20CoGateway._confirmStakeIntentRawTx()', () => {
         stakeParams.blockHeight,
         stakeParams.storageProof,
       ),
-      `Invalid staker address: ${undefined}.`,
+      'Invalid staker address: undefined.',
     );
   });
 
@@ -84,7 +82,7 @@ describe('EIP20CoGateway._confirmStakeIntentRawTx()', () => {
         stakeParams.blockHeight,
         stakeParams.storageProof,
       ),
-      `Invalid nonce: ${undefined}.`,
+      'Invalid nonce: undefined.',
     );
   });
 
@@ -101,7 +99,7 @@ describe('EIP20CoGateway._confirmStakeIntentRawTx()', () => {
         stakeParams.blockHeight,
         stakeParams.storageProof,
       ),
-      `Invalid beneficiary address: ${undefined}.`,
+      'Invalid beneficiary address: undefined.',
     );
   });
 
@@ -118,7 +116,7 @@ describe('EIP20CoGateway._confirmStakeIntentRawTx()', () => {
         stakeParams.blockHeight,
         stakeParams.storageProof,
       ),
-      `Invalid stake amount: ${undefined}.`,
+      'Invalid stake amount: undefined.',
     );
   });
 
@@ -135,7 +133,7 @@ describe('EIP20CoGateway._confirmStakeIntentRawTx()', () => {
         stakeParams.blockHeight,
         stakeParams.storageProof,
       ),
-      `Invalid gas price: ${undefined}.`,
+      'Invalid gas price: undefined.',
     );
   });
 
@@ -152,7 +150,7 @@ describe('EIP20CoGateway._confirmStakeIntentRawTx()', () => {
         stakeParams.blockHeight,
         stakeParams.storageProof,
       ),
-      `Invalid gas limit: ${undefined}.`,
+      'Invalid gas limit: undefined.',
     );
   });
 
@@ -169,7 +167,24 @@ describe('EIP20CoGateway._confirmStakeIntentRawTx()', () => {
         undefined,
         stakeParams.storageProof,
       ),
-      `Invalid block height: ${undefined}.`,
+      'Invalid block height: undefined.',
+    );
+  });
+
+  it('should throw error when hash lock is undefined', async () => {
+    await AssertAsync.reject(
+      coGateway._confirmStakeIntentRawTx(
+        stakeParams.staker,
+        stakeParams.nonce,
+        stakeParams.beneficiary,
+        stakeParams.amount,
+        stakeParams.gasPrice,
+        stakeParams.gasLimit,
+        undefined,
+        stakeParams.blockHeight,
+        stakeParams.storageProof,
+      ),
+      'Invalid hash lock: undefined.',
     );
   });
 
@@ -186,11 +201,11 @@ describe('EIP20CoGateway._confirmStakeIntentRawTx()', () => {
         stakeParams.blockHeight,
         undefined,
       ),
-      `Invalid storage proof data: ${undefined}.`,
+      'Invalid storage proof data: undefined.',
     );
   });
 
-  it('should return correct mocked transaction object', async () => {
+  it('should return correct transaction object', async () => {
     setup();
     const result = await coGateway._confirmStakeIntentRawTx(
       stakeParams.staker,

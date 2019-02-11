@@ -1,11 +1,9 @@
 'use strict';
 
-const chai = require('chai');
+const { assert } = require('chai');
 const path = require('path');
 
 const AbiBinProvider = require('../../src/AbiBinProvider');
-
-const { assert } = chai;
 
 describe('AbiBinProvider.constructor()', () => {
   it('loads contracts from directories provided as constructor parameters', () => {

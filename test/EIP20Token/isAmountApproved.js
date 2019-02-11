@@ -1,13 +1,11 @@
 'use strict';
 
-const chai = require('chai');
+const { assert } = require('chai');
 const Web3 = require('web3');
 const sinon = require('sinon');
 const EIP20Token = require('../../src/ContractInteract/EIP20Token');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const AssertAsync = require('../../test_utils/AssertAsync');
-
-const { assert } = chai;
 
 describe('EIP20Token.isAmountApproved()', () => {
   let web3;
@@ -48,21 +46,21 @@ describe('EIP20Token.isAmountApproved()', () => {
   it('should throw an error when owner address is undefined', async () => {
     await AssertAsync.reject(
       token.isAmountApproved(undefined, spenderAddress, amount),
-      `Invalid owner address: ${undefined}.`,
+      'Invalid owner address: undefined.',
     );
   });
 
   it('should throw an error when spender address is undefined', async () => {
     await AssertAsync.reject(
       token.isAmountApproved(ownerAddress, undefined, amount),
-      `Invalid spender address: ${undefined}.`,
+      'Invalid spender address: undefined.',
     );
   });
 
   it('should throw an error when amount is undefined', async () => {
     await AssertAsync.reject(
       token.isAmountApproved(ownerAddress, spenderAddress, undefined),
-      `Invalid amount: ${undefined}.`,
+      'Invalid amount: undefined.',
     );
   });
 

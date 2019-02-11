@@ -246,6 +246,11 @@ class EIP20CoGateway {
       return Promise.reject(err);
     }
 
+    if (typeof hashLock !== 'string') {
+      const err = new TypeError(`Invalid hash lock: ${hashLock}.`);
+      return Promise.reject(err);
+    }
+
     if (typeof storageProof !== 'string') {
       const err = new TypeError(
         `Invalid storage proof data: ${storageProof}.`,
@@ -622,7 +627,7 @@ class EIP20CoGateway {
    * @returns {Promise<Object>} Promise object that resolves to object containing state root and block height.
    */
   async getLatestAnchorInfo() {
-    return this.getAnchor().then((anchor) => anchor.getLatestAnchorInfo());
+    return this.getAnchor().then((anchor) => anchor.getLatestInfo());
   }
 
   /**

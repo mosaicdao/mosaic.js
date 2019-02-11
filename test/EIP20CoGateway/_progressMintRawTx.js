@@ -1,10 +1,8 @@
 'use strict';
 
-const chai = require('chai');
+const { assert } = require('chai');
 const Web3 = require('web3');
 const sinon = require('sinon');
-
-const { assert } = chai;
 const EIP20CoGateway = require('../../src/ContractInteract/EIP20CoGateway');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const AssertAsync = require('../../test_utils/AssertAsync');
@@ -50,18 +48,18 @@ describe('EIP20CoGateway._progressMintRawTx()', () => {
   it('should throw an error when message hash is undefined', async () => {
     await AssertAsync.reject(
       coGateway._progressMintRawTx(undefined, unlockSecret),
-      `Invalid message hash: ${undefined}.`,
+      'Invalid message hash: undefined.',
     );
   });
 
   it('should throw an error when unlock secret is undefined', async () => {
     await AssertAsync.reject(
       coGateway._progressMintRawTx(messageHash, undefined),
-      `Invalid unlock secret: ${undefined}.`,
+      'Invalid unlock secret: undefined.',
     );
   });
 
-  it('should return correct mocked transaction object', async () => {
+  it('should return correct transaction object', async () => {
     setup();
     const result = await coGateway._progressMintRawTx(
       messageHash,

@@ -1,6 +1,6 @@
 'use strict';
 
-const chai = require('chai');
+const { assert } = require('chai');
 const sinon = require('sinon');
 const Facilitator = require('../../src/Facilitator');
 const TestMosaic = require('../../test_utils/TestMosaic');
@@ -9,8 +9,6 @@ const SpyAssert = require('../../test_utils/SpyAssert');
 const Message = require('../../src/utils/Message');
 
 const MessageStatus = Message.messageStatus();
-
-const { assert } = chai;
 
 describe('Facilitator.performProgressMint()', () => {
   let mosaic;
@@ -37,6 +35,7 @@ describe('Facilitator.performProgressMint()', () => {
       sinon.fake.resolves(progressMintResult),
     );
   };
+
   const teardown = () => {
     sinon.restore();
     spyCall.restore();
@@ -66,7 +65,7 @@ describe('Facilitator.performProgressMint()', () => {
         progressMintParams.unlockSecret,
         progressMintParams.txOptions,
       ),
-      `Invalid message hash: ${undefined}.`,
+      'Invalid message hash: undefined.',
     );
   });
 
@@ -77,7 +76,7 @@ describe('Facilitator.performProgressMint()', () => {
         undefined,
         progressMintParams.txOptions,
       ),
-      `Invalid unlock secret: ${undefined}.`,
+      'Invalid unlock secret: undefined.',
     );
   });
 
@@ -88,7 +87,7 @@ describe('Facilitator.performProgressMint()', () => {
         progressMintParams.unlockSecret,
         undefined,
       ),
-      `Invalid transaction option: ${undefined}.`,
+      'Invalid transaction option: undefined.',
     );
   });
 

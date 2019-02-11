@@ -1,8 +1,6 @@
 'use strict';
 
-const chai = require('chai');
-
-const { assert } = chai;
+const { assert } = require('chai');
 
 /**
  * This class includes the utitity assert function

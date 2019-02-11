@@ -1,14 +1,12 @@
 'use strict';
 
-const chai = require('chai');
+const { assert } = require('chai');
 const sinon = require('sinon');
 const EIP20Gateway = require('../../src/ContractInteract/EIP20Gateway');
 const EIP20Token = require('../../src/ContractInteract/EIP20Token');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const AssertAsync = require('../../test_utils/AssertAsync');
 const TestMosaic = require('../../test_utils/TestMosaic');
-
-const { assert } = chai;
 
 describe('EIP20Gateway.approveStakeAmount()', () => {
   let mosaic;
@@ -39,6 +37,7 @@ describe('EIP20Gateway.approveStakeAmount()', () => {
 
     spyCall = sinon.spy(gateway, 'approveStakeAmount');
   };
+
   const tearDown = () => {
     sinon.restore();
     spyCall.restore();
@@ -63,14 +62,14 @@ describe('EIP20Gateway.approveStakeAmount()', () => {
   it('should throw an error when stake amount undefined', async () => {
     await AssertAsync.reject(
       gateway.approveStakeAmount(undefined, txOptions),
-      `Invalid stake amount: ${undefined}.`,
+      'Invalid stake amount: undefined.',
     );
   });
 
   it('should throw an error when transaction options is undefined', async () => {
     await AssertAsync.reject(
       gateway.approveStakeAmount(stakeAmount, undefined),
-      `Invalid transaction options: ${undefined}.`,
+      'Invalid transaction options: undefined.',
     );
   });
 
@@ -78,7 +77,7 @@ describe('EIP20Gateway.approveStakeAmount()', () => {
     delete txOptions.from;
     await AssertAsync.reject(
       gateway.approveStakeAmount(stakeAmount, txOptions),
-      `Invalid from address: ${undefined}.`,
+      'Invalid from address: undefined.',
     );
   });
 

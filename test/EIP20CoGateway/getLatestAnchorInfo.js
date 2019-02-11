@@ -1,13 +1,11 @@
 'use strict';
 
-const chai = require('chai');
+const { assert } = require('chai');
 const Web3 = require('web3');
 const sinon = require('sinon');
 const EIP20CoGateway = require('../../src/ContractInteract/EIP20CoGateway');
 const Anchor = require('../../src/ContractInteract/Anchor');
 const SpyAssert = require('../../test_utils/SpyAssert');
-
-const { assert } = chai;
 
 describe('EIP20CoGateway.getLatestAnchorInfo()', () => {
   let web3;
@@ -29,7 +27,7 @@ describe('EIP20CoGateway.getLatestAnchorInfo()', () => {
     mockedAnchor = sinon.mock(anchor);
     spyGetLatestAnchorInfo = sinon.replace(
       mockedAnchor.object,
-      'getLatestAnchorInfo',
+      'getLatestInfo',
       sinon.fake.resolves(getLatestAnchorInfoResult),
     );
     spyGetAnchor = sinon.replace(

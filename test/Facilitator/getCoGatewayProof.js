@@ -1,13 +1,11 @@
 'use strict';
 
-const chai = require('chai');
+const { assert } = require('chai');
 const sinon = require('sinon');
 const Facilitator = require('../../src/Facilitator');
 const TestMosaic = require('../../test_utils/TestMosaic');
 const AssertAsync = require('../../test_utils/AssertAsync');
 const SpyAssert = require('../../test_utils/SpyAssert');
-
-const { assert } = chai;
 
 describe('Facilitator.getCoGatewayProof()', () => {
   let mosaic;
@@ -52,7 +50,7 @@ describe('Facilitator.getCoGatewayProof()', () => {
   it('should throw an error when message hash is undefined', async () => {
     await AssertAsync.reject(
       facilitator.getCoGatewayProof(),
-      `Invalid message hash: ${undefined}.`,
+      'Invalid message hash: undefined.',
     );
   });
 

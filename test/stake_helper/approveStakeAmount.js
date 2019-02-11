@@ -1,4 +1,4 @@
-const chai = require('chai');
+const { assert } = require('chai');
 const sinon = require('sinon');
 const StakeHelper = require('../../src/helpers/StakeHelper');
 const Contracts = require('../../src/Contracts');
@@ -6,8 +6,6 @@ const SpyAssert = require('../../test_utils/SpyAssert');
 const Utils = require('../../src/utils/Utils');
 const TestMosaic = require('../../test_utils/TestMosaic');
 const AssertAsync = require('../../test_utils/AssertAsync');
-
-const { assert } = chai;
 
 describe('StakeHelper.approveStakeAmount()', () => {
   let mosaic;
@@ -108,7 +106,7 @@ describe('StakeHelper.approveStakeAmount()', () => {
   it('should fail when transaction option is undefined', async () => {
     await AssertAsync.reject(
       stakeHelper.approveStakeAmount(stakeAmount),
-      `Invalid transaction options: ${undefined}.`,
+      'Invalid transaction options: undefined.',
     );
   });
 

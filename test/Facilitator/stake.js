@@ -1,13 +1,11 @@
 'use strict';
 
-const chai = require('chai');
+const { assert } = require('chai');
 const sinon = require('sinon');
 const Facilitator = require('../../src/Facilitator');
 const TestMosaic = require('../../test_utils/TestMosaic');
 const AssertAsync = require('../../test_utils/AssertAsync');
 const SpyAssert = require('../../test_utils/SpyAssert');
-
-const { assert } = chai;
 
 describe('Facilitator.stake()', () => {
   let mosaic;
@@ -105,7 +103,7 @@ describe('Facilitator.stake()', () => {
         stakeParams.hashLock,
         txOptions,
       ),
-      `Invalid staker address: ${undefined}.`,
+      'Invalid staker address: undefined.',
     );
   });
 
@@ -135,7 +133,7 @@ describe('Facilitator.stake()', () => {
         stakeParams.hashLock,
         txOptions,
       ),
-      `Invalid beneficiary address: ${undefined}.`,
+      'Invalid beneficiary address: undefined.',
     );
   });
 
@@ -150,7 +148,7 @@ describe('Facilitator.stake()', () => {
         stakeParams.hashLock,
         txOptions,
       ),
-      `Invalid gas price: ${undefined}.`,
+      'Invalid gas price: undefined.',
     );
   });
 
@@ -165,7 +163,7 @@ describe('Facilitator.stake()', () => {
         stakeParams.hashLock,
         txOptions,
       ),
-      `Invalid gas limit: ${undefined}.`,
+      'Invalid gas limit: undefined.',
     );
   });
 
@@ -180,7 +178,7 @@ describe('Facilitator.stake()', () => {
         undefined,
         txOptions,
       ),
-      `Invalid hash lock: ${undefined}.`,
+      'Invalid hash lock: undefined.',
     );
   });
 
@@ -195,7 +193,7 @@ describe('Facilitator.stake()', () => {
         stakeParams.hashLock,
         undefined,
       ),
-      `Invalid transaction options: ${undefined}.`,
+      'Invalid transaction options: undefined.',
     );
   });
 

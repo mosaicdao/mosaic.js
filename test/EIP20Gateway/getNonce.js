@@ -1,13 +1,11 @@
 'use strict';
 
-const chai = require('chai');
+const { assert } = require('chai');
 const Web3 = require('web3');
 const sinon = require('sinon');
 const EIP20Gateway = require('../../src/ContractInteract/EIP20Gateway');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const AssertAsync = require('../../test_utils/AssertAsync');
-
-const { assert } = chai;
 
 describe('EIP20Gateway.getNonce()', () => {
   let web3;
@@ -48,11 +46,11 @@ describe('EIP20Gateway.getNonce()', () => {
   it('should throw an error when account address is undefined', async () => {
     await AssertAsync.reject(
       gateway.getNonce(),
-      `Invalid account address: ${undefined}.`,
+      'Invalid account address: undefined.',
     );
   });
 
-  it('should return correct mocked nonce', async () => {
+  it('should return correct nonce', async () => {
     setup();
     const result = await gateway.getNonce(accountAddress);
     assert.strictEqual(

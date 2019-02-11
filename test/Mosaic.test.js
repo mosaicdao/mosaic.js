@@ -1,12 +1,10 @@
 'use strict';
 
-const chai = require('chai');
+const { assert } = require('chai');
 const Web3 = require('web3');
 
 const Chain = require('../src/Chain');
 const Mosaic = require('../src/Mosaic');
-
-const { assert } = chai;
 
 describe('Mosaic', () => {
   // This is not used to actually make calls, only to assert correct parameters.

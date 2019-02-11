@@ -1,10 +1,8 @@
 'use strict';
 
-const chai = require('chai');
+const { assert } = require('chai');
 const Web3 = require('web3');
 const sinon = require('sinon');
-
-const { assert } = chai;
 const EIP20Token = require('../../src/ContractInteract/EIP20Token');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const AssertAsync = require('../../test_utils/AssertAsync');
@@ -66,7 +64,7 @@ describe('EIP20Token.approve()', () => {
   it('should throw an error when transaction options is undefined', async () => {
     await AssertAsync.reject(
       token.approve(spenderAddress, amount, undefined),
-      `Invalid transaction options: ${undefined}.`,
+      'Invalid transaction options: undefined.',
     );
   });
 
@@ -74,11 +72,11 @@ describe('EIP20Token.approve()', () => {
     delete txOptions.from;
     await AssertAsync.reject(
       token.approve(spenderAddress, amount, txOptions),
-      `Invalid from address: ${undefined}.`,
+      'Invalid from address: undefined.',
     );
   });
 
-  it('should return mocked allowance value', async () => {
+  it('should return allowance value', async () => {
     setup();
     const result = await token.approve(spenderAddress, amount, txOptions);
 

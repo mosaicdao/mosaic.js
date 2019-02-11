@@ -1,6 +1,6 @@
 'use strict';
 
-const chai = require('chai');
+const { assert } = require('chai');
 const BN = require('bn.js');
 const sinon = require('sinon');
 const Facilitator = require('../../src/Facilitator');
@@ -8,8 +8,6 @@ const TestMosaic = require('../../test_utils/TestMosaic');
 const Proof = require('../../src/utils/Proof');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const AssertAsync = require('../../test_utils/AssertAsync');
-
-const { assert } = chai;
 
 describe('Facilitator._getProof()', () => {
   let mosaic;

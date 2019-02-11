@@ -1,14 +1,12 @@
 'use strict';
 
-const chai = require('chai');
+const { assert } = require('chai');
 const Web3 = require('web3');
 const sinon = require('sinon');
 const Anchor = require('../../src/ContractInteract/Anchor');
 const SpyAssert = require('../../test_utils/SpyAssert');
 
-const { assert } = chai;
-
-describe('Anchor.getLatestAnchorInfo()', () => {
+describe('Anchor.getLatestInfo()', () => {
   let web3;
   let anchorAddress;
   let anchor;
@@ -21,7 +19,7 @@ describe('Anchor.getLatestAnchorInfo()', () => {
   let spyGetStateRootResult;
 
   const setup = () => {
-    spyCall = sinon.spy(anchor, 'getLatestAnchorInfo');
+    spyCall = sinon.spy(anchor, 'getLatestInfo');
     spyGetLatestStateRootBlockHeight = sinon.replace(
       anchor,
       'getLatestStateRootBlockHeight',
@@ -51,7 +49,7 @@ describe('Anchor.getLatestAnchorInfo()', () => {
   it('should pass when called with correct arguments', async () => {
     setup();
 
-    const result = await anchor.getLatestAnchorInfo();
+    const result = await anchor.getLatestInfo();
 
     assert.strictEqual(
       result.blockHeight,

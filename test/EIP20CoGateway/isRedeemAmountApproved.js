@@ -1,14 +1,12 @@
 'use strict';
 
-const chai = require('chai');
+const { assert } = require('chai');
 const Web3 = require('web3');
 const sinon = require('sinon');
 const EIP20CoGateway = require('../../src/ContractInteract/EIP20CoGateway');
 const EIP20Token = require('../../src/ContractInteract/EIP20Token');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const AssertAsync = require('../../test_utils/AssertAsync');
-
-const { assert } = chai;
 
 describe('EIP20CoGateway.isRedeemAmountApproved()', () => {
   let web3;
@@ -61,14 +59,14 @@ describe('EIP20CoGateway.isRedeemAmountApproved()', () => {
   it('should throw an error when redeemer address is undefined', async () => {
     await AssertAsync.reject(
       coGateway.isRedeemAmountApproved(undefined, amount),
-      `Invalid redeemer address: ${undefined}.`,
+      'Invalid redeemer address: undefined.',
     );
   });
 
   it('should throw an error when amount is undefined', async () => {
     await AssertAsync.reject(
       coGateway.isRedeemAmountApproved(redeemer, undefined),
-      `Invalid redeem amount: ${undefined}.`,
+      'Invalid redeem amount: undefined.',
     );
   });
 

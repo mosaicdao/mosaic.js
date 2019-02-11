@@ -1,13 +1,11 @@
 'use strict';
 
-const chai = require('chai');
+const { assert } = require('chai');
 const Web3 = require('web3');
 const sinon = require('sinon');
 const EIP20CoGateway = require('../../src/ContractInteract/EIP20CoGateway');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const AssertAsync = require('../../test_utils/AssertAsync');
-
-const { assert } = chai;
 
 describe('EIP20CoGateway._proveGatewayRawTx()', () => {
   let web3;
@@ -53,25 +51,25 @@ describe('EIP20CoGateway._proveGatewayRawTx()', () => {
   it('should throw error when block height is invalid', async () => {
     await AssertAsync.reject(
       coGateway._proveGatewayRawTx(undefined, encodedAccount, accountProof),
-      `Invalid block height: ${undefined}.`,
+      'Invalid block height: undefined.',
     );
   });
 
   it('should throw error when encoded account is invalid', async () => {
     await AssertAsync.reject(
       coGateway._proveGatewayRawTx(blockHeight, undefined, accountProof),
-      `Invalid account data: ${undefined}.`,
+      'Invalid account data: undefined.',
     );
   });
 
   it('should throw error when account proof is invalid', async () => {
     await AssertAsync.reject(
       coGateway._proveGatewayRawTx(blockHeight, encodedAccount, undefined),
-      `Invalid account proof: ${undefined}.`,
+      'Invalid account proof: undefined.',
     );
   });
 
-  it('should return correct mocked transaction object', async () => {
+  it('should return correct transaction object', async () => {
     setup();
     const result = await coGateway._proveGatewayRawTx(
       blockHeight,

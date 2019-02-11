@@ -1,14 +1,12 @@
 'use strict';
 
-const chai = require('chai');
+const { assert } = require('chai');
 const sinon = require('sinon');
 const EIP20CoGateway = require('../../src/ContractInteract/EIP20CoGateway');
 const EIP20Token = require('../../src/ContractInteract/EIP20Token');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const AssertAsync = require('../../test_utils/AssertAsync');
 const TestMosaic = require('../../test_utils/TestMosaic');
-
-const { assert } = chai;
 
 describe('EIP20CoGateway.approveRedeemAmount()', () => {
   let mosaic;
@@ -38,6 +36,7 @@ describe('EIP20CoGateway.approveRedeemAmount()', () => {
 
     spyCall = sinon.spy(coGateway, 'approveRedeemAmount');
   };
+
   const tearDown = () => {
     sinon.restore();
     spyCall.restore();
@@ -62,14 +61,14 @@ describe('EIP20CoGateway.approveRedeemAmount()', () => {
   it('should throw an error when redeem amount undefined', async () => {
     await AssertAsync.reject(
       coGateway.approveRedeemAmount(undefined, txOptions),
-      `Invalid redeem amount: ${undefined}.`,
+      'Invalid redeem amount: undefined.',
     );
   });
 
   it('should throw an error when transaction options is undefined', async () => {
     await AssertAsync.reject(
       coGateway.approveRedeemAmount(redeemAmount, undefined),
-      `Invalid transaction options: ${undefined}.`,
+      'Invalid transaction options: undefined.',
     );
   });
 
@@ -77,7 +76,7 @@ describe('EIP20CoGateway.approveRedeemAmount()', () => {
     delete txOptions.from;
     await AssertAsync.reject(
       coGateway.approveRedeemAmount(redeemAmount, txOptions),
-      `Invalid from address: ${undefined}.`,
+      'Invalid from address: undefined.',
     );
   });
 

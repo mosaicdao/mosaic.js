@@ -1,13 +1,11 @@
 'use strict';
 
-const chai = require('chai');
+const { assert } = require('chai');
 const Web3 = require('web3');
 const sinon = require('sinon');
 const EIP20Gateway = require('../../src/ContractInteract/EIP20Gateway');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const AssertAsync = require('../../test_utils/AssertAsync');
-
-const { assert } = chai;
 
 describe('EIP20Gateway._stakeRawTx()', () => {
   let web3;
@@ -90,7 +88,7 @@ describe('EIP20Gateway._stakeRawTx()', () => {
         stakeParams.nonce,
         stakeParams.hashLock,
       ),
-      `Invalid gas price: ${undefined}.`,
+      'Invalid gas price: undefined.',
     );
   });
 
@@ -104,7 +102,7 @@ describe('EIP20Gateway._stakeRawTx()', () => {
         stakeParams.nonce,
         stakeParams.hashLock,
       ),
-      `Invalid gas limit: ${undefined}.`,
+      'Invalid gas limit: undefined.',
     );
   });
 
@@ -118,7 +116,7 @@ describe('EIP20Gateway._stakeRawTx()', () => {
         undefined,
         stakeParams.hashLock,
       ),
-      `Invalid nonce: ${undefined}.`,
+      'Invalid nonce: undefined.',
     );
   });
 
@@ -132,11 +130,11 @@ describe('EIP20Gateway._stakeRawTx()', () => {
         stakeParams.nonce,
         undefined,
       ),
-      `Invalid hash lock: ${undefined}.`,
+      'Invalid hash lock: undefined.',
     );
   });
 
-  it('should return correct mocked transaction object', async () => {
+  it('should return correct transaction object', async () => {
     setup();
     const result = await gateway._stakeRawTx(
       stakeParams.amount,

@@ -1,14 +1,12 @@
 'use strict';
 
-const chai = require('chai');
+const { assert } = require('chai');
 const Web3 = require('web3');
 const sinon = require('sinon');
 const EIP20Gateway = require('../../src/ContractInteract/EIP20Gateway');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const AssertAsync = require('../../test_utils/AssertAsync');
 const Utils = require('../../src/utils/Utils');
-
-const { assert } = chai;
 
 describe('EIP20Gateway.progressUnstake()', () => {
   let web3;
@@ -67,7 +65,7 @@ describe('EIP20Gateway.progressUnstake()', () => {
   it('should throw error when transaction object is invalid', async () => {
     await AssertAsync.reject(
       gateway.progressUnstake(messageHash, unlockSecret, undefined),
-      `Invalid transaction options: ${undefined}.`,
+      'Invalid transaction options: undefined.',
     );
   });
 
@@ -79,7 +77,7 @@ describe('EIP20Gateway.progressUnstake()', () => {
     );
   });
 
-  it('should return correct mocked transaction object', async () => {
+  it('should return correct transaction object', async () => {
     setup();
     const result = await gateway.progressUnstake(
       messageHash,
