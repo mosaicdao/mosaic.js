@@ -27,7 +27,7 @@ describe('EIP20CoGateway.proveGateway()', () => {
   const setup = () => {
     spyRawTx = sinon.replace(
       coGateway,
-      '_proveGatewayRawTx',
+      'proveGatewayRawTx',
       sinon.fake.resolves(mockedTx),
     );
 

@@ -49,7 +49,7 @@ class EIP20CoGateway {
     }
 
     this.proveGateway = this.proveGateway.bind(this);
-    this._proveGatewayRawTx = this._proveGatewayRawTx.bind(this);
+    this.proveGatewayRawTx = this.proveGatewayRawTx.bind(this);
     this.confirmStakeIntent = this.confirmStakeIntent.bind(this);
     this._confirmStakeIntentRawTx = this._confirmStakeIntentRawTx.bind(this);
     this.progressMint = this.progressMint.bind(this);
@@ -91,7 +91,7 @@ class EIP20CoGateway {
       );
       return Promise.reject(err);
     }
-    return this._proveGatewayRawTx(
+    return this.proveGatewayRawTx(
       blockHeight,
       encodedAccount,
       accountProof,
@@ -107,7 +107,7 @@ class EIP20CoGateway {
    *
    * @returns {Promise<Object>} Promise that resolves to raw transaction object.
    */
-  _proveGatewayRawTx(blockHeight, encodedAccount, accountProof) {
+  proveGatewayRawTx(blockHeight, encodedAccount, accountProof) {
     if (typeof blockHeight !== 'string') {
       const err = new TypeError(`Invalid block height: ${blockHeight}.`);
       return Promise.reject(err);
