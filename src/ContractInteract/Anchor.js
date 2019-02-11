@@ -12,7 +12,6 @@
  * @property {string} deployer Address to be used to send deployment
  *                    transactions.
  * @property {string} organizationOwner Address of owner of `organization`.
-
  */
 
 'use strict';
@@ -78,7 +77,7 @@ class Anchor {
    * @param {Object} txOptions Transaction options.
    *
    * @returns {Promise<Anchor>} Promise containing the Anchor instance that
-   *                         has been set up.
+   *                            has been set up.
    */
   static setup(originWeb3, auxiliaryWeb3, config, txOptions = {}) {
     Anchor.validateSetupConfig(config);

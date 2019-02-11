@@ -76,7 +76,7 @@ class OSTPrime {
    * @param {Object} txOptions Transaction options.
    *
    * @param {Promise<OSTPrime>} Promise containing the OSTPrime instance that
-   *                           has been set up.
+   *                            has been set up.
    */
   static setup(web3, config, txOptions) {
     if (!config.valueToken) {
@@ -140,7 +140,7 @@ class OSTPrime {
    * @param {Object} txOptions Transaction options.
    *
    * @param {Promise<OSTPrime>} Promise containing the OSTPrime instance that
-   *                           has been deployed.
+   *                            has been deployed.
    */
   static async deploy(web3, valueToken, organization, txOptions) {
     const tx = OSTPrime.deployRawTx(web3, valueToken, organization);
@@ -393,7 +393,7 @@ class OSTPrime {
   }
 
   /**
-   * Sets the CoGateway contract address. This can be called only by$
+   * Sets the CoGateway contract address. This can be called only by
    * an organization address.
    *
    * @param {string} coGateway EIP20CoGateway contract address.

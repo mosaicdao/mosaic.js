@@ -1,5 +1,5 @@
 /**
- * Validates that the provided config object exitsts.
+ * Validates that the provided config object exists.
  *
  * @param {Object} config The configuration object.
  *

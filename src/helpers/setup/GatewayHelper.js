@@ -6,9 +6,7 @@ const {
   deprecationNoticeChainSetup,
 } = require('../../utils/Utils');
 const EIP20Gateway = require('../../ContractInteract/EIP20Gateway');
-const EIP20CoGateway = require('../../ContractInteract/EIP20CoGateway');
 
-const ContractName = 'EIP20Gateway';
 class GatewayHelper {
   constructor(web3, address, messageBusAddress, gatewayLibAddress) {
     this.web3 = web3;

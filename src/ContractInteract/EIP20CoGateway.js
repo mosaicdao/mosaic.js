@@ -3,18 +3,18 @@
  *
  * @property {string} valueToken The value token contract address.
  * @property {string} utilityToken The utility token address that will be used for
- *                 minting the utility token.
+ *                    minting the utility token.
  * @property {string} anchor Address of anchor to use for getting the state root of
- *                 the auxiliary chain.
+ *                    the auxiliary chain.
  * @property {string} bounty The amount that facilitator will stakes to initiate the
- *                 stake process.
+ *                    stake process.
  * @property {string} organization Address of an organization contract.
  * @property {string} gateway Address of EIP20Gateway on Origin.
  * @property {string} burner Address where tokens will be burned.
  * @property {string} messageBus Address of MessageBus contract
- *                 to link into the contract bytecode.
+ *                    to link into the contract bytecode.
  * @property {string} gatewayLib Address of GatewayLib contract
- *                 to link into the contract bytecode.
+ *                    to link into the contract bytecode.
  * @property {string} deployer Address to be used to send deployment
  *                    transactions.
  */

@@ -41,8 +41,6 @@ describe('LibsHelper', () => {
   const subject = new LibsHelper(shared.origin.web3);
 
   after(() => {
-    // const auxiliaryHelper = new LibsHelper(shared.auxiliary.web3);
-
     const deployParams = {
       from: shared.setupConfig.deployerAddress,
       gas: '5000000',
