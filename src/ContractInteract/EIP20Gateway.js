@@ -64,7 +64,7 @@ class EIP20Gateway {
     this.approveBountyAmount = this.approveBountyAmount.bind(this);
     this.getAnchor = this.getAnchor.bind(this);
     this.getLatestAnchorInfo = this.getLatestAnchorInfo.bind(this);
-    this.getEIP20BaseToken = this.getEIP20BaseToken.bind(this);
+    this.getBaseTokenContract = this.getBaseTokenContract.bind(this);
     this.getEIP20ValueToken = this.getEIP20ValueToken.bind(this);
     this.isBountyAmountApproved = this.isBountyAmountApproved.bind(this);
     this.isStakeAmountApproved = this.isStakeAmountApproved.bind(this);
@@ -614,7 +614,7 @@ class EIP20Gateway {
       );
       return Promise.reject(err);
     }
-    return this.getEIP20BaseToken().then((eip20BaseToken) => {
+    return this.getBaseTokenContract().then((eip20BaseToken) => {
       return this.getBounty().then((bounty) => {
         return eip20BaseToken.isAmountApproved(
           facilityAddress,
@@ -646,7 +646,7 @@ class EIP20Gateway {
    *
    * @returns {Promise<Object>} Promise that resolves to EIP20Token object.
    */
-  getEIP20BaseToken() {
+  getBaseTokenContract() {
     if (this._eip20BaseToken) {
       return Promise.resolve(this._eip20BaseToken);
     }
@@ -700,7 +700,7 @@ class EIP20Gateway {
       const err = new TypeError(`Invalid from address: ${txOptions.from}.`);
       return Promise.reject(err);
     }
-    return this.getEIP20BaseToken().then((eip20BaseToken) => {
+    return this.getBaseTokenContract().then((eip20BaseToken) => {
       return this.getBounty().then((bounty) =>
         eip20BaseToken.approve(this.gatewayAddress, bounty, txOptions),
       );

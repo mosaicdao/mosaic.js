@@ -4,7 +4,7 @@ const sinon = require('sinon');
 const EIP20Gateway = require('../../src/ContractInteract/EIP20Gateway');
 const SpyAssert = require('../../test_utils/SpyAssert');
 
-describe('EIP20CoGateway.getEIP20BaseToken()', () => {
+describe('EIP20CoGateway.getBaseTokenContract()', () => {
   let web3;
   let gatewayAddress;
   let gateway;
@@ -20,7 +20,7 @@ describe('EIP20CoGateway.getEIP20BaseToken()', () => {
       'getBaseToken',
       sinon.fake.resolves(getBaseTokenAddressResult),
     );
-    spyCall = sinon.spy(gateway, 'getEIP20BaseToken');
+    spyCall = sinon.spy(gateway, 'getBaseTokenContract');
   };
 
   const tearDown = () => {
@@ -37,7 +37,7 @@ describe('EIP20CoGateway.getEIP20BaseToken()', () => {
 
   it('should return EIP20Token object', async () => {
     setup();
-    const result = await gateway.getEIP20BaseToken();
+    const result = await gateway.getBaseTokenContract();
     assert.strictEqual(
       result.web3,
       web3,
@@ -54,33 +54,33 @@ describe('EIP20CoGateway.getEIP20BaseToken()', () => {
     tearDown();
   });
 
-  it('should return EIP20Token object from the instance variable', async () => {
+  it('should return base token contract object from the instance variable', async () => {
     setup();
-    const firstCallResult = await gateway.getEIP20BaseToken();
+    const firstCallResult = await gateway.getBaseTokenContract();
     assert.strictEqual(
       firstCallResult.web3,
       web3,
-      'Function should return EIP20Token object with correct web3.',
+      'Function should return base token contract object with correct web3.',
     );
     assert.strictEqual(
       firstCallResult.tokenAddress,
       getBaseTokenAddressResult,
-      'Function should return EIP20Token object with correct contract address.',
+      'Function should return base token contract object with correct contract address.',
     );
 
     SpyAssert.assert(spyGetBaseTokenAddress, 1, [[]]);
     SpyAssert.assert(spyCall, 1, [[]]);
 
-    const secondCallResult = await gateway.getEIP20BaseToken();
+    const secondCallResult = await gateway.getBaseTokenContract();
     assert.strictEqual(
       secondCallResult.web3,
       web3,
-      'Function should return EIP20Token object with correct web3.',
+      'Function should return base token contract object with correct web3.',
     );
     assert.strictEqual(
       secondCallResult.tokenAddress,
       getBaseTokenAddressResult,
-      'Function should return EIP20Token object with correct contract address.',
+      'Function should return base token contract object with correct contract address.',
     );
 
     SpyAssert.assert(spyGetBaseTokenAddress, 1, [[]]);

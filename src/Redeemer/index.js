@@ -65,7 +65,7 @@ class Redeemer {
     }
 
     return this.coGatewayContract
-      .getEIP20UtilityToken()
+      .getUtilityTokenContract()
       .then((utilityToken) => {
         return utilityToken.approve(this.coGatewayAddress, amount, txOptions);
       });

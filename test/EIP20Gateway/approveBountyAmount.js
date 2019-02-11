@@ -13,14 +13,14 @@ describe('EIP20Gateway.approveBountyAmount()', () => {
   let gateway;
 
   let spyGetBounty;
-  let spyGetEIP20BaseToken;
-  let mockEIP20BaseToken;
+  let spyGetBaseTokenContract;
+  let mockBaseTokenContract;
   let spyApprove;
   let spyCall;
 
   const setup = () => {
-    mockEIP20BaseToken = sinon.createStubInstance(EIP20Token);
-    const eip20BaseTokenContract = mockEIP20BaseToken;
+    mockBaseTokenContract = sinon.createStubInstance(EIP20Token);
+    const eip20BaseTokenContract = mockBaseTokenContract;
 
     spyGetBounty = sinon.replace(
       gateway,
@@ -28,9 +28,9 @@ describe('EIP20Gateway.approveBountyAmount()', () => {
       sinon.fake.resolves(bountyAmount),
     );
 
-    spyGetEIP20BaseToken = sinon.replace(
+    spyGetBaseTokenContract = sinon.replace(
       gateway,
-      'getEIP20BaseToken',
+      'getBaseTokenContract',
       sinon.fake.resolves(eip20BaseTokenContract),
     );
 
@@ -86,7 +86,7 @@ describe('EIP20Gateway.approveBountyAmount()', () => {
     assert.strictEqual(result, true, 'Result must be true');
 
     SpyAssert.assert(spyGetBounty, 1, [[]]);
-    SpyAssert.assert(spyGetEIP20BaseToken, 1, [[]]);
+    SpyAssert.assert(spyGetBaseTokenContract, 1, [[]]);
     SpyAssert.assert(spyApprove, 1, [
       [mosaic.origin.contractAddresses.EIP20Gateway, bountyAmount, txOptions],
     ]);

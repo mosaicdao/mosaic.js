@@ -4,7 +4,7 @@ const sinon = require('sinon');
 const EIP20CoGateway = require('../../src/ContractInteract/EIP20CoGateway');
 const SpyAssert = require('../../test_utils/SpyAssert');
 
-describe('EIP20CoGateway.getEIP20UtilityToken()', () => {
+describe('EIP20CoGateway.getUtilityTokenContract()', () => {
   let web3;
   let coGatewayAddress;
   let coGateway;
@@ -20,7 +20,7 @@ describe('EIP20CoGateway.getEIP20UtilityToken()', () => {
       'getUtilityToken',
       sinon.fake.resolves(getUtilityTokenAddressResult),
     );
-    spyCall = sinon.spy(coGateway, 'getEIP20UtilityToken');
+    spyCall = sinon.spy(coGateway, 'getUtilityTokenContract');
   };
 
   const tearDown = () => {
@@ -36,18 +36,18 @@ describe('EIP20CoGateway.getEIP20UtilityToken()', () => {
       '0x0000000000000000000000000000000000000003';
   });
 
-  it('should return EIP20UtilityToken object', async () => {
+  it('should return UtilityToken contract object', async () => {
     setup();
-    const result = await coGateway.getEIP20UtilityToken();
+    const result = await coGateway.getUtilityTokenContract();
     assert.strictEqual(
       result.web3,
       web3,
-      'Function should return EIP20Token object with correct web3.',
+      'Function should return UtilityToken contract object with correct web3.',
     );
     assert.strictEqual(
       result.tokenAddress,
       getUtilityTokenAddressResult,
-      'Function should return EIP20Token object with correct contract address.',
+      'Function should return UtilityToken contract object with correct contract address.',
     );
 
     SpyAssert.assert(spyGetUtilityTokenAddress, 1, [[]]);
@@ -55,33 +55,33 @@ describe('EIP20CoGateway.getEIP20UtilityToken()', () => {
     tearDown();
   });
 
-  it('should return already created EIP20UtilityToken object instead of creating new object', async () => {
+  it('should return already created UtilityToken contract object instead of creating new object', async () => {
     setup();
-    const firstCallResult = await coGateway.getEIP20UtilityToken();
+    const firstCallResult = await coGateway.getUtilityTokenContract();
     assert.strictEqual(
       firstCallResult.web3,
       web3,
-      'Function should return EIP20Token object with correct web3.',
+      'Function should return UtilityToken contract object with correct web3.',
     );
     assert.strictEqual(
       firstCallResult.tokenAddress,
       getUtilityTokenAddressResult,
-      'Function should return EIP20Token object with correct contract address.',
+      'Function should return UtilityToken contract object with correct contract address.',
     );
 
     SpyAssert.assert(spyGetUtilityTokenAddress, 1, [[]]);
     SpyAssert.assert(spyCall, 1, [[]]);
 
-    const secondCallResult = await coGateway.getEIP20UtilityToken();
+    const secondCallResult = await coGateway.getUtilityTokenContract();
     assert.strictEqual(
       secondCallResult.web3,
       web3,
-      'Function should return EIP20Token object with correct web3.',
+      'Function should return UtilityToken contract object with correct web3.',
     );
     assert.strictEqual(
       secondCallResult.tokenAddress,
       getUtilityTokenAddressResult,
-      'Function should return EIP20Token object with correct contract address.',
+      'Function should return UtilityToken contract object with correct contract address.',
     );
 
     SpyAssert.assert(spyGetUtilityTokenAddress, 1, [[]]);

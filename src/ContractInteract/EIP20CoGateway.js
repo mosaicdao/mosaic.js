@@ -63,7 +63,7 @@ class EIP20CoGateway {
     this.getOutboxMessageStatus = this.getOutboxMessageStatus.bind(this);
     this.getAnchor = this.getAnchor.bind(this);
     this.getLatestAnchorInfo = this.getLatestAnchorInfo.bind(this);
-    this.getEIP20UtilityToken = this.getEIP20UtilityToken.bind(this);
+    this.getUtilityTokenContract = this.getUtilityTokenContract.bind(this);
     this.getUtilityToken = this.getUtilityToken.bind(this);
     this.isRedeemAmountApproved = this.isRedeemAmountApproved.bind(this);
     this.redeem = this.redeem.bind(this);
@@ -570,7 +570,7 @@ class EIP20CoGateway {
       const err = new TypeError(`Invalid redeem amount: ${amount}.`);
       return Promise.reject(err);
     }
-    return this.getEIP20UtilityToken().then((eip20ValueToken) => {
+    return this.getUtilityTokenContract().then((eip20ValueToken) => {
       return eip20ValueToken.isAmountApproved(
         redeemer,
         this.coGatewayAddress,
@@ -600,7 +600,7 @@ class EIP20CoGateway {
       const err = new TypeError(`Invalid redeem amount: ${amount}.`);
       return Promise.reject(err);
     }
-    return this.getEIP20UtilityToken().then((eip20Token) => {
+    return this.getUtilityTokenContract().then((eip20Token) => {
       return eip20Token.approve(this.coGatewayAddress, amount, txOptions);
     });
   }
@@ -631,11 +631,11 @@ class EIP20CoGateway {
   }
 
   /**
-   * Returns utitity token object.
+   * Returns utility token object.
    *
    * @returns {Promise<Object>} Promise that resolves to utility token object.
    */
-  getEIP20UtilityToken() {
+  getUtilityTokenContract() {
     if (this._eip20UtilityToken) {
       return Promise.resolve(this._eip20UtilityToken);
     }
