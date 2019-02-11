@@ -50,7 +50,7 @@ class EIP20Gateway {
     this.stake = this.stake.bind(this);
     this.stakeRawTx = this.stakeRawTx.bind(this);
     this.progressStake = this.progressStake.bind(this);
-    this._progressStakeRawTx = this._progressStakeRawTx.bind(this);
+    this.progressStakeRawTx = this.progressStakeRawTx.bind(this);
     this.getBounty = this.getBounty.bind(this);
     this.getBaseToken = this.getBaseToken.bind(this);
     this.getValueToken = this.getValueToken.bind(this);
@@ -238,7 +238,7 @@ class EIP20Gateway {
       );
       return Promise.reject(err);
     }
-    return this._progressStakeRawTx(messageHash, unlockSecret).then((tx) =>
+    return this.progressStakeRawTx(messageHash, unlockSecret).then((tx) =>
       Utils.sendTransaction(tx, txOptions),
     );
   }
@@ -251,7 +251,7 @@ class EIP20Gateway {
    *
    * @returns {Promise<Object>} Promise that resolves to raw transaction object.
    */
-  _progressStakeRawTx(messageHash, unlockSecret) {
+  progressStakeRawTx(messageHash, unlockSecret) {
     if (typeof messageHash !== 'string') {
       const err = new TypeError(`Invalid message hash: ${messageHash}.`);
       return Promise.reject(err);
