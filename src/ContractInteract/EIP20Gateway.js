@@ -68,6 +68,7 @@ class EIP20Gateway {
     this.getValueTokenContract = this.getValueTokenContract.bind(this);
     this.isBountyAmountApproved = this.isBountyAmountApproved.bind(this);
     this.isStakeAmountApproved = this.isStakeAmountApproved.bind(this);
+    this.confirmRedeemIntentRawTx = this.confirmRedeemIntentRawTx.bind(this);
   }
 
   /**
@@ -304,7 +305,7 @@ class EIP20Gateway {
       );
       return Promise.reject(err);
     }
-    return this._confirmRedeemIntentRawTx(
+    return this.confirmRedeemIntentRawTx(
       redeemer,
       nonce,
       beneficiary,
@@ -332,7 +333,7 @@ class EIP20Gateway {
    *
    * @returns {Promise<Object>} Promise that resolves to raw transaction object.
    */
-  _confirmRedeemIntentRawTx(
+  confirmRedeemIntentRawTx(
     redeemer,
     nonce,
     beneficiary,

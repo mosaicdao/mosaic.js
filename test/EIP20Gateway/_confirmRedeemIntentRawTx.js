@@ -7,7 +7,7 @@ const EIP20Gateway = require('../../src/ContractInteract/EIP20Gateway');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const AssertAsync = require('../../test_utils/AssertAsync');
 
-describe('EIP20Gateway._confirmRedeemIntentRawTx()', () => {
+describe('EIP20Gateway.confirmRedeemIntentRawTx()', () => {
   let web3;
   let gatewayAddress;
   let gateway;
@@ -25,7 +25,7 @@ describe('EIP20Gateway._confirmRedeemIntentRawTx()', () => {
       sinon.fake.resolves(mockedTx),
     );
 
-    spyCall = sinon.spy(gateway, '_confirmRedeemIntentRawTx');
+    spyCall = sinon.spy(gateway, 'confirmRedeemIntentRawTx');
   };
 
   const tearDown = () => {
@@ -54,7 +54,7 @@ describe('EIP20Gateway._confirmRedeemIntentRawTx()', () => {
 
   it('should throw error when redeemer address is invalid', async () => {
     await AssertAsync.reject(
-      gateway._confirmRedeemIntentRawTx(
+      gateway.confirmRedeemIntentRawTx(
         undefined,
         redeemParams.nonce,
         redeemParams.beneficiary,
@@ -71,7 +71,7 @@ describe('EIP20Gateway._confirmRedeemIntentRawTx()', () => {
 
   it('should throw error when nonce is invalid', async () => {
     await AssertAsync.reject(
-      gateway._confirmRedeemIntentRawTx(
+      gateway.confirmRedeemIntentRawTx(
         redeemParams.redeemer,
         undefined,
         redeemParams.beneficiary,
@@ -88,7 +88,7 @@ describe('EIP20Gateway._confirmRedeemIntentRawTx()', () => {
 
   it('should throw error when beneficiary address is undefined', async () => {
     await AssertAsync.reject(
-      gateway._confirmRedeemIntentRawTx(
+      gateway.confirmRedeemIntentRawTx(
         redeemParams.redeemer,
         redeemParams.nonce,
         undefined,
@@ -105,7 +105,7 @@ describe('EIP20Gateway._confirmRedeemIntentRawTx()', () => {
 
   it('should throw error when redeem amount is invalid', async () => {
     await AssertAsync.reject(
-      gateway._confirmRedeemIntentRawTx(
+      gateway.confirmRedeemIntentRawTx(
         redeemParams.redeemer,
         redeemParams.nonce,
         redeemParams.beneficiary,
@@ -122,7 +122,7 @@ describe('EIP20Gateway._confirmRedeemIntentRawTx()', () => {
 
   it('should throw error when gas price is invalid', async () => {
     await AssertAsync.reject(
-      gateway._confirmRedeemIntentRawTx(
+      gateway.confirmRedeemIntentRawTx(
         redeemParams.redeemer,
         redeemParams.nonce,
         redeemParams.beneficiary,
@@ -139,7 +139,7 @@ describe('EIP20Gateway._confirmRedeemIntentRawTx()', () => {
 
   it('should throw error when gas limit is invalid', async () => {
     await AssertAsync.reject(
-      gateway._confirmRedeemIntentRawTx(
+      gateway.confirmRedeemIntentRawTx(
         redeemParams.redeemer,
         redeemParams.nonce,
         redeemParams.beneficiary,
@@ -156,7 +156,7 @@ describe('EIP20Gateway._confirmRedeemIntentRawTx()', () => {
 
   it('should throw error when block height is invalid', async () => {
     await AssertAsync.reject(
-      gateway._confirmRedeemIntentRawTx(
+      gateway.confirmRedeemIntentRawTx(
         redeemParams.redeemer,
         redeemParams.nonce,
         redeemParams.beneficiary,
@@ -173,7 +173,7 @@ describe('EIP20Gateway._confirmRedeemIntentRawTx()', () => {
 
   it('should throw error when storage proof is invalid', async () => {
     await AssertAsync.reject(
-      gateway._confirmRedeemIntentRawTx(
+      gateway.confirmRedeemIntentRawTx(
         redeemParams.redeemer,
         redeemParams.nonce,
         redeemParams.beneficiary,
@@ -190,7 +190,7 @@ describe('EIP20Gateway._confirmRedeemIntentRawTx()', () => {
 
   it('should throw error when hash lock is undefined', async () => {
     await AssertAsync.reject(
-      gateway._confirmRedeemIntentRawTx(
+      gateway.confirmRedeemIntentRawTx(
         redeemParams.redeemer,
         redeemParams.nonce,
         redeemParams.beneficiary,
@@ -207,7 +207,7 @@ describe('EIP20Gateway._confirmRedeemIntentRawTx()', () => {
 
   it('should return correct transaction object', async () => {
     setup();
-    const result = await gateway._confirmRedeemIntentRawTx(
+    const result = await gateway.confirmRedeemIntentRawTx(
       redeemParams.redeemer,
       redeemParams.nonce,
       redeemParams.beneficiary,
