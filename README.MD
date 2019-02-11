@@ -1,7 +1,7 @@
 # 💠 mosaic.js
 
 ![Build master](https://img.shields.io/travis/OpenSTFoundation/mosaic.js/master.svg?label=build%20master&style=flat)
-![Build develop](https://img.shields.io/travis/OpenSTFoundation/mosaic.jsts/develop.svg?label=build%20develop&style=flat)
+![Build develop](https://img.shields.io/travis/OpenSTFoundation/mosaic.js/develop.svg?label=build%20develop&style=flat)
 ![npm version](https://img.shields.io/npm/v/@openstfoundation/mosaic.js.svg?style=flat)
 [![Discuss on Discourse](https://img.shields.io/discourse/https/discuss.openst.org/topics.svg?style=flat)][discourse]
 [![Chat on Gitter](https://img.shields.io/gitter/room/OpenSTFoundation/SimpleToken.svg?style=flat)][gitter]
