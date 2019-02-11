@@ -1,12 +1,10 @@
-const chai = require('chai');
+const { assert } = require('chai');
 const Web3 = require('web3');
 const sinon = require('sinon');
 const EIP20Gateway = require('../../src/ContractInteract/EIP20Gateway');
 const EIP20Token = require('../../src/ContractInteract/EIP20Token');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const AssertAsync = require('../../test_utils/AssertAsync');
-
-const { assert } = chai;
 
 describe('EIP20Gateway.isStakeAmountApproved()', () => {
   let web3;
@@ -59,14 +57,14 @@ describe('EIP20Gateway.isStakeAmountApproved()', () => {
   it('should throw an error when staker address is undefined', async () => {
     await AssertAsync.reject(
       gateway.isStakeAmountApproved(undefined, amount),
-      `Invalid staker address: ${undefined}.`,
+      'Invalid staker address: undefined.',
     );
   });
 
   it('should throw an error when amount is undefined', async () => {
     await AssertAsync.reject(
       gateway.isStakeAmountApproved(staker, undefined),
-      `Invalid stake amount: ${undefined}.`,
+      'Invalid stake amount: undefined.',
     );
   });
 

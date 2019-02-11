@@ -1,4 +1,4 @@
-const chai = require('chai');
+const { assert } = require('chai');
 const Web3 = require('web3');
 const sinon = require('sinon');
 const EIP20CoGateway = require('../../src/ContractInteract/EIP20CoGateway');
@@ -7,7 +7,6 @@ const AssertAsync = require('../../test_utils/AssertAsync');
 const Message = require('../../src/utils/Message');
 
 const MessageStatus = Message.messageStatus();
-const { assert } = chai;
 
 describe('EIP20CoGateway.getOutboxMessageStatus()', () => {
   let web3;
@@ -49,11 +48,11 @@ describe('EIP20CoGateway.getOutboxMessageStatus()', () => {
   it('should throw an error when message hash is undefined', async () => {
     await AssertAsync.reject(
       coGateway.getOutboxMessageStatus(),
-      `Invalid message hash: ${undefined}.`,
+      'Invalid message hash: undefined.',
     );
   });
 
-  it('should return correct mocked message status', async () => {
+  it('should return correct message status', async () => {
     setup();
     const result = await coGateway.getOutboxMessageStatus(messageHash);
     assert.strictEqual(

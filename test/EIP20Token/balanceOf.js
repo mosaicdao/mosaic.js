@@ -1,11 +1,9 @@
-const chai = require('chai');
+const { assert } = require('chai');
 const Web3 = require('web3');
 const sinon = require('sinon');
 const EIP20Token = require('../../src/ContractInteract/EIP20Token');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const AssertAsync = require('../../test_utils/AssertAsync');
-
-const { assert } = chai;
 
 describe('EIP20Token.balanceOf()', () => {
   let web3;
@@ -44,11 +42,11 @@ describe('EIP20Token.balanceOf()', () => {
   it('should throw an error when account address is undefined', async () => {
     await AssertAsync.reject(
       token.balanceOf(undefined),
-      `Invalid address: ${undefined}.`,
+      'Invalid address: undefined.',
     );
   });
 
-  it('should return mocked balance value', async () => {
+  it('should return balance value', async () => {
     setup();
     const result = await token.balanceOf(accountAddress);
 

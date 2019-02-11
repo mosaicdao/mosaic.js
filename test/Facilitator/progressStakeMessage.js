@@ -1,11 +1,9 @@
-const chai = require('chai');
+const { assert } = require('chai');
 const sinon = require('sinon');
 const Facilitator = require('../../src/Facilitator');
 const TestMosaic = require('../../test_utils/TestMosaic');
 const AssertAsync = require('../../test_utils/AssertAsync');
 const SpyAssert = require('../../test_utils/SpyAssert');
-
-const { assert } = chai;
 
 describe('Facilitator.progressStakeMessage()', () => {
   let mosaic;
@@ -32,6 +30,7 @@ describe('Facilitator.progressStakeMessage()', () => {
     );
     spyCall = sinon.spy(facilitator, 'progressStakeMessage');
   };
+
   const teardown = () => {
     sinon.restore();
     spyCall.restore();
@@ -66,7 +65,7 @@ describe('Facilitator.progressStakeMessage()', () => {
         progressStakeMessageParams.txOptionOrigin,
         progressStakeMessageParams.txOptionAuxiliary,
       ),
-      `Invalid message hash: ${undefined}.`,
+      'Invalid message hash: undefined.',
     );
   });
 
@@ -78,7 +77,7 @@ describe('Facilitator.progressStakeMessage()', () => {
         progressStakeMessageParams.txOptionOrigin,
         progressStakeMessageParams.txOptionAuxiliary,
       ),
-      `Invalid unlock secret: ${undefined}.`,
+      'Invalid unlock secret: undefined.',
     );
   });
 
@@ -90,7 +89,7 @@ describe('Facilitator.progressStakeMessage()', () => {
         undefined,
         progressStakeMessageParams.txOptionAuxiliary,
       ),
-      `Invalid origin transaction option: ${undefined}.`,
+      'Invalid origin transaction option: undefined.',
     );
   });
 
@@ -117,7 +116,7 @@ describe('Facilitator.progressStakeMessage()', () => {
         progressStakeMessageParams.txOptionOrigin,
         undefined,
       ),
-      `Invalid auxiliary transaction option: ${undefined}.`,
+      'Invalid auxiliary transaction option: undefined.',
     );
   });
 

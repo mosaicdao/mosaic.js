@@ -1,11 +1,9 @@
-const chai = require('chai');
+const { assert } = require('chai');
 const Web3 = require('web3');
 const sinon = require('sinon');
 const EIP20Gateway = require('../../src/ContractInteract/EIP20Gateway');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const AssertAsync = require('../../test_utils/AssertAsync');
-
-const { assert } = chai;
 
 describe('EIP20Gateway._confirmRedeemIntentRawTx()', () => {
   let web3;
@@ -65,7 +63,7 @@ describe('EIP20Gateway._confirmRedeemIntentRawTx()', () => {
         redeemParams.hashLock,
         redeemParams.storageProof,
       ),
-      `Invalid redeemer address: ${undefined}.`,
+      'Invalid redeemer address: undefined.',
     );
   });
 
@@ -82,7 +80,7 @@ describe('EIP20Gateway._confirmRedeemIntentRawTx()', () => {
         redeemParams.hashLock,
         redeemParams.storageProof,
       ),
-      `Invalid nonce: ${undefined}.`,
+      'Invalid nonce: undefined.',
     );
   });
 
@@ -99,7 +97,7 @@ describe('EIP20Gateway._confirmRedeemIntentRawTx()', () => {
         redeemParams.hashLock,
         redeemParams.storageProof,
       ),
-      `Invalid beneficiary address: ${undefined}.`,
+      'Invalid beneficiary address: undefined.',
     );
   });
 
@@ -116,7 +114,7 @@ describe('EIP20Gateway._confirmRedeemIntentRawTx()', () => {
         redeemParams.hashLock,
         redeemParams.storageProof,
       ),
-      `Invalid redeem amount: ${undefined}.`,
+      'Invalid redeem amount: undefined.',
     );
   });
 
@@ -133,7 +131,7 @@ describe('EIP20Gateway._confirmRedeemIntentRawTx()', () => {
         redeemParams.hashLock,
         redeemParams.storageProof,
       ),
-      `Invalid gas price: ${undefined}.`,
+      'Invalid gas price: undefined.',
     );
   });
 
@@ -150,7 +148,7 @@ describe('EIP20Gateway._confirmRedeemIntentRawTx()', () => {
         redeemParams.hashLock,
         redeemParams.storageProof,
       ),
-      `Invalid gas limit: ${undefined}.`,
+      'Invalid gas limit: undefined.',
     );
   });
 
@@ -167,7 +165,7 @@ describe('EIP20Gateway._confirmRedeemIntentRawTx()', () => {
         redeemParams.hashLock,
         redeemParams.storageProof,
       ),
-      `Invalid block height: ${undefined}.`,
+      'Invalid block height: undefined.',
     );
   });
 
@@ -184,11 +182,28 @@ describe('EIP20Gateway._confirmRedeemIntentRawTx()', () => {
         redeemParams.hashLock,
         undefined,
       ),
-      `Invalid storage proof data: ${undefined}.`,
+      'Invalid storage proof data: undefined.',
     );
   });
 
-  it('should return correct mocked transaction object', async () => {
+  it('should throw error when hash lock is undefined', async () => {
+    await AssertAsync.reject(
+      gateway._confirmRedeemIntentRawTx(
+        redeemParams.redeemer,
+        redeemParams.nonce,
+        redeemParams.beneficiary,
+        redeemParams.amount,
+        redeemParams.gasPrice,
+        redeemParams.blockHeight,
+        redeemParams.gasLimit,
+        undefined,
+        redeemParams.storageProof,
+      ),
+      'Invalid hash lock: undefined.',
+    );
+  });
+
+  it('should return correct transaction object', async () => {
     setup();
     const result = await gateway._confirmRedeemIntentRawTx(
       redeemParams.redeemer,

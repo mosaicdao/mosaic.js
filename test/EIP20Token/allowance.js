@@ -1,8 +1,6 @@
-const chai = require('chai');
+const { assert } = require('chai');
 const Web3 = require('web3');
 const sinon = require('sinon');
-
-const { assert } = chai;
 const EIP20Token = require('../../src/ContractInteract/EIP20Token');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const AssertAsync = require('../../test_utils/AssertAsync');
@@ -47,7 +45,7 @@ describe('EIP20Token.allowance()', () => {
   it('should throw an error when owner account address is undefined', async () => {
     await AssertAsync.reject(
       token.allowance(undefined, spenderAccountAddress),
-      `Owner address is invalid or missing: ${undefined}.`,
+      'Owner address is invalid or missing: undefined.',
     );
   });
 
@@ -58,7 +56,7 @@ describe('EIP20Token.allowance()', () => {
     );
   });
 
-  it('should return mocked allowance value', async () => {
+  it('should return allowance value', async () => {
     setup();
     const result = await token.allowance(
       ownerAccountAddress,

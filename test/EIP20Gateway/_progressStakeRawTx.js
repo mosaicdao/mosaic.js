@@ -1,11 +1,9 @@
-const chai = require('chai');
+const { assert } = require('chai');
 const Web3 = require('web3');
 const sinon = require('sinon');
 const EIP20Gateway = require('../../src/ContractInteract/EIP20Gateway');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const AssertAsync = require('../../test_utils/AssertAsync');
-
-const { assert } = chai;
 
 describe('EIP20Gateway._progressStakeRawTx()', () => {
   let web3;
@@ -48,18 +46,18 @@ describe('EIP20Gateway._progressStakeRawTx()', () => {
   it('should throw error when message hash is invalid', async () => {
     await AssertAsync.reject(
       gateway._progressStakeRawTx(undefined, unlockSecret),
-      `Invalid message hash: ${undefined}.`,
+      'Invalid message hash: undefined.',
     );
   });
 
   it('should throw error when unlock secret is invalid', async () => {
     await AssertAsync.reject(
       gateway._progressStakeRawTx(messageHash, undefined),
-      `Invalid unlock secret: ${undefined}.`,
+      'Invalid unlock secret: undefined.',
     );
   });
 
-  it('should return correct mocked transaction object', async () => {
+  it('should return correct transaction object', async () => {
     setup();
     const result = await gateway._progressStakeRawTx(
       messageHash,

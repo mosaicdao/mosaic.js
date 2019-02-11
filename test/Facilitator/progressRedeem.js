@@ -1,12 +1,10 @@
-const chai = require('chai');
+const { assert } = require('chai');
 const sinon = require('sinon');
 const Facilitator = require('../../src/Facilitator');
 const TestMosaic = require('../../test_utils/TestMosaic');
 const AssertAsync = require('../../test_utils/AssertAsync');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const Message = require('../../src/utils/Message');
-
-const { assert } = chai;
 
 describe('Facilitator.progressRedeem()', () => {
   let mosaic;
@@ -89,7 +87,7 @@ describe('Facilitator.progressRedeem()', () => {
         txOptionsOrigin,
         txOptionsAuxiliary,
       ),
-      `Invalid redeemer address: ${undefined}.`,
+      'Invalid redeemer address: undefined.',
     );
   });
 
@@ -107,7 +105,7 @@ describe('Facilitator.progressRedeem()', () => {
         txOptionsOrigin,
         txOptionsAuxiliary,
       ),
-      `Redeem amount must be greater than zero: ${undefined}.`,
+      'Redeem amount must be greater than zero: undefined.',
     );
   });
 
@@ -125,7 +123,7 @@ describe('Facilitator.progressRedeem()', () => {
         txOptionsOrigin,
         txOptionsAuxiliary,
       ),
-      `Invalid beneficiary address: ${undefined}.`,
+      'Invalid beneficiary address: undefined.',
     );
   });
 
@@ -143,7 +141,7 @@ describe('Facilitator.progressRedeem()', () => {
         txOptionsOrigin,
         txOptionsAuxiliary,
       ),
-      `Invalid gas price: ${undefined}.`,
+      'Invalid gas price: undefined.',
     );
   });
 
@@ -161,7 +159,7 @@ describe('Facilitator.progressRedeem()', () => {
         txOptionsOrigin,
         txOptionsAuxiliary,
       ),
-      `Invalid gas limit: ${undefined}.`,
+      'Invalid gas limit: undefined.',
     );
   });
 
@@ -179,7 +177,7 @@ describe('Facilitator.progressRedeem()', () => {
         txOptionsOrigin,
         txOptionsAuxiliary,
       ),
-      `Invalid redeemer nonce: ${undefined}.`,
+      'Invalid redeemer nonce: undefined.',
     );
   });
 
@@ -197,7 +195,7 @@ describe('Facilitator.progressRedeem()', () => {
         undefined,
         txOptionsAuxiliary,
       ),
-      `Invalid transaction options for origin chain: ${undefined}.`,
+      'Invalid transaction options for origin chain: undefined.',
     );
   });
 
@@ -215,7 +213,7 @@ describe('Facilitator.progressRedeem()', () => {
         txOptionsOrigin,
         undefined,
       ),
-      `Invalid transaction options for auxiliary chain: ${undefined}.`,
+      'Invalid transaction options for auxiliary chain: undefined.',
     );
   });
 

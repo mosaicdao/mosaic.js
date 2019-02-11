@@ -1,4 +1,4 @@
-const chai = require('chai');
+const { assert } = require('chai');
 const sinon = require('sinon');
 const Facilitator = require('../../src/Facilitator');
 const TestMosaic = require('../../test_utils/TestMosaic');
@@ -7,8 +7,6 @@ const SpyAssert = require('../../test_utils/SpyAssert');
 const Message = require('../../src/utils/Message');
 
 const MessageStatus = Message.messageStatus();
-
-const { assert } = chai;
 
 describe('Facilitator.confirmStakeIntent()', () => {
   let mosaic;
@@ -114,7 +112,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
         stakeParams.hashLock,
         txOptions,
       ),
-      `Invalid staker address: ${undefined}.`,
+      'Invalid staker address: undefined.',
     );
   });
 
@@ -146,7 +144,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
         stakeParams.hashLock,
         txOptions,
       ),
-      `Invalid beneficiary address: ${undefined}.`,
+      'Invalid beneficiary address: undefined.',
     );
   });
 
@@ -162,7 +160,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
         stakeParams.hashLock,
         txOptions,
       ),
-      `Invalid gas price: ${undefined}.`,
+      'Invalid gas price: undefined.',
     );
   });
 
@@ -178,7 +176,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
         stakeParams.hashLock,
         txOptions,
       ),
-      `Invalid gas limit: ${undefined}.`,
+      'Invalid gas limit: undefined.',
     );
   });
 
@@ -194,7 +192,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
         stakeParams.hashLock,
         txOptions,
       ),
-      `Invalid staker nonce: ${undefined}.`,
+      'Invalid staker nonce: undefined.',
     );
   });
 
@@ -210,7 +208,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
         undefined,
         txOptions,
       ),
-      `Invalid hash lock: ${undefined}.`,
+      'Invalid hash lock: undefined.',
     );
   });
 
@@ -226,7 +224,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
         stakeParams.hashLock,
         undefined,
       ),
-      `Invalid transaction options: ${undefined}.`,
+      'Invalid transaction options: undefined.',
     );
   });
 

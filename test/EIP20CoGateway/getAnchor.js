@@ -1,10 +1,8 @@
-const chai = require('chai');
+const { assert } = require('chai');
 const Web3 = require('web3');
 const sinon = require('sinon');
 const EIP20CoGateway = require('../../src/ContractInteract/EIP20CoGateway');
 const SpyAssert = require('../../test_utils/SpyAssert');
-
-const { assert } = chai;
 
 describe('EIP20CoGateway.getAnchor()', () => {
   let web3;

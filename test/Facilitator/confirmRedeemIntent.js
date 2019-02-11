@@ -1,4 +1,4 @@
-const chai = require('chai');
+const { assert } = require('chai');
 const sinon = require('sinon');
 const Facilitator = require('../../src/Facilitator');
 const TestMosaic = require('../../test_utils/TestMosaic');
@@ -7,8 +7,6 @@ const SpyAssert = require('../../test_utils/SpyAssert');
 const Message = require('../../src/utils/Message');
 
 const MessageStatus = Message.messageStatus();
-
-const { assert } = chai;
 
 describe('Facilitator.confirmRedeemIntent()', () => {
   let mosaic;
@@ -115,7 +113,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
         redeemParams.hashLock,
         txOptions,
       ),
-      `Invalid redeemer address: ${undefined}.`,
+      'Invalid redeemer address: undefined.',
     );
   });
 
@@ -147,7 +145,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
         redeemParams.hashLock,
         txOptions,
       ),
-      `Invalid beneficiary address: ${undefined}.`,
+      'Invalid beneficiary address: undefined.',
     );
   });
 
@@ -163,7 +161,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
         redeemParams.hashLock,
         txOptions,
       ),
-      `Invalid gas price: ${undefined}.`,
+      'Invalid gas price: undefined.',
     );
   });
 
@@ -179,7 +177,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
         redeemParams.hashLock,
         txOptions,
       ),
-      `Invalid gas limit: ${undefined}.`,
+      'Invalid gas limit: undefined.',
     );
   });
 
@@ -195,7 +193,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
         redeemParams.hashLock,
         txOptions,
       ),
-      `Invalid redeemer nonce: ${undefined}.`,
+      'Invalid redeemer nonce: undefined.',
     );
   });
 
@@ -211,7 +209,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
         undefined,
         txOptions,
       ),
-      `Invalid hash lock: ${undefined}.`,
+      'Invalid hash lock: undefined.',
     );
   });
 
@@ -227,7 +225,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
         redeemParams.hashLock,
         undefined,
       ),
-      `Invalid transaction options: ${undefined}.`,
+      'Invalid transaction options: undefined.',
     );
   });
 

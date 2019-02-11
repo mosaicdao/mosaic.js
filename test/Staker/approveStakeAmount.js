@@ -1,12 +1,10 @@
-const chai = require('chai');
+const { assert } = require('chai');
 const sinon = require('sinon');
 const Staker = require('../../src/Staker');
 const EIP20Token = require('../../src/ContractInteract/EIP20Token');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const AssertAsync = require('../../test_utils/AssertAsync');
 const TestMosaic = require('../../test_utils/TestMosaic');
-
-const { assert } = chai;
 
 describe('Staker.approveStakeAmount()', () => {
   let mosaic;
@@ -37,6 +35,7 @@ describe('Staker.approveStakeAmount()', () => {
 
     spyCall = sinon.spy(staker, 'approveStakeAmount');
   };
+
   const tearDown = () => {
     sinon.restore();
     spyCall.restore();
@@ -58,14 +57,14 @@ describe('Staker.approveStakeAmount()', () => {
   it('should throw an error when stake amount undefined', async () => {
     await AssertAsync.reject(
       staker.approveStakeAmount(undefined, txOptions),
-      `Invalid stake amount: ${undefined}.`,
+      'Invalid stake amount: undefined.',
     );
   });
 
   it('should throw an error when transaction options is undefined', async () => {
     await AssertAsync.reject(
       staker.approveStakeAmount(stakeAmount, undefined),
-      `Invalid transaction options: ${undefined}.`,
+      'Invalid transaction options: undefined.',
     );
   });
 
@@ -73,7 +72,7 @@ describe('Staker.approveStakeAmount()', () => {
     delete txOptions.from;
     await AssertAsync.reject(
       staker.approveStakeAmount(stakeAmount, txOptions),
-      `Invalid staker address: ${undefined}.`,
+      'Invalid staker address: undefined.',
     );
   });
 

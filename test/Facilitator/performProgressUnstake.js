@@ -1,4 +1,4 @@
-const chai = require('chai');
+const { assert } = require('chai');
 const sinon = require('sinon');
 const Facilitator = require('../../src/Facilitator');
 const TestMosaic = require('../../test_utils/TestMosaic');
@@ -7,8 +7,6 @@ const SpyAssert = require('../../test_utils/SpyAssert');
 const Message = require('../../src/utils/Message');
 
 const MessageStatus = Message.messageStatus();
-
-const { assert } = chai;
 
 describe('Facilitator.performProgressUnstake()', () => {
   let mosaic;
@@ -35,6 +33,7 @@ describe('Facilitator.performProgressUnstake()', () => {
       sinon.fake.resolves(progressUnstakeResult),
     );
   };
+
   const teardown = () => {
     sinon.restore();
     spyCall.restore();
@@ -64,7 +63,7 @@ describe('Facilitator.performProgressUnstake()', () => {
         progressUnstakeParams.unlockSecret,
         progressUnstakeParams.txOptions,
       ),
-      `Invalid message hash: ${undefined}.`,
+      'Invalid message hash: undefined.',
     );
   });
 
@@ -75,7 +74,7 @@ describe('Facilitator.performProgressUnstake()', () => {
         undefined,
         progressUnstakeParams.txOptions,
       ),
-      `Invalid unlock secret: ${undefined}.`,
+      'Invalid unlock secret: undefined.',
     );
   });
 
@@ -86,7 +85,7 @@ describe('Facilitator.performProgressUnstake()', () => {
         progressUnstakeParams.unlockSecret,
         undefined,
       ),
-      `Invalid transaction option: ${undefined}.`,
+      'Invalid transaction option: undefined.',
     );
   });
 

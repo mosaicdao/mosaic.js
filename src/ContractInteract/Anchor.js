@@ -100,7 +100,7 @@ class Anchor {
    *
    * @returns {Promise<Object>} Promise object that resolves to object containing state root and block height.
    */
-  async getLatestAnchorInfo() {
+  async getLatestInfo() {
     const blockHeight = await this.getLatestStateRootBlockHeight();
     const stateRoot = await this.getStateRoot(blockHeight);
 

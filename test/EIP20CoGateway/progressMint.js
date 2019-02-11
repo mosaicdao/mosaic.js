@@ -1,8 +1,6 @@
-const chai = require('chai');
+const { assert } = require('chai');
 const Web3 = require('web3');
 const sinon = require('sinon');
-
-const { assert } = chai;
 const EIP20CoGateway = require('../../src/ContractInteract/EIP20CoGateway');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const AssertAsync = require('../../test_utils/AssertAsync');
@@ -65,7 +63,7 @@ describe('EIP20CoGateway.progressMint()', () => {
   it('should throw an error when transaction object is undefined', async () => {
     await AssertAsync.reject(
       coGateway.progressMint(messageHash, unlockSecret, undefined),
-      `Invalid transaction options: ${undefined}.`,
+      'Invalid transaction options: undefined.',
     );
   });
 
@@ -77,7 +75,7 @@ describe('EIP20CoGateway.progressMint()', () => {
     );
   });
 
-  it('should return correct mocked transaction object', async () => {
+  it('should return correct transaction object', async () => {
     setup();
     const result = await coGateway.progressMint(
       messageHash,

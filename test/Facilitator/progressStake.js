@@ -1,12 +1,10 @@
-const chai = require('chai');
+const { assert } = require('chai');
 const sinon = require('sinon');
 const Facilitator = require('../../src/Facilitator');
 const TestMosaic = require('../../test_utils/TestMosaic');
 const AssertAsync = require('../../test_utils/AssertAsync');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const Message = require('../../src/utils/Message');
-
-const { assert } = chai;
 
 describe('Facilitator.progressStake()', () => {
   let mosaic;
@@ -89,7 +87,7 @@ describe('Facilitator.progressStake()', () => {
         txOptionsOrigin,
         txOptionsAuxiliary,
       ),
-      `Invalid staker address: ${undefined}.`,
+      'Invalid staker address: undefined.',
     );
   });
 
@@ -107,7 +105,7 @@ describe('Facilitator.progressStake()', () => {
         txOptionsOrigin,
         txOptionsAuxiliary,
       ),
-      `Stake amount must be greater than zero: ${undefined}.`,
+      'Stake amount must be greater than zero: undefined.',
     );
   });
 
@@ -125,7 +123,7 @@ describe('Facilitator.progressStake()', () => {
         txOptionsOrigin,
         txOptionsAuxiliary,
       ),
-      `Invalid beneficiary address: ${undefined}.`,
+      'Invalid beneficiary address: undefined.',
     );
   });
 
@@ -143,7 +141,7 @@ describe('Facilitator.progressStake()', () => {
         txOptionsOrigin,
         txOptionsAuxiliary,
       ),
-      `Invalid gas price: ${undefined}.`,
+      'Invalid gas price: undefined.',
     );
   });
 
@@ -161,7 +159,7 @@ describe('Facilitator.progressStake()', () => {
         txOptionsOrigin,
         txOptionsAuxiliary,
       ),
-      `Invalid gas limit: ${undefined}.`,
+      'Invalid gas limit: undefined.',
     );
   });
 
@@ -179,7 +177,7 @@ describe('Facilitator.progressStake()', () => {
         txOptionsOrigin,
         txOptionsAuxiliary,
       ),
-      `Invalid staker nonce: ${undefined}.`,
+      'Invalid staker nonce: undefined.',
     );
   });
 
@@ -197,7 +195,7 @@ describe('Facilitator.progressStake()', () => {
         undefined,
         txOptionsAuxiliary,
       ),
-      `Invalid transaction options for origin chain: ${undefined}.`,
+      'Invalid transaction options for origin chain: undefined.',
     );
   });
 
@@ -215,7 +213,7 @@ describe('Facilitator.progressStake()', () => {
         txOptionsOrigin,
         undefined,
       ),
-      `Invalid transaction options for auxiliary chain: ${undefined}.`,
+      'Invalid transaction options for auxiliary chain: undefined.',
     );
   });
 
