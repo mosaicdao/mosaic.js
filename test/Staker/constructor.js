@@ -1,8 +1,6 @@
-const chai = require('chai');
+const { assert } = require('chai');
 const Staker = require('../../src/Staker');
-const TestMosaic = require('../../test_utils/GetTestMosaic');
-
-const { assert } = chai;
+const TestMosaic = require('../../test_utils/TestMosaic');
 
 describe('Staker.constructor()', () => {
   let mosaic;

@@ -1,11 +1,9 @@
-const chai = require('chai');
+const { assert } = require('chai');
 const sinon = require('sinon');
 const StakeHelper = require('../../src/helpers/StakeHelper');
 const Contracts = require('../../src/Contracts');
 const SpyAssert = require('../../test_utils/SpyAssert');
-const TestMosaic = require('../../test_utils/GetTestMosaic');
-
-const { assert } = chai;
+const TestMosaic = require('../../test_utils/TestMosaic');
 
 describe('StakeHelper._getNonce()', () => {
   let stakeHelper;

@@ -63,7 +63,7 @@ class EIP20CoGateway {
     this.getOutboxMessageStatus = this.getOutboxMessageStatus.bind(this);
     this.getAnchor = this.getAnchor.bind(this);
     this.getLatestAnchorInfo = this.getLatestAnchorInfo.bind(this);
-    this.getEIP20UtilityToken = this.getEIP20UtilityToken.bind(this);
+    this.getUtilityTokenContract = this.getUtilityTokenContract.bind(this);
     this.getUtilityToken = this.getUtilityToken.bind(this);
     this.isRedeemAmountApproved = this.isRedeemAmountApproved.bind(this);
     this.redeem = this.redeem.bind(this);
@@ -83,6 +83,12 @@ class EIP20CoGateway {
   proveGateway(blockHeight, encodedAccount, accountProof, txOptions) {
     if (!txOptions) {
       const err = new TypeError(`Invalid transaction options: ${txOptions}.`);
+      return Promise.reject(err);
+    }
+    if (!Web3.utils.isAddress(txOptions.from)) {
+      const err = new TypeError(
+        `Invalid from address ${txOptions.from} in transaction options.`,
+      );
       return Promise.reject(err);
     }
     return this._proveGatewayRawTx(
@@ -157,6 +163,13 @@ class EIP20CoGateway {
       const err = new TypeError(`Invalid transaction options: ${txOptions}.`);
       return Promise.reject(err);
     }
+    if (!Web3.utils.isAddress(txOptions.from)) {
+      const err = new TypeError(
+        `Invalid from address ${txOptions.from} in transaction options.`,
+      );
+      return Promise.reject(err);
+    }
+
     return this._confirmStakeIntentRawTx(
       staker,
       nonce,
@@ -233,6 +246,11 @@ class EIP20CoGateway {
       return Promise.reject(err);
     }
 
+    if (typeof hashLock !== 'string') {
+      const err = new TypeError(`Invalid hash lock: ${hashLock}.`);
+      return Promise.reject(err);
+    }
+
     if (typeof storageProof !== 'string') {
       const err = new TypeError(
         `Invalid storage proof data: ${storageProof}.`,
@@ -266,6 +284,12 @@ class EIP20CoGateway {
   progressMint(messageHash, unlockSecret, txOptions) {
     if (!txOptions) {
       const err = new TypeError(`Invalid transaction options: ${txOptions}.`);
+      return Promise.reject(err);
+    }
+    if (!Web3.utils.isAddress(txOptions.from)) {
+      const err = new TypeError(
+        `Invalid from address ${txOptions.from} in transaction options.`,
+      );
       return Promise.reject(err);
     }
     return this._progressMintRawTx(messageHash, unlockSecret).then((tx) =>
@@ -307,7 +331,13 @@ class EIP20CoGateway {
    */
   progressRedeem(messageHash, unlockSecret, txOptions) {
     if (!txOptions) {
-      const err = new TypeError('Invalid transaction options.');
+      const err = new TypeError(`Invalid transaction options: ${txOptions}.`);
+      return Promise.reject(err);
+    }
+    if (!Web3.utils.isAddress(txOptions.from)) {
+      const err = new TypeError(
+        `Invalid from address ${txOptions.from} in transaction options.`,
+      );
       return Promise.reject(err);
     }
     return this._progressRedeemRawTx(messageHash, unlockSecret).then((tx) =>
@@ -325,12 +355,12 @@ class EIP20CoGateway {
    */
   _progressRedeemRawTx(messageHash, unlockSecret) {
     if (typeof messageHash !== 'string') {
-      const err = new TypeError('Invalid message hash.');
+      const err = new TypeError(`Invalid message hash: ${messageHash}.`);
       return Promise.reject(err);
     }
 
     if (typeof unlockSecret !== 'string') {
-      const err = new TypeError('Invalid unlock secret.');
+      const err = new TypeError(`Invalid unlock secret: ${unlockSecret}.`);
       return Promise.reject(err);
     }
 
@@ -533,14 +563,14 @@ class EIP20CoGateway {
    */
   isRedeemAmountApproved(redeemer, amount) {
     if (!Web3.utils.isAddress(redeemer)) {
-      const err = new TypeError(`Invalid redemeer address: ${redeemer}.`);
+      const err = new TypeError(`Invalid redeemer address: ${redeemer}.`);
       return Promise.reject(err);
     }
-    if (typeof amount != 'string') {
+    if (typeof amount !== 'string') {
       const err = new TypeError(`Invalid redeem amount: ${amount}.`);
       return Promise.reject(err);
     }
-    return this.getEIP20UtilityToken().then((eip20ValueToken) => {
+    return this.getUtilityTokenContract().then((eip20ValueToken) => {
       return eip20ValueToken.isAmountApproved(
         redeemer,
         this.coGatewayAddress,
@@ -567,10 +597,10 @@ class EIP20CoGateway {
       return Promise.reject(err);
     }
     if (typeof amount !== 'string') {
-      const err = new TypeError(`Invalid stake amount: ${amount}.`);
+      const err = new TypeError(`Invalid redeem amount: ${amount}.`);
       return Promise.reject(err);
     }
-    return this.getEIP20UtilityToken().then((eip20Token) => {
+    return this.getUtilityTokenContract().then((eip20Token) => {
       return eip20Token.approve(this.coGatewayAddress, amount, txOptions);
     });
   }
@@ -597,22 +627,15 @@ class EIP20CoGateway {
    * @returns {Promise<Object>} Promise object that resolves to object containing state root and block height.
    */
   async getLatestAnchorInfo() {
-    const anchor = await this.getAnchor();
-    const blockHeight = await anchor.getLatestStateRootBlockHeight();
-    const stateRoot = await anchor.getStateRoot(blockHeight);
-
-    return {
-      blockHeight,
-      stateRoot,
-    };
+    return this.getAnchor().then((anchor) => anchor.getLatestInfo());
   }
 
   /**
-   * Returns utitity token object.
+   * Returns utility token object.
    *
    * @returns {Promise<Object>} Promise that resolves to utility token object.
    */
-  getEIP20UtilityToken() {
+  getUtilityTokenContract() {
     if (this._eip20UtilityToken) {
       return Promise.resolve(this._eip20UtilityToken);
     }

@@ -1,8 +1,6 @@
-const chai = require('chai');
+const { assert } = require('chai');
 const Web3 = require('web3');
 const sinon = require('sinon');
-
-const { assert } = chai;
 const EIP20Gateway = require('../../src/ContractInteract/EIP20Gateway');
 const SpyAssert = require('../../test_utils/SpyAssert');
 
@@ -40,7 +38,7 @@ describe('EIP20Gateway.getBaseToken()', () => {
     mockedBaseTokenAddress = '0x0000000000000000000000000000000000000003';
   });
 
-  it('should return correct mocked base token address', async () => {
+  it('should return correct base token address', async () => {
     setup();
     const result = await gateway.getBaseToken();
     assert.strictEqual(

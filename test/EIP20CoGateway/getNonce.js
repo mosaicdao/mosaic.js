@@ -1,8 +1,6 @@
-const chai = require('chai');
+const { assert } = require('chai');
 const Web3 = require('web3');
 const sinon = require('sinon');
-
-const { assert } = chai;
 const EIP20CoGateway = require('../../src/ContractInteract/EIP20CoGateway');
 const SpyAssert = require('../../test_utils/SpyAssert');
 
@@ -45,10 +43,10 @@ describe('EIP20CoGateway.getNonce()', () => {
   it('should throw an error when account address is undefined', async () => {
     assert.throws(() => {
       coGateway.getNonce();
-    }, `Invalid account address: ${undefined}.`);
+    }, 'Invalid account address: undefined.');
   });
 
-  it('should return correct mocked nonce', async () => {
+  it('should return correct nonce', async () => {
     setup();
     const result = await coGateway.getNonce(accountAddress);
     assert.strictEqual(

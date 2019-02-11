@@ -1,10 +1,9 @@
-const chai = require('chai');
+const { assert } = require('chai');
 const Web3 = require('web3');
 const sinon = require('sinon');
-
-const { assert } = chai;
 const EIP20CoGateway = require('../../src/ContractInteract/EIP20CoGateway');
 const SpyAssert = require('../../test_utils/SpyAssert');
+const AssertAsync = require('../../test_utils/AssertAsync');
 
 describe('EIP20CoGateway._progressMintRawTx()', () => {
   let web3;
@@ -44,33 +43,21 @@ describe('EIP20CoGateway._progressMintRawTx()', () => {
     mockedTx = 'MockedTx';
   });
 
-  it('should throw error when message hash is invalid', async () => {
-    const expectedErrorMessage = `Invalid message hash: ${undefined}.`;
-    await coGateway
-      ._progressMintRawTx(undefined, unlockSecret)
-      .catch((exception) => {
-        assert.strictEqual(
-          exception.message,
-          expectedErrorMessage,
-          `Exception reason must be "${expectedErrorMessage}"`,
-        );
-      });
+  it('should throw an error when message hash is undefined', async () => {
+    await AssertAsync.reject(
+      coGateway._progressMintRawTx(undefined, unlockSecret),
+      'Invalid message hash: undefined.',
+    );
   });
 
-  it('should throw error when unlock secret is invalid', async () => {
-    const expectedErrorMessage = `Invalid unlock secret: ${undefined}.`;
-    await coGateway
-      ._progressMintRawTx(messageHash, undefined)
-      .catch((exception) => {
-        assert.strictEqual(
-          exception.message,
-          expectedErrorMessage,
-          `Exception reason must be "${expectedErrorMessage}"`,
-        );
-      });
+  it('should throw an error when unlock secret is undefined', async () => {
+    await AssertAsync.reject(
+      coGateway._progressMintRawTx(messageHash, undefined),
+      'Invalid unlock secret: undefined.',
+    );
   });
 
-  it('should return correct mocked transaction object', async () => {
+  it('should return correct transaction object', async () => {
     setup();
     const result = await coGateway._progressMintRawTx(
       messageHash,

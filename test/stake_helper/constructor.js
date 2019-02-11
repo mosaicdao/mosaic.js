@@ -1,8 +1,6 @@
-const chai = require('chai');
+const { assert } = require('chai');
 const StakeHelper = require('../../src/helpers/StakeHelper');
-const TestMosaic = require('../../test_utils/GetTestMosaic');
-
-const { assert } = chai;
+const TestMosaic = require('../../test_utils/TestMosaic');
 
 describe('StakeHelper.constructor()', () => {
   let mosaic;
@@ -23,7 +21,7 @@ describe('StakeHelper.constructor()', () => {
     }
   });
 
-  it('should pass with valid constructor arguments', async function() {
+  it('should pass with valid arguments', async function() {
     const stakeHelper = new StakeHelper(mosaic);
 
     assert.strictEqual(

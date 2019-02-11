@@ -94,6 +94,21 @@ class Anchor {
     const tx = this.contract.methods.anchorStateRoot(blockHeight, stateRoot);
     return Utils.sendTransaction(tx, txOptions);
   }
+
+  /**
+   * Get the latest state root and block height.
+   *
+   * @returns {Promise<Object>} Promise object that resolves to object containing state root and block height.
+   */
+  async getLatestInfo() {
+    const blockHeight = await this.getLatestStateRootBlockHeight();
+    const stateRoot = await this.getStateRoot(blockHeight);
+
+    return {
+      blockHeight,
+      stateRoot,
+    };
+  }
 }
 
 module.exports = Anchor;

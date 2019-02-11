@@ -1,8 +1,6 @@
-const chai = require('chai');
+const { assert } = require('chai');
 const Web3 = require('web3');
 const sinon = require('sinon');
-
-const { assert } = chai;
 const EIP20CoGateway = require('../../src/ContractInteract/EIP20CoGateway');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const AssertAsync = require('../../test_utils/AssertAsync');
@@ -69,7 +67,7 @@ describe('EIP20CoGateway.confirmStakeIntent()', () => {
     mockedTx = 'MockedTx';
   });
 
-  it('should throw error transaction object is invalid', async () => {
+  it('should throw error when transaction object is invalid', async () => {
     await AssertAsync.reject(
       coGateway.confirmStakeIntent(
         stakeParams.staker,
@@ -83,11 +81,30 @@ describe('EIP20CoGateway.confirmStakeIntent()', () => {
         stakeParams.storageProof,
         undefined,
       ),
-      `Invalid transaction options: ${undefined}.`,
+      'Invalid transaction options: undefined.',
     );
   });
 
-  it('should return correct mocked transaction object', async () => {
+  it('should throw error when `from` address in transaction object is undefined', async () => {
+    delete txOptions.from;
+    await AssertAsync.reject(
+      coGateway.confirmStakeIntent(
+        stakeParams.staker,
+        stakeParams.nonce,
+        stakeParams.beneficiary,
+        stakeParams.amount,
+        stakeParams.gasPrice,
+        stakeParams.gasLimit,
+        stakeParams.hashLock,
+        stakeParams.blockHeight,
+        stakeParams.storageProof,
+        txOptions,
+      ),
+      `Invalid from address ${txOptions.from} in transaction options.`,
+    );
+  });
+
+  it('should return correct transaction object', async () => {
     setup();
     const result = await coGateway.confirmStakeIntent(
       stakeParams.staker,

@@ -25,7 +25,7 @@
     "url": "https://github.com/OpenSTFoundation/mosaic.js/issues"
   },
   "scripts": {
-    "test": "mocha --recursive --timeout 5000",
+    "test": "MOSAIC_LOG_LEVEL=0 mocha --recursive --timeout 5000",
     "test:integration": "node test_integration/integration_tests.js",
     "pre-commit": "lint-staged",
     "build": "webpack --mode=production",

@@ -95,7 +95,7 @@ class StakeHelper {
    */
   async getNonce(staker) {
     if (!Web3.utils.isAddress(staker)) {
-      throw new TypeError('Invalid account address.');
+      throw new TypeError(`Invalid account address: ${staker}.`);
     }
     return this._getNonce(staker, this.originWeb3, this.gatewayAddress);
   }
@@ -131,11 +131,11 @@ class StakeHelper {
    */
   async approveStakeAmount(stakeAmount, txOptions) {
     if (!txOptions) {
-      const err = new TypeError('Invalid transaction options.');
+      const err = new TypeError(`Invalid transaction options: ${txOptions}.`);
       return Promise.reject(err);
     }
     if (!Web3.utils.isAddress(txOptions.from)) {
-      const err = new TypeError('Invalid staker address.');
+      const err = new TypeError(`Invalid staker address: ${txOptions.from}.`);
       return Promise.reject(err);
     }
     return this.getValueToken().then((valueTokenAddress) => {

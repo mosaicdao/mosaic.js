@@ -1,6 +1,4 @@
-const chai = require('chai');
-
-const { assert } = chai;
+const { assert } = require('chai');
 
 /**
  * This class includes the utitity functions to assert spy data.
@@ -35,7 +33,11 @@ class SpyAssert {
           assert.strictEqual(
             actualArguments[params],
             expectedArguments[params],
-            'Input params must match with the expected value.',
+            `Input param value ${
+              actualArguments[params]
+            } must match with the expected param value ${
+              expectedArguments[params]
+            }.`,
           );
         }
       }

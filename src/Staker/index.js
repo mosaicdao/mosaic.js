@@ -59,7 +59,7 @@ class Staker {
       return Promise.reject(err);
     }
 
-    return this.gatewayContract.getEIP20ValueToken().then((token) => {
+    return this.gatewayContract.getValueTokenContract().then((token) => {
       return token.approve(this.gatewayAddress, amount, txOptions);
     });
   }

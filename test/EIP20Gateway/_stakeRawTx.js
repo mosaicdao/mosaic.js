@@ -1,10 +1,9 @@
-const chai = require('chai');
+const { assert } = require('chai');
 const Web3 = require('web3');
 const sinon = require('sinon');
-
-const { assert } = chai;
 const EIP20Gateway = require('../../src/ContractInteract/EIP20Gateway');
 const SpyAssert = require('../../test_utils/SpyAssert');
+const AssertAsync = require('../../test_utils/AssertAsync');
 
 describe('EIP20Gateway._stakeRawTx()', () => {
   let web3;
@@ -49,87 +48,91 @@ describe('EIP20Gateway._stakeRawTx()', () => {
     mockedTx = 'MockedTx';
   });
 
-  it('should throw error when stake amount is zero', async function() {
-    const expectedErrorMessage = `Stake amount must be greater than zero: 0.`;
-    await gateway
-      ._stakeRawTx(
-        '0',
+  it('should throw error when stake amount is zero', async () => {
+    await AssertAsync.reject(
+      gateway._stakeRawTx(
+        0,
         stakeParams.beneficiary,
         stakeParams.gasPrice,
         stakeParams.gasLimit,
         stakeParams.nonce,
         stakeParams.hashLock,
-      )
-      .catch((exception) => {
-        assert.strictEqual(
-          exception.message,
-          expectedErrorMessage,
-          `Exception reason must be "${expectedErrorMessage}"`,
-        );
-      });
+      ),
+      'Stake amount must be greater than zero: 0.',
+    );
   });
 
-  it('should throw error when beneficiary address is invalid', async function() {
-    const expectedErrorMessage = `Invalid beneficiary address: 0x123.`;
-    await gateway
-      ._stakeRawTx(
+  it('should throw error when beneficiary address is undefined', async function() {
+    await AssertAsync.reject(
+      gateway._stakeRawTx(
         stakeParams.amount,
         '0x123',
         stakeParams.gasPrice,
         stakeParams.gasLimit,
         stakeParams.nonce,
         stakeParams.hashLock,
-      )
-      .catch((exception) => {
-        assert.strictEqual(
-          exception.message,
-          expectedErrorMessage,
-          `Exception reason must be "${expectedErrorMessage}"`,
-        );
-      });
+      ),
+      'Invalid beneficiary address: 0x123.',
+    );
   });
 
   it('should throw error when gas price is undefined', async function() {
-    const expectedErrorMessage = `Invalid gas price: ${undefined}.`;
-    await gateway
-      ._stakeRawTx(
+    await AssertAsync.reject(
+      gateway._stakeRawTx(
         stakeParams.amount,
         stakeParams.beneficiary,
         undefined,
         stakeParams.gasLimit,
         stakeParams.nonce,
         stakeParams.hashLock,
-      )
-      .catch((exception) => {
-        assert.strictEqual(
-          exception.message,
-          expectedErrorMessage,
-          `Exception reason must be "${expectedErrorMessage}"`,
-        );
-      });
+      ),
+      'Invalid gas price: undefined.',
+    );
   });
 
   it('should throw error when gas limit is undefined', async function() {
-    const expectedErrorMessage = `Invalid gas limit: ${undefined}.`;
-    await gateway
-      ._stakeRawTx(
+    await AssertAsync.reject(
+      gateway._stakeRawTx(
         stakeParams.amount,
         stakeParams.beneficiary,
         stakeParams.gasPrice,
         undefined,
         stakeParams.nonce,
         stakeParams.hashLock,
-      )
-      .catch((exception) => {
-        assert.strictEqual(
-          exception.message,
-          expectedErrorMessage,
-          `Exception reason must be "${expectedErrorMessage}"`,
-        );
-      });
+      ),
+      'Invalid gas limit: undefined.',
+    );
   });
 
-  it('should return correct mocked transaction object', async () => {
+  it('should throw error when nonce is undefined', async () => {
+    await AssertAsync.reject(
+      gateway._stakeRawTx(
+        stakeParams.amount,
+        stakeParams.beneficiary,
+        stakeParams.gasPrice,
+        stakeParams.gasLimit,
+        undefined,
+        stakeParams.hashLock,
+      ),
+      'Invalid nonce: undefined.',
+    );
+  });
+
+  it('should throw error when hashlock is undefined', async () => {
+    await AssertAsync.reject(
+      gateway._stakeRawTx(
+        stakeParams.amount,
+        stakeParams.beneficiary,
+        stakeParams.gasPrice,
+        stakeParams.gasLimit,
+        stakeParams.nonce,
+        undefined,
+      ),
+      'Invalid hash lock: undefined.',
+    );
+  });
+
+  it('should return correct transaction object', async () => {
     setup();
     const result = await gateway._stakeRawTx(
       stakeParams.amount,

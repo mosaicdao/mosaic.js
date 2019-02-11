@@ -1,10 +1,9 @@
-const chai = require('chai');
+const { assert } = require('chai');
 const Web3 = require('web3');
 const sinon = require('sinon');
-
-const { assert } = chai;
 const EIP20CoGateway = require('../../src/ContractInteract/EIP20CoGateway');
 const SpyAssert = require('../../test_utils/SpyAssert');
+const AssertAsync = require('../../test_utils/AssertAsync');
 
 describe('EIP20CoGateway._confirmStakeIntentRawTx()', () => {
   let web3;
@@ -52,9 +51,8 @@ describe('EIP20CoGateway._confirmStakeIntentRawTx()', () => {
   });
 
   it('should throw error when staker address is invalid', async () => {
-    const expectedErrorMessage = `Invalid staker address: ${undefined}.`;
-    await coGateway
-      ._confirmStakeIntentRawTx(
+    await AssertAsync.reject(
+      coGateway._confirmStakeIntentRawTx(
         undefined,
         stakeParams.nonce,
         stakeParams.beneficiary,
@@ -64,20 +62,14 @@ describe('EIP20CoGateway._confirmStakeIntentRawTx()', () => {
         stakeParams.hashLock,
         stakeParams.blockHeight,
         stakeParams.storageProof,
-      )
-      .catch((exception) => {
-        assert.strictEqual(
-          exception.message,
-          expectedErrorMessage,
-          `Exception reason must be "${expectedErrorMessage}"`,
-        );
-      });
+      ),
+      'Invalid staker address: undefined.',
+    );
   });
 
   it('should throw error when nonce is invalid', async () => {
-    const expectedErrorMessage = `Invalid nonce: ${undefined}.`;
-    await coGateway
-      ._confirmStakeIntentRawTx(
+    await AssertAsync.reject(
+      coGateway._confirmStakeIntentRawTx(
         stakeParams.staker,
         undefined,
         stakeParams.beneficiary,
@@ -87,20 +79,14 @@ describe('EIP20CoGateway._confirmStakeIntentRawTx()', () => {
         stakeParams.hashLock,
         stakeParams.blockHeight,
         stakeParams.storageProof,
-      )
-      .catch((exception) => {
-        assert.strictEqual(
-          exception.message,
-          expectedErrorMessage,
-          `Exception reason must be "${expectedErrorMessage}"`,
-        );
-      });
+      ),
+      'Invalid nonce: undefined.',
+    );
   });
 
-  it('should throw error when beneficiary address is invalid', async () => {
-    const expectedErrorMessage = `Invalid beneficiary address: ${undefined}.`;
-    await coGateway
-      ._confirmStakeIntentRawTx(
+  it('should throw error when beneficiary address is undefined', async () => {
+    await AssertAsync.reject(
+      coGateway._confirmStakeIntentRawTx(
         stakeParams.staker,
         stakeParams.nonce,
         undefined,
@@ -110,20 +96,14 @@ describe('EIP20CoGateway._confirmStakeIntentRawTx()', () => {
         stakeParams.hashLock,
         stakeParams.blockHeight,
         stakeParams.storageProof,
-      )
-      .catch((exception) => {
-        assert.strictEqual(
-          exception.message,
-          expectedErrorMessage,
-          `Exception reason must be "${expectedErrorMessage}"`,
-        );
-      });
+      ),
+      'Invalid beneficiary address: undefined.',
+    );
   });
 
   it('should throw error when stake amount is invalid', async () => {
-    const expectedErrorMessage = `Invalid stake amount: ${undefined}.`;
-    await coGateway
-      ._confirmStakeIntentRawTx(
+    await AssertAsync.reject(
+      coGateway._confirmStakeIntentRawTx(
         stakeParams.staker,
         stakeParams.nonce,
         stakeParams.beneficiary,
@@ -133,20 +113,14 @@ describe('EIP20CoGateway._confirmStakeIntentRawTx()', () => {
         stakeParams.hashLock,
         stakeParams.blockHeight,
         stakeParams.storageProof,
-      )
-      .catch((exception) => {
-        assert.strictEqual(
-          exception.message,
-          expectedErrorMessage,
-          `Exception reason must be "${expectedErrorMessage}"`,
-        );
-      });
+      ),
+      'Invalid stake amount: undefined.',
+    );
   });
 
   it('should throw error when gas price is invalid', async () => {
-    const expectedErrorMessage = `Invalid gas price: ${undefined}.`;
-    await coGateway
-      ._confirmStakeIntentRawTx(
+    await AssertAsync.reject(
+      coGateway._confirmStakeIntentRawTx(
         stakeParams.staker,
         stakeParams.nonce,
         stakeParams.beneficiary,
@@ -156,20 +130,14 @@ describe('EIP20CoGateway._confirmStakeIntentRawTx()', () => {
         stakeParams.hashLock,
         stakeParams.blockHeight,
         stakeParams.storageProof,
-      )
-      .catch((exception) => {
-        assert.strictEqual(
-          exception.message,
-          expectedErrorMessage,
-          `Exception reason must be "${expectedErrorMessage}"`,
-        );
-      });
+      ),
+      'Invalid gas price: undefined.',
+    );
   });
 
   it('should throw error when gas limit is invalid', async () => {
-    const expectedErrorMessage = `Invalid gas limit: ${undefined}.`;
-    await coGateway
-      ._confirmStakeIntentRawTx(
+    await AssertAsync.reject(
+      coGateway._confirmStakeIntentRawTx(
         stakeParams.staker,
         stakeParams.nonce,
         stakeParams.beneficiary,
@@ -179,20 +147,14 @@ describe('EIP20CoGateway._confirmStakeIntentRawTx()', () => {
         stakeParams.hashLock,
         stakeParams.blockHeight,
         stakeParams.storageProof,
-      )
-      .catch((exception) => {
-        assert.strictEqual(
-          exception.message,
-          expectedErrorMessage,
-          `Exception reason must be "${expectedErrorMessage}"`,
-        );
-      });
+      ),
+      'Invalid gas limit: undefined.',
+    );
   });
 
   it('should throw error when block height is invalid', async () => {
-    const expectedErrorMessage = `Invalid block height: ${undefined}.`;
-    await coGateway
-      ._confirmStakeIntentRawTx(
+    await AssertAsync.reject(
+      coGateway._confirmStakeIntentRawTx(
         stakeParams.staker,
         stakeParams.nonce,
         stakeParams.beneficiary,
@@ -202,20 +164,31 @@ describe('EIP20CoGateway._confirmStakeIntentRawTx()', () => {
         stakeParams.hashLock,
         undefined,
         stakeParams.storageProof,
-      )
-      .catch((exception) => {
-        assert.strictEqual(
-          exception.message,
-          expectedErrorMessage,
-          `Exception reason must be "${expectedErrorMessage}"`,
-        );
-      });
+      ),
+      'Invalid block height: undefined.',
+    );
+  });
+
+  it('should throw error when hash lock is undefined', async () => {
+    await AssertAsync.reject(
+      coGateway._confirmStakeIntentRawTx(
+        stakeParams.staker,
+        stakeParams.nonce,
+        stakeParams.beneficiary,
+        stakeParams.amount,
+        stakeParams.gasPrice,
+        stakeParams.gasLimit,
+        undefined,
+        stakeParams.blockHeight,
+        stakeParams.storageProof,
+      ),
+      'Invalid hash lock: undefined.',
+    );
   });
 
   it('should throw error when storage proof is invalid', async () => {
-    const expectedErrorMessage = `Invalid storage proof data: ${undefined}.`;
-    await coGateway
-      ._confirmStakeIntentRawTx(
+    await AssertAsync.reject(
+      coGateway._confirmStakeIntentRawTx(
         stakeParams.staker,
         stakeParams.nonce,
         stakeParams.beneficiary,
@@ -225,17 +198,12 @@ describe('EIP20CoGateway._confirmStakeIntentRawTx()', () => {
         stakeParams.hashLock,
         stakeParams.blockHeight,
         undefined,
-      )
-      .catch((exception) => {
-        assert.strictEqual(
-          exception.message,
-          expectedErrorMessage,
-          `Exception reason must be "${expectedErrorMessage}"`,
-        );
-      });
+      ),
+      'Invalid storage proof data: undefined.',
+    );
   });
 
-  it('should return correct mocked transaction object', async () => {
+  it('should return correct transaction object', async () => {
     setup();
     const result = await coGateway._confirmStakeIntentRawTx(
       stakeParams.staker,

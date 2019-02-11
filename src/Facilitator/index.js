@@ -65,7 +65,7 @@ class Facilitator {
     this.stake = this.stake.bind(this);
     this.progressStake = this.progressStake.bind(this);
     this.confirmStakeIntent = this.confirmStakeIntent.bind(this);
-    this.getProof = this.getProof.bind(this);
+    this._getProof = this._getProof.bind(this);
     this.progressStakeMessage = this.progressStakeMessage.bind(this);
     this.performProgressStake = this.performProgressStake.bind(this);
     this.performProgressMint = this.performProgressMint.bind(this);
@@ -123,6 +123,11 @@ class Facilitator {
       return Promise.reject(err);
     }
 
+    if (typeof hashLock !== 'string') {
+      const err = new TypeError(`Invalid hash lock: ${hashLock}.`);
+      return Promise.reject(err);
+    }
+
     if (!txOption) {
       const err = new TypeError(`Invalid transaction options: ${txOption}.`);
       return Promise.reject(err);
@@ -133,17 +138,6 @@ class Facilitator {
         `Invalid facilitator address: ${txOption.from}.`,
       );
       return Promise.reject(err);
-    }
-
-    let stakeHashLock = hashLock;
-    if (hashLock === undefined) {
-      logger.info('Generating hash lock and unlock secret');
-      const hashLockObj = await this.getHashLock();
-      stakeHashLock = hashLockObj.hashLock;
-      logger.info(`  - hash lock generated is ${stakeHashLock}`);
-      logger.info(
-        `  - unlock secrete generated is ${hashLockObj.unlockSecret}`,
-      );
     }
 
     const facilitatorAddress = txOption.from;
@@ -311,7 +305,12 @@ class Facilitator {
           txOptions.value
         } is not equal to the bounty amount ${bounty}`,
       );
-      return Promise.reject(false);
+      const err = new Error(
+        `Value passed in transaction object ${
+          txOptions.value
+        } must be equal to bounty amount ${bounty}`,
+      );
+      return Promise.reject(err);
     }
 
     logger.info(
@@ -416,7 +415,9 @@ class Facilitator {
     }
 
     if (new BN(amount).eqn(0)) {
-      const err = new TypeError(`Stake amount must not be zero: ${amount}.`);
+      const err = new TypeError(
+        `Stake amount must be greater than zero: ${amount}.`,
+      );
       return Promise.reject(err);
     }
 
@@ -480,7 +481,6 @@ class Facilitator {
       gasLimit,
       nonce,
       hashLock,
-      unlockSecret,
       txOptionAuxiliary,
     ).then(() => {
       const messageHash = Message.getStakeMessageHash(
@@ -541,7 +541,7 @@ class Facilitator {
 
     if (!new BN(amount).gtn(0)) {
       const err = new TypeError(
-        `Redeemer amount must not be zero: ${amount}.`,
+        `Redeem amount must be greater than zero: ${amount}.`,
       );
       return Promise.reject(err);
     }
@@ -638,7 +638,6 @@ class Facilitator {
    * @param {string} gasLimit Maximum gas for reward calculation.
    * @param {string} nonce Stake nonce.
    * @param {string} hashLock Hash lock.
-   * @param {string} unlockSecret Unlock secret.
    * @param {Object} txOptions Transaction options.
    *
    * @returns {Promise<Object>} Promise that resolves to transaction receipt.
@@ -651,7 +650,6 @@ class Facilitator {
     gasLimit,
     nonce,
     hashLock,
-    unlockSecret,
     txOptions,
   ) {
     logger.info('Confirming stake intent');
@@ -661,7 +659,9 @@ class Facilitator {
       return Promise.reject(err);
     }
     if (new BN(amount).eqn(0)) {
-      const err = new TypeError(`Stake amount must not be zero: ${amount}.`);
+      const err = new TypeError(
+        `Stake amount must be greater than be zero: ${amount}.`,
+      );
       return Promise.reject(err);
     }
     if (!Web3.utils.isAddress(beneficiary)) {
@@ -680,6 +680,10 @@ class Facilitator {
     }
     if (typeof nonce !== 'string') {
       const err = new TypeError(`Invalid staker nonce: ${nonce}.`);
+      return Promise.reject(err);
+    }
+    if (typeof hashLock !== 'string') {
+      const err = new TypeError(`Invalid hash lock: ${hashLock}.`);
       return Promise.reject(err);
     }
     if (!txOptions) {
@@ -811,7 +815,9 @@ class Facilitator {
       return Promise.reject(err);
     }
     if (new BN(amount).eqn(0)) {
-      const err = new TypeError(`Redeem amount must not be zero: ${amount}.`);
+      const err = new TypeError(
+        `Redeem amount must be greater than zero: ${amount}.`,
+      );
       return Promise.reject(err);
     }
     if (!Web3.utils.isAddress(beneficiary)) {
@@ -830,6 +836,10 @@ class Facilitator {
     }
     if (typeof nonce !== 'string') {
       const err = new TypeError(`Invalid redeemer nonce: ${nonce}.`);
+      return Promise.reject(err);
+    }
+    if (typeof hashLock !== 'string') {
+      const err = new TypeError(`Invalid hash lock: ${hashLock}.`);
       return Promise.reject(err);
     }
     if (!txOptions) {
@@ -964,9 +974,25 @@ class Facilitator {
       );
       return Promise.reject(err);
     }
+    if (!Web3.utils.isAddress(txOptionOrigin.from)) {
+      const err = new TypeError(
+        `Invalid from address ${
+          txOptionOrigin.from
+        } in origin transaction options.`,
+      );
+      return Promise.reject(err);
+    }
     if (txOptionAuxiliary === undefined) {
       const err = new TypeError(
         `Invalid auxiliary transaction option: ${txOptionAuxiliary}.`,
+      );
+      return Promise.reject(err);
+    }
+    if (!Web3.utils.isAddress(txOptionAuxiliary.from)) {
+      const err = new TypeError(
+        `Invalid from address ${
+          txOptionAuxiliary.from
+        } in auxiliary transaction options.`,
       );
       return Promise.reject(err);
     }
@@ -1048,6 +1074,12 @@ class Facilitator {
       const err = new TypeError(`Invalid transaction option: ${txOption}.`);
       return Promise.reject(err);
     }
+    if (!Web3.utils.isAddress(txOption.from)) {
+      const err = new TypeError(
+        `Invalid from address ${txOption.from} in transaction options.`,
+      );
+      return Promise.reject(err);
+    }
 
     const stakeMessageStatus = await this.gateway
       .getOutboxMessageStatus(messageHash)
@@ -1106,6 +1138,12 @@ class Facilitator {
     }
     if (txOption === undefined) {
       const err = new TypeError(`Invalid transaction option: ${txOption}.`);
+      return Promise.reject(err);
+    }
+    if (!Web3.utils.isAddress(txOption.from)) {
+      const err = new TypeError(
+        `Invalid from address ${txOption.from} in transaction options.`,
+      );
       return Promise.reject(err);
     }
 
@@ -1168,6 +1206,12 @@ class Facilitator {
       const err = new TypeError(`Invalid transaction option: ${txOption}.`);
       return Promise.reject(err);
     }
+    if (!Web3.utils.isAddress(txOption.from)) {
+      const err = new TypeError(
+        `Invalid from address ${txOption.from} in transaction options.`,
+      );
+      return Promise.reject(err);
+    }
 
     const unstakeMessageStatus = await this.gateway
       .getInboxMessageStatus(messageHash)
@@ -1228,6 +1272,12 @@ class Facilitator {
       const err = new TypeError(`Invalid transaction option: ${txOption}.`);
       return Promise.reject(err);
     }
+    if (!Web3.utils.isAddress(txOption.from)) {
+      const err = new TypeError(
+        `Invalid from address ${txOption.from} in transaction options.`,
+      );
+      return Promise.reject(err);
+    }
 
     const redeemMessageStatus = await this.coGateway
       .getOutboxMessageStatus(messageHash)
@@ -1275,12 +1325,16 @@ class Facilitator {
    */
   getGatewayProof(messageHash) {
     logger.info('Generating Gateway proof data');
+    if (typeof messageHash !== 'string') {
+      const err = new TypeError(`Invalid message hash: ${messageHash}.`);
+      return Promise.reject(err);
+    }
     return this.coGateway.getLatestAnchorInfo().then((latestAnchorInfo) => {
       const proofGenerator = new Proof(
         this.mosaic.origin.web3,
         this.mosaic.auxiliary.web3,
       );
-      return this.getProof(
+      return this._getProof(
         proofGenerator,
         this.gateway.gatewayAddress,
         latestAnchorInfo,
@@ -1298,12 +1352,16 @@ class Facilitator {
    */
   getCoGatewayProof(messageHash) {
     logger.info('Generating CoGateway proof data');
+    if (typeof messageHash !== 'string') {
+      const err = new TypeError(`Invalid message hash: ${messageHash}.`);
+      return Promise.reject(err);
+    }
     return this.gateway.getLatestAnchorInfo().then((latestAnchorInfo) => {
       const proofGenerator = new Proof(
         this.mosaic.auxiliary.web3,
         this.mosaic.origin.web3,
       );
-      return this.getProof(
+      return this._getProof(
         proofGenerator,
         this.coGateway.coGatewayAddress,
         latestAnchorInfo,
@@ -1314,7 +1372,7 @@ class Facilitator {
 
   /**
    * Gets the proof and validates it.
-   *
+   * @private
    * @param {Object} proofGenerator Proof generator object
    * @param {string} accountAddress Account address.
    * @param {Object} latestAnchorInfo Object containing state root and block height.
@@ -1322,12 +1380,32 @@ class Facilitator {
    *
    * @returns {Promise<Object>} Promise that resolves to proof data.
    */
-  async getProof(
+  async _getProof(
     proofGenerator,
     accountAddress,
     latestAnchorInfo,
     messageHash,
   ) {
+    if (proofGenerator === undefined) {
+      const err = new TypeError(
+        `Invalid proof generator object: ${proofGenerator}`,
+      );
+      return Promise.reject(err);
+    }
+    if (typeof accountAddress !== 'string') {
+      const err = new TypeError(`Invalid account address: ${accountAddress}`);
+      return Promise.reject(err);
+    }
+    if (latestAnchorInfo === undefined) {
+      const err = new TypeError(
+        `Invalid anchor info object: ${latestAnchorInfo}`,
+      );
+      return Promise.reject(err);
+    }
+    if (typeof messageHash !== 'string') {
+      const err = new TypeError(`Invalid message hash: ${messageHash}`);
+      return Promise.reject(err);
+    }
     logger.info(
       `  - Last committed block height is ${latestAnchorInfo.blockHeight}`,
     );

@@ -1,10 +1,9 @@
-const chai = require('chai');
+const { assert } = require('chai');
 const Web3 = require('web3');
 const sinon = require('sinon');
-
-const { assert } = chai;
 const EIP20Gateway = require('../../src/ContractInteract/EIP20Gateway');
 const SpyAssert = require('../../test_utils/SpyAssert');
+const AssertAsync = require('../../test_utils/AssertAsync');
 
 describe('EIP20Gateway._proveGatewayRawTx()', () => {
   let web3;
@@ -48,45 +47,27 @@ describe('EIP20Gateway._proveGatewayRawTx()', () => {
   });
 
   it('should throw error when block height is invalid', async () => {
-    const expectedErrorMessage = `Invalid block height: ${undefined}.`;
-    await gateway
-      ._proveGatewayRawTx(undefined, encodedAccount, accountProof)
-      .catch((exception) => {
-        assert.strictEqual(
-          exception.message,
-          expectedErrorMessage,
-          `Exception reason must be "${expectedErrorMessage}"`,
-        );
-      });
+    await AssertAsync.reject(
+      gateway._proveGatewayRawTx(undefined, encodedAccount, accountProof),
+      'Invalid block height: undefined.',
+    );
   });
 
-  it('should throw error when encoded account is invalid', () => {
-    const expectedErrorMessage = `Invalid account data: ${undefined}.`;
-    gateway
-      ._proveGatewayRawTx(blockHeight, undefined, accountProof)
-      .catch((exception) => {
-        assert.strictEqual(
-          exception.message,
-          expectedErrorMessage,
-          `Exception reason must be "${expectedErrorMessage}"`,
-        );
-      });
+  it('should throw error when encoded account is invalid', async () => {
+    await AssertAsync.reject(
+      gateway._proveGatewayRawTx(blockHeight, undefined, accountProof),
+      'Invalid account data: undefined.',
+    );
   });
 
-  it('should throw error when account proof is invalid', () => {
-    const expectedErrorMessage = `Invalid account proof: ${undefined}.`;
-    gateway
-      ._proveGatewayRawTx(blockHeight, encodedAccount, undefined)
-      .catch((exception) => {
-        assert.strictEqual(
-          exception.message,
-          expectedErrorMessage,
-          `Exception reason must be "${expectedErrorMessage}"`,
-        );
-      });
+  it('should throw error when account proof is invalid', async () => {
+    await AssertAsync.reject(
+      gateway._proveGatewayRawTx(blockHeight, encodedAccount, undefined),
+      'Invalid account proof: undefined.',
+    );
   });
 
-  it('should return correct mocked transaction object', async () => {
+  it('should return correct transaction object', async () => {
     setup();
     const result = await gateway._proveGatewayRawTx(
       blockHeight,
