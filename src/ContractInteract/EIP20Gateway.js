@@ -69,6 +69,7 @@ class EIP20Gateway {
     this.isBountyAmountApproved = this.isBountyAmountApproved.bind(this);
     this.isStakeAmountApproved = this.isStakeAmountApproved.bind(this);
     this.confirmRedeemIntentRawTx = this.confirmRedeemIntentRawTx.bind(this);
+    this.progressUnstakeRawTx = this.progressUnstakeRawTx.bind(this);
   }
 
   /**
@@ -427,7 +428,7 @@ class EIP20Gateway {
       );
       return Promise.reject(err);
     }
-    return this._progressUnstakeRawTx(messageHash, unlockSecret).then((tx) =>
+    return this.progressUnstakeRawTx(messageHash, unlockSecret).then((tx) =>
       Utils.sendTransaction(tx, txOptions),
     );
   }
@@ -440,7 +441,7 @@ class EIP20Gateway {
    *
    * @returns {Promise<Object>} Promise that resolves to raw transaction object.
    */
-  _progressUnstakeRawTx(messageHash, unlockSecret) {
+  progressUnstakeRawTx(messageHash, unlockSecret) {
     if (typeof messageHash !== 'string') {
       const err = new TypeError(`Invalid message hash: ${messageHash}.`);
       return Promise.reject(err);
