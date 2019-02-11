@@ -67,7 +67,7 @@ class EIP20CoGateway {
     this.getUtilityToken = this.getUtilityToken.bind(this);
     this.isRedeemAmountApproved = this.isRedeemAmountApproved.bind(this);
     this.redeem = this.redeem.bind(this);
-    this._redeemRawTx = this._redeemRawTx.bind(this);
+    this.redeemRawTx = this.redeemRawTx.bind(this);
   }
 
   /**
@@ -491,7 +491,7 @@ class EIP20CoGateway {
       return Promise.reject(err);
     }
 
-    return this._redeemRawTx(
+    return this.redeemRawTx(
       amount,
       beneficiary,
       gasPrice,
@@ -513,7 +513,7 @@ class EIP20CoGateway {
    *
    * @returns {Promise<Object>} Promise that resolves to raw transaction object.
    */
-  _redeemRawTx(amount, beneficiary, gasPrice, gasLimit, nonce, hashLock) {
+  redeemRawTx(amount, beneficiary, gasPrice, gasLimit, nonce, hashLock) {
     if (!new BN(amount).gtn(0)) {
       const err = new TypeError(
         `Redeem amount must be greater than zero: ${amount}.`,
