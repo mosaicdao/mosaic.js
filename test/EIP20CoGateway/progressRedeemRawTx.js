@@ -7,7 +7,7 @@ const EIP20CoGateway = require('../../src/ContractInteract/EIP20CoGateway');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const AssertAsync = require('../../test_utils/AssertAsync');
 
-describe('EIP20CoGateway._progressRedeemRawTx()', () => {
+describe('EIP20CoGateway.progressRedeemRawTx()', () => {
   let web3;
   let coGatewayAddress;
   let coGateway;
@@ -26,7 +26,7 @@ describe('EIP20CoGateway._progressRedeemRawTx()', () => {
       sinon.fake.resolves(mockedTx),
     );
 
-    spyCall = sinon.spy(coGateway, '_progressRedeemRawTx');
+    spyCall = sinon.spy(coGateway, 'progressRedeemRawTx');
   };
 
   const tearDown = () => {
@@ -47,21 +47,21 @@ describe('EIP20CoGateway._progressRedeemRawTx()', () => {
 
   it('should throw an error when message hash is undefined', async () => {
     await AssertAsync.reject(
-      coGateway._progressRedeemRawTx(undefined, unlockSecret),
+      coGateway.progressRedeemRawTx(undefined, unlockSecret),
       'Invalid message hash: undefined.',
     );
   });
 
   it('should throw an error when unlock secret is undefined', async () => {
     await AssertAsync.reject(
-      coGateway._progressRedeemRawTx(messageHash, undefined),
+      coGateway.progressRedeemRawTx(messageHash, undefined),
       'Invalid unlock secret: undefined.',
     );
   });
 
   it('should return correct transaction object', async () => {
     setup();
-    const result = await coGateway._progressRedeemRawTx(
+    const result = await coGateway.progressRedeemRawTx(
       messageHash,
       unlockSecret,
     );

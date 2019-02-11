@@ -25,7 +25,7 @@ describe('EIP20CoGateway.progressRedeem()', () => {
   const setup = () => {
     spyRawTx = sinon.replace(
       coGateway,
-      '_progressRedeemRawTx',
+      'progressRedeemRawTx',
       sinon.fake.resolves(mockedTx),
     );
 

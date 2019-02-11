@@ -68,6 +68,7 @@ class EIP20CoGateway {
     this.isRedeemAmountApproved = this.isRedeemAmountApproved.bind(this);
     this.redeem = this.redeem.bind(this);
     this.redeemRawTx = this.redeemRawTx.bind(this);
+    this.progressRedeemRawTx = this.progressRedeemRawTx.bind(this);
   }
 
   /**
@@ -340,7 +341,7 @@ class EIP20CoGateway {
       );
       return Promise.reject(err);
     }
-    return this._progressRedeemRawTx(messageHash, unlockSecret).then((tx) =>
+    return this.progressRedeemRawTx(messageHash, unlockSecret).then((tx) =>
       Utils.sendTransaction(tx, txOptions),
     );
   }
@@ -353,7 +354,7 @@ class EIP20CoGateway {
    *
    * @returns {Promise<Object>} Promise that resolves to raw transaction object.
    */
-  _progressRedeemRawTx(messageHash, unlockSecret) {
+  progressRedeemRawTx(messageHash, unlockSecret) {
     if (typeof messageHash !== 'string') {
       const err = new TypeError(`Invalid message hash: ${messageHash}.`);
       return Promise.reject(err);
