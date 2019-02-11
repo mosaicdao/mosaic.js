@@ -8,7 +8,7 @@ const OSTPrime = require('../../src/ContractInteract/OSTPrime');
 const AssertAsync = require('../../test_utils/AssertAsync');
 const SpyAssert = require('../../test_utils/SpyAssert');
 
-describe('OSTPrime._unwrapRawTx()', () => {
+describe('OSTPrime.unwrapRawTx()', () => {
   let web3;
   let ostPrimeAddress;
   let ostPrime;
@@ -27,10 +27,10 @@ describe('OSTPrime._unwrapRawTx()', () => {
       sinon.fake.resolves(Promise.resolve(mockTx)),
     );
 
-    const spyUnwrapRawTx = sinon.spy(ostPrime, '_unwrapRawTx');
+    const spyUnwrapRawTx = sinon.spy(ostPrime, 'unwrapRawTx');
     const amount = '100';
 
-    const result = await ostPrime._unwrapRawTx(amount);
+    const result = await ostPrime.unwrapRawTx(amount);
 
     assert.strictEqual(result, mockTx, 'It must return expected tx');
 
@@ -44,7 +44,7 @@ describe('OSTPrime._unwrapRawTx()', () => {
     const amount = undefined;
 
     await AssertAsync.reject(
-      ostPrime._unwrapRawTx(amount),
+      ostPrime.unwrapRawTx(amount),
       `Invalid amount: ${amount}.`,
     );
   });
