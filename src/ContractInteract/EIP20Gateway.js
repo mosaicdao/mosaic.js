@@ -48,7 +48,7 @@ class EIP20Gateway {
     this.proveGateway = this.proveGateway.bind(this);
     this.proveGatewayRawTx = this.proveGatewayRawTx.bind(this);
     this.stake = this.stake.bind(this);
-    this._stakeRawTx = this._stakeRawTx.bind(this);
+    this.stakeRawTx = this.stakeRawTx.bind(this);
     this.progressStake = this.progressStake.bind(this);
     this._progressStakeRawTx = this._progressStakeRawTx.bind(this);
     this.getBounty = this.getBounty.bind(this);
@@ -156,7 +156,7 @@ class EIP20Gateway {
       return Promise.reject(err);
     }
 
-    return this._stakeRawTx(
+    return this.stakeRawTx(
       amount,
       beneficiary,
       gasPrice,
@@ -178,7 +178,7 @@ class EIP20Gateway {
    *
    * @returns {Promise<Object>} Promise that resolves to raw transaction object.
    */
-  _stakeRawTx(amount, beneficiary, gasPrice, gasLimit, nonce, hashLock) {
+  stakeRawTx(amount, beneficiary, gasPrice, gasLimit, nonce, hashLock) {
     if (!new BN(amount).gtn(0)) {
       const err = new TypeError(
         `Stake amount must be greater than zero: ${amount}.`,
