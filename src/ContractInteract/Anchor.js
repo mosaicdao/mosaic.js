@@ -71,15 +71,15 @@ class Anchor {
    * deploys the Anchor contract, and sets its coAnchor address (if provided).
    *
    *
-   * @param {Web3} originWeb3 Web3 object.
-   * @param {Web3} auxiliaryWeb3 Web3 object for remote chain.
+   * @param {Web3} web3 Web3 object.
+   * @param {Web3} coWeb3 Web3 object for remote chain.
    * @param {AnchorSetupConfig} config Anchor setup configuration.
    * @param {Object} txOptions Transaction options.
    *
    * @returns {Promise<Anchor>} Promise containing the Anchor instance that
    *                            has been set up.
    */
-  static setup(originWeb3, auxiliaryWeb3, config, txOptions = {}) {
+  static setup(web3, coWeb3, config, txOptions = {}) {
     Anchor.validateSetupConfig(config);
 
     const deployParams = Object.assign({}, txOptions);
@@ -87,7 +87,7 @@ class Anchor {
 
     // 1. Get block and stateRoot.
     const blockHeight = config.blockHeight || 'latest';
-    let promiseChain = auxiliaryWeb3.eth
+    let promiseChain = coWeb3.eth
       .getBlock(blockHeight)
       .then((block) => ({
         initialBlockHeight: block.number,
@@ -96,7 +96,7 @@ class Anchor {
       .then(({ initialStateRoot, initialBlockHeight }) => {
         // 2. Deploy the Contract
         return Anchor.deploy(
-          originWeb3,
+          web3,
           config.remoteChainId,
           initialBlockHeight,
           initialStateRoot,
