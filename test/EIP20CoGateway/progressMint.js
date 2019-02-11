@@ -25,7 +25,7 @@ describe('EIP20CoGateway.progressMint()', () => {
   const setup = () => {
     spyRawTx = sinon.replace(
       coGateway,
-      '_progressMintRawTx',
+      'progressMintRawTx',
       sinon.fake.resolves(mockedTx),
     );
 

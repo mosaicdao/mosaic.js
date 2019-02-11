@@ -53,7 +53,7 @@ class EIP20CoGateway {
     this.confirmStakeIntent = this.confirmStakeIntent.bind(this);
     this.confirmStakeIntentRawTx = this.confirmStakeIntentRawTx.bind(this);
     this.progressMint = this.progressMint.bind(this);
-    this._progressMintRawTx = this._progressMintRawTx.bind(this);
+    this.progressMintRawTx = this.progressMintRawTx.bind(this);
     this.getBounty = this.getBounty.bind(this);
     this.getNonce = this.getNonce.bind(this);
     this.getStateRootProviderAddress = this.getStateRootProviderAddress.bind(
@@ -292,7 +292,7 @@ class EIP20CoGateway {
       );
       return Promise.reject(err);
     }
-    return this._progressMintRawTx(messageHash, unlockSecret).then((tx) =>
+    return this.progressMintRawTx(messageHash, unlockSecret).then((tx) =>
       Utils.sendTransaction(tx, txOptions),
     );
   }
@@ -305,7 +305,7 @@ class EIP20CoGateway {
    *
    * @returns {Promise<Object>} Promise that resolves to raw transaction object.
    */
-  _progressMintRawTx(messageHash, unlockSecret) {
+  progressMintRawTx(messageHash, unlockSecret) {
     if (typeof messageHash !== 'string') {
       const err = new TypeError(`Invalid message hash: ${messageHash}.`);
       return Promise.reject(err);
