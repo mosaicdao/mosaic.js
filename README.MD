@@ -64,10 +64,10 @@ const facilitator = new Mosaic.Facilitator(mosaic);
 Staking:
 ```js
 const staker = '0x00000000000000000000stakeraccountaddress';
-const amount = '1000000000';
+const amount = '1000000000000';
 const beneficiary = '0x000000000000000beneficiaryaccountaddress';
-const gasPrice = '1';
-const gasLimit = '1000000000';
+const gasPrice = '5';
+const gasLimit = '150000000';
 const hashLock = '0x00000000000000000000000000000000000000000000000000000000hashlock';
 const txOptions = { from: staker };
 
@@ -111,10 +111,10 @@ facilitator
 Redeeming:
 ```js
 const redeemer = '0x0000000000000000000000000redeemeraddress';
-const redeemAmount = '10000';
+const redeemAmount = '1000000000000';
 const beneficiary = '0x000000000000000beneficiaryaccountaddress';
-const gasPrice = '1';
-const gasLimit = '10000000';
+const gasPrice = '4;
+const gasLimit = '150000000';
 const hashLock = '00000000000000000000000000000000000000000000000000000000hashlock';
 const txOptionRedeem = {
   from: redeemer,
