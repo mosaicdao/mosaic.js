@@ -158,28 +158,6 @@ facilitator
   .catch(console.log);
 ```
 
-#### Deploying Gateways
-
-Using `mosaic.js` to deploy gateways is still a work in progress and must be done manually for now:
-```js
-// Expecting Mosaic import and an instance of `mosaic`:
-const { EIP20Gateway } = Mosaic.Contracts;
-
-EIP20Gateway
-  .setup(
-    mosaic.origin.web3,
-    mosaic.auxiliary.web3,
-    gatewayConfig,
-    coGatewayConfig,
-    originTxOptions,
-    auxiliaryTxOptions,
-  )
-  .then(console.log)
-  .catch(console.log);
-```
-
-> ⚠️ Note that deployment will be simplified in the future.
-
 ## Related Work
 
 [mosaic-contracts] provides the EVM smart contracts implementations.
