@@ -290,7 +290,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
       [
         stakeParams.amount,
         stakeParams.beneficiary,
-        facilitator.gateway.gatewayAddress,
+        facilitator.gateway.address,
         stakeParams.nonce,
         stakeParams.gasPrice,
         stakeParams.gasLimit,
@@ -347,7 +347,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
       [
         stakeParams.amount,
         stakeParams.beneficiary,
-        facilitator.gateway.gatewayAddress,
+        facilitator.gateway.address,
         stakeParams.nonce,
         stakeParams.gasPrice,
         stakeParams.gasLimit,
@@ -404,7 +404,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
       [
         stakeParams.amount,
         stakeParams.beneficiary,
-        facilitator.gateway.gatewayAddress,
+        facilitator.gateway.address,
         stakeParams.nonce,
         stakeParams.gasPrice,
         stakeParams.gasLimit,
@@ -460,7 +460,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
       [
         stakeParams.amount,
         stakeParams.beneficiary,
-        facilitator.gateway.gatewayAddress,
+        facilitator.gateway.address,
         stakeParams.nonce,
         stakeParams.gasPrice,
         stakeParams.gasLimit,

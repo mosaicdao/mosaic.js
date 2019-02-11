@@ -488,7 +488,7 @@ class Facilitator {
       const messageHash = Message.getStakeMessageHash(
         amount,
         beneficiary,
-        this.gateway.gatewayAddress,
+        this.gateway.address,
         nonce,
         gasPrice,
         gasLimit,
@@ -613,7 +613,7 @@ class Facilitator {
       const messageHash = Message.getRedeemMessageHash(
         amount,
         beneficiary,
-        this.coGateway.coGatewayAddress,
+        this.coGateway.address,
         nonce,
         gasPrice,
         gasLimit,
@@ -703,7 +703,7 @@ class Facilitator {
     const messageHash = Message.getStakeMessageHash(
       amount,
       beneficiary,
-      this.gateway.gatewayAddress,
+      this.gateway.address,
       nonce,
       gasPrice,
       gasLimit,
@@ -859,7 +859,7 @@ class Facilitator {
     const messageHash = Message.getRedeemMessageHash(
       amount,
       beneficiary,
-      this.coGateway.coGatewayAddress,
+      this.coGateway.address,
       nonce,
       gasPrice,
       gasLimit,
@@ -1338,7 +1338,7 @@ class Facilitator {
       );
       return this._getProof(
         proofGenerator,
-        this.gateway.gatewayAddress,
+        this.gateway.address,
         latestAnchorInfo,
         messageHash,
       );
@@ -1365,7 +1365,7 @@ class Facilitator {
       );
       return this._getProof(
         proofGenerator,
-        this.coGateway.coGatewayAddress,
+        this.coGateway.address,
         latestAnchorInfo,
         messageHash,
       );
@@ -1375,7 +1375,7 @@ class Facilitator {
   /**
    * Gets the proof and validates it.
    * @private
-   * @param {Object} proofGenerator Proof generator object
+   * @param {Object} proofGenerator P`roof generator object
    * @param {string} accountAddress Account address.
    * @param {Object} latestAnchorInfo Object containing state root and block height.
    * @param {string} messageHash Message hash.
