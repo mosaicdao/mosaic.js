@@ -113,7 +113,7 @@ Redeeming:
 const redeemer = '0x0000000000000000000000000redeemeraddress';
 const redeemAmount = '1000000000000';
 const beneficiary = '0x000000000000000beneficiaryaccountaddress';
-const gasPrice = '4;
+const gasPrice = '4';
 const gasLimit = '150000000';
 const hashLock = '00000000000000000000000000000000000000000000000000000000hashlock';
 const txOptionRedeem = {
@@ -153,6 +153,50 @@ facilitator
     unlockSecret,
     txOptionOriginRedeem,
     txOptionAuxiliaryRedeem,
+  )
+  .then(console.log)
+  .catch(console.log);
+```
+
+#### General Contract Interaction
+
+EIP20Gateway example:
+```js
+// Expecting Mosaic import and an instance of `mosaic`:
+const {
+  Anchor,
+  EIP20CoGateway,
+  EIP20Gateway,
+  EIP20Token,
+  OSTPrime,
+} = Mosaic.Contracts;
+
+// Afterwards, ou can call methods directly on the contract instance:
+const eip20Gateway = new EIP20Gateway(
+  mosaic.origin.web3,
+  mosaic.origin.contractAddresses.EIP20Gateway,
+);
+
+const staker = '0x00000000000000000000stakeraccountaddress';
+
+const amount = '1000000000000';
+const beneficiary = '0x000000000000000beneficiaryaccountaddress';
+const gasPrice = '5';
+const gasLimit = '150000000';
+const hashLock = '0x00000000000000000000000000000000000000000000000000000000hashlock';
+const txOptions = { from: staker };
+
+const nonce = await eip20Gateway.getNonce(staker);
+
+eip20Gateway
+  .stake(
+    amount,
+    beneficiary,
+    gasPrice,
+    gasLimit,
+    nonce,
+    hashLock,
+    txOptions,
   )
   .then(console.log)
   .catch(console.log);
