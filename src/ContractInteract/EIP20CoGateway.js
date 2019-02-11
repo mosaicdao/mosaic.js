@@ -4,8 +4,8 @@
  * @property {string} valueToken The value token contract address.
  * @property {string} utilityToken The utility token address that will be used for
  *                    minting the utility token.
- * @property {string} anchor Address of anchor to use for getting the state root of
- *                    the auxiliary chain.
+ * @property {string} stateRootProvider Address of contract to use for getting the state root of
+ *                    the origin chain.
  * @property {string} bounty The amount that facilitator will stakes to initiate the
  *                    stake process.
  * @property {string} organization Address of an organization contract.
@@ -119,7 +119,7 @@ class EIP20CoGateway {
       web3,
       config.valueToken,
       config.utilityToken,
-      config.anchor,
+      config.stateRootProvider,
       config.bounty,
       config.organization,
       config.gateway,
@@ -142,7 +142,7 @@ class EIP20CoGateway {
     validateConfigKeyExists(config, 'deployer', 'config');
     validateConfigKeyExists(config, 'bounty', 'config');
     validateConfigKeyExists(config, 'organization', 'config');
-    validateConfigKeyExists(config, 'anchor', 'config');
+    validateConfigKeyExists(config, 'stateRootProvider', 'config');
     validateConfigKeyExists(config, 'messageBus', 'config');
     validateConfigKeyExists(config, 'gatewayLib', 'config');
     validateConfigKeyExists(config, 'valueToken', 'config');
@@ -157,8 +157,8 @@ class EIP20CoGateway {
    * @param {string} valueToken The value token contract address.
    * @param {string} utilityToken The utility token address that will be used for
    *                 minting the utility token.
-   * @param {string} anchor Address of anchor to use for getting the state root of
-   *                 the auxiliary chain.
+   * @param {string} stateRootProvider Address of contract to use for getting the state root of
+   *                 the origin chain.
    * @param {string} bounty The amount that facilitator will stakes to initiate the
    *                 stake process.
    * @param {string} organization Address of an organization contract.
@@ -177,7 +177,7 @@ class EIP20CoGateway {
     web3,
     valueToken,
     utilityToken,
-    anchor,
+    stateRootProvider,
     bounty,
     organization,
     gateway,
@@ -190,7 +190,7 @@ class EIP20CoGateway {
       web3,
       valueToken,
       utilityToken,
-      anchor,
+      stateRootProvider,
       bounty,
       organization,
       gateway,
@@ -212,8 +212,8 @@ class EIP20CoGateway {
    * @param {string} valueToken The value token contract address.
    * @param {string} utilityToken The utility token address that will be used for
    *                 minting the utility token.
-   * @param {string} anchor Address of anchor to use for getting the state root of
-   *                 the auxiliary chain.
+   * @param {string} stateRootProvider Address of contract to use for getting the state root of
+   *                 the origin chain.
    * @param {string} bounty The amount that facilitator will stakes to initiate the
    *                 stake process.
    * @param {string} organization Address of an organization contract.
@@ -231,7 +231,7 @@ class EIP20CoGateway {
     web3,
     valueToken,
     utilityToken,
-    anchor,
+    stateRootProvider,
     bounty,
     organization,
     gateway,
@@ -260,7 +260,7 @@ class EIP20CoGateway {
     const args = [
       valueToken,
       utilityToken,
-      anchor,
+      stateRootProvider,
       bounty,
       organization,
       gateway,

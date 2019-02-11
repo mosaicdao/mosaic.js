@@ -2,20 +2,20 @@
  * @typedef EIP20GatewaySetupConfig
  *
  * @property {string} token The ERC20 token contract address that will be
- *                 staked and corresponding utility tokens will be minted
- *                 in auxiliary chain.
+ *                    staked and corresponding utility tokens will be minted
+ *                    in auxiliary chain.
  * @property {string} baseToken The ERC20 token address that will be used for
- *                 staking bounty from the facilitators.
- * @property {string} anchor Address of anchor to use for getting the state root of
- *                 the auxiliary chain.
+ *                    staking bounty from the facilitators.
+ * @property {string} stateRootProvider Address of contract that implements
+ *                    the state root provider interface.
  * @property {string} bounty The amount that facilitator will stakes to initiate the
- *                 stake process.
+ *                    stake process.
  * @property {string} organization Address of an organization contract.
  * @property {string} burner Address where tokens will be burned.
  * @property {string} messageBus Address of MessageBus contract
- *                 to link into the contract bytecode.
+ *                    to link into the contract bytecode.
  * @property {string} gatewayLib Address of GatewayLib contract
- *                 to link into the contract bytecode.
+ *                    to link into the contract bytecode.
  * @property {string} deployer Address to be used to send deployment
  *                    transactions.
  * @property {string} organizationOwner Address of owner of `organization`.
@@ -159,7 +159,7 @@ class EIP20Gateway {
       originWeb3,
       gatewayConfig.token,
       gatewayConfig.baseToken,
-      gatewayConfig.anchor,
+      gatewayConfig.stateRootProvider,
       gatewayConfig.bounty,
       gatewayConfig.organization,
       gatewayConfig.burner,
@@ -206,7 +206,11 @@ class EIP20Gateway {
   static validateSetupConfig(gatewayConfig) {
     validateConfigKeyExists(gatewayConfig, 'deployer', 'gatewayConfig');
     validateConfigKeyExists(gatewayConfig, 'organization', 'gatewayConfig');
-    validateConfigKeyExists(gatewayConfig, 'anchor', 'gatewayConfig');
+    validateConfigKeyExists(
+      gatewayConfig,
+      'stateRootProvider',
+      'gatewayConfig',
+    );
     validateConfigKeyExists(gatewayConfig, 'bounty', 'gatewayConfig');
     validateConfigKeyExists(gatewayConfig, 'burner', 'gatewayConfig');
     validateConfigKeyExists(gatewayConfig, 'messageBus', 'gatewayConfig');
@@ -228,7 +232,7 @@ class EIP20Gateway {
    *                 in auxiliary chain.
    * @param {string} baseToken The ERC20 token address that will be used for
    *                 staking bounty from the facilitators.
-   * @param {string} anchor Address of anchor to use for getting the state root of
+   * @param {string} stateRootProvider Address of contract to use for getting the state root of
    *                 the auxiliary chain.
    * @param {string} bounty The amount that facilitator will stakes to initiate the
    *                 stake process.
@@ -247,7 +251,7 @@ class EIP20Gateway {
     web3,
     token,
     baseToken,
-    anchor,
+    stateRootProvider,
     bounty,
     organization,
     burner,
@@ -259,7 +263,7 @@ class EIP20Gateway {
       web3,
       token,
       baseToken,
-      anchor,
+      stateRootProvider,
       bounty,
       organization,
       burner,
@@ -282,7 +286,7 @@ class EIP20Gateway {
    *                 in auxiliary chain.
    * @param {string} baseToken The ERC20 token address that will be used for
    *                 staking bounty from the facilitators.
-   * @param {string} anchor Address of anchor to use for getting the state root of
+   * @param {string} stateRootProvider Address of contract to use for getting the state root of
    *                 the auxiliary chain.
    * @param {string} bounty The amount that facilitator will stakes to initiate the
    *                 stake process.
@@ -299,7 +303,7 @@ class EIP20Gateway {
     web3,
     token,
     baseToken,
-    anchor,
+    stateRootProvider,
     bounty,
     organization,
     burner,
@@ -324,7 +328,14 @@ class EIP20Gateway {
     );
 
     const contract = new web3.eth.Contract(abi, null, null);
-    const args = [token, baseToken, anchor, bounty, organization, burner];
+    const args = [
+      token,
+      baseToken,
+      stateRootProvider,
+      bounty,
+      organization,
+      burner,
+    ];
 
     return contract.deploy({
       data: bin,
