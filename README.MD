@@ -162,7 +162,7 @@ facilitator
 
 Using `mosaic.js` to deploy gateways is still a work in progress and must be done manually for now:
 ```js
-// Expecting Mosaic impart and an instance of `mosaic`:
+// Expecting Mosaic import and an instance of `mosaic`:
 const { EIP20Gateway } = Mosaic.Contracts;
 
 EIP20Gateway
