@@ -861,7 +861,7 @@ class EIP20Gateway {
     return this.getValueTokenContract().then((eip20ValueToken) => {
       return eip20ValueToken.isAmountApproved(
         stakerAddress,
-        this.gatewayAddress,
+        this.address,
         amount,
       );
     });
@@ -885,7 +885,7 @@ class EIP20Gateway {
       return this.getBounty().then((bounty) => {
         return eip20BaseToken.isAmountApproved(
           facilityAddress,
-          this.gatewayAddress,
+          this.address,
           bounty,
         );
       });
@@ -946,7 +946,7 @@ class EIP20Gateway {
       return Promise.reject(err);
     }
     return this.getValueTokenContract().then((eip20Token) =>
-      eip20Token.approve(this.gatewayAddress, amount, txOptions),
+      eip20Token.approve(this.address, amount, txOptions),
     );
   }
 
@@ -969,7 +969,7 @@ class EIP20Gateway {
     }
     return this.getBaseTokenContract().then((eip20BaseToken) => {
       return this.getBounty().then((bounty) =>
-        eip20BaseToken.approve(this.gatewayAddress, bounty, txOptions),
+        eip20BaseToken.approve(this.address, bounty, txOptions),
       );
     });
   }
