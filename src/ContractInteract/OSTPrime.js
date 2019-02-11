@@ -40,7 +40,7 @@ class OSTPrime {
     this.allowance = this.allowance.bind(this);
     this.isAmountApproved = this.isAmountApproved.bind(this);
     this.wrap = this.wrap.bind(this);
-    this._wrapRawTx = this._wrapRawTx.bind(this);
+    this.wrapRawTx = this.wrapRawTx.bind(this);
     this.unwrap = this.unwrap.bind(this);
     this._unwrapRawTx = this._unwrapRawTx.bind(this);
   }
@@ -218,9 +218,7 @@ class OSTPrime {
       const err = new TypeError(`Invalid address: ${txOptions.from}.`);
       return Promise.reject(err);
     }
-    return this._wrapRawTx().then((tx) =>
-      Utils.sendTransaction(tx, txOptions),
-    );
+    return this.wrapRawTx().then((tx) => Utils.sendTransaction(tx, txOptions));
   }
 
   /**
@@ -228,7 +226,7 @@ class OSTPrime {
    *
    * @returns {Promise<Object>} Promise that resolves to raw transaction object.
    */
-  _wrapRawTx() {
+  wrapRawTx() {
     const tx = this.contract.methods.wrap();
     return Promise.resolve(tx);
   }
