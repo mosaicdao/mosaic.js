@@ -65,7 +65,7 @@ class EIP20Gateway {
     this.getAnchor = this.getAnchor.bind(this);
     this.getLatestAnchorInfo = this.getLatestAnchorInfo.bind(this);
     this.getBaseTokenContract = this.getBaseTokenContract.bind(this);
-    this.getEIP20ValueToken = this.getEIP20ValueToken.bind(this);
+    this.getValueTokenContract = this.getValueTokenContract.bind(this);
     this.isBountyAmountApproved = this.isBountyAmountApproved.bind(this);
     this.isStakeAmountApproved = this.isStakeAmountApproved.bind(this);
   }
@@ -591,7 +591,7 @@ class EIP20Gateway {
       const err = new TypeError(`Invalid stake amount: ${amount}.`);
       return Promise.reject(err);
     }
-    return this.getEIP20ValueToken().then((eip20ValueToken) => {
+    return this.getValueTokenContract().then((eip20ValueToken) => {
       return eip20ValueToken.isAmountApproved(
         stakerAddress,
         this.gatewayAddress,
@@ -630,7 +630,7 @@ class EIP20Gateway {
    *
    * @returns {Promise<Object>} Promise that resolves to EIP20Token object.
    */
-  getEIP20ValueToken() {
+  getValueTokenContract() {
     if (this._eip20ValueToken) {
       return Promise.resolve(this._eip20ValueToken);
     }
@@ -678,7 +678,7 @@ class EIP20Gateway {
       const err = new TypeError(`Invalid stake amount: ${amount}.`);
       return Promise.reject(err);
     }
-    return this.getEIP20ValueToken().then((eip20Token) =>
+    return this.getValueTokenContract().then((eip20Token) =>
       eip20Token.approve(this.gatewayAddress, amount, txOptions),
     );
   }

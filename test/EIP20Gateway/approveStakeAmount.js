@@ -12,18 +12,18 @@ describe('EIP20Gateway.approveStakeAmount()', () => {
   let txOptions;
   let gateway;
 
-  let spyGetEIP20ValueToken;
-  let mockEIP20ValueToken;
+  let spyGetValueTokenContract;
+  let mockValueTokenContract;
   let spyApprove;
   let spyCall;
 
   const setup = () => {
-    mockEIP20ValueToken = sinon.createStubInstance(EIP20Token);
-    const eip20ValueTokenContract = mockEIP20ValueToken;
+    mockValueTokenContract = sinon.createStubInstance(EIP20Token);
+    const eip20ValueTokenContract = mockValueTokenContract;
 
-    spyGetEIP20ValueToken = sinon.replace(
+    spyGetValueTokenContract = sinon.replace(
       gateway,
-      'getEIP20ValueToken',
+      'getValueTokenContract',
       sinon.fake.resolves(eip20ValueTokenContract),
     );
 
@@ -85,7 +85,7 @@ describe('EIP20Gateway.approveStakeAmount()', () => {
 
     assert.strictEqual(result, true, 'Result must be true');
 
-    SpyAssert.assert(spyGetEIP20ValueToken, 1, [[]]);
+    SpyAssert.assert(spyGetValueTokenContract, 1, [[]]);
     SpyAssert.assert(spyApprove, 1, [
       [mosaic.origin.contractAddresses.EIP20Gateway, stakeAmount, txOptions],
     ]);
