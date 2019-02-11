@@ -7,7 +7,7 @@ const EIP20Token = require('../../src/ContractInteract/EIP20Token');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const AssertAsync = require('../../test_utils/AssertAsync');
 
-describe('EIP20Token._approveRawTx()', () => {
+describe('EIP20Token.approveRawTx()', () => {
   let web3;
   let tokenAddress;
   let token;
@@ -26,7 +26,7 @@ describe('EIP20Token._approveRawTx()', () => {
       sinon.fake.resolves(mockedTx),
     );
 
-    spyCall = sinon.spy(token, '_approveRawTx');
+    spyCall = sinon.spy(token, 'approveRawTx');
   };
 
   const tearDown = () => {
@@ -46,21 +46,21 @@ describe('EIP20Token._approveRawTx()', () => {
 
   it('should throw an error when spender address is undefined', async () => {
     await AssertAsync.reject(
-      token._approveRawTx(undefined, amount),
+      token.approveRawTx(undefined, amount),
       'Invalid spender address: undefined.',
     );
   });
 
   it('should throw an error when amount is undefined', async () => {
     await AssertAsync.reject(
-      token._approveRawTx(spenderAddress, undefined),
+      token.approveRawTx(spenderAddress, undefined),
       'Invalid approval amount: undefined.',
     );
   });
 
   it('should return transaction object', async () => {
     setup();
-    const result = await token._approveRawTx(spenderAddress, amount);
+    const result = await token.approveRawTx(spenderAddress, amount);
 
     assert.strictEqual(
       result,

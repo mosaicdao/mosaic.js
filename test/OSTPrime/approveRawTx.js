@@ -8,7 +8,7 @@ const OSTPrime = require('../../src/ContractInteract/OSTPrime');
 const AssertAsync = require('../../test_utils/AssertAsync');
 const SpyAssert = require('../../test_utils/SpyAssert');
 
-describe('OSTPrime._approveRawTx()', () => {
+describe('OSTPrime.approveRawTx()', () => {
   let web3;
   let ostPrimeAddress;
   let ostPrime;
@@ -27,12 +27,12 @@ describe('OSTPrime._approveRawTx()', () => {
       sinon.fake.resolves(Promise.resolve(mockTx)),
     );
 
-    const spyApproveRawTx = sinon.spy(ostPrime, '_approveRawTx');
+    const spyApproveRawTx = sinon.spy(ostPrime, 'approveRawTx');
 
     const spenderAddress = '0x0000000000000000000000000000000000000004';
     const amount = '100';
 
-    const tx = await ostPrime._approveRawTx(spenderAddress, amount);
+    const tx = await ostPrime.approveRawTx(spenderAddress, amount);
 
     assert.strictEqual(tx, mockTx, 'It must return expected tx');
 
@@ -47,7 +47,7 @@ describe('OSTPrime._approveRawTx()', () => {
     const spenderAddress = '0x123';
 
     await AssertAsync.reject(
-      ostPrime._approveRawTx(spenderAddress, amount),
+      ostPrime.approveRawTx(spenderAddress, amount),
       `Invalid spender address: ${spenderAddress}.`,
     );
   });
@@ -57,7 +57,7 @@ describe('OSTPrime._approveRawTx()', () => {
     const spenderAddress = undefined;
 
     await AssertAsync.reject(
-      ostPrime._approveRawTx(spenderAddress, amount),
+      ostPrime.approveRawTx(spenderAddress, amount),
       `Invalid spender address: ${spenderAddress}.`,
     );
   });
@@ -67,7 +67,7 @@ describe('OSTPrime._approveRawTx()', () => {
     const amount = undefined;
 
     await AssertAsync.reject(
-      ostPrime._approveRawTx(spenderAddress, amount),
+      ostPrime.approveRawTx(spenderAddress, amount),
       `Invalid approval amount: ${amount}.`,
     );
   });
