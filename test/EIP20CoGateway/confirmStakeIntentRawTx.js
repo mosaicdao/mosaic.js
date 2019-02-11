@@ -7,7 +7,7 @@ const EIP20CoGateway = require('../../src/ContractInteract/EIP20CoGateway');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const AssertAsync = require('../../test_utils/AssertAsync');
 
-describe('EIP20CoGateway._confirmStakeIntentRawTx()', () => {
+describe('EIP20CoGateway.confirmStakeIntentRawTx()', () => {
   let web3;
   let coGatewayAddress;
   let coGateway;
@@ -25,7 +25,7 @@ describe('EIP20CoGateway._confirmStakeIntentRawTx()', () => {
       sinon.fake.resolves(mockedTx),
     );
 
-    spyCall = sinon.spy(coGateway, '_confirmStakeIntentRawTx');
+    spyCall = sinon.spy(coGateway, 'confirmStakeIntentRawTx');
   };
 
   const tearDown = () => {
@@ -54,7 +54,7 @@ describe('EIP20CoGateway._confirmStakeIntentRawTx()', () => {
 
   it('should throw error when staker address is invalid', async () => {
     await AssertAsync.reject(
-      coGateway._confirmStakeIntentRawTx(
+      coGateway.confirmStakeIntentRawTx(
         undefined,
         stakeParams.nonce,
         stakeParams.beneficiary,
@@ -71,7 +71,7 @@ describe('EIP20CoGateway._confirmStakeIntentRawTx()', () => {
 
   it('should throw error when nonce is invalid', async () => {
     await AssertAsync.reject(
-      coGateway._confirmStakeIntentRawTx(
+      coGateway.confirmStakeIntentRawTx(
         stakeParams.staker,
         undefined,
         stakeParams.beneficiary,
@@ -88,7 +88,7 @@ describe('EIP20CoGateway._confirmStakeIntentRawTx()', () => {
 
   it('should throw error when beneficiary address is undefined', async () => {
     await AssertAsync.reject(
-      coGateway._confirmStakeIntentRawTx(
+      coGateway.confirmStakeIntentRawTx(
         stakeParams.staker,
         stakeParams.nonce,
         undefined,
@@ -105,7 +105,7 @@ describe('EIP20CoGateway._confirmStakeIntentRawTx()', () => {
 
   it('should throw error when stake amount is invalid', async () => {
     await AssertAsync.reject(
-      coGateway._confirmStakeIntentRawTx(
+      coGateway.confirmStakeIntentRawTx(
         stakeParams.staker,
         stakeParams.nonce,
         stakeParams.beneficiary,
@@ -122,7 +122,7 @@ describe('EIP20CoGateway._confirmStakeIntentRawTx()', () => {
 
   it('should throw error when gas price is invalid', async () => {
     await AssertAsync.reject(
-      coGateway._confirmStakeIntentRawTx(
+      coGateway.confirmStakeIntentRawTx(
         stakeParams.staker,
         stakeParams.nonce,
         stakeParams.beneficiary,
@@ -139,7 +139,7 @@ describe('EIP20CoGateway._confirmStakeIntentRawTx()', () => {
 
   it('should throw error when gas limit is invalid', async () => {
     await AssertAsync.reject(
-      coGateway._confirmStakeIntentRawTx(
+      coGateway.confirmStakeIntentRawTx(
         stakeParams.staker,
         stakeParams.nonce,
         stakeParams.beneficiary,
@@ -156,7 +156,7 @@ describe('EIP20CoGateway._confirmStakeIntentRawTx()', () => {
 
   it('should throw error when block height is invalid', async () => {
     await AssertAsync.reject(
-      coGateway._confirmStakeIntentRawTx(
+      coGateway.confirmStakeIntentRawTx(
         stakeParams.staker,
         stakeParams.nonce,
         stakeParams.beneficiary,
@@ -173,7 +173,7 @@ describe('EIP20CoGateway._confirmStakeIntentRawTx()', () => {
 
   it('should throw error when hash lock is undefined', async () => {
     await AssertAsync.reject(
-      coGateway._confirmStakeIntentRawTx(
+      coGateway.confirmStakeIntentRawTx(
         stakeParams.staker,
         stakeParams.nonce,
         stakeParams.beneficiary,
@@ -190,7 +190,7 @@ describe('EIP20CoGateway._confirmStakeIntentRawTx()', () => {
 
   it('should throw error when storage proof is invalid', async () => {
     await AssertAsync.reject(
-      coGateway._confirmStakeIntentRawTx(
+      coGateway.confirmStakeIntentRawTx(
         stakeParams.staker,
         stakeParams.nonce,
         stakeParams.beneficiary,
@@ -207,7 +207,7 @@ describe('EIP20CoGateway._confirmStakeIntentRawTx()', () => {
 
   it('should return correct transaction object', async () => {
     setup();
-    const result = await coGateway._confirmStakeIntentRawTx(
+    const result = await coGateway.confirmStakeIntentRawTx(
       stakeParams.staker,
       stakeParams.nonce,
       stakeParams.beneficiary,

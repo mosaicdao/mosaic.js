@@ -51,7 +51,7 @@ class EIP20CoGateway {
     this.proveGateway = this.proveGateway.bind(this);
     this.proveGatewayRawTx = this.proveGatewayRawTx.bind(this);
     this.confirmStakeIntent = this.confirmStakeIntent.bind(this);
-    this._confirmStakeIntentRawTx = this._confirmStakeIntentRawTx.bind(this);
+    this.confirmStakeIntentRawTx = this.confirmStakeIntentRawTx.bind(this);
     this.progressMint = this.progressMint.bind(this);
     this._progressMintRawTx = this._progressMintRawTx.bind(this);
     this.getBounty = this.getBounty.bind(this);
@@ -170,7 +170,7 @@ class EIP20CoGateway {
       return Promise.reject(err);
     }
 
-    return this._confirmStakeIntentRawTx(
+    return this.confirmStakeIntentRawTx(
       staker,
       nonce,
       beneficiary,
@@ -198,7 +198,7 @@ class EIP20CoGateway {
    *
    * @returns {Promise<Object>} Promise that resolves to raw transaction object.
    */
-  _confirmStakeIntentRawTx(
+  confirmStakeIntentRawTx(
     staker,
     nonce,
     beneficiary,

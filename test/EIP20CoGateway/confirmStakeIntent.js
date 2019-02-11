@@ -24,7 +24,7 @@ describe('EIP20CoGateway.confirmStakeIntent()', () => {
   const setup = () => {
     spyRawTx = sinon.replace(
       coGateway,
-      '_confirmStakeIntentRawTx',
+      'confirmStakeIntentRawTx',
       sinon.fake.resolves(mockedTx),
     );
 
