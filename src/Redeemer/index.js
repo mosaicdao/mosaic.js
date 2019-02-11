@@ -1,3 +1,5 @@
+'use strict';
+
 const Web3 = require('web3');
 const EIP20CoGateway = require('../../src/ContractInteract/EIP20CoGateway');
 const Mosaic = require('../Mosaic');

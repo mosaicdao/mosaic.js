@@ -1,3 +1,5 @@
+'use strict';
+
 const Web3Utils = require('web3-utils');
 
 function libraryHashPlaceholder(input) {

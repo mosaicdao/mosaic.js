@@ -1,3 +1,5 @@
+'use strict';
+
 const { assert } = require('chai');
 const sinon = require('sinon');
 const Facilitator = require('../../src/Facilitator');

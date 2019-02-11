@@ -1,3 +1,5 @@
+'use strict';
+
 const BN = require('bn.js');
 const Web3 = require('web3');
 const EIP20Gateway = require('../ContractInteract/EIP20Gateway');

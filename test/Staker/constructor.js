@@ -1,3 +1,5 @@
+'use strict';
+
 const { assert } = require('chai');
 const Staker = require('../../src/Staker');
 const TestMosaic = require('../../test_utils/TestMosaic');
