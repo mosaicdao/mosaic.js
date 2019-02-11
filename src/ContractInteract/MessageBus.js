@@ -53,12 +53,7 @@ class MessageBus {
   static async deploy(web3, merklePatriciaProof, txOptions) {
     const tx = MessageBus.deployRawTx(web3, merklePatriciaProof);
 
-    const _txOptions = txOptions;
-    if (!_txOptions.gas) {
-      _txOptions.gas = await tx.estimateGas();
-    }
-
-    return Utils.sendTransaction(tx, _txOptions).then((txReceipt) => {
+    return Utils.sendTransaction(tx, txOptions).then((txReceipt) => {
       const address = txReceipt.contractAddress;
       return new MessageBus(web3, address);
     });

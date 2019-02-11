@@ -267,12 +267,7 @@ class EIP20Gateway {
       gatewayLib,
     );
 
-    const _txOptions = txOptions;
-    if (!_txOptions.gas) {
-      _txOptions.gas = await tx.estimateGas();
-    }
-
-    return Utils.sendTransaction(tx, _txOptions).then((txReceipt) => {
+    return Utils.sendTransaction(tx, txOptions).then((txReceipt) => {
       const address = txReceipt.contractAddress;
       return new EIP20Gateway(web3, address);
     });

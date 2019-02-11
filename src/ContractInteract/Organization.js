@@ -103,12 +103,7 @@ class Organization {
       expirationHeight,
     );
 
-    const _txOptions = txOptions;
-    if (!_txOptions.gas) {
-      _txOptions.gas = await tx.estimateGas();
-    }
-
-    return sendTransaction(tx, _txOptions).then((txReceipt) => {
+    return sendTransaction(tx, txOptions).then((txReceipt) => {
       const address = txReceipt.contractAddress;
       return new Organization(web3, address);
     });

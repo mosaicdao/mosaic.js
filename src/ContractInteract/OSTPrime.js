@@ -145,12 +145,7 @@ class OSTPrime {
   static async deploy(web3, valueToken, organization, txOptions) {
     const tx = OSTPrime.deployRawTx(web3, valueToken, organization);
 
-    const _txOptions = txOptions;
-    if (!_txOptions.gas) {
-      _txOptions.gas = await tx.estimateGas();
-    }
-
-    return Utils.sendTransaction(tx, _txOptions).then((txReceipt) => {
+    return Utils.sendTransaction(tx, txOptions).then((txReceipt) => {
       const address = txReceipt.contractAddress;
       return new OSTPrime(web3, address);
     });
