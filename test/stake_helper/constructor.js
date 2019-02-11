@@ -8,7 +8,7 @@ describe('StakeHelper.constructor()', () => {
     mosaic = TestMosaic.mosaic();
   });
 
-  it('should throw an error when a web3 object is undefined', async function() {
+  it('should throw an error when a web3 object is undefined', async () => {
     let expectedErrorMessage = 'invalid origin web3 object';
     try {
       new StakeHelper();
@@ -32,7 +32,7 @@ describe('StakeHelper.constructor()', () => {
     }
   });
 
-  it('should pass with valid constructor arguments', async function() {
+  it('should pass with valid constructor arguments', async () => {
     const stakeHelper = new StakeHelper(
       mosaic.origin.web3,
       mosaic.auxiliary.web3,

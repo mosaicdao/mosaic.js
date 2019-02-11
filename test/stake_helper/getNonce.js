@@ -20,7 +20,7 @@ describe('StakeHelper.getNonce()', () => {
     );
   });
 
-  it('should throw error when account address is not string', async function() {
+  it('should throw error when account address is not string', async () => {
     this.timeout(5000);
 
     const accountAddress = 0x0000000000000000000000000000000000000003;
@@ -30,7 +30,7 @@ describe('StakeHelper.getNonce()', () => {
     );
   });
 
-  it('should return correct nonce value', async function() {
+  it('should return correct nonce value', async () => {
     const accountAddress = '0x79376dc1925ba1e0276473244802287394216a39';
 
     // Add spy on stakeHelper.getGatewayNonce.

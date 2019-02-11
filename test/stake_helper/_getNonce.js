@@ -18,7 +18,7 @@ describe('StakeHelper._getNonce()', () => {
     );
   });
 
-  it('should return correct nonce value', async function() {
+  it('should return correct nonce value', async () => {
     const accountAddress = '0x0000000000000000000000000000000000000003';
 
     // Mock an instance of gateway contract.

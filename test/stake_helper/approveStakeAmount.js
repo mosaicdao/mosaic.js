@@ -24,7 +24,7 @@ describe('StakeHelper.approveStakeAmount()', () => {
   let spySendTransaction;
   let spyValueTokenApprove;
 
-  const setup = function() {
+  const setup = () => {
     // Mock stakeHelper.getValueToken method to return expected value token address.
     spyGetValueToken = sinon.replace(
       stakeHelper,
@@ -69,7 +69,7 @@ describe('StakeHelper.approveStakeAmount()', () => {
     spyApproveStakeAmount = sinon.spy(stakeHelper, 'approveStakeAmount');
   };
 
-  const tearDown = function() {
+  const tearDown = () => {
     // Restore all mocked and spy objects.
     mockValueTokenContract.restore();
     mockTx.restore();

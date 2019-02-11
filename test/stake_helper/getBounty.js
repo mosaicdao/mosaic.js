@@ -20,7 +20,7 @@ describe('StakeHelper.getBounty()', () => {
     );
   });
 
-  it('should return correct bounty value', async function() {
+  it('should return correct bounty value', async () => {
     const mockedBountyAmount = 100;
 
     // Mock an instance of gateway contract.
