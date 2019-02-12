@@ -31,7 +31,7 @@ describe('OSTPrime.wrap()', () => {
     );
     const unwrapRawTxSpy = sinon.replace(
       ostPrime,
-      '_wrapRawTx',
+      'wrapRawTx',
       sinon.fake.resolves(mockTX),
     );
     const amount = '100';

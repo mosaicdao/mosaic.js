@@ -46,11 +46,11 @@ class EIP20Gateway {
     }
 
     this.proveGateway = this.proveGateway.bind(this);
-    this._proveGatewayRawTx = this._proveGatewayRawTx.bind(this);
+    this.proveGatewayRawTx = this.proveGatewayRawTx.bind(this);
     this.stake = this.stake.bind(this);
-    this._stakeRawTx = this._stakeRawTx.bind(this);
+    this.stakeRawTx = this.stakeRawTx.bind(this);
     this.progressStake = this.progressStake.bind(this);
-    this._progressStakeRawTx = this._progressStakeRawTx.bind(this);
+    this.progressStakeRawTx = this.progressStakeRawTx.bind(this);
     this.getBounty = this.getBounty.bind(this);
     this.getBaseToken = this.getBaseToken.bind(this);
     this.getValueToken = this.getValueToken.bind(this);
@@ -68,6 +68,10 @@ class EIP20Gateway {
     this.getValueTokenContract = this.getValueTokenContract.bind(this);
     this.isBountyAmountApproved = this.isBountyAmountApproved.bind(this);
     this.isStakeAmountApproved = this.isStakeAmountApproved.bind(this);
+    this.confirmRedeemIntentRawTx = this.confirmRedeemIntentRawTx.bind(this);
+    this.progressUnstakeRawTx = this.progressUnstakeRawTx.bind(this);
+    this.confirmRedeemIntent = this.confirmRedeemIntent.bind(this);
+    this.progressUnstake = this.progressUnstake.bind(this);
   }
 
   /**
@@ -91,7 +95,7 @@ class EIP20Gateway {
       );
       return Promise.reject(err);
     }
-    return this._proveGatewayRawTx(
+    return this.proveGatewayRawTx(
       blockHeight,
       encodedAccount,
       accountProof,
@@ -107,7 +111,7 @@ class EIP20Gateway {
    *
    * @returns {Promise<Object>} Promise that resolves to raw transaction object.
    */
-  _proveGatewayRawTx(blockHeight, encodedAccount, accountProof) {
+  proveGatewayRawTx(blockHeight, encodedAccount, accountProof) {
     if (typeof blockHeight !== 'string') {
       const err = new TypeError(`Invalid block height: ${blockHeight}.`);
       return Promise.reject(err);
@@ -156,7 +160,7 @@ class EIP20Gateway {
       return Promise.reject(err);
     }
 
-    return this._stakeRawTx(
+    return this.stakeRawTx(
       amount,
       beneficiary,
       gasPrice,
@@ -178,7 +182,7 @@ class EIP20Gateway {
    *
    * @returns {Promise<Object>} Promise that resolves to raw transaction object.
    */
-  _stakeRawTx(amount, beneficiary, gasPrice, gasLimit, nonce, hashLock) {
+  stakeRawTx(amount, beneficiary, gasPrice, gasLimit, nonce, hashLock) {
     if (!new BN(amount).gtn(0)) {
       const err = new TypeError(
         `Stake amount must be greater than zero: ${amount}.`,
@@ -238,7 +242,7 @@ class EIP20Gateway {
       );
       return Promise.reject(err);
     }
-    return this._progressStakeRawTx(messageHash, unlockSecret).then((tx) =>
+    return this.progressStakeRawTx(messageHash, unlockSecret).then((tx) =>
       Utils.sendTransaction(tx, txOptions),
     );
   }
@@ -251,7 +255,7 @@ class EIP20Gateway {
    *
    * @returns {Promise<Object>} Promise that resolves to raw transaction object.
    */
-  _progressStakeRawTx(messageHash, unlockSecret) {
+  progressStakeRawTx(messageHash, unlockSecret) {
     if (typeof messageHash !== 'string') {
       const err = new TypeError(`Invalid message hash: ${messageHash}.`);
       return Promise.reject(err);
@@ -304,7 +308,7 @@ class EIP20Gateway {
       );
       return Promise.reject(err);
     }
-    return this._confirmRedeemIntentRawTx(
+    return this.confirmRedeemIntentRawTx(
       redeemer,
       nonce,
       beneficiary,
@@ -332,7 +336,7 @@ class EIP20Gateway {
    *
    * @returns {Promise<Object>} Promise that resolves to raw transaction object.
    */
-  _confirmRedeemIntentRawTx(
+  confirmRedeemIntentRawTx(
     redeemer,
     nonce,
     beneficiary,
@@ -426,7 +430,7 @@ class EIP20Gateway {
       );
       return Promise.reject(err);
     }
-    return this._progressUnstakeRawTx(messageHash, unlockSecret).then((tx) =>
+    return this.progressUnstakeRawTx(messageHash, unlockSecret).then((tx) =>
       Utils.sendTransaction(tx, txOptions),
     );
   }
@@ -439,7 +443,7 @@ class EIP20Gateway {
    *
    * @returns {Promise<Object>} Promise that resolves to raw transaction object.
    */
-  _progressUnstakeRawTx(messageHash, unlockSecret) {
+  progressUnstakeRawTx(messageHash, unlockSecret) {
     if (typeof messageHash !== 'string') {
       const err = new TypeError(`Invalid message hash: ${messageHash}.`);
       return Promise.reject(err);

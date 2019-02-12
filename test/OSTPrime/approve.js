@@ -30,7 +30,7 @@ describe('OSTPrime.approve()', () => {
     );
     const approveRawTxSpy = sinon.replace(
       ostPrime,
-      '_approveRawTx',
+      'approveRawTx',
       sinon.fake.resolves(mockTX),
     );
     const spenderAddress = '0x0000000000000000000000000000000000000003';

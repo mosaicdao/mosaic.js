@@ -24,7 +24,7 @@ describe('EIP20Gateway.stake()', () => {
   const setup = () => {
     spyRawTx = sinon.replace(
       gateway,
-      '_stakeRawTx',
+      'stakeRawTx',
       sinon.fake.resolves(mockedTx),
     );
 

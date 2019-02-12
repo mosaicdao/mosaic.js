@@ -23,7 +23,7 @@ describe('EIP20CoGateway.redeem()', () => {
   const setup = () => {
     spyRedeemRawTx = sinon.replace(
       coGateway,
-      '_redeemRawTx',
+      'redeemRawTx',
       sinon.fake.resolves(mockedTx),
     );
     spySendTransaction = sinon.replace(

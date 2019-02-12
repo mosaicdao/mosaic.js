@@ -7,7 +7,7 @@ const EIP20Gateway = require('../../src/ContractInteract/EIP20Gateway');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const AssertAsync = require('../../test_utils/AssertAsync');
 
-describe('EIP20Gateway._progressUnstakeRawTx()', () => {
+describe('EIP20Gateway.progressUnstakeRawTx()', () => {
   let web3;
   let gatewayAddress;
   let gateway;
@@ -26,7 +26,7 @@ describe('EIP20Gateway._progressUnstakeRawTx()', () => {
       sinon.fake.resolves(mockedTx),
     );
 
-    spyCall = sinon.spy(gateway, '_progressUnstakeRawTx');
+    spyCall = sinon.spy(gateway, 'progressUnstakeRawTx');
   };
 
   const tearDown = () => {
@@ -47,21 +47,21 @@ describe('EIP20Gateway._progressUnstakeRawTx()', () => {
 
   it('should throw error when message hash is invalid', async () => {
     await AssertAsync.reject(
-      gateway._progressUnstakeRawTx(undefined, unlockSecret),
+      gateway.progressUnstakeRawTx(undefined, unlockSecret),
       'Invalid message hash: undefined.',
     );
   });
 
   it('should throw error when unlock secret is invalid', async () => {
     await AssertAsync.reject(
-      gateway._progressUnstakeRawTx(messageHash, undefined),
+      gateway.progressUnstakeRawTx(messageHash, undefined),
       'Invalid unlock secret: undefined.',
     );
   });
 
   it('should return correct transaction object', async () => {
     setup();
-    const result = await gateway._progressUnstakeRawTx(
+    const result = await gateway.progressUnstakeRawTx(
       messageHash,
       unlockSecret,
     );

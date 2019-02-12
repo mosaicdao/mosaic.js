@@ -7,7 +7,7 @@ const EIP20Gateway = require('../../src/ContractInteract/EIP20Gateway');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const AssertAsync = require('../../test_utils/AssertAsync');
 
-describe('EIP20Gateway._stakeRawTx()', () => {
+describe('EIP20Gateway.stakeRawTx()', () => {
   let web3;
   let gatewayAddress;
   let gateway;
@@ -25,7 +25,7 @@ describe('EIP20Gateway._stakeRawTx()', () => {
       sinon.fake.resolves(mockedTx),
     );
 
-    spyCall = sinon.spy(gateway, '_stakeRawTx');
+    spyCall = sinon.spy(gateway, 'stakeRawTx');
   };
 
   const tearDown = () => {
@@ -52,7 +52,7 @@ describe('EIP20Gateway._stakeRawTx()', () => {
 
   it('should throw error when stake amount is zero', async () => {
     await AssertAsync.reject(
-      gateway._stakeRawTx(
+      gateway.stakeRawTx(
         0,
         stakeParams.beneficiary,
         stakeParams.gasPrice,
@@ -66,7 +66,7 @@ describe('EIP20Gateway._stakeRawTx()', () => {
 
   it('should throw error when beneficiary address is undefined', async function() {
     await AssertAsync.reject(
-      gateway._stakeRawTx(
+      gateway.stakeRawTx(
         stakeParams.amount,
         '0x123',
         stakeParams.gasPrice,
@@ -80,7 +80,7 @@ describe('EIP20Gateway._stakeRawTx()', () => {
 
   it('should throw error when gas price is undefined', async function() {
     await AssertAsync.reject(
-      gateway._stakeRawTx(
+      gateway.stakeRawTx(
         stakeParams.amount,
         stakeParams.beneficiary,
         undefined,
@@ -94,7 +94,7 @@ describe('EIP20Gateway._stakeRawTx()', () => {
 
   it('should throw error when gas limit is undefined', async function() {
     await AssertAsync.reject(
-      gateway._stakeRawTx(
+      gateway.stakeRawTx(
         stakeParams.amount,
         stakeParams.beneficiary,
         stakeParams.gasPrice,
@@ -108,7 +108,7 @@ describe('EIP20Gateway._stakeRawTx()', () => {
 
   it('should throw error when nonce is undefined', async () => {
     await AssertAsync.reject(
-      gateway._stakeRawTx(
+      gateway.stakeRawTx(
         stakeParams.amount,
         stakeParams.beneficiary,
         stakeParams.gasPrice,
@@ -122,7 +122,7 @@ describe('EIP20Gateway._stakeRawTx()', () => {
 
   it('should throw error when hashlock is undefined', async () => {
     await AssertAsync.reject(
-      gateway._stakeRawTx(
+      gateway.stakeRawTx(
         stakeParams.amount,
         stakeParams.beneficiary,
         stakeParams.gasPrice,
@@ -136,7 +136,7 @@ describe('EIP20Gateway._stakeRawTx()', () => {
 
   it('should return correct transaction object', async () => {
     setup();
-    const result = await gateway._stakeRawTx(
+    const result = await gateway.stakeRawTx(
       stakeParams.amount,
       stakeParams.beneficiary,
       stakeParams.gasPrice,

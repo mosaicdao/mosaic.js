@@ -49,11 +49,11 @@ class EIP20CoGateway {
     }
 
     this.proveGateway = this.proveGateway.bind(this);
-    this._proveGatewayRawTx = this._proveGatewayRawTx.bind(this);
+    this.proveGatewayRawTx = this.proveGatewayRawTx.bind(this);
     this.confirmStakeIntent = this.confirmStakeIntent.bind(this);
-    this._confirmStakeIntentRawTx = this._confirmStakeIntentRawTx.bind(this);
+    this.confirmStakeIntentRawTx = this.confirmStakeIntentRawTx.bind(this);
     this.progressMint = this.progressMint.bind(this);
-    this._progressMintRawTx = this._progressMintRawTx.bind(this);
+    this.progressMintRawTx = this.progressMintRawTx.bind(this);
     this.getBounty = this.getBounty.bind(this);
     this.getNonce = this.getNonce.bind(this);
     this.getStateRootProviderAddress = this.getStateRootProviderAddress.bind(
@@ -67,7 +67,10 @@ class EIP20CoGateway {
     this.getUtilityToken = this.getUtilityToken.bind(this);
     this.isRedeemAmountApproved = this.isRedeemAmountApproved.bind(this);
     this.redeem = this.redeem.bind(this);
-    this._redeemRawTx = this._redeemRawTx.bind(this);
+    this.redeemRawTx = this.redeemRawTx.bind(this);
+    this.progressRedeemRawTx = this.progressRedeemRawTx.bind(this);
+    this.approveRedeemAmount = this.approveRedeemAmount.bind(this);
+    this.progressRedeem = this.progressRedeem.bind(this);
   }
 
   /**
@@ -91,7 +94,7 @@ class EIP20CoGateway {
       );
       return Promise.reject(err);
     }
-    return this._proveGatewayRawTx(
+    return this.proveGatewayRawTx(
       blockHeight,
       encodedAccount,
       accountProof,
@@ -107,7 +110,7 @@ class EIP20CoGateway {
    *
    * @returns {Promise<Object>} Promise that resolves to raw transaction object.
    */
-  _proveGatewayRawTx(blockHeight, encodedAccount, accountProof) {
+  proveGatewayRawTx(blockHeight, encodedAccount, accountProof) {
     if (typeof blockHeight !== 'string') {
       const err = new TypeError(`Invalid block height: ${blockHeight}.`);
       return Promise.reject(err);
@@ -170,7 +173,7 @@ class EIP20CoGateway {
       return Promise.reject(err);
     }
 
-    return this._confirmStakeIntentRawTx(
+    return this.confirmStakeIntentRawTx(
       staker,
       nonce,
       beneficiary,
@@ -198,7 +201,7 @@ class EIP20CoGateway {
    *
    * @returns {Promise<Object>} Promise that resolves to raw transaction object.
    */
-  _confirmStakeIntentRawTx(
+  confirmStakeIntentRawTx(
     staker,
     nonce,
     beneficiary,
@@ -292,7 +295,7 @@ class EIP20CoGateway {
       );
       return Promise.reject(err);
     }
-    return this._progressMintRawTx(messageHash, unlockSecret).then((tx) =>
+    return this.progressMintRawTx(messageHash, unlockSecret).then((tx) =>
       Utils.sendTransaction(tx, txOptions),
     );
   }
@@ -305,7 +308,7 @@ class EIP20CoGateway {
    *
    * @returns {Promise<Object>} Promise that resolves to raw transaction object.
    */
-  _progressMintRawTx(messageHash, unlockSecret) {
+  progressMintRawTx(messageHash, unlockSecret) {
     if (typeof messageHash !== 'string') {
       const err = new TypeError(`Invalid message hash: ${messageHash}.`);
       return Promise.reject(err);
@@ -340,7 +343,7 @@ class EIP20CoGateway {
       );
       return Promise.reject(err);
     }
-    return this._progressRedeemRawTx(messageHash, unlockSecret).then((tx) =>
+    return this.progressRedeemRawTx(messageHash, unlockSecret).then((tx) =>
       Utils.sendTransaction(tx, txOptions),
     );
   }
@@ -353,7 +356,7 @@ class EIP20CoGateway {
    *
    * @returns {Promise<Object>} Promise that resolves to raw transaction object.
    */
-  _progressRedeemRawTx(messageHash, unlockSecret) {
+  progressRedeemRawTx(messageHash, unlockSecret) {
     if (typeof messageHash !== 'string') {
       const err = new TypeError(`Invalid message hash: ${messageHash}.`);
       return Promise.reject(err);
@@ -491,7 +494,7 @@ class EIP20CoGateway {
       return Promise.reject(err);
     }
 
-    return this._redeemRawTx(
+    return this.redeemRawTx(
       amount,
       beneficiary,
       gasPrice,
@@ -513,7 +516,7 @@ class EIP20CoGateway {
    *
    * @returns {Promise<Object>} Promise that resolves to raw transaction object.
    */
-  _redeemRawTx(amount, beneficiary, gasPrice, gasLimit, nonce, hashLock) {
+  redeemRawTx(amount, beneficiary, gasPrice, gasLimit, nonce, hashLock) {
     if (!new BN(amount).gtn(0)) {
       const err = new TypeError(
         `Redeem amount must be greater than zero: ${amount}.`,

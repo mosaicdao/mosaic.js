@@ -7,7 +7,7 @@ const EIP20Gateway = require('../../src/ContractInteract/EIP20Gateway');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const AssertAsync = require('../../test_utils/AssertAsync');
 
-describe('EIP20Gateway._proveGatewayRawTx()', () => {
+describe('EIP20Gateway.proveGatewayRawTx()', () => {
   let web3;
   let gatewayAddress;
   let gateway;
@@ -28,7 +28,7 @@ describe('EIP20Gateway._proveGatewayRawTx()', () => {
       sinon.fake.resolves(mockedTx),
     );
 
-    spyCall = sinon.spy(gateway, '_proveGatewayRawTx');
+    spyCall = sinon.spy(gateway, 'proveGatewayRawTx');
   };
 
   const tearDown = () => {
@@ -50,28 +50,28 @@ describe('EIP20Gateway._proveGatewayRawTx()', () => {
 
   it('should throw error when block height is invalid', async () => {
     await AssertAsync.reject(
-      gateway._proveGatewayRawTx(undefined, encodedAccount, accountProof),
+      gateway.proveGatewayRawTx(undefined, encodedAccount, accountProof),
       'Invalid block height: undefined.',
     );
   });
 
   it('should throw error when encoded account is invalid', async () => {
     await AssertAsync.reject(
-      gateway._proveGatewayRawTx(blockHeight, undefined, accountProof),
+      gateway.proveGatewayRawTx(blockHeight, undefined, accountProof),
       'Invalid account data: undefined.',
     );
   });
 
   it('should throw error when account proof is invalid', async () => {
     await AssertAsync.reject(
-      gateway._proveGatewayRawTx(blockHeight, encodedAccount, undefined),
+      gateway.proveGatewayRawTx(blockHeight, encodedAccount, undefined),
       'Invalid account proof: undefined.',
     );
   });
 
   it('should return correct transaction object', async () => {
     setup();
-    const result = await gateway._proveGatewayRawTx(
+    const result = await gateway.proveGatewayRawTx(
       blockHeight,
       encodedAccount,
       accountProof,

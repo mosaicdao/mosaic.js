@@ -7,7 +7,7 @@ const EIP20CoGateway = require('../../src/ContractInteract/EIP20CoGateway');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const AssertAsync = require('../../test_utils/AssertAsync');
 
-describe('EIP20CoGateway._redeemRawTx()', () => {
+describe('EIP20CoGateway.redeemRawTx()', () => {
   let web3;
   let coGatewayAddress;
   let coGateway;
@@ -25,7 +25,7 @@ describe('EIP20CoGateway._redeemRawTx()', () => {
       sinon.fake.resolves(mockedTx),
     );
 
-    spyCall = sinon.spy(coGateway, '_redeemRawTx');
+    spyCall = sinon.spy(coGateway, 'redeemRawTx');
   };
 
   const tearDown = () => {
@@ -53,7 +53,7 @@ describe('EIP20CoGateway._redeemRawTx()', () => {
     const expectedErrorMessage = `Redeem amount must be greater than zero: ${0}.`;
 
     await AssertAsync.reject(
-      coGateway._redeemRawTx(
+      coGateway.redeemRawTx(
         0,
         redeemParams.beneficiary,
         redeemParams.gasPrice,
@@ -69,7 +69,7 @@ describe('EIP20CoGateway._redeemRawTx()', () => {
     const expectedErrorMessage = `Redeem amount must be greater than zero: ${-1}.`;
 
     await AssertAsync.reject(
-      coGateway._redeemRawTx(
+      coGateway.redeemRawTx(
         -1,
         redeemParams.beneficiary,
         redeemParams.gasPrice,
@@ -85,7 +85,7 @@ describe('EIP20CoGateway._redeemRawTx()', () => {
     const expectedErrorMessage = `Invalid beneficiary address: 0x123.`;
 
     await AssertAsync.reject(
-      coGateway._redeemRawTx(
+      coGateway.redeemRawTx(
         redeemParams.amount,
         `0x123`,
         redeemParams.gasPrice,
@@ -101,7 +101,7 @@ describe('EIP20CoGateway._redeemRawTx()', () => {
     const expectedErrorMessage = 'Invalid gas price: undefined.';
 
     await AssertAsync.reject(
-      coGateway._redeemRawTx(
+      coGateway.redeemRawTx(
         redeemParams.amount,
         redeemParams.beneficiary,
         undefined,
@@ -117,7 +117,7 @@ describe('EIP20CoGateway._redeemRawTx()', () => {
     const expectedErrorMessage = 'Invalid gas limit: undefined.';
 
     await AssertAsync.reject(
-      coGateway._redeemRawTx(
+      coGateway.redeemRawTx(
         redeemParams.amount,
         redeemParams.beneficiary,
         redeemParams.gasPrice,
@@ -133,7 +133,7 @@ describe('EIP20CoGateway._redeemRawTx()', () => {
     const expectedErrorMessage = 'Invalid nonce: undefined.';
 
     await AssertAsync.reject(
-      coGateway._redeemRawTx(
+      coGateway.redeemRawTx(
         redeemParams.amount,
         redeemParams.beneficiary,
         redeemParams.gasPrice,
@@ -149,7 +149,7 @@ describe('EIP20CoGateway._redeemRawTx()', () => {
     const expectedErrorMessage = 'Invalid hash lock: undefined.';
 
     await AssertAsync.reject(
-      coGateway._redeemRawTx(
+      coGateway.redeemRawTx(
         redeemParams.amount,
         redeemParams.beneficiary,
         redeemParams.gasPrice,
@@ -163,7 +163,7 @@ describe('EIP20CoGateway._redeemRawTx()', () => {
 
   it('should return correct transaction object', async () => {
     setup();
-    const result = await coGateway._redeemRawTx(
+    const result = await coGateway.redeemRawTx(
       redeemParams.amount,
       redeemParams.beneficiary,
       redeemParams.gasPrice,

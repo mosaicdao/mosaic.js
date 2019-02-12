@@ -25,7 +25,7 @@ describe('EIP20Token.approve()', () => {
   const setup = () => {
     spyApproveRawTx = sinon.replace(
       token,
-      '_approveRawTx',
+      'approveRawTx',
       sinon.fake.resolves(mockedTx),
     );
 

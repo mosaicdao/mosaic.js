@@ -44,9 +44,10 @@ class EIP20Token {
     }
 
     this.approve = this.approve.bind(this);
-    this._approveRawTx = this._approveRawTx.bind(this);
+    this.approveRawTx = this.approveRawTx.bind(this);
     this.allowance = this.allowance.bind(this);
     this.isAmountApproved = this.isAmountApproved.bind(this);
+    this.balanceOf = this.balanceOf.bind(this);
   }
 
   /**
@@ -67,7 +68,7 @@ class EIP20Token {
       const err = new TypeError(`Invalid from address: ${txOptions.from}.`);
       return Promise.reject(err);
     }
-    return this._approveRawTx(spenderAddress, amount).then((tx) =>
+    return this.approveRawTx(spenderAddress, amount).then((tx) =>
       Utils.sendTransaction(tx, txOptions),
     );
   }
@@ -80,7 +81,7 @@ class EIP20Token {
    *
    * @returns {Promise<boolean>} Promise that resolves to raw transaction object.
    */
-  _approveRawTx(spenderAddress, amount) {
+  approveRawTx(spenderAddress, amount) {
     if (!Web3.utils.isAddress(spenderAddress)) {
       const err = new TypeError(`Invalid spender address: ${spenderAddress}.`);
       return Promise.reject(err);

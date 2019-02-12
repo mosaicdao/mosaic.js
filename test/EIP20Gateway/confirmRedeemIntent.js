@@ -24,7 +24,7 @@ describe('EIP20Gateway.confirmRedeemIntent()', () => {
   const setup = () => {
     spyRawTx = sinon.replace(
       gateway,
-      '_confirmRedeemIntentRawTx',
+      'confirmRedeemIntentRawTx',
       sinon.fake.resolves(mockedTx),
     );
 
