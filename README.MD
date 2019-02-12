@@ -202,6 +202,14 @@ eip20Gateway
   .catch(console.log);
 ```
 
+#### OSTPrime
+
+On the auxiliary chain OST is the base token.
+The gas price on auxiliary is paid in OST (like Ether pays for gas on Ethereum mainnet).
+To obtain the base token, you need to stake OST on origin.
+<!-- Add contract addresses for test nets -->
+On auxiliary, the `OSTPrime` contract will convert the EIP20 token to base tokens for the beneficiary.
+
 ## Related Work
 
 [mosaic-contracts] provides the EVM smart contracts implementations.
