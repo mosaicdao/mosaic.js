@@ -21,7 +21,7 @@ class EIP20Token {
     }
     if (!Web3.utils.isAddress(tokenAddress)) {
       throw new TypeError(
-        "Mandatory Parameter 'tokenAddress' is missing or invalid.",
+        `Mandatory Parameter 'tokenAddress' is missing or invalid: ${tokenAddress}`,
       );
     }
 

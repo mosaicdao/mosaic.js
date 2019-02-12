@@ -36,7 +36,7 @@ class OSTPrime {
     }
     if (!Web3.utils.isAddress(address)) {
       throw new TypeError(
-        "Mandatory Parameter 'address' is missing or invalid.",
+        `Mandatory Parameter 'address' is missing or invalid: ${address}`,
       );
     }
 

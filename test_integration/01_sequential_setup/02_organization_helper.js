@@ -51,6 +51,7 @@ describe('OrganizationHelper', () => {
   });
 
   after(() => {
+    // set up Organization on auxiliary for later tests
     return Organization.setup(shared.auxiliary.web3, orgConfig).then(
       (instance) => {
         shared.auxiliary.addresses.Organization = instance.address;

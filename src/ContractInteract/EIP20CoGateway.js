@@ -48,7 +48,7 @@ class EIP20CoGateway {
     }
     if (!Web3.utils.isAddress(coGatewayAddress)) {
       throw new TypeError(
-        "Mandatory Parameter 'coGatewayAddress' is missing or invalid.",
+        `Mandatory Parameter 'coGatewayAddress' is missing or invalid: ${coGatewayAddress}`,
       );
     }
 

@@ -41,7 +41,7 @@ class Anchor {
     }
     if (!Web3.utils.isAddress(anchorAddress)) {
       throw new TypeError(
-        "Mandatory Parameter 'anchorAddress' is missing or invalid.",
+        `Mandatory Parameter 'anchorAddress' is missing or invalid: ${anchorAddress}`,
       );
     }
 

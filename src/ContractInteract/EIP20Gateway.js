@@ -52,7 +52,7 @@ class EIP20Gateway {
     }
     if (!Web3.utils.isAddress(gatewayAddress)) {
       throw new TypeError(
-        "Mandatory Parameter 'gatewayAddress' is missing or invalid.",
+        `Mandatory Parameter 'gatewayAddress' is missing or invalid: ${gatewayAddress}`,
       );
     }
 
