@@ -1,3 +1,14 @@
+/**
+ * @typedef {Object} OrganizationSetupConfig
+ *
+ * @property {string} deployer Address to be used to send deployment transactions.
+ * @property {string} owner Address of the organization owner.
+ * @property {string} admin Address of the organization admin.
+ * @property {Array<string>} workers Addresses of the organization workers.
+ * @property {string|number} workerExpirationHeight If any workers are given,
+ *                           this will be the block height at which they expire.
+ */
+
 'use strict';
 
 const Web3 = require('web3');
@@ -39,18 +50,16 @@ class Organization {
     }
   }
 
-  /*
-  //Supported Configurations for setup
-  config = {
-    "deployer": config.deployerAddress,
-    "owner": config.organizationOwner, 
-    "admin": config.organizationAdmin, 
-    "worker": config.organizationWorker,
-    "workerExpirationHeight": 10000000
-  };
-  //deployer and worker are mandetory.
-*/
-
+  /**
+   * Setup for Organization contract. Deploys the contract.
+   *
+   * @param {Web3} web3 Web3 object.
+   * @param {OrganizationSetupConfig} config Organization setup configuration.
+   * @param {Object} txOptions Transaction options.
+   *
+   * @returns {Promise<Organization>} Promise containing the Organization instance that
+   *                                  has been set up.
+   */
   static setup(web3, config, txOptions = {}) {
     Organization.validateSetupConfig(config);
 
@@ -67,6 +76,13 @@ class Organization {
     );
   }
 
+  /**
+   * Validate the setup configuration.
+   *
+   * @param {OrganizationSetupConfig} config Organization setup configuration.
+   *
+   * @throws Will throw an error if setup configuration is incomplete.
+   */
   static validateSetupConfig(config) {
     validateConfigKeyExists(config, 'deployer', 'config');
     validateConfigKeyExists(config, 'owner', 'config');
@@ -77,12 +93,26 @@ class Organization {
     return true;
   }
 
+  /**
+   * Deploys an Organization contract.
+   *
+   * @param {Web3} web3 Web3 object.
+   * @param {string} owner Address of the organization owner.
+   * @param {string} admin Address of the organization admin.
+   * @param {Array<string>} workers Addresses of the organization workers.
+   * @param {string|number} workerExpirationHeight If any workers are given,
+   *                        this will be the block height at which they expire.
+   * @param {Object} txOptions Transaction options.
+   *
+   * @returns {Promise<Organization>} Promise containing the Organization instance that
+   *                                  has been deployed.
+   */
   static async deploy(
     web3,
     owner,
     admin,
     workers,
-    expirationHeight,
+    workerExpirationHeight,
     txOptions,
   ) {
     const tx = Organization.deployRawTx(
@@ -90,7 +120,7 @@ class Organization {
       owner,
       admin,
       workers,
-      expirationHeight,
+      workerExpirationHeight,
     );
 
     return sendTransaction(tx, txOptions).then((txReceipt) => {
@@ -99,12 +129,49 @@ class Organization {
     });
   }
 
-  static deployRawTx(web3, owner, admin, workers, expirationHeight) {
+  /**
+   * Raw transaction for {@link Organization#deploy}.
+   *
+   * @param {Web3} web3 Web3 object.
+   * @param {string} owner Address of the organization owner.
+   * @param {string} admin Address of the organization admin.
+   * @param {Array<string>} workers Addresses of the organization workers.
+   * @param {string|number} workerExpirationHeight If any workers are given,
+   *                        this will be the block height at which they expire.
+   *
+   * @returns {Object} Raw transaction.
+   */
+  static deployRawTx(web3, owner, admin, workers, workerExpirationHeight) {
+    if (!(web3 instanceof Web3)) {
+      throw new TypeError(
+        `Mandatory Parameter 'web3' is missing or invalid: ${web3}`,
+      );
+    }
+    if (!Web3.utils.isAddress(owner)) {
+      throw new TypeError(`Invalid owner address: ${owner}.`);
+    }
+    if (!Web3.utils.isAddress(admin)) {
+      throw new TypeError(`Invalid admin address: ${admin}.`);
+    }
+    if (!Array.isArray(workers)) {
+      throw new TypeError(`Invalid workers addresses: ${workers}.`);
+    }
+    if (
+      !(
+        typeof workerExpirationHeight === 'string' ||
+        typeof workerExpirationHeight === 'number'
+      )
+    ) {
+      throw new TypeError(
+        `Invalid workerExpirationHeight: ${workerExpirationHeight}.`,
+      );
+    }
+
     const abiBinProvider = new AbiBinProvider();
     const contract = Contracts.getOrganization(web3, null, null);
 
     const bin = abiBinProvider.getBIN(ContractName);
-    const args = [owner, admin, workers, expirationHeight];
+    const args = [owner, admin, workers, workerExpirationHeight];
 
     return contract.deploy({
       data: bin,

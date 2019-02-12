@@ -182,11 +182,11 @@ class Anchor {
    * Raw transaction for {@link Anchor#deploy}.
    *
    * @param {Web3} web3 Web3 object.
-   * @param {string} remoteChainId The chain id of the chain that is tracked
+   * @param {string|number} remoteChainId The chain id of the chain that is tracked
    *                 by this Anchor.
-   * @param {string} blockHeight Block height.
+   * @param {string|number} blockHeight Block height.
    * @param {string} stateRoot Storage root.
-   * @param {string} maxStateRoots The max number of state roots to store in
+   * @param {string|number} maxStateRoots The max number of state roots to store in
    *                 the circular buffer of Anchor.
    * @param {string} organization Address of Organization contract managing
    *                 Anchor.
@@ -201,6 +201,33 @@ class Anchor {
     maxStateRoots,
     organization,
   ) {
+    if (!(web3 instanceof Web3)) {
+      throw new TypeError(
+        `Mandatory Parameter 'web3' is missing or invalid: ${web3}`,
+      );
+    }
+    if (
+      !(typeof remoteChainId === 'string' || typeof remoteChainId === 'number')
+    ) {
+      throw new TypeError(`Invalid remote chain id: ${remoteChainId}.`);
+    }
+    if (
+      !(typeof blockHeight === 'string' || typeof blockHeight === 'number')
+    ) {
+      throw new TypeError(`Invalid block height: ${blockHeight}.`);
+    }
+    if (typeof stateRoot !== 'string') {
+      throw new TypeError(`Invalid state root: ${stateRoot}.`);
+    }
+    if (
+      !(typeof maxStateRoots === 'string' || typeof maxStateRoots === 'number')
+    ) {
+      throw new TypeError(`Invalid max state roots value: ${maxStateRoots}.`);
+    }
+    if (!Web3.utils.isAddress(organization)) {
+      throw new TypeError(`Invalid organization address: ${organization}.`);
+    }
+
     const abiBinProvider = new AbiBinProvider();
     const contract = Contracts.getAnchor(web3, null, null);
 
@@ -298,11 +325,11 @@ class Anchor {
    */
   setCoAnchorAddress(coAnchorAddress, txOptions) {
     if (!txOptions) {
-      const err = new TypeError('Invalid transaction options.');
+      const err = new TypeError(`Invalid transaction options: ${txOptions}.`);
       return Promise.reject(err);
     }
     if (!Web3.utils.isAddress(txOptions.from)) {
-      const err = new TypeError('Invalid from address.');
+      const err = new TypeError(`Invalid from address: ${txOptions.from}.`);
       return Promise.reject(err);
     }
 
@@ -318,7 +345,9 @@ class Anchor {
    */
   setCoAnchorAddressRawTx(coAnchorAddress) {
     if (!Web3.utils.isAddress(coAnchorAddress)) {
-      const err = new TypeError('Invalid coAnchor address.');
+      const err = new TypeError(
+        `Invalid coAnchor address.: ${coAnchorAddress}`,
+      );
       return Promise.reject(err);
     }
 

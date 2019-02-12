@@ -43,6 +43,11 @@ class MerklePatriciaProof {
    *                                         instance that has been deployed.
    */
   static async deploy(web3, txOptions) {
+    if (!(web3 instanceof Web3)) {
+      throw new TypeError(
+        `Mandatory Parameter 'web3' is missing or invalid: ${web3}`,
+      );
+    }
     const tx = MerklePatriciaProof.deployRawTx(web3);
 
     return Utils.sendTransaction(tx, txOptions).then((txReceipt) => {

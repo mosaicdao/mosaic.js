@@ -63,6 +63,17 @@ class GatewayLib {
    * @returns {Promise<Object>} Promise that resolves to raw transaction object.
    */
   static deployRawTx(web3, merklePatriciaProof) {
+    if (!(web3 instanceof Web3)) {
+      throw new TypeError(
+        `Mandatory Parameter 'web3' is missing or invalid: ${web3}`,
+      );
+    }
+    if (!Web3.utils.isAddress(merklePatriciaProof)) {
+      throw new TypeError(
+        `Invalid merklePatriciaProof address: ${merklePatriciaProof}.`,
+      );
+    }
+
     const merklePatriciaProofInfo = {
       name: 'MerklePatriciaProof',
       address: merklePatriciaProof,

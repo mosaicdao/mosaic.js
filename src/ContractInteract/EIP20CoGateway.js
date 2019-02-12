@@ -204,7 +204,7 @@ class EIP20CoGateway {
    *                 minting the utility token.
    * @param {string} stateRootProvider Address of contract to use for getting the state root of
    *                 the origin chain.
-   * @param {string} bounty The amount that facilitator will stakes to initiate the
+   * @param {string} bounty The amount that facilitators will stake to initiate the
    *                 stake process.
    * @param {string} organization Address of an organization contract.
    * @param {string} gateway Address of EIP20Gateway on Origin.
@@ -229,6 +229,45 @@ class EIP20CoGateway {
     messageBusAddress,
     gatewayLibAddress,
   ) {
+    if (!(web3 instanceof Web3)) {
+      throw new TypeError(
+        `Mandatory Parameter 'web3' is missing or invalid: ${web3}`,
+      );
+    }
+    if (!Web3.utils.isAddress(valueToken)) {
+      throw new TypeError(`Invalid valueToken address: ${valueToken}.`);
+    }
+    if (!Web3.utils.isAddress(utilityToken)) {
+      throw new TypeError(`Invalid utilityToken address: ${utilityToken}.`);
+    }
+    if (!Web3.utils.isAddress(stateRootProvider)) {
+      throw new TypeError(
+        `Invalid stateRootProvider address: ${stateRootProvider}.`,
+      );
+    }
+    if (!(typeof bounty === 'string' || typeof bounty === 'number')) {
+      throw new TypeError(`Invalid bounty: ${bounty}.`);
+    }
+    if (!Web3.utils.isAddress(organization)) {
+      throw new TypeError(`Invalid organization address: ${organization}.`);
+    }
+    if (!Web3.utils.isAddress(gateway)) {
+      throw new TypeError(`Invalid gateway address: ${gateway}.`);
+    }
+    if (!Web3.utils.isAddress(burner)) {
+      throw new TypeError(`Invalid burner address: ${burner}.`);
+    }
+    if (!Web3.utils.isAddress(messageBusAddress)) {
+      throw new TypeError(
+        `Invalid messageBusAddress address: ${messageBusAddress}.`,
+      );
+    }
+    if (!Web3.utils.isAddress(gatewayLibAddress)) {
+      throw new TypeError(
+        `Invalid gatewayLibAddress address: ${gatewayLibAddress}.`,
+      );
+    }
+
     const messageBusLinkInfo = {
       address: messageBusAddress,
       name: 'MessageBus',

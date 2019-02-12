@@ -301,6 +301,42 @@ class EIP20Gateway {
     messageBusAddress,
     gatewayLibAddress,
   ) {
+    if (!(web3 instanceof Web3)) {
+      throw new TypeError(
+        `Mandatory Parameter 'web3' is missing or invalid: ${web3}`,
+      );
+    }
+    if (!Web3.utils.isAddress(token)) {
+      throw new TypeError(`Invalid token address: ${token}.`);
+    }
+    if (!Web3.utils.isAddress(baseToken)) {
+      throw new TypeError(`Invalid baseToken address: ${baseToken}.`);
+    }
+    if (!Web3.utils.isAddress(stateRootProvider)) {
+      throw new TypeError(
+        `Invalid stateRootProvider address: ${stateRootProvider}.`,
+      );
+    }
+    if (!(typeof bounty === 'string' || typeof bounty === 'number')) {
+      throw new TypeError(`Invalid bounty: ${bounty}.`);
+    }
+    if (!Web3.utils.isAddress(organization)) {
+      throw new TypeError(`Invalid organization address: ${organization}.`);
+    }
+    if (!Web3.utils.isAddress(burner)) {
+      throw new TypeError(`Invalid burner address: ${burner}.`);
+    }
+    if (!Web3.utils.isAddress(messageBusAddress)) {
+      throw new TypeError(
+        `Invalid messageBusAddress address: ${messageBusAddress}.`,
+      );
+    }
+    if (!Web3.utils.isAddress(gatewayLibAddress)) {
+      throw new TypeError(
+        `Invalid gatewayLibAddress address: ${gatewayLibAddress}.`,
+      );
+    }
+
     const messageBusLinkInfo = {
       address: messageBusAddress,
       name: 'MessageBus',

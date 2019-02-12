@@ -72,8 +72,8 @@ class OSTPrime {
    * @param {OSTPrimeSetupConfig} config OSTPrime setup configuration.
    * @param {Object} txOptions Transaction options.
    *
-   * @param {Promise<OSTPrime>} Promise containing the OSTPrime instance that
-   *                            has been set up.
+   * @returns {Promise<OSTPrime>} Promise containing the OSTPrime instance that
+   *                              has been set up.
    */
   static setup(web3, config, txOptions) {
     OSTPrime.validateSetupConfig(config);
@@ -125,7 +125,7 @@ class OSTPrime {
    * @param {string} organization Address of Organization contract managing OSTPrime.
    * @param {Object} txOptions Transaction options.
    *
-   * @param {Promise<OSTPrime>} Promise containing the OSTPrime instance that
+   * @returns {Promise<OSTPrime>} Promise containing the OSTPrime instance that
    *                            has been deployed.
    */
   static async deploy(web3, valueToken, organization, txOptions) {
@@ -147,6 +147,18 @@ class OSTPrime {
    * @returns {Object} Raw transaction.
    */
   static deployRawTx(web3, valueToken, organization) {
+    if (!(web3 instanceof Web3)) {
+      throw new TypeError(
+        `Mandatory Parameter 'web3' is missing or invalid: ${web3}`,
+      );
+    }
+    if (!Web3.utils.isAddress(valueToken)) {
+      throw new TypeError(`Invalid valueToken address: ${valueToken}.`);
+    }
+    if (!Web3.utils.isAddress(organization)) {
+      throw new TypeError(`Invalid organization address: ${organization}.`);
+    }
+
     const abiBinProvider = new AbiBinProvider();
     const contract = Contracts.getOSTPrime(web3, null, null);
 
