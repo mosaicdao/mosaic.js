@@ -59,7 +59,7 @@ const commonConfig = (target, babelTargets) => {
       ],
     },
     optimization: {
-      minimize: true,
+      minimize: target == 'web' ? true : false,
       minimizer: [new UglifyJsPlugin()],
     },
   };
