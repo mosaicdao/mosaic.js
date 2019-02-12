@@ -9,7 +9,7 @@ const AssertAsync = require('../../test_utils/AssertAsync');
 
 describe('EIP20Token.approveRawTx()', () => {
   let web3;
-  let tokenAddress;
+  let address;
   let token;
 
   let spenderAddress;
@@ -36,8 +36,8 @@ describe('EIP20Token.approveRawTx()', () => {
 
   beforeEach(() => {
     web3 = new Web3();
-    tokenAddress = '0x0000000000000000000000000000000000000002';
-    token = new EIP20Token(web3, tokenAddress);
+    address = '0x0000000000000000000000000000000000000002';
+    token = new EIP20Token(web3, address);
 
     spenderAddress = '0x0000000000000000000000000000000000000005';
     amount = '1000';

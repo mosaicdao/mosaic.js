@@ -47,7 +47,7 @@ describe('EIP20CoGateway.getUtilityTokenContract()', () => {
       'Function should return UtilityToken contract object with correct web3.',
     );
     assert.strictEqual(
-      result.tokenAddress,
+      result.address,
       getUtilityTokenAddressResult,
       'Function should return UtilityToken contract object with correct contract address.',
     );
@@ -66,7 +66,7 @@ describe('EIP20CoGateway.getUtilityTokenContract()', () => {
       'Function should return UtilityToken contract object with correct web3.',
     );
     assert.strictEqual(
-      firstCallResult.tokenAddress,
+      firstCallResult.address,
       getUtilityTokenAddressResult,
       'Function should return UtilityToken contract object with correct contract address.',
     );
@@ -81,7 +81,7 @@ describe('EIP20CoGateway.getUtilityTokenContract()', () => {
       'Function should return UtilityToken contract object with correct web3.',
     );
     assert.strictEqual(
-      secondCallResult.tokenAddress,
+      secondCallResult.address,
       getUtilityTokenAddressResult,
       'Function should return UtilityToken contract object with correct contract address.',
     );

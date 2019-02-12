@@ -9,7 +9,7 @@ const AssertAsync = require('../../test_utils/AssertAsync');
 
 describe('EIP20Token.allowance()', () => {
   let web3;
-  let tokenAddress;
+  let address;
   let token;
   let ownerAccountAddress;
   let spenderAccountAddress;
@@ -37,8 +37,8 @@ describe('EIP20Token.allowance()', () => {
 
   beforeEach(() => {
     web3 = new Web3();
-    tokenAddress = '0x0000000000000000000000000000000000000002';
-    token = new EIP20Token(web3, tokenAddress);
+    address = '0x0000000000000000000000000000000000000002';
+    token = new EIP20Token(web3, address);
     ownerAccountAddress = '0x0000000000000000000000000000000000000003';
     spenderAccountAddress = '0x0000000000000000000000000000000000000004';
     mockedAllowanceValue = '100';
