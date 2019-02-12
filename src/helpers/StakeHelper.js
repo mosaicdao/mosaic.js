@@ -1,267 +1,300 @@
-const Web3 = require('web3');
+'use strict';
+
+const BN = require('bn.js');
+const Web3Utils = require('web3-utils');
+const Crypto = require('crypto');
 const Contracts = require('../Contracts');
-const Utils = require('../utils/Utils.js');
-const Mosaic = require('../Mosaic');
+const Utils = require('../utils/Utils');
 
-/**
- * Class for stake helper methods
- */
 class StakeHelper {
-  /**
-   * Constructor for stake helper.
-   *
-   * @param {Object} mosaic Mosaic object.
-   */
-  constructor(mosaic) {
-    if (!(mosaic instanceof Mosaic)) {
-      const err = new TypeError('Invalid mosaic object.');
-      throw err;
-    }
-    if (!(mosaic.origin.web3 instanceof Web3)) {
-      const err = new TypeError('Invalid origin web3 object.');
-      throw err;
-    }
-    if (!Web3.utils.isAddress(mosaic.origin.contractAddresses.EIP20Gateway)) {
-      const err = new TypeError('Invalid EIP20Gateway address.');
-      throw err;
-    }
+  constructor(originWeb3, simpleToken, gateway, staker, txOptions) {
+    Utils.deprecationNoticeStakeHelper();
 
-    this.mosaic = mosaic;
-    this.originWeb3 = mosaic.origin.web3;
-    this.gatewayAddress = mosaic.origin.contractAddresses.EIP20Gateway;
-
-    this.getBounty = this.getBounty.bind(this);
-    this.getNonce = this.getNonce.bind(this);
-    this.approveStakeAmount = this.approveStakeAmount.bind(this);
-    this._getNonce = this._getNonce.bind(this);
-    this._approveStakeAmountRawTx = this._approveStakeAmountRawTx.bind(this);
-    this._stakeRawTx = this._stakeRawTx.bind(this);
+    const oThis = this;
+    oThis.web3 = originWeb3;
+    oThis.valueToken = simpleToken;
+    oThis.simpleToken = simpleToken;
+    oThis.gateway = gateway;
+    oThis.staker = staker;
+    oThis.txOptions = txOptions || {
+      gasPrice: '0x5B9ACA00',
+    };
   }
 
-  /**
-   * Returns the bounty amount from EIP20Gateway contract.
-   *
-   * @returns {Promise} Promise object represents the bounty.
-   */
-  async getBounty() {
-    if (this.bountyAmount) {
-      return Promise.resolve(this.bountyAmount);
-    }
+  perform(_amount, _beneficiary, _gasPrice, _gasLimit) {
+    Utils.deprecationNoticeStakeHelper('perform');
 
-    const gatewayContract = Contracts.getEIP20Gateway(
-      this.originWeb3,
-      this.gatewayAddress,
-    );
+    const oThis = this;
 
-    return gatewayContract.methods
+    let _nonce, amountToApprove, _hashLock;
+
+    let haslockInfo = StakeHelper.createSecretHashLock();
+    _hashLock = haslockInfo.hashLock;
+
+    let promiseChain = oThis.getBounty();
+
+    _amount = String(_amount);
+
+    promiseChain = promiseChain.then((_bounty) => {
+      let bnBounty = new BN(_bounty);
+      let bnAmount = new BN(_amount);
+      let bnAmountToApprove = bnBounty.add(bnAmount);
+      amountToApprove = bnAmountToApprove.toString(10);
+
+      console.log('\t - Amount to approve:', amountToApprove);
+      return _bounty;
+    });
+
+    promiseChain = promiseChain
+      .then(() => {
+        return oThis.getNonce();
+      })
+      .then((nonce) => {
+        _nonce = nonce;
+      });
+
+    promiseChain = promiseChain.then(() => {
+      return oThis.approveStakeAmount(amountToApprove);
+    });
+
+    promiseChain = promiseChain
+      .then(() => {
+        return oThis.stake(
+          _amount,
+          _beneficiary,
+          _gasPrice,
+          _gasLimit,
+          _nonce,
+          _hashLock,
+        );
+      })
+      .then((stakeReceipt) => {
+        return {
+          receipt: stakeReceipt,
+          haslockInfo: haslockInfo,
+        };
+      });
+
+    return promiseChain;
+  }
+
+  getNonce(staker, originWeb3, gateway) {
+    Utils.deprecationNoticeStakeHelper('getNonce');
+
+    const oThis = this;
+
+    let web3 = originWeb3 || oThis.web3;
+    gateway = gateway || oThis.gateway;
+    staker = staker || oThis.staker;
+
+    let contract = Contracts.getEIP20Gateway(web3, gateway);
+
+    console.log(`* Fetching Staker Nonce`);
+    return contract.methods
+      .getNonce(staker)
+      .call()
+      .then((_nonce) => {
+        console.log(`\t - Gateway Nonce for ${staker}:`, _nonce);
+        return _nonce;
+      });
+  }
+
+  getBounty(staker, originWeb3, gateway) {
+    Utils.deprecationNoticeStakeHelper('getBounty');
+
+    const oThis = this;
+
+    let web3 = originWeb3 || oThis.web3;
+    gateway = gateway || oThis.gateway;
+    staker = staker || oThis.staker;
+
+    let contract = Contracts.getEIP20Gateway(web3, gateway);
+
+    console.log(`* Fetching Gateway Bounty`);
+    return contract.methods
       .bounty()
       .call()
-      .then((bounty) => {
-        this.bountyAmount = bounty;
-        return bounty;
+      .then((_bounty) => {
+        console.log('\t - Gateway Bounty:', _bounty);
+        return _bounty;
       });
   }
 
-  /**
-   * Returns the EIP20 token address.
-   *
-   * @returns {Promise} Promise object represents EIP20 token address.
-   */
-  async getValueToken() {
-    if (this.valueTokenAddress) {
-      return Promise.resolve(this.valueTokenAddress);
-    }
+  approveStakeAmount(
+    _value,
+    txOptions,
+    originWeb3,
+    valueToken,
+    gateway,
+    staker,
+  ) {
+    Utils.deprecationNoticeStakeHelper('approveStakeAmount');
 
-    const gatewayContract = Contracts.getEIP20Gateway(
-      this.originWeb3,
-      this.gatewayAddress,
+    const oThis = this;
+
+    let web3 = originWeb3 || oThis.web3;
+    valueToken = valueToken || oThis.valueToken;
+    gateway = gateway || oThis.gateway;
+    staker = staker || oThis.staker;
+
+    let tx = oThis._approveStakeAmountRawTx(
+      _value,
+      txOptions,
+      web3,
+      valueToken,
+      gateway,
+      staker,
     );
 
-    return gatewayContract.methods
-      .token()
-      .call()
-      .then((token) => {
-        this.valueTokenAddress = token;
-        return token;
+    console.log(`* Approving Stake Amount`);
+    return tx
+      .send(txOptions)
+      .on('transactionHash', function(transactionHash) {
+        console.log('\t - transaction hash:', transactionHash);
+      })
+      .on('receipt', function(receipt) {
+        console.log(
+          '\t - Receipt:\n\x1b[2m',
+          JSON.stringify(receipt),
+          '\x1b[0m\n',
+        );
+      })
+      .on('error', function(error) {
+        console.log('\t !! Error !!', error, '\n\t !! ERROR !!\n');
+        return Promise.reject(error);
       });
   }
 
-  /**
-   * Returns the gateway nonce for the given account address.
-   *
-   * @param {string} accountAddress Account address for which the nonce is to be fetched.
-   *
-   * @returns {Promise} Promise object represents the nonce of account address.
-   */
-  async getNonce(staker) {
-    if (!Web3.utils.isAddress(staker)) {
-      throw new TypeError(`Invalid account address: ${staker}.`);
-    }
-    return this._getNonce(staker, this.originWeb3, this.gatewayAddress);
-  }
-
-  /**
-   * Returns the nonce for the given staker account address.
-   *
-   * @param {string} stakerAddress Staker address.
-   * @param {Object} originWeb3 Origin web3 object.
-   * @param {string} gateway EIP20Gateway contract address.
-   *
-   * @returns {Promise} Promise object represents the nonce of staker address.
-   */
-  _getNonce(stakerAddress, originWeb3, gateway) {
-    const web3 = originWeb3 || this.originWeb3;
-    const gatewayAddress = gateway || this.gatewayAddress;
-    const contract = Contracts.getEIP20Gateway(web3, gatewayAddress);
-    return contract.methods
-      .getNonce(stakerAddress)
-      .call()
-      .then((nonce) => {
-        return nonce;
-      });
-  }
-
-  /**
-   * Approves gateway address for the stake amount transfer.
-   *
-   * @param {string} stakeAmount Stake amount.
-   * @param {string} txOptions Transaction options.
-   *
-   * @returns {Promise} Promise object.
-   */
-  async approveStakeAmount(stakeAmount, txOptions) {
-    if (!txOptions) {
-      const err = new TypeError(`Invalid transaction options: ${txOptions}.`);
-      return Promise.reject(err);
-    }
-    if (!Web3.utils.isAddress(txOptions.from)) {
-      const err = new TypeError(`Invalid staker address: ${txOptions.from}.`);
-      return Promise.reject(err);
-    }
-    return this.getValueToken().then((valueTokenAddress) => {
-      const valueToken = Contracts.getEIP20Token(
-        this.originWeb3,
-        valueTokenAddress,
-      );
-      return valueToken.methods
-        .approve(this.gatewayAddress, stakeAmount)
-        .then((tx) => Utils.sendTransaction(tx, txOptions));
-    });
-  }
-
-  /**
-   * Returns the raw transaction object for approving stake amount.
-   *
-   * @param {string} value Amount to approve.
-   * @param {Object} txOptions Transaction options.
-   * @param {Object} web3 Web3 object.
-   * @param {string} valueToken Value token contract address.
-   * @param {string} gateway EIP20Gateway contract address.
-   * @param {string} staker Staker address.
-   *
-   * @returns {Object} Raw transaction object.
-   */
   _approveStakeAmountRawTx(
-    value,
+    _value,
     txOptions,
     web3,
     valueToken,
     gateway,
     staker,
   ) {
-    const transactionOptions = Object.assign(
+    Utils.deprecationNoticeStakeHelper('_approveStakeAmountRawTx');
+
+    const oThis = this;
+
+    txOptions = Object.assign(
       {
         from: staker,
         to: valueToken,
         gas: '100000',
       },
+      oThis.txOptions || {},
       txOptions || {},
     );
 
-    const contract = Contracts.getEIP20Token(
-      web3,
-      valueToken,
-      transactionOptions,
-    );
-
-    const tx = contract.methods.approve(gateway, value);
+    let contract = Contracts.getEIP20Token(web3, valueToken, txOptions);
+    let tx = contract.methods.approve(gateway, _value);
 
     return tx;
   }
 
-  /**
-   * Returns the stake raw transaction object.
-   *
-   * @param {string} amount Amount to stake.
-   * @param {string} beneficiary Beneficiary address.
-   * @param {string} gasPrice Gas price that staker is willing to pay for the reward.
-   * @param {string} gasLimit Maximum gas limit for reward calculation.
-   * @param {string} nonce Staker nonce.
-   * @param {string} hashLock Hash lock.
-   * @param {Object} txOptions Transaction options.
-   * @param {Object} web3 Web3 object.
-   * @param {string} gateway EIP20Gateway contract address.
-   * @param {string} staker Staker address.
-   *
-   * @returns {Object} Raw transaction object.
-   */
+  stake(
+    _amount,
+    _beneficiary,
+    _gasPrice,
+    _gasLimit,
+    _nonce,
+    _hashLock,
+    txOptions,
+    originWeb3,
+    gateway,
+    staker,
+  ) {
+    Utils.deprecationNoticeStakeHelper('stake');
+
+    const oThis = this;
+
+    let web3 = originWeb3 || oThis.web3;
+    gateway = gateway || oThis.gateway;
+    staker = staker || oThis.staker;
+
+    let tx = oThis._stakeRawTx(
+      _amount,
+      _beneficiary,
+      _gasPrice,
+      _gasLimit,
+      _nonce,
+      _hashLock,
+      txOptions,
+      web3,
+      gateway,
+      staker,
+    );
+    console.log(`* Staking SimpleToken`);
+    return tx
+      .send(txOptions)
+      .on('transactionHash', function(transactionHash) {
+        console.log('\t - transaction hash:', transactionHash);
+      })
+      .on('receipt', function(receipt) {
+        console.log(
+          '\t - Receipt:\n\x1b[2m',
+          JSON.stringify(receipt),
+          '\x1b[0m\n',
+        );
+      })
+      .on('error', function(error) {
+        console.log('\t !! Error !!', error, '\n\t !! ERROR !!\n');
+        return Promise.reject(error);
+      });
+  }
+
   _stakeRawTx(
-    amount,
-    beneficiary,
-    gasPrice,
-    gasLimit,
-    nonce,
-    hashLock,
+    _amount,
+    _beneficiary,
+    _gasPrice,
+    _gasLimit,
+    _nonce,
+    _hashLock,
     txOptions,
     web3,
     gateway,
     staker,
   ) {
-    const transactionOptions = Object.assign(
+    Utils.deprecationNoticeStakeHelper('_stakeRawTx');
+
+    const oThis = this;
+
+    txOptions = Object.assign(
       {
         from: staker,
         to: gateway,
         gas: '7000000',
       },
+      oThis.txOptions || {},
       txOptions || {},
     );
 
-    const contract = Contracts.getEIP20Gateway(
-      web3,
-      gateway,
-      transactionOptions,
-    );
-
-    const tx = contract.methods.stake(
-      amount,
-      beneficiary,
-      gasPrice,
-      gasLimit,
-      nonce,
-      hashLock,
+    let contract = Contracts.getEIP20Gateway(web3, gateway, txOptions);
+    let tx = contract.methods.stake(
+      _amount,
+      _beneficiary,
+      _gasPrice,
+      _gasLimit,
+      _nonce,
+      _hashLock,
     );
 
     return tx;
   }
 
-  /**
-   * Creates a random secret string, unlock secrete and hash lock.
-   *
-   * @returns {HashLock} HashLock object.
-   */
   static createSecretHashLock() {
-    return Utils.createSecretHashLock();
+    let secret = Crypto.randomBytes(16).toString('hex');
+    return StakeHelper.toHashLock(secret);
   }
 
-  /**
-   * Returns the HashLock from the given secret string.
-   *
-   * @param {string} secretString The secret string.
-   *
-   * @returns {HashLock} HashLock object.
-   */
   static toHashLock(secretString) {
-    return Utils.toHashLock(secretString);
+    let secretBytes = Buffer.from(secretString);
+    return {
+      secret: secretString,
+      unlockSecret: '0x' + secretBytes.toString('hex'),
+      hashLock: Web3Utils.keccak256(secretString),
+    };
   }
 }
 
