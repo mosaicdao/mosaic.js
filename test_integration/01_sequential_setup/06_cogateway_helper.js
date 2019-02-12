@@ -3,7 +3,9 @@
 const { assert } = require('chai');
 const Web3 = require('web3');
 
-const CoGatewayHelper = require('../../src/helpers/setup/CoGatewayHelper');
+const { ChainSetup } = require('../../index');
+
+const { CoGatewayHelper } = ChainSetup;
 
 const shared = require('../shared');
 
@@ -31,8 +33,6 @@ const assertDeploymentReceipt = (receipt) => {
 describe('CoGatewayHelper', () => {
   let deployParams;
 
-  let organizationOwner;
-
   const subject = new CoGatewayHelper(shared.auxiliary.web3);
 
   before(() => {
@@ -40,7 +40,6 @@ describe('CoGatewayHelper', () => {
       from: shared.setupConfig.deployerAddress,
       gasPrice: shared.setupConfig.gasPrice,
     };
-    organizationOwner = shared.setupConfig.deployerAddress;
   });
 
   const someValidAddress = '0x2222222222222222222222222222222222222222';

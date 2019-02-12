@@ -3,7 +3,10 @@
 const { assert } = require('chai');
 const Web3 = require('web3');
 
-const AnchorHelper = require('../../src/helpers/setup/AnchorHelper');
+const { ChainSetup } = require('../../index');
+const Anchor = require('../../src/ContractInteract/Anchor');
+
+const { AnchorHelper } = ChainSetup;
 
 const shared = require('../shared');
 
@@ -144,6 +147,11 @@ describe('AnchorHelper', () => {
       maxStateRoots: 10,
       organizationOwner: shared.setupConfig.organizationOwner,
     };
-    return subject.setup(anchorConfig, deployParams);
+    return Anchor.setup(
+      shared.origin.web3,
+      shared.auxiliary.web3,
+      anchorConfig,
+      deployParams,
+    );
   });
 });

@@ -30,7 +30,7 @@ describe('OSTPrime.constructor()', () => {
     ostPrime = new OSTPrime(web3, ostPrimeAddress);
 
     assert.strictEqual(
-      ostPrime.contractAddress,
+      ostPrime.address,
       ostPrimeAddress,
       'OST Prime contract address from contract must be equal to expected' +
         ' address.',
@@ -61,14 +61,14 @@ describe('OSTPrime.constructor()', () => {
   it('should throw if invalid contract address is passed', function() {
     assert.throws(
       () => new OSTPrime(web3, '0x123'),
-      /Mandatory Parameter 'contractAddress' is missing or invalid./,
+      /Mandatory Parameter 'address' is missing or invalid./,
     );
   });
 
   it('should throw if undefined contract address is passed', function() {
     assert.throws(
       () => new OSTPrime(web3, undefined),
-      /Mandatory Parameter 'contractAddress' is missing or invalid./,
+      /Mandatory Parameter 'address' is missing or invalid./,
     );
   });
 
