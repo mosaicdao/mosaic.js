@@ -13,7 +13,7 @@ describe('EIP20Token.isAmountApproved()', () => {
   let ownerAddress;
   let spenderAddress;
   let amount;
-  let address;
+  let tokenAddress;
   let mockedAllowance;
 
   let spyAllowance;
@@ -38,9 +38,9 @@ describe('EIP20Token.isAmountApproved()', () => {
     ownerAddress = '0x0000000000000000000000000000000000000005';
     spenderAddress = '0x0000000000000000000000000000000000000007';
     amount = '1000';
-    address = '0x0000000000000000000000000000000000000004';
+    tokenAddress = '0x0000000000000000000000000000000000000004';
     mockedAllowance = '10000';
-    token = new EIP20Token(web3, address);
+    token = new EIP20Token(web3, tokenAddress);
   });
 
   it('should throw an error when owner address is undefined', async () => {

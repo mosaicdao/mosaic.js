@@ -10,7 +10,7 @@ const Utils = require('../../src/utils/Utils');
 
 describe('EIP20Token.approve()', () => {
   let web3;
-  let address;
+  let tokenAddress;
   let token;
 
   let spenderAddress;
@@ -45,8 +45,8 @@ describe('EIP20Token.approve()', () => {
 
   beforeEach(() => {
     web3 = new Web3();
-    address = '0x0000000000000000000000000000000000000002';
-    token = new EIP20Token(web3, address);
+    tokenAddress = '0x0000000000000000000000000000000000000002';
+    token = new EIP20Token(web3, tokenAddress);
 
     spenderAddress = '0x0000000000000000000000000000000000000005';
     amount = '1000';
