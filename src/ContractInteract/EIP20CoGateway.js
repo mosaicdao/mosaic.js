@@ -29,10 +29,7 @@ const Contracts = require('../Contracts');
 const Utils = require('../utils/Utils');
 const Anchor = require('../ContractInteract/Anchor');
 const EIP20Token = require('../ContractInteract/EIP20Token');
-const {
-  validateConfigExists,
-  validateConfigKeyExists,
-} = require('./validation');
+const { validateConfigKeyExists } = require('./validation');
 
 const ContractName = 'EIP20CoGateway';
 /**
@@ -104,7 +101,6 @@ class EIP20CoGateway {
    */
   static setup(web3, config, txOptions = {}) {
     EIP20CoGateway.validateSetupConfig(config);
-    validateConfigKeyExists(config, 'gateway', 'config');
 
     const deployParams = Object.assign({}, txOptions);
     deployParams.from = txOptions.from || config.deployer;
@@ -132,7 +128,7 @@ class EIP20CoGateway {
    * @throws Will throw an error if setup configuration is incomplete.
    */
   static validateSetupConfig(config) {
-    validateConfigExists(config);
+    validateConfigKeyExists(config, 'gateway', 'config');
     validateConfigKeyExists(config, 'deployer', 'config');
     validateConfigKeyExists(config, 'bounty', 'config');
     validateConfigKeyExists(config, 'organization', 'config');

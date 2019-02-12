@@ -133,7 +133,12 @@ class EIP20Gateway {
     }
 
     EIP20Gateway.validateSetupConfig(gatewayConfig);
-    EIP20CoGateway.validateSetupConfig(coGatewayConfig);
+    EIP20CoGateway.validateSetupConfig({
+      ...coGatewayConfig,
+      // Add a dummy value for gateway address, as we only know the real value
+      // after we deployed the EIP20Gateway.
+      gateway: 'dummy',
+    });
 
     const gatewayDeployParams = Object.assign({}, originTxOptions);
     gatewayDeployParams.from = gatewayConfig.deployer;
@@ -153,11 +158,14 @@ class EIP20Gateway {
 
     const coGatewayDeploy = gatewayDeploy.then((gateway) => {
       const gatewayAddress = gateway.address;
-      coGatewayConfig.gateway = gatewayAddress;
+      const _coGatewayConfig = {
+        ...coGatewayConfig,
+        gateway: gatewayAddress,
+      };
 
       return EIP20CoGateway.setup(
         auxiliaryWeb3,
-        coGatewayConfig,
+        _coGatewayConfig,
         auxiliaryTxOptions,
       );
     });

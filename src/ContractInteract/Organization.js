@@ -5,10 +5,7 @@ const Web3 = require('web3');
 const AbiBinProvider = require('../AbiBinProvider');
 const Contracts = require('../Contracts');
 const { sendTransaction } = require('../utils/Utils');
-const {
-  validateConfigExists,
-  validateConfigKeyExists,
-} = require('./validation');
+const { validateConfigKeyExists } = require('./validation');
 
 const ContractName = 'Organization';
 
@@ -71,7 +68,6 @@ class Organization {
   }
 
   static validateSetupConfig(config) {
-    validateConfigExists(config);
     validateConfigKeyExists(config, 'deployer', 'config');
     validateConfigKeyExists(config, 'owner', 'config');
     validateConfigKeyExists(config, 'admin', 'config');

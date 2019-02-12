@@ -21,10 +21,7 @@ const Web3 = require('web3');
 const AbiBinProvider = require('../AbiBinProvider');
 const Contracts = require('../Contracts');
 const Utils = require('../utils/Utils');
-const {
-  validateConfigExists,
-  validateConfigKeyExists,
-} = require('./validation');
+const { validateConfigKeyExists } = require('./validation');
 
 const ContractName = 'Anchor';
 
@@ -129,7 +126,6 @@ class Anchor {
    * @throws Will throw an error if setup configuration is incomplete.
    */
   static validateSetupConfig(config) {
-    validateConfigExists(config);
     validateConfigKeyExists(config, 'deployer', 'config');
     validateConfigKeyExists(config, 'organization', 'config');
     validateConfigKeyExists(config, 'remoteChainId', 'config');

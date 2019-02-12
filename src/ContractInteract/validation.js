@@ -1,17 +1,4 @@
 /**
- * Validates that the provided config object exists.
- *
- * @param {Object} config The configuration object.
- *
- * @throws Will throw an error if configuration is missing.
- */
-const validateConfigExists = (config) => {
-  if (!config) {
-    throw new Error('Mandatory parameter "config" missing.');
-  }
-};
-
-/**
  * Validates that a config key exists in the provided config object.
  *
  * @param {Object} config The configuration object.
@@ -21,6 +8,9 @@ const validateConfigExists = (config) => {
  * @throws Will throw an error if configuration key is missing.
  */
 const validateConfigKeyExists = (config, key, configName) => {
+  if (!config) {
+    throw new Error('Mandatory parameter "config" missing.');
+  }
   if (!config[key]) {
     throw new Error(
       `Mandatory configuration "${key}" missing. Set ${configName}.${key}`,
@@ -29,6 +19,5 @@ const validateConfigKeyExists = (config, key, configName) => {
 };
 
 module.exports = {
-  validateConfigExists,
   validateConfigKeyExists,
 };

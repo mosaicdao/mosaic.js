@@ -16,10 +16,7 @@ const Web3 = require('web3');
 const AbiBinProvider = require('../AbiBinProvider');
 const Contracts = require('../Contracts');
 const Utils = require('../utils/Utils');
-const {
-  validateConfigExists,
-  validateConfigKeyExists,
-} = require('./validation');
+const { validateConfigKeyExists } = require('./validation');
 
 const ContractName = 'OSTPrime';
 
@@ -79,18 +76,6 @@ class OSTPrime {
    *                            has been set up.
    */
   static setup(web3, config, txOptions) {
-    if (!config.valueToken) {
-      throw new Error(
-        'Mandatory configuration "valueToken" missing. Provide EIP20 token contract address.',
-      );
-    }
-
-    if (!config.organization) {
-      throw new Error(
-        'Mandatory configuration "organization" missing. Set config.organization address.',
-      );
-    }
-
     OSTPrime.validateSetupConfig(config);
 
     const deployParams = Object.assign({}, txOptions);
@@ -126,9 +111,10 @@ class OSTPrime {
    * @throws Will throw an error if setup configuration is incomplete.
    */
   static validateSetupConfig(config) {
-    validateConfigExists(config);
     validateConfigKeyExists(config, 'deployer', 'config');
     validateConfigKeyExists(config, 'chainOwner', 'config');
+    validateConfigKeyExists(config, 'organization', 'config');
+    validateConfigKeyExists(config, 'valueToken', 'config');
   }
 
   /**
