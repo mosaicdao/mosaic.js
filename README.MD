@@ -17,6 +17,9 @@ The protocol defines a set of actions that together perform atomic token transfe
 Atomicity is achieved using a 2-phase message passing architecture between the chains. Messages are declared on the source chain, and confirmed on the target chain with Merkle Patricia proofs once the source chain is finalized. Once messages are confirmed on the target chain, they can efficiently progressed with a hashlock.
 Messages can also be reverted if they are not yet completed on the target chain.
 
+> ⚠️ Reverting is not yet supported in `mosaic.js` and will be supported in a future version.
+> In the meantime you can revert by accessing the contracts directly.
+
 You can read [the draft of the mosaic whitepaper][mosaic whitepaper] or [the original OpenST whitepaper][openst whitepaper].
 
 ## Instructions
