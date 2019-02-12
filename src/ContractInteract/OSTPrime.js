@@ -135,6 +135,15 @@ class OSTPrime {
    *                            has been deployed.
    */
   static async deploy(web3, valueToken, organization, txOptions) {
+    if (!txOptions) {
+      const err = new TypeError('Invalid transaction options.');
+      return Promise.reject(err);
+    }
+    if (!Web3.utils.isAddress(txOptions.from)) {
+      const err = new TypeError(`Invalid from address: ${txOptions.from}.`);
+      return Promise.reject(err);
+    }
+
     const tx = OSTPrime.deployRawTx(web3, valueToken, organization);
 
     return Utils.sendTransaction(tx, txOptions).then((txReceipt) => {
@@ -420,7 +429,7 @@ class OSTPrime {
    */
   setCoGatewayRawTx(coGateway) {
     if (!Web3.utils.isAddress(coGateway)) {
-      const err = new TypeError('Invalid coGateway address.');
+      const err = new TypeError(`Invalid coGateway address: ${coGateway}`);
       return Promise.reject(err);
     }
 

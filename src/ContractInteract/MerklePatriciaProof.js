@@ -25,7 +25,7 @@ class MerklePatriciaProof {
     }
     if (!Web3.utils.isAddress(libraryAddress)) {
       throw new TypeError(
-        "Mandatory Parameter 'libraryAddress' is missing or invalid.",
+        `Mandatory Parameter 'libraryAddress' is missing or invalid: ${libraryAddress}`,
       );
     }
 
@@ -48,6 +48,15 @@ class MerklePatriciaProof {
         `Mandatory Parameter 'web3' is missing or invalid: ${web3}`,
       );
     }
+    if (!txOptions) {
+      const err = new TypeError('Invalid transaction options.');
+      return Promise.reject(err);
+    }
+    if (!Web3.utils.isAddress(txOptions.from)) {
+      const err = new TypeError(`Invalid from address: ${txOptions.from}.`);
+      return Promise.reject(err);
+    }
+
     const tx = MerklePatriciaProof.deployRawTx(web3);
 
     return Utils.sendTransaction(tx, txOptions).then((txReceipt) => {

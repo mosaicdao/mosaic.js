@@ -250,6 +250,15 @@ class EIP20Gateway {
     gatewayLibAddress,
     txOptions,
   ) {
+    if (!txOptions) {
+      const err = new TypeError('Invalid transaction options.');
+      return Promise.reject(err);
+    }
+    if (!Web3.utils.isAddress(txOptions.from)) {
+      const err = new TypeError(`Invalid from address: ${txOptions.from}.`);
+      return Promise.reject(err);
+    }
+
     const tx = EIP20Gateway.deployRawTx(
       web3,
       token,
@@ -1045,7 +1054,7 @@ class EIP20Gateway {
    * Activate gateway by setting the address of the corresponding EIP20CoGateway on the
    * remote chain.
    *
-   * @param {coGatewayAddress} Address of cogateway.
+   * @param {string} coGatewayAddress Address of cogateway.
    * @param {Object} txOptions Transaction options.
    *
    * @returns {Promise<Object>} Promise object that resolves to address of the stake vault.
@@ -1053,6 +1062,10 @@ class EIP20Gateway {
   activateGateway(coGatewayAddress, txOptions) {
     if (!txOptions) {
       const err = new TypeError('Invalid transaction options.');
+      return Promise.reject(err);
+    }
+    if (!Web3.utils.isAddress(txOptions.from)) {
+      const err = new TypeError(`Invalid from address: ${txOptions.from}.`);
       return Promise.reject(err);
     }
 
@@ -1064,7 +1077,7 @@ class EIP20Gateway {
   /**
    * Raw transaction object for {@link EIP20Gateway#activateGateway}
    *
-   * @param {coGatewayAddress} Address of cogateway.
+   * @param {string} coGatewayAddress Address of cogateway.
    *
    * @returns {Promise<Object>} Promise that resolves to raw transaction object.
    */

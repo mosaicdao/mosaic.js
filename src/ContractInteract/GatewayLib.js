@@ -25,7 +25,7 @@ class GatewayLib {
     }
     if (!Web3.utils.isAddress(libraryAddress)) {
       throw new TypeError(
-        "Mandatory Parameter 'libraryAddress' is missing or invalid.",
+        `Mandatory Parameter 'libraryAddress' is missing or invalid: ${libraryAddress}`,
       );
     }
 
@@ -45,6 +45,15 @@ class GatewayLib {
    *                                         instance that has been deployed.
    */
   static async deploy(web3, merklePatriciaProofAddress, txOptions) {
+    if (!txOptions) {
+      const err = new TypeError('Invalid transaction options.');
+      return Promise.reject(err);
+    }
+    if (!Web3.utils.isAddress(txOptions.from)) {
+      const err = new TypeError(`Invalid from address: ${txOptions.from}.`);
+      return Promise.reject(err);
+    }
+
     const tx = GatewayLib.deployRawTx(web3, merklePatriciaProofAddress);
 
     return Utils.sendTransaction(tx, txOptions).then((txReceipt) => {

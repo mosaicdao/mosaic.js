@@ -176,6 +176,15 @@ class EIP20CoGateway {
     gatewayLibAddress,
     txOptions,
   ) {
+    if (!txOptions) {
+      const err = new TypeError('Invalid transaction options.');
+      return Promise.reject(err);
+    }
+    if (!Web3.utils.isAddress(txOptions.from)) {
+      const err = new TypeError(`Invalid from address: ${txOptions.from}.`);
+      return Promise.reject(err);
+    }
+
     const tx = EIP20CoGateway.deployRawTx(
       web3,
       valueToken,
