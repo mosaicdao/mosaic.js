@@ -33,19 +33,23 @@ const assertDeploymentReceipt = (receipt) => {
 
 describe('GatewayHelper', () => {
   let deployParams;
+  let tokenAddress;
+  let anchorAddress;
 
   before(() => {
     deployParams = {
       from: shared.setupConfig.deployerAddress,
       gasPrice: shared.setupConfig.gasPrice,
     };
+
+    tokenAddress = shared.origin.addresses.EIP20Token;
+    anchorAddress = shared.origin.addresses.Anchor;
   });
 
-  const someValidAddress = '0x1111111111111111111111111111111111111111';
   it('should deploy new Gateway contract', () => {
-    const _token = someValidAddress;
-    const _baseToken = someValidAddress;
-    const _anchor = someValidAddress;
+    const _token = tokenAddress;
+    const _baseToken = tokenAddress;
+    const _anchor = anchorAddress;
     const _bounty = 1000;
 
     const subject = new GatewayHelper(shared.origin.web3);
@@ -69,7 +73,7 @@ describe('GatewayHelper', () => {
 
   // Test Setup
   it('should setup Gateway and CoGateway', () => {
-    const simpleToken = someValidAddress;
+    const simpleToken = tokenAddress;
 
     const gatewayConfig = {
       deployer: shared.setupConfig.deployerAddress,

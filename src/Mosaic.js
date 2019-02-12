@@ -89,7 +89,7 @@ class Mosaic {
   }
 
   static get ChainSetup() {
-    Utils.deprecationNoticeChainSetup();
+    Utils.deprecationNoticeChainSetup('ChainSetup');
 
     return ChainSetup;
   }

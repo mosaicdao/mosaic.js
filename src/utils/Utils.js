@@ -68,9 +68,9 @@ class Utils {
       }
 
       tx.send(txOptions)
-        .on('receipt', receipt => onResolve(receipt))
-        .on('error', error => onReject(error))
-        .catch(exception => onReject(exception));
+        .on('receipt', (receipt) => onResolve(receipt))
+        .on('error', (error) => onReject(error))
+        .catch((exception) => onReject(exception));
     });
   }
 
@@ -78,16 +78,10 @@ class Utils {
    * Prints a deprecation warning for deprecated ChainSetup methods.
    * See {@link https://github.com/OpenSTFoundation/mosaic.js/issues/57}.
    *
-   * @param {string} [method] The method on the StakeHelper that has been deprecated.
+   * @param {string} object Identifier of the chain setup related object that has been deprecated.
    */
-  static deprecationNoticeChainSetup(method) {
+  static deprecationNoticeChainSetup(object) {
     const issueNumber = '57';
-
-    let object = 'ChainSetup';
-    if (method !== undefined) {
-      object = `${method}::${method}()`;
-    }
-
     Utils.deprecationNotice(object, issueNumber);
   }
 
