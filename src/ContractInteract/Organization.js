@@ -20,22 +20,16 @@ class Organization {
    * @param {string} address Organization contract address.
    */
   constructor(web3, address) {
-    if (web3 instanceof Web3) {
-      this.web3 = web3;
-    } else {
-      const err = new TypeError(
-        "Mandatory Parameter 'web3' is missing or invalid",
-      );
-      throw err;
+    if (!(web3 instanceof Web3)) {
+      throw new TypeError("Mandatory Parameter 'web3' is missing or invalid");
     }
-
     if (!Web3.utils.isAddress(address)) {
-      const err = new TypeError(
+      throw new TypeError(
         "Mandatory Parameter 'address' is missing or invalid.",
       );
-      throw err;
     }
 
+    this.web3 = web3;
     this.address = address;
 
     this.contract = Contracts.getEIP20Token(this.web3, this.address);

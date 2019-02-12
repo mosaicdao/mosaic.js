@@ -20,22 +20,16 @@ class MerklePatriciaProof {
    * @param {string} libraryAddress MerklePatriciaProof contract address.
    */
   constructor(web3, libraryAddress) {
-    if (web3 instanceof Web3) {
-      this.web3 = web3;
-    } else {
-      const err = new TypeError(
-        "Mandatory Parameter 'web3' is missing or invalid",
-      );
-      throw err;
+    if (!(web3 instanceof Web3)) {
+      throw new TypeError("Mandatory Parameter 'web3' is missing or invalid");
     }
-
     if (!Web3.utils.isAddress(libraryAddress)) {
-      const err = new TypeError(
+      throw new TypeError(
         "Mandatory Parameter 'libraryAddress' is missing or invalid.",
       );
-      throw err;
     }
 
+    this.web3 = web3;
     this.address = libraryAddress;
   }
 

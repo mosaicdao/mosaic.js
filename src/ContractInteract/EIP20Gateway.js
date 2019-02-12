@@ -47,22 +47,16 @@ class EIP20Gateway {
    * @param {string} gatewayAddress Gateway contract address.
    */
   constructor(web3, gatewayAddress) {
-    if (web3 instanceof Web3) {
-      this.web3 = web3;
-    } else {
-      const err = new TypeError(
-        "Mandatory Parameter 'web3' is missing or invalid",
-      );
-      throw err;
+    if (!(web3 instanceof Web3)) {
+      throw new TypeError("Mandatory Parameter 'web3' is missing or invalid");
     }
-
     if (!Web3.utils.isAddress(gatewayAddress)) {
-      const err = new TypeError(
+      throw new TypeError(
         "Mandatory Parameter 'gatewayAddress' is missing or invalid.",
       );
-      throw err;
     }
 
+    this.web3 = web3;
     this.address = gatewayAddress;
 
     this.contract = Contracts.getEIP20Gateway(this.web3, this.address);
@@ -119,22 +113,11 @@ class EIP20Gateway {
   static setup(
     originWeb3,
     auxiliaryWeb3,
-    gatewayConfig,
-    coGatewayConfig,
+    gatewayConfig = {},
+    coGatewayConfig = {},
     originTxOptions = {},
     auxiliaryTxOptions = {},
   ) {
-    if (!gatewayConfig) {
-      throw new Error('Mandatory parameter "gatewayConfig" missing. ');
-    }
-    if (!coGatewayConfig) {
-      throw new Error('Mandatory parameter "coGatewayConfig" missing. ');
-    }
-
-    gatewayConfig = gatewayConfig || {};
-    gatewayConfig.messageBus = gatewayConfig.messageBus || this.messageBus;
-    gatewayConfig.gatewayLib = gatewayConfig.gatewayLib || this.gatewayLib;
-
     if (!originWeb3) {
       throw new Error('Mandatory parameter "originWeb3" missing.');
     }

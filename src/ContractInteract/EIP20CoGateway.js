@@ -46,22 +46,16 @@ class EIP20CoGateway {
    * @param {string} coGatewayAddress EIP20CoGateway contract address.
    */
   constructor(web3, coGatewayAddress) {
-    if (web3 instanceof Web3) {
-      this.web3 = web3;
-    } else {
-      const err = new TypeError(
-        "Mandatory Parameter 'web3' is missing or invalid",
-      );
-      throw err;
+    if (!(web3 instanceof Web3)) {
+      throw new TypeError("Mandatory Parameter 'web3' is missing or invalid");
     }
-
     if (!Web3.utils.isAddress(coGatewayAddress)) {
-      const err = new TypeError(
+      throw new TypeError(
         "Mandatory Parameter 'coGatewayAddress' is missing or invalid.",
       );
-      throw err;
     }
 
+    this.web3 = web3;
     this.address = coGatewayAddress;
 
     this.contract = Contracts.getEIP20CoGateway(this.web3, this.address);
