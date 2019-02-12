@@ -210,6 +210,42 @@ To obtain the base token, you need to stake OST on origin.
 <!-- Add contract addresses for test nets -->
 On auxiliary, the `OSTPrime` contract will convert the EIP20 token to base tokens for the beneficiary.
 
+Create an OSTPrime object:
+```js
+const ostPrime = new Mosaic.ContractInteract.OSTPrime(
+  mosaic.auxiliary.web3,
+  mosaic.auxiliary.contractAddresses.OSTPrime,
+);
+```
+
+Wrap:
+```js
+const amountToWrap = '1000';
+const fromAddress = '0x00000000000000000000000000000fromaddress';
+let txOptions = {
+  value: amountToWrap,
+  from: fromAddress,
+};
+
+ostPrime
+  .wrap(txOptions)
+  .then(console.log)
+  .catch(console.log);
+```
+
+Unwrap:
+```js
+const amountToUnwrap = '1000';
+txOptions = {
+  from: fromAddress,
+};
+
+ostPrime
+  .unwrap(amountToUnwrap, txOptions)
+  .then(console.log)
+  .catch(console.log);
+```
+
 ## Related Work
 
 [mosaic-contracts] provides the EVM smart contracts implementations.
