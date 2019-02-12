@@ -20,7 +20,7 @@ class Facilitator {
   /**
    * Constructor for facilitator.
    *
-   * @param {Object} mosaic Mosaic object.
+   * @param {Mosaic} mosaic Mosaic object.
    */
   constructor(mosaic) {
     if (!(mosaic instanceof Mosaic)) {
