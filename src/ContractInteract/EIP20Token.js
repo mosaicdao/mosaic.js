@@ -16,22 +16,16 @@ class EIP20Token {
    * @param {string} tokenAddress EIP20Token contract address.
    */
   constructor(web3, tokenAddress) {
-    if (web3 instanceof Web3) {
-      this.web3 = web3;
-    } else {
-      const err = new TypeError(
-        "Mandatory Parameter 'web3' is missing or invalid",
-      );
-      throw err;
+    if (!(web3 instanceof Web3)) {
+      throw new TypeError("Mandatory Parameter 'web3' is missing or invalid");
     }
-
     if (!Web3.utils.isAddress(tokenAddress)) {
-      const err = new TypeError(
-        "Mandatory Parameter 'tokenAddress' is missing or invalid.",
+      throw new TypeError(
+        `Mandatory Parameter 'tokenAddress' is missing or invalid: ${tokenAddress}`,
       );
-      throw err;
     }
 
+    this.web3 = web3;
     this.tokenAddress = tokenAddress;
 
     this.contract = Contracts.getEIP20Token(this.web3, this.tokenAddress);

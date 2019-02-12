@@ -3,7 +3,10 @@
 const { assert } = require('chai');
 const Web3 = require('web3');
 
-const OrganizationHelper = require('../../src/helpers/setup/OrganizationHelper');
+const { ChainSetup } = require('../../index');
+const Organization = require('../../src/ContractInteract/Organization');
+
+const { OrganizationHelper } = ChainSetup;
 
 const shared = require('../shared');
 
@@ -48,52 +51,30 @@ describe('OrganizationHelper', () => {
   });
 
   after(() => {
-    const auxiliaryHelper = new OrganizationHelper(shared.auxiliary.web3);
-    return auxiliaryHelper.setup(orgConfig).then(() => {
-      shared.auxiliary.addresses.Organization = auxiliaryHelper.address;
-    });
+    // set up Organization on auxiliary for later tests
+    return Organization.setup(shared.auxiliary.web3, orgConfig).then(
+      (instance) => {
+        shared.auxiliary.addresses.Organization = instance.address;
+      },
+    );
   });
 
   const subject = new OrganizationHelper(shared.origin.web3);
 
   it('should deploy new organization contract', () => {
     return subject
-      .deploy(orgConfig.owner, null, null, null, deployParams)
+      .deploy(orgConfig.owner, undefined, undefined, undefined, deployParams)
       .then(assertDeploymentReceipt);
-  });
-
-  it('should set admin address', () => {
-    const adminKeyAddress = orgConfig.admin;
-    return subject.setAdmin(adminKeyAddress, deployParams).then(assertReceipt);
-  });
-
-  it('should set worker address', () => {
-    const workerKeyAddress = orgConfig.workers[0];
-    return subject
-      .setWorker(workerKeyAddress, '10000000', deployParams)
-      .then(assertReceipt);
-  });
-
-  it('should initiate Ownership Transfer', () => {
-    const ownerKeyAddress = orgConfig.admin;
-    return subject
-      .initiateOwnershipTransfer(ownerKeyAddress, deployParams)
-      .then(assertReceipt);
-  });
-
-  it('should complete Ownership Transfer', () => {
-    const ownerKeyAddress = orgConfig.admin;
-    const ownerParams = Object.assign({}, deployParams, {
-      from: ownerKeyAddress,
-    });
-    return subject.completeOwnershipTransfer(ownerParams).then(assertReceipt);
   });
 
   it('should do complete organization setup', () => {
     const _orgConfig = orgConfig;
     _orgConfig.owner = shared.setupConfig.organizationOwner;
-    return subject.setup(_orgConfig).then(() => {
-      shared.origin.addresses.Organization = subject.address;
-    });
+
+    return Organization.setup(shared.origin.web3, _orgConfig).then(
+      (instance) => {
+        shared.origin.addresses.Organization = instance.address;
+      },
+    );
   });
 });

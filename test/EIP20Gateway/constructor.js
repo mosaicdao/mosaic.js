@@ -73,7 +73,7 @@ describe('EIP20Gateway.constructor()', () => {
 
     const contractObject = new EIP20Gateway(web3, gatewayAddress);
     assert.strictEqual(
-      contractObject.gatewayAddress,
+      contractObject.address,
       gatewayAddress,
       'Gateway contract address from contract must be equal to expected address',
     );

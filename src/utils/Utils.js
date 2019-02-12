@@ -60,9 +60,14 @@ class Utils {
    *
    * @returns {Promise} Promise object.
    */
-  static sendTransaction(tx, txOption) {
-    return new Promise((onResolve, onReject) => {
-      tx.send(txOption)
+  static async sendTransaction(tx, txOption) {
+    return new Promise(async (onResolve, onReject) => {
+      const txOptions = Object.assign({}, txOption);
+      if (!txOptions.gas) {
+        txOptions.gas = await tx.estimateGas(txOptions);
+      }
+
+      tx.send(txOptions)
         .on('transactionHash', (transactionHash) => {})
         .on('receipt', (receipt) => {
           return onResolve(receipt);
@@ -74,6 +79,16 @@ class Utils {
           return onReject(exception);
         });
     });
+  }
+
+  /**
+   * Prints a deprecation warning for deprecated ChainSetup methods.
+   * See {@link https://github.com/OpenSTFoundation/mosaic.js/issues/57}.
+   */
+  static deprecationNoticeChainSetup(method) {
+    console.warn(
+      `${method} has been deprecated. See https://github.com/OpenSTFoundation/mosaic.js/issues/57 for migration instructions.`,
+    );
   }
 }
 

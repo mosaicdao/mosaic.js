@@ -1,6 +1,6 @@
 {
   "name": "@openstfoundation/mosaic.js",
-  "version": "0.10.0-alpha.4",
+  "version": "0.10.0-beta.1",
   "description": "Provides mosaic contract ABIs and BINs. This package also provides an API to interact with existing mosaic contracts and to deploy new ones on existing chains.",
   "main": "lib/mosaic.node.js",
   "browser": "lib/mosaic.web.js",
@@ -20,7 +20,7 @@
   ],
   "homepage": "https://openst.org",
   "author": "OpenST Ltd.",
-  "license": "LGPL-3.0",
+  "license": "LGPL-3.0-only",
   "bugs": {
     "url": "https://github.com/OpenSTFoundation/mosaic.js/issues"
   },
