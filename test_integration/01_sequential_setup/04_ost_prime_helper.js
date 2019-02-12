@@ -3,7 +3,10 @@
 const { assert } = require('chai');
 const Web3 = require('web3');
 
-const OSTPrimeHelper = require('../../src/helpers/setup/OSTPrimeHelper');
+const { ChainSetup } = require('../../index');
+const OSTPrime = require('../../src/ContractInteract/OSTPrime');
+
+const { OSTPrimeHelper } = ChainSetup;
 
 const shared = require('../shared');
 
@@ -69,11 +72,14 @@ describe('OSTPrimeHelper', () => {
       deployer: shared.setupConfig.deployerAddress,
       organization: addressOrganization,
       chainOwner: chainOwner,
+      valueToken: ValueTokenAddress,
     };
-    return subject
-      .setup(ValueTokenAddress, ostPrimeConfig, deployParams)
-      .then(() => {
-        shared.auxiliary.addresses.OSTPrime = subject.address;
-      });
+    return OSTPrime.setup(
+      shared.auxiliary.web3,
+      ostPrimeConfig,
+      deployParams,
+    ).then((instance) => {
+      shared.auxiliary.addresses.OSTPrime = instance.address;
+    });
   });
 });
