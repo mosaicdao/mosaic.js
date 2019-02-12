@@ -1,8 +1,8 @@
-const chai = require('chai');
+'use strict';
+
+const { assert } = require('chai');
 const Web3 = require('web3');
 const sinon = require('sinon');
-
-const assert = chai.assert;
 const EIP20CoGateway = require('../../src/ContractInteract/EIP20CoGateway');
 const Contracts = require('../../src/Contracts');
 const SpyAssert = require('../../test_utils/SpyAssert');
@@ -73,7 +73,7 @@ describe('EIP20CoGateway.constructor()', () => {
 
     const contractObject = new EIP20CoGateway(web3, coGatewayAddress);
     assert.strictEqual(
-      contractObject.coGatewayAddress,
+      contractObject.address,
       coGatewayAddress,
       'Cogateway contract address from contract must be equal to expected address',
     );

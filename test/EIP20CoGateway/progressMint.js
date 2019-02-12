@@ -1,10 +1,11 @@
-const chai = require('chai');
+'use strict';
+
+const { assert } = require('chai');
 const Web3 = require('web3');
 const sinon = require('sinon');
-
-const assert = chai.assert;
 const EIP20CoGateway = require('../../src/ContractInteract/EIP20CoGateway');
 const SpyAssert = require('../../test_utils/SpyAssert');
+const AssertAsync = require('../../test_utils/AssertAsync');
 const Utils = require('../../src/utils/Utils');
 
 describe('EIP20CoGateway.progressMint()', () => {
@@ -24,7 +25,7 @@ describe('EIP20CoGateway.progressMint()', () => {
   const setup = () => {
     spyRawTx = sinon.replace(
       coGateway,
-      '_progressMintRawTx',
+      'progressMintRawTx',
       sinon.fake.resolves(mockedTx),
     );
 
@@ -61,19 +62,22 @@ describe('EIP20CoGateway.progressMint()', () => {
     mockedTx = 'MockedTx';
   });
 
-  it('should throw error transaction object is invalid', async () => {
-    await coGateway
-      .progressMint(messageHash, unlockSecret, undefined)
-      .catch((exception) => {
-        assert.strictEqual(
-          exception.message,
-          `Invalid transaction options: ${undefined}.`,
-          'Exeception message should match',
-        );
-      });
+  it('should throw an error when transaction object is undefined', async () => {
+    await AssertAsync.reject(
+      coGateway.progressMint(messageHash, unlockSecret, undefined),
+      'Invalid transaction options: undefined.',
+    );
   });
 
-  it('should return correct mocked transaction object', async () => {
+  it('should throw an error when `from` address in transaction object is undefined', async () => {
+    delete txOptions.from;
+    await AssertAsync.reject(
+      coGateway.progressMint(messageHash, unlockSecret, txOptions),
+      `Invalid from address ${txOptions.from} in transaction options.`,
+    );
+  });
+
+  it('should return correct transaction object', async () => {
     setup();
     const result = await coGateway.progressMint(
       messageHash,

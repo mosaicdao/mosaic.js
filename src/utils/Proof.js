@@ -1,3 +1,5 @@
+'use strict';
+
 const rlp = require('rlp');
 
 // This is the position of message outbox defined in GatewayBase.sol

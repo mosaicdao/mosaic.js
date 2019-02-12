@@ -1,8 +1,8 @@
-const chai = require('chai');
+'use strict';
+
+const { assert } = require('chai');
 const Web3 = require('web3');
 const sinon = require('sinon');
-
-const assert = chai.assert;
 const EIP20Gateway = require('../../src/ContractInteract/EIP20Gateway');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const AssertAsync = require('../../test_utils/AssertAsync');
@@ -25,7 +25,7 @@ describe('EIP20Gateway.progressStake()', () => {
   const setup = () => {
     spyRawTx = sinon.replace(
       gateway,
-      '_progressStakeRawTx',
+      'progressStakeRawTx',
       sinon.fake.resolves(mockedTx),
     );
 
@@ -62,14 +62,22 @@ describe('EIP20Gateway.progressStake()', () => {
     mockedTx = 'MockedTx';
   });
 
-  it('should throw error transaction object is invalid', async () => {
+  it('should throw error when transaction object is invalid', async () => {
     await AssertAsync.reject(
       gateway.progressStake(messageHash, unlockSecret, undefined),
-      `Invalid transaction options: ${undefined}.`,
+      'Invalid transaction options: undefined.',
     );
   });
 
-  it('should return correct mocked transaction object', async () => {
+  it('should throw error when from address transaction object is undefined', async () => {
+    delete txOptions.from;
+    await AssertAsync.reject(
+      gateway.progressStake(messageHash, unlockSecret, txOptions),
+      `Invalid from address ${txOptions.from} in transaction options.`,
+    );
+  });
+
+  it('should return correct transaction object', async () => {
     setup();
     const result = await gateway.progressStake(
       messageHash,

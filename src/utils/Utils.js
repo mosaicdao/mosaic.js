@@ -1,3 +1,5 @@
+'use strict';
+
 const Web3Utils = require('web3-utils');
 const Web3 = require('web3');
 const Crypto = require('crypto');
@@ -58,20 +60,58 @@ class Utils {
    *
    * @returns {Promise} Promise object.
    */
-  static sendTransaction(tx, txOption) {
-    return new Promise((onResolve, onReject) => {
-      tx.send(txOption)
-        .on('transactionHash', (transactionHash) => {})
-        .on('receipt', (receipt) => {
-          return onResolve(receipt);
-        })
-        .on('error', (error) => {
-          return onReject(error);
-        })
-        .catch((exception) => {
-          return onReject(exception);
-        });
+  static async sendTransaction(tx, txOption) {
+    return new Promise(async (onResolve, onReject) => {
+      const txOptions = Object.assign({}, txOption);
+      if (!txOptions.gas) {
+        txOptions.gas = await tx.estimateGas(txOptions);
+      }
+
+      tx.send(txOptions)
+        .on('receipt', (receipt) => onResolve(receipt))
+        .on('error', (error) => onReject(error))
+        .catch((exception) => onReject(exception));
     });
+  }
+
+  /**
+   * Prints a deprecation warning for deprecated ChainSetup methods.
+   * See {@link https://github.com/OpenSTFoundation/mosaic.js/issues/57}.
+   *
+   * @param {string} object Identifier of the chain setup related object that has been deprecated.
+   */
+  static deprecationNoticeChainSetup(object) {
+    const issueNumber = '57';
+    Utils.deprecationNotice(object, issueNumber);
+  }
+
+  /**
+   * Prints a deprecation warning for deprecated StakeHelper.
+   * See {@link https://github.com/OpenSTFoundation/mosaic.js/issues/86}.
+   *
+   * @param {string} [method] The method on the StakeHelper that is deprecated.
+   */
+  static deprecationNoticeStakeHelper(method) {
+    const issueNumber = '86';
+
+    let object = 'StakeHelper';
+    if (method !== undefined) {
+      object = `${object}::${method}()`;
+    }
+
+    Utils.deprecationNotice(object, issueNumber);
+  }
+
+  /**
+   * Prints a deprecation warning for deprecated code.
+   *
+   * @param {string} object Identifier of what has been deprecated.
+   * @param {string} issueNumber Issue number on GitHub that has instructions on how to migrate.
+   */
+  static deprecationNotice(object, issueNumber) {
+    console.warn(
+      `⚠️ '${object}' has been deprecated. See https://github.com/OpenSTFoundation/mosaic.js/issues/${issueNumber} for migration instructions.`,
+    );
   }
 }
 

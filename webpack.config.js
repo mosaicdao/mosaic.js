@@ -1,3 +1,5 @@
+'use strict';
+
 const path = require('path');
 const webpack = require('webpack');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
@@ -57,7 +59,7 @@ const commonConfig = (target, babelTargets) => {
       ],
     },
     optimization: {
-      minimize: true,
+      minimize: target == 'web' ? true : false,
       minimizer: [new UglifyJsPlugin()],
     },
   };

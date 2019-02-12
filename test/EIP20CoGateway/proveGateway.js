@@ -1,8 +1,8 @@
-const chai = require('chai');
+'use strict';
+
+const { assert } = require('chai');
 const Web3 = require('web3');
 const sinon = require('sinon');
-
-const assert = chai.assert;
 const EIP20CoGateway = require('../../src/ContractInteract/EIP20CoGateway');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const AssertAsync = require('../../test_utils/AssertAsync');
@@ -27,7 +27,7 @@ describe('EIP20CoGateway.proveGateway()', () => {
   const setup = () => {
     spyRawTx = sinon.replace(
       coGateway,
-      '_proveGatewayRawTx',
+      'proveGatewayRawTx',
       sinon.fake.resolves(mockedTx),
     );
 
@@ -73,11 +73,24 @@ describe('EIP20CoGateway.proveGateway()', () => {
         accountProof,
         undefined,
       ),
-      `Invalid transaction options: ${undefined}.`,
+      'Invalid transaction options: undefined.',
     );
   });
 
-  it('should return correct mocked transaction object', async () => {
+  it('should throw error when `from` address is undefined in transaction object', async () => {
+    delete txOptions.from;
+    await AssertAsync.reject(
+      coGateway.proveGateway(
+        blockHeight,
+        encodedAccount,
+        accountProof,
+        txOptions,
+      ),
+      `Invalid from address ${txOptions.from} in transaction options.`,
+    );
+  });
+
+  it('should return correct transaction object', async () => {
     setup();
     const result = await coGateway.proveGateway(
       blockHeight,

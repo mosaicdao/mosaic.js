@@ -1,8 +1,8 @@
-const chai = require('chai');
+'use strict';
+
+const { assert } = require('chai');
 const Web3 = require('web3');
 const sinon = require('sinon');
-
-const assert = chai.assert;
 const EIP20Gateway = require('../../src/ContractInteract/EIP20Gateway');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const AssertAsync = require('../../test_utils/AssertAsync');
@@ -24,7 +24,7 @@ describe('EIP20Gateway.stake()', () => {
   const setup = () => {
     spyRawTx = sinon.replace(
       gateway,
-      '_stakeRawTx',
+      'stakeRawTx',
       sinon.fake.resolves(mockedTx),
     );
 
@@ -77,7 +77,7 @@ describe('EIP20Gateway.stake()', () => {
         stakeParams.hashLock,
         undefined,
       ),
-      `Invalid transaction options: ${undefined}.`,
+      'Invalid transaction options: undefined.',
     );
   });
 
@@ -93,11 +93,11 @@ describe('EIP20Gateway.stake()', () => {
         stakeParams.hashLock,
         txOptions,
       ),
-      `Invalid facilitator address: ${undefined}.`,
+      'Invalid facilitator address: undefined.',
     );
   });
 
-  it('should return correct mocked transaction object', async () => {
+  it('should return correct transaction object', async () => {
     setup();
     const result = await gateway.stake(
       stakeParams.amount,

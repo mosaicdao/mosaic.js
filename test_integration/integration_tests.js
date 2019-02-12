@@ -1,3 +1,5 @@
+'use strict';
+
 const Mocha = require('mocha');
 const Web3 = require('web3');
 const { dockerSetup, dockerTeardown } = require('./docker');

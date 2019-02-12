@@ -13,40 +13,35 @@ class EIP20Token {
    * Constructor for EIP20Gateway.
    *
    * @param {Object} web3 Web3 object.
-   * @param {string} tokenAddress EIP20Token contract address.
+   * @param {string} address EIP20Token contract address.
    */
-  constructor(web3, tokenAddress) {
-    if (web3 instanceof Web3) {
-      this.web3 = web3;
-    } else {
-      const err = new TypeError(
-        "Mandatory Parameter 'web3' is missing or invalid",
+  constructor(web3, address) {
+    if (!(web3 instanceof Web3)) {
+      throw new TypeError("Mandatory Parameter 'web3' is missing or invalid");
+    }
+    if (!Web3.utils.isAddress(address)) {
+      throw new TypeError(
+        `Mandatory Parameter 'address' is missing or invalid: ${address}`,
       );
-      throw err;
     }
 
-    if (!Web3.utils.isAddress(tokenAddress)) {
-      const err = new TypeError(
-        "Mandatory Parameter 'tokenAddress' is missing or invalid.",
-      );
-      throw err;
-    }
+    this.web3 = web3;
+    this.address = address;
 
-    this.tokenAddress = tokenAddress;
-
-    this.contract = Contracts.getEIP20Token(this.web3, this.tokenAddress);
+    this.contract = Contracts.getEIP20Token(this.web3, this.address);
 
     if (!this.contract) {
       const err = new Error(
-        `Could not load token contract for: ${this.tokenAddress}`,
+        `Could not load token contract for: ${this.address}`,
       );
       throw err;
     }
 
     this.approve = this.approve.bind(this);
-    this._approveRawTx = this._approveRawTx.bind(this);
+    this.approveRawTx = this.approveRawTx.bind(this);
     this.allowance = this.allowance.bind(this);
     this.isAmountApproved = this.isAmountApproved.bind(this);
+    this.balanceOf = this.balanceOf.bind(this);
   }
 
   /**
@@ -67,7 +62,7 @@ class EIP20Token {
       const err = new TypeError(`Invalid from address: ${txOptions.from}.`);
       return Promise.reject(err);
     }
-    return this._approveRawTx(spenderAddress, amount).then((tx) =>
+    return this.approveRawTx(spenderAddress, amount).then((tx) =>
       Utils.sendTransaction(tx, txOptions),
     );
   }
@@ -80,7 +75,7 @@ class EIP20Token {
    *
    * @returns {Promise<boolean>} Promise that resolves to raw transaction object.
    */
-  _approveRawTx(spenderAddress, amount) {
+  approveRawTx(spenderAddress, amount) {
     if (!Web3.utils.isAddress(spenderAddress)) {
       const err = new TypeError(`Invalid spender address: ${spenderAddress}.`);
       return Promise.reject(err);
