@@ -47,7 +47,7 @@ describe('EIP20CoGateway.getAnchor()', () => {
       'Function should return anchor object with correct web3.',
     );
     assert.strictEqual(
-      result.anchorAddress,
+      result.address,
       getStateRootProviderAddressResult,
       'Function should return anchor object with correct anchor address.',
     );
@@ -66,7 +66,7 @@ describe('EIP20CoGateway.getAnchor()', () => {
       'Function should return anchor object with correct web3.',
     );
     assert.strictEqual(
-      firstCallResult.anchorAddress,
+      firstCallResult.address,
       getStateRootProviderAddressResult,
       'Function should return anchor object with correct anchor address.',
     );
@@ -81,7 +81,7 @@ describe('EIP20CoGateway.getAnchor()', () => {
       'Function should return anchor object with correct web3.',
     );
     assert.strictEqual(
-      secondCallResult.anchorAddress,
+      secondCallResult.address,
       getStateRootProviderAddressResult,
       'Function should return anchor object with correct anchor address.',
     );
