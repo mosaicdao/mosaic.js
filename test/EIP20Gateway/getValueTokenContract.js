@@ -46,7 +46,7 @@ describe('EIP20CoGateway.getValueTokenContract()', () => {
       'Function should return value token contact object with correct web3.',
     );
     assert.strictEqual(
-      result.tokenAddress,
+      result.address,
       getValueTokenAddressResult,
       'Function should return value token contact object with correct contract address.',
     );
@@ -65,7 +65,7 @@ describe('EIP20CoGateway.getValueTokenContract()', () => {
       'Function should return value token contact object with correct web3.',
     );
     assert.strictEqual(
-      firstCallResult.tokenAddress,
+      firstCallResult.address,
       getValueTokenAddressResult,
       'Function should return value token contact object with correct contract address.',
     );
@@ -80,7 +80,7 @@ describe('EIP20CoGateway.getValueTokenContract()', () => {
       'Function should return value token contact object with correct web3.',
     );
     assert.strictEqual(
-      secondCallResult.tokenAddress,
+      secondCallResult.address,
       getValueTokenAddressResult,
       'Function should return value token contact object with correct contract address.',
     );

@@ -8,7 +8,7 @@ const SpyAssert = require('../../test_utils/SpyAssert');
 
 describe('Anchor.getLatestInfo()', () => {
   let web3;
-  let anchorAddress;
+  let address;
   let anchor;
 
   let getLatestStateRootBlockHeightResult;
@@ -39,8 +39,8 @@ describe('Anchor.getLatestInfo()', () => {
 
   beforeEach(() => {
     web3 = new Web3();
-    anchorAddress = '0x0000000000000000000000000000000000000002';
-    anchor = new Anchor(web3, anchorAddress);
+    address = '0x0000000000000000000000000000000000000002';
+    anchor = new Anchor(web3, address);
     getLatestStateRootBlockHeightResult = 100;
     getStateRootResult =
       '0x0000000000000000000000000000000000000000000000000000000000000001';

@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * Validates that a config key exists in the provided config object.
  *
