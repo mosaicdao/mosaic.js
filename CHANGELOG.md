@@ -12,8 +12,8 @@ It requires [mosaic-contracts](https://github.com/OpenSTFoundation/mosaic-contra
 
 * Library is provided via npm package [@openstfoundation/mosaic.js](https://www.npmjs.com/package/@openstfoundation/mosaic.js)
 * Now provides a `Mosaic` "super" provider to access both chains and their contract addresses ([#44](https://github.com/OpenSTFoundation/mosaic.js/pull/44)).
+* Now provides a `Facilitator` class for easier interaction ([#42](https://github.com/OpenSTFoundation/mosaic.js/pull/42), [#51](https://github.com/OpenSTFoundation/mosaic.js/pull/51), [#56](https://github.com/OpenSTFoundation/mosaic.js/pull/56)).
 * Now provides contract classes to interact with the contracts:
-  * Facilitator ([#42](https://github.com/OpenSTFoundation/mosaic.js/pull/42), [#51](https://github.com/OpenSTFoundation/mosaic.js/pull/51), [#56](https://github.com/OpenSTFoundation/mosaic.js/pull/56)).
   * Anchor ([#42](https://github.com/OpenSTFoundation/mosaic.js/pull/42)).
   * EIP20Gateway and EIP20CoGateway ([#42](https://github.com/OpenSTFoundation/mosaic.js/pull/42)).
   * EIP20Token ([#42](https://github.com/OpenSTFoundation/mosaic.js/pull/42)).
