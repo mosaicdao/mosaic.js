@@ -75,7 +75,7 @@ describe('Facilitator.getCoGatewayProof()', () => {
 
     assert.strictEqual(
       spyGetProof.args[0][1],
-      facilitator.coGateway.coGatewayAddress,
+      facilitator.coGateway.address,
       'Second argument for get proof call must be gateway contract address',
     );
 

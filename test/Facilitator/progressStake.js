@@ -292,7 +292,7 @@ describe('Facilitator.progressStake()', () => {
       [
         stakeParams.amount,
         stakeParams.beneficiary,
-        facilitator.gateway.gatewayAddress,
+        facilitator.gateway.address,
         stakeParams.nonce,
         stakeParams.gasPrice,
         stakeParams.gasLimit,

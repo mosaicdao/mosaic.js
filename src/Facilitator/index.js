@@ -488,7 +488,7 @@ class Facilitator {
       const messageHash = Message.getStakeMessageHash(
         amount,
         beneficiary,
-        this.gateway.gatewayAddress,
+        this.gateway.address,
         nonce,
         gasPrice,
         gasLimit,
@@ -613,7 +613,7 @@ class Facilitator {
       const messageHash = Message.getRedeemMessageHash(
         amount,
         beneficiary,
-        this.coGateway.coGatewayAddress,
+        this.coGateway.address,
         nonce,
         gasPrice,
         gasLimit,
@@ -703,7 +703,7 @@ class Facilitator {
     const messageHash = Message.getStakeMessageHash(
       amount,
       beneficiary,
-      this.gateway.gatewayAddress,
+      this.gateway.address,
       nonce,
       gasPrice,
       gasLimit,
@@ -859,7 +859,7 @@ class Facilitator {
     const messageHash = Message.getRedeemMessageHash(
       amount,
       beneficiary,
-      this.coGateway.coGatewayAddress,
+      this.coGateway.address,
       nonce,
       gasPrice,
       gasLimit,
@@ -1338,7 +1338,7 @@ class Facilitator {
       );
       return this._getProof(
         proofGenerator,
-        this.gateway.gatewayAddress,
+        this.gateway.address,
         latestAnchorInfo,
         messageHash,
       );
@@ -1365,7 +1365,7 @@ class Facilitator {
       );
       return this._getProof(
         proofGenerator,
-        this.coGateway.coGatewayAddress,
+        this.coGateway.address,
         latestAnchorInfo,
         messageHash,
       );
