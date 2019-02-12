@@ -2,17 +2,13 @@
 
 const Web3 = require('web3');
 const AbiBinProvider = require('./AbiBinProvider');
-const Mosaic = require('./Mosaic');
 
 const abProvider = new AbiBinProvider();
 
 class Contracts {
-  constructor(mosaic) {
-    if (!(mosaic instanceof Mosaic)) {
-      const err = new TypeError('Invalid mosaic object.');
-      throw err;
-    }
-    this.mosaic = mosaic;
+  constructor(originWeb3, auxiliaryWeb3) {
+    this.originWeb3 = Contracts._getWeb3(originWeb3);
+    this.auxiliaryWeb3 = Contracts._getWeb3(auxiliaryWeb3);
   }
 
   ValueToken(options) {
