@@ -5,6 +5,7 @@ const MosaicProvider = require('./src/Mosaic');
 const AbiBinProvider = require('./src/AbiBinProvider');
 const Chain = require('./src/Chain');
 const ChainSetup = require('./src/ChainSetup');
+const Contracts = require('./src/Contracts');
 const Facilitator = require('./src/Facilitator');
 const Redeemer = require('./src/Redeemer');
 const Staker = require('./src/Staker');
@@ -63,6 +64,10 @@ class Mosaic {
   }
 
   static get Contracts() {
+    return Contracts;
+  }
+
+  static get ContractInteract() {
     return {
       Anchor,
       EIP20CoGateway,
