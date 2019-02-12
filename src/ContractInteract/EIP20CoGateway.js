@@ -69,6 +69,8 @@ class EIP20CoGateway {
     this.redeem = this.redeem.bind(this);
     this.redeemRawTx = this.redeemRawTx.bind(this);
     this.progressRedeemRawTx = this.progressRedeemRawTx.bind(this);
+    this.approveRedeemAmount = this.approveRedeemAmount.bind(this);
+    this.progressRedeem = this.progressRedeem.bind(this);
   }
 
   /**

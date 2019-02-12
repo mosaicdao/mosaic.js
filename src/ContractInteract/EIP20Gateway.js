@@ -70,6 +70,8 @@ class EIP20Gateway {
     this.isStakeAmountApproved = this.isStakeAmountApproved.bind(this);
     this.confirmRedeemIntentRawTx = this.confirmRedeemIntentRawTx.bind(this);
     this.progressUnstakeRawTx = this.progressUnstakeRawTx.bind(this);
+    this.confirmRedeemIntent = this.confirmRedeemIntent.bind(this);
+    this.progressUnstake = this.progressUnstake.bind(this);
   }
 
   /**

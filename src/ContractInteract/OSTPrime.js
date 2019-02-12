@@ -43,6 +43,7 @@ class OSTPrime {
     this.wrapRawTx = this.wrapRawTx.bind(this);
     this.unwrap = this.unwrap.bind(this);
     this.unwrapRawTx = this.unwrapRawTx.bind(this);
+    this.balanceOf = this.balanceOf.bind(this);
   }
 
   /**
