@@ -291,7 +291,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
       [
         redeemParams.amount,
         redeemParams.beneficiary,
-        facilitator.coGateway.coGatewayAddress,
+        facilitator.coGateway.address,
         redeemParams.nonce,
         redeemParams.gasPrice,
         redeemParams.gasLimit,
@@ -348,7 +348,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
       [
         redeemParams.amount,
         redeemParams.beneficiary,
-        facilitator.coGateway.coGatewayAddress,
+        facilitator.coGateway.address,
         redeemParams.nonce,
         redeemParams.gasPrice,
         redeemParams.gasLimit,
@@ -405,7 +405,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
       [
         redeemParams.amount,
         redeemParams.beneficiary,
-        facilitator.coGateway.coGatewayAddress,
+        facilitator.coGateway.address,
         redeemParams.nonce,
         redeemParams.gasPrice,
         redeemParams.gasLimit,
@@ -461,7 +461,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
       [
         redeemParams.amount,
         redeemParams.beneficiary,
-        facilitator.coGateway.coGatewayAddress,
+        facilitator.coGateway.address,
         redeemParams.nonce,
         redeemParams.gasPrice,
         redeemParams.gasLimit,
