@@ -110,7 +110,7 @@ class EIP20Gateway {
    * @returns {Promise<EIP20Gateway>} Promise containing the EIP20Gateway instance that
    *                                  has been set up.
    */
-  static setup(
+  static setupPair(
     originWeb3,
     auxiliaryWeb3,
     gatewayConfig = {},
@@ -181,7 +181,7 @@ class EIP20Gateway {
 
       return gateway
         .activateGateway(coGatewayAddress, ownerTxParams)
-        .then(() => gateway);
+        .then(() => ({ EIP20Gateway: gateway, EIP20CoGateway: coGateway }));
     });
 
     return gatewayActivation;
@@ -229,9 +229,9 @@ class EIP20Gateway {
    *                 stake process.
    * @param {string} organization Address of an organization contract.
    * @param {string} burner Address where tokens will be burned.
-   * @param {string} messageBus Address of MessageBus contract
+   * @param {string} messageBusAddress Address of MessageBus contract
    *                 to link into the contract bytecode.
-   * @param {string} gatewayLib Address of GatewayLib contract
+   * @param {string} gatewayLibAddress Address of GatewayLib contract
    *                 to link into the contract bytecode.
    * @param {Object} txOptions Transaction options.
    *
@@ -246,8 +246,8 @@ class EIP20Gateway {
     bounty,
     organization,
     burner,
-    messageBus,
-    gatewayLib,
+    messageBusAddress,
+    gatewayLibAddress,
     txOptions,
   ) {
     const tx = EIP20Gateway.deployRawTx(
@@ -258,8 +258,8 @@ class EIP20Gateway {
       bounty,
       organization,
       burner,
-      messageBus,
-      gatewayLib,
+      messageBusAddress,
+      gatewayLibAddress,
     );
 
     return Utils.sendTransaction(tx, txOptions).then((txReceipt) => {

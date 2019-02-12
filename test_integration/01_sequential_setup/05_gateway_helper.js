@@ -96,13 +96,22 @@ describe('GatewayHelper', () => {
       gatewayLib: shared.auxiliary.addresses.GatewayLib,
     };
 
-    return EIP20Gateway.setup(
+    return EIP20Gateway.setupPair(
       shared.origin.web3,
       shared.auxiliary.web3,
       gatewayConfig,
       coGatewayConfig,
       deployParams,
       deployParams,
-    );
+    ).then(({ EIP20Gateway: gateway, EIP20CoGateway: coGateway }) => {
+      assert.isTrue(
+        Web3.utils.isAddress(gateway.address),
+        'Invalid EIP20Gateway address returned from setupPair',
+      );
+      assert.isTrue(
+        Web3.utils.isAddress(coGateway.address),
+        'Invalid EIP20CoGateway address returned from setupPair',
+      );
+    });
   });
 });

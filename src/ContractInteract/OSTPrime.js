@@ -68,6 +68,12 @@ class OSTPrime {
    * Setup for OSTPrime contract. Deploys the contract and initializes
    * it. See {@link OSTPrime#initialize}.
    *
+   * The setup takes special care to make sure to transfer all available
+   * unwraped base tokens of the chain it is used on to the OSTPrime contract.
+   * For that it is assumed that the `config.chainOwner` holds all unwraped
+   * base tokens and the transactions are done with a gasPrice of 0 so that
+   * none of the tokens leak to validators via gas rewards.
+   *
    * @param {Web3} web3 Web3 object.
    * @param {OSTPrimeSetupConfig} config OSTPrime setup configuration.
    * @param {Object} txOptions Transaction options.

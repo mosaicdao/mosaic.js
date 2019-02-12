@@ -154,9 +154,9 @@ class EIP20CoGateway {
    * @param {string} organization Address of an organization contract.
    * @param {string} gateway Address of EIP20Gateway on Origin.
    * @param {string} burner Address where tokens will be burned.
-   * @param {string} messageBus Address of MessageBus contract
+   * @param {string} messageBusAddress Address of MessageBus contract
    *                 to link into the contract bytecode.
-   * @param {string} gatewayLib Address of GatewayLib contract
+   * @param {string} gatewayLibAddress Address of GatewayLib contract
    *                 to link into the contract bytecode.
    * @param {Object} txOptions Transaction options.
    *
@@ -172,8 +172,8 @@ class EIP20CoGateway {
     organization,
     gateway,
     burner,
-    messageBus,
-    gatewayLib,
+    messageBusAddress,
+    gatewayLibAddress,
     txOptions,
   ) {
     const tx = EIP20CoGateway.deployRawTx(
@@ -185,8 +185,8 @@ class EIP20CoGateway {
       organization,
       gateway,
       burner,
-      messageBus,
-      gatewayLib,
+      messageBusAddress,
+      gatewayLibAddress,
     );
 
     return Utils.sendTransaction(tx, txOptions).then((txReceipt) => {

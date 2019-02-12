@@ -132,7 +132,7 @@ class Anchor {
 
     if (config.coAnchorAddress && !config.organizationOwner) {
       throw new Error(
-        'Mandatory configuration "organizationOwner" missing. Set config.organizationOwner address. organizationOwner is mandatory when using coAnchorAddress config option',
+        'Mandatory configuration "organizationOwner" missing. Set config.organizationOwner address. organizationOwner (owner of the Organization on local chain) is mandatory when using coAnchorAddress config option',
       );
     }
   }

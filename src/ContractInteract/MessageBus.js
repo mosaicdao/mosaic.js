@@ -37,15 +37,15 @@ class MessageBus {
    * Deploys a MessageBus contract.
    *
    * @param {Web3} web3 Web3 object.
-   * @param {string} merklePatriciaProof Address of MerklePatriciaProof contract
+   * @param {string} merklePatriciaProofAddress Address of MerklePatriciaProof contract
    *                 to link into the contract bytecode.
    * @param {Object} txOptions Transaction options.
    *
    * @returns {Promise<MessageBus>} Promise containing the MessageBus
    *                                         instance that has been deployed.
    */
-  static async deploy(web3, merklePatriciaProof, txOptions) {
-    const tx = MessageBus.deployRawTx(web3, merklePatriciaProof);
+  static async deploy(web3, merklePatriciaProofAddress, txOptions) {
+    const tx = MessageBus.deployRawTx(web3, merklePatriciaProofAddress);
 
     return Utils.sendTransaction(tx, txOptions).then((txReceipt) => {
       const address = txReceipt.contractAddress;
@@ -57,26 +57,26 @@ class MessageBus {
    * Raw transaction object for {@link MessageBus#deploy}
    *
    * @param {Object} web3 Web3 object.
-   * @param {string} merklePatriciaProof Address of MerklePatriciaProof contract
+   * @param {string} merklePatriciaProofAddress Address of MerklePatriciaProof contract
    *                 to link into the contract bytecode.
    *
    * @returns {Promise<Object>} Promise that resolves to raw transaction object.
    */
-  static deployRawTx(web3, merklePatriciaProof) {
+  static deployRawTx(web3, merklePatriciaProofAddress) {
     if (!(web3 instanceof Web3)) {
       throw new TypeError(
         `Mandatory Parameter 'web3' is missing or invalid: ${web3}`,
       );
     }
-    if (!Web3.utils.isAddress(merklePatriciaProof)) {
+    if (!Web3.utils.isAddress(merklePatriciaProofAddress)) {
       throw new TypeError(
-        `Invalid merklePatriciaProof address: ${merklePatriciaProof}.`,
+        `Invalid merklePatriciaProofAddress address: ${merklePatriciaProofAddress}.`,
       );
     }
 
     const merklePatriciaProofInfo = {
       name: 'MerklePatriciaProof',
-      address: merklePatriciaProof,
+      address: merklePatriciaProofAddress,
     };
     const abiBinProvider = new AbiBinProvider();
     const abi = abiBinProvider.getABI(ContractName);
