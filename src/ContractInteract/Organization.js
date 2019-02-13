@@ -159,7 +159,7 @@ class Organization {
     if (!Web3.utils.isAddress(owner)) {
       throw new TypeError(`Invalid owner address: ${owner}.`);
     }
-    if (!Web3.utils.isAddress(admin)) {
+    if (admin && !Web3.utils.isAddress(admin)) {
       throw new TypeError(`Invalid admin address: ${admin}.`);
     }
     if (!Array.isArray(workers)) {
