@@ -40,7 +40,7 @@ class Organization {
     this.web3 = web3;
     this.address = address;
 
-    this.contract = Contracts.getEIP20Token(this.web3, this.address);
+    this.contract = Contracts.getOrganization(this.web3, this.address);
 
     if (!this.contract) {
       const err = new Error(
