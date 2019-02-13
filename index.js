@@ -14,6 +14,10 @@ const Anchor = require('./src/ContractInteract/Anchor');
 const EIP20CoGateway = require('./src/ContractInteract/EIP20CoGateway');
 const EIP20Gateway = require('./src/ContractInteract/EIP20Gateway');
 const EIP20Token = require('./src/ContractInteract/EIP20Token');
+const GatewayLib = require('./src/ContractInteract/GatewayLib');
+const MerklePatriciaProof = require('./src/ContractInteract/MerklePatriciaProof');
+const MessageBus = require('./src/ContractInteract/MessageBus');
+const Organization = require('./src/ContractInteract/Organization');
 const OSTPrime = require('./src/ContractInteract/OSTPrime');
 const Mosaic = require('./src/Mosaic');
 
@@ -64,6 +68,10 @@ class MosaicWithExports extends Mosaic {
       EIP20CoGateway,
       EIP20Gateway,
       EIP20Token,
+      GatewayLib,
+      MerklePatriciaProof,
+      MessageBus,
+      Organization,
       OSTPrime,
     };
   }
@@ -85,7 +93,10 @@ class MosaicWithExports extends Mosaic {
   }
 
   static get Utils() {
-    return { EIP712TypedData: TypedData };
+    return {
+      EIP712TypedData: TypedData,
+      createSecretHashLock: Utils.createSecretHashLock,
+    };
   }
 }
 
