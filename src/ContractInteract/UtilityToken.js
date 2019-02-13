@@ -306,6 +306,26 @@ class UtilityToken {
   }
 
   /**
+   * Sets the CoGateway contract address. This can be called only by
+   * an organization address.
+   *
+   * @param {st`ring} coGateway EIP20CoGateway contract address.
+   * @param {Object} txOptions Transaction options.
+   *
+   * @returns {Promise<Object>} Promise that resolves to transaction receipt.
+   */
+  setCoGateway(coGateway, txOptions) {
+    if (!txOptions) {
+      const err = new TypeError('Invalid transaction options.');
+      return Promise.reject(err);
+    }
+
+    return this.setCoGatewayRawTx(coGateway).then((tx) =>
+      Utils.sendTransaction(tx, txOptions),
+    );
+  }
+
+  /**
    * Raw transaction object for {@link UtilityToken#setCoGateway}
    *
    * @param {string} coGateway EIP20CoGateway contract address.
@@ -323,4 +343,4 @@ class UtilityToken {
   }
 }
 
-module.exports = OSTPrime;
+module.exports = UtilityToken;

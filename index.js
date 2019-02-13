@@ -19,6 +19,7 @@ const MerklePatriciaProof = require('./src/ContractInteract/MerklePatriciaProof'
 const MessageBus = require('./src/ContractInteract/MessageBus');
 const Organization = require('./src/ContractInteract/Organization');
 const OSTPrime = require('./src/ContractInteract/OSTPrime');
+const UtilityToken = require('./src/ContractInteract/UtilityToken');
 const Mosaic = require('./src/Mosaic');
 
 const Utils = require('./src/utils/Utils');
@@ -73,6 +74,7 @@ class MosaicWithExports extends Mosaic {
       MessageBus,
       Organization,
       OSTPrime,
+      UtilityToken,
     };
   }
 
