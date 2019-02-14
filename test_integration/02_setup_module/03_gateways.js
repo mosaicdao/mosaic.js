@@ -1,0 +1,59 @@
+'use strict';
+
+const Setup = require('../../src/Setup');
+const shared = require('../shared');
+
+const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
+
+describe('Setup.gateways', () => {
+  let originTxOptions;
+  let auxiliaryTxOptions;
+
+  before(() => {
+    originTxOptions = {
+      gasPrice: shared.setupConfig.gasPrice,
+    };
+    auxiliaryTxOptions = {
+      gasPrice: shared.setupConfig.gasPrice,
+    };
+  });
+
+  it('should deploy new gateways', async () => {
+    const originConfig = {
+      // Placeholders for token addresses:
+      token: shared.origin.addresses.EIP20Token,
+      baseToken: shared.origin.addresses.EIP20Token,
+      stateRootProvider: shared.setupModule.originAnchor.address,
+      bounty: '0',
+      organization: shared.setupModule.originOrganization.address,
+      burner: ZERO_ADDRESS,
+      deployer: shared.setupConfig.deployerAddress,
+      organizationOwner: shared.setupConfig.deployerAddress,
+    };
+    const auxiliaryConfig = {
+      // Placeholders for token addresses:
+      valueToken: shared.auxiliary.addresses.OSTPrime,
+      utilityToken: shared.auxiliary.addresses.OSTPrime,
+      stateRootProvider: shared.setupModule.auxiliaryAnchor.address,
+      bounty: '0',
+      organization: shared.setupModule.auxiliaryOrganization.address,
+      burner: ZERO_ADDRESS,
+      deployer: shared.setupConfig.deployerAddress,
+      organizationOwner: shared.setupConfig.deployerAddress,
+    };
+
+    const [originGateway, auxiliaryGateway] = await Setup.gateways(
+      shared.origin.web3,
+      shared.auxiliary.web3,
+      originConfig,
+      auxiliaryConfig,
+      originTxOptions,
+      auxiliaryTxOptions,
+    );
+
+    console.log(originGateway, auxiliaryGateway);
+
+    shared.setupModule.originGateway = originGateway;
+    shared.setupModule.auxiliaryGateway = auxiliaryGateway;
+  });
+});
