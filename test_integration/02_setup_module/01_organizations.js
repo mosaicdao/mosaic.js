@@ -1,5 +1,7 @@
 'use strict';
 
+const { assert } = require('chai');
+const Web3 = require('web3');
 const Setup = require('../../src/Setup');
 const shared = require('../shared');
 
@@ -42,6 +44,21 @@ describe('Setup.organizations', () => {
       auxiliaryConfig,
       originTxOptions,
       auxiliaryTxOptions,
+    );
+
+    assert.strictEqual(
+      Web3.utils.isAddress(originOrganization.address),
+      true,
+      `Origin organization does not have a valid address: ${
+        originOrganization.address
+      }`,
+    );
+    assert.strictEqual(
+      Web3.utils.isAddress(auxiliaryOrganization.address),
+      true,
+      `Auxiliary organization does not have a valid address: ${
+        auxiliaryOrganization.address
+      }`,
     );
 
     shared.setupModule.originOrganization = originOrganization;

@@ -1,5 +1,7 @@
 'use strict';
 
+const { assert } = require('chai');
+const Web3 = require('web3');
 const Setup = require('../../src/Setup');
 const shared = require('../shared');
 
@@ -42,7 +44,7 @@ describe('Setup.gateways', () => {
       organizationOwner: shared.setupConfig.deployerAddress,
     };
 
-    const [originGateway, auxiliaryGateway] = await Setup.gateways(
+    const [originGateway, auxiliaryCoGateway] = await Setup.gateways(
       shared.origin.web3,
       shared.auxiliary.web3,
       originConfig,
@@ -51,9 +53,15 @@ describe('Setup.gateways', () => {
       auxiliaryTxOptions,
     );
 
-    console.log(originGateway, auxiliaryGateway);
-
-    shared.setupModule.originGateway = originGateway;
-    shared.setupModule.auxiliaryGateway = auxiliaryGateway;
+    assert.strictEqual(
+      Web3.utils.isAddress(originGateway.address),
+      true,
+      `Gateway does not have a valid address: ${originGateway.address}`,
+    );
+    assert.strictEqual(
+      Web3.utils.isAddress(auxiliaryCoGateway.address),
+      true,
+      `CoGateway does not have a valid address: ${auxiliaryCoGateway.address}`,
+    );
   });
 });
