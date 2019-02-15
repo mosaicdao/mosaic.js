@@ -1,5 +1,5 @@
 /**
- * @typedef {Object} UtilityTokenConfig
+ * @typedef {Object} UtilityTokenSetupConfig
  *
  * @property {string} deployer Address to be used to send deployment transactions.
  * @property {string} valueToken Address of EIP20 Token on Origin chain.
@@ -61,11 +61,10 @@ class UtilityToken {
   }
 
   /**
-   * Setup for Utility token contract. Deploys the contract and initializes
-   * it.
+   * Setup for Utility token contract. It deploys contract.
    *
    * @param {Web3} web3 Web3 object.
-   * @param {UtilityTokenConfig} config Utility Token setup configuration.
+   * @param {UtilityTokenSetupConfig} config Utility Token setup configuration.
    * @param {Object} txOptions Transaction options.
    *
    * @returns {Promise<UtilityToken>} Promise containing the Utility token
@@ -92,7 +91,7 @@ class UtilityToken {
   /**
    * Validate the setup configuration.
    *
-   * @param {UtilityTokenConfig} config Utility Token setup configuration.
+   * @param {UtilityTokenSetupConfig} config Utility Token setup configuration.
    *
    * @throws Will throw an error if setup configuration is incomplete.
    */

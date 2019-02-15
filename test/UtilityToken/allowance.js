@@ -29,7 +29,7 @@ describe('UtilityToken.allowance()', () => {
       }),
     );
 
-    const spyOstPrimeAllowance = sinon.spy(utilityToken, 'allowance');
+    const spyUtilityTokenAllowance = sinon.spy(utilityToken, 'allowance');
 
     const ownerAddress = '0x0000000000000000000000000000000000000003';
     const spenderAddress = '0x0000000000000000000000000000000000000004';
@@ -45,7 +45,7 @@ describe('UtilityToken.allowance()', () => {
     SpyAssert.assert(spyContractAllowance, 1, [
       [ownerAddress, spenderAddress],
     ]);
-    SpyAssert.assert(spyOstPrimeAllowance, 1, [
+    SpyAssert.assert(spyUtilityTokenAllowance, 1, [
       [ownerAddress, spenderAddress],
     ]);
 
