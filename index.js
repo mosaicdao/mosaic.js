@@ -6,6 +6,7 @@ const ChainSetup = require('./src/ChainSetup');
 const Contracts = require('./src/Contracts');
 const Facilitator = require('./src/Facilitator');
 const Redeemer = require('./src/Redeemer');
+const Setup = require('./src/Setup');
 const Staker = require('./src/Staker');
 const StakeHelper = require('./src/helpers/StakeHelper');
 const TypedData = require('./src/utils/EIP712SignerExtension/TypedData');
@@ -88,6 +89,10 @@ class MosaicWithExports extends Mosaic {
 
   static get Redeemer() {
     return Redeemer;
+  }
+
+  static get Setup() {
+    return Setup;
   }
 
   static get Staker() {
