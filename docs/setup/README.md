@@ -34,7 +34,7 @@ const origin = {
   // For now, burnt tokens are sent to the zero address
   burner: '0x0000000000000000000000000000000000000000',
   // The address of your organization (owner):
-  organization: '0x6d4e5f5ca54b88fdb68a5d0e6ea5aa3869f88116',
+  masterKey: '0x6d4e5f5ca54b88fdb68a5d0e6ea5aa3869f88116',
 };
 const auxiliary = {
   web3: new Web3('http://localhost:8546'),
@@ -49,7 +49,7 @@ const auxiliary = {
   // For now, burnt tokens are sent to the zero address
   burner: '0x0000000000000000000000000000000000000000',
   // The address of your organization (owner):
-  organization: '0x48dbe0b823ba5e4a3114925242b75c5ae2041f62',
+  masterKey: '0x48dbe0b823ba5e4a3114925242b75c5ae2041f62',
 };
 ```
 
@@ -67,9 +67,9 @@ const [originOrganization, auxiliaryOrganization] = await Setup.organizations(
   {
     deployer: origin.deployer,
     // The owner of an organization contract has all privileges:
-    owner: origin.organization,
+    owner: origin.masterKey,
     // Some privileges are delegated to an admin:
-    admin: origin.organization,
+    admin: origin.masterKey,
     // Workers are optional and can help with some simple tasks:
     workers: [],
     // Workers always expire at a certain block height:
@@ -78,9 +78,9 @@ const [originOrganization, auxiliaryOrganization] = await Setup.organizations(
   {
     deployer: auxiliary.deployer,
     // The owner of an organization contract has all privileges:
-    owner: auxiliary.organization,
+    owner: auxiliary.masterKey,
     // Some privileges are delegated to an admin:
-    admin: auxiliary.organization,
+    admin: auxiliary.masterKey,
     // Workers are optional and can help with some simple tasks:
     workers: [],
     // Workers always expire at a certain block height:
@@ -110,7 +110,7 @@ const [originAnchor, auxiliaryAnchor] = await Setup.anchors(
     // Anchors use ring buffers to limit the number of state roots they store:
     maxStateRoots: '10',
     organization: originOrganization.address,
-    organizationOwner: origin.organization,
+    organizationOwner: origin.masterKey,
     deployer: origin.deployer,
   },
   {
@@ -119,7 +119,7 @@ const [originAnchor, auxiliaryAnchor] = await Setup.anchors(
     // Anchors use ring buffers to limit the number of state roots they store:
     maxStateRoots: '10',
     organization: auxiliaryOrganization.address,
-    organizationOwner: auxiliary.organization,
+    organizationOwner: auxiliary.masterKey,
     deployer: auxiliary.deployer,
   },
   origin.txOptions,
@@ -151,7 +151,7 @@ const [originGateway, auxiliaryCoGateway] = await Setup.gateways(
     // The burner address is the address where burnt tokens will be transferred to:
     burner: origin.burner,
     deployer: origin.deployer,
-    organizationOwner: origin.organization,
+    organizationOwner: origin.masterKey,
   },
   {
     // The utility token wraps and unwraps base tokens of auxiliary to be transferred as EIP20
@@ -164,7 +164,7 @@ const [originGateway, auxiliaryCoGateway] = await Setup.gateways(
     // The burner address is the address where burnt tokens will be transferred to:
     burner: auxiliary.burner,
     deployer: auxiliary.deployer,
-    organizationOwner: auxiliary.organization,
+    organizationOwner: auxiliary.masterKey,
   },
   origin.txOptions,
   auxiliary.txOptions,
@@ -226,7 +226,7 @@ const origin = {
   // For now, burnt tokens are sent to the zero address
   burner: '0x0000000000000000000000000000000000000000',
   // The address of your organization (owner):
-  organization: '0x6d4e5f5ca54b88fdb68a5d0e6ea5aa3869f88116',
+  masterKey: '0x6d4e5f5ca54b88fdb68a5d0e6ea5aa3869f88116',
 };
 const auxiliary = {
   web3: new Web3('http://localhost:8546'),
@@ -241,7 +241,7 @@ const auxiliary = {
   // For now, burnt tokens are sent to the zero address
   burner: '0x0000000000000000000000000000000000000000',
   // The address of your organization (owner):
-  organization: '0x48dbe0b823ba5e4a3114925242b75c5ae2041f62',
+  masterKey: '0x48dbe0b823ba5e4a3114925242b75c5ae2041f62',
 };
 
 const [originOrganization, auxiliaryOrganization] = await Setup.organizations(
@@ -250,9 +250,9 @@ const [originOrganization, auxiliaryOrganization] = await Setup.organizations(
   {
     deployer: origin.deployer,
     // The owner of an organization contract has all privileges:
-    owner: origin.organization,
+    owner: origin.masterKey,
     // Some privileges are delegated to an admin:
-    admin: origin.organization,
+    admin: origin.masterKey,
     // Workers are optional and can help with some simple tasks:
     workers: [],
     // Workers always expire at a certain block height:
@@ -261,9 +261,9 @@ const [originOrganization, auxiliaryOrganization] = await Setup.organizations(
   {
     deployer: auxiliary.deployer,
     // The owner of an organization contract has all privileges:
-    owner: auxiliary.organization,
+    owner: auxiliary.masterKey,
     // Some privileges are delegated to an admin:
-    admin: auxiliary.organization,
+    admin: auxiliary.masterKey,
     // Workers are optional and can help with some simple tasks:
     workers: [],
     // Workers always expire at a certain block height:
@@ -282,7 +282,7 @@ const [originAnchor, auxiliaryAnchor] = await Setup.anchors(
     // Anchors use ring buffers to limit the number of state roots they store:
     maxStateRoots: '10',
     organization: originOrganization.address,
-    organizationOwner: origin.organization,
+    organizationOwner: origin.masterKey,
     deployer: origin.deployer,
   },
   {
@@ -291,7 +291,7 @@ const [originAnchor, auxiliaryAnchor] = await Setup.anchors(
     // Anchors use ring buffers to limit the number of state roots they store:
     maxStateRoots: '10',
     organization: auxiliaryOrganization.address,
-    organizationOwner: auxiliary.organization,
+    organizationOwner: auxiliary.masterKey,
     deployer: auxiliary.deployer,
   },
   origin.txOptions,
@@ -313,7 +313,7 @@ const [originGateway, auxiliaryCoGateway] = await Setup.gateways(
     // The burner address is the address where burnt tokens will be transferred to:
     burner: origin.burner,
     deployer: origin.deployer,
-    organizationOwner: origin.organization,
+    organizationOwner: origin.masterKey,
   },
   {
     // The utility token wraps and unwraps base tokens of auxiliary to be transferred as EIP20
@@ -326,7 +326,7 @@ const [originGateway, auxiliaryCoGateway] = await Setup.gateways(
     // The burner address is the address where burnt tokens will be transferred to:
     burner: auxiliary.burner,
     deployer: auxiliary.deployer,
-    organizationOwner: auxiliary.organization,
+    organizationOwner: auxiliary.masterKey,
   },
   origin.txOptions,
   auxiliary.txOptions,
