@@ -143,7 +143,7 @@ const setup = (
 
   return deployedGateways.then(
     // Waiting for the origin gateway activation to finish, but dropping it from the result set.
-    (gateways) => [gateways.EIP20gateway, gateways.EIP20CoGateway],
+    (gateways) => [gateways.EIP20Gateway, gateways.EIP20CoGateway],
   );
 };
 

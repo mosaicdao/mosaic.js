@@ -55,6 +55,8 @@ const auxiliary = {
 
 ## Organizations
 
+Organizations are used for access control to specific methods of contracts.
+
 If you don't have any organizations deployed, yet, mosaic.js can help you to deploy organizations
 on origin and auxiliary:
 
@@ -64,16 +66,24 @@ const [originOrganization, auxiliaryOrganization] = await Setup.organizations(
   auxiliary.web3,
   {
     deployer: origin.deployer,
+    // The owner of an organization contract has all privileges:
     owner: origin.organization,
+    // Some privileges are delegated to an admin:
     admin: origin.organization,
+    // Workers are optional and can help with some simple tasks:
     workers: [],
+    // Workers always expire at a certain block height:
     workerExpirationHeight: '0',
   },
   {
     deployer: auxiliary.deployer,
+    // The owner of an organization contract has all privileges:
     owner: auxiliary.organization,
+    // Some privileges are delegated to an admin:
     admin: auxiliary.organization,
+    // Workers are optional and can help with some simple tasks:
     workers: [],
+    // Workers always expire at a certain block height:
     workerExpirationHeight: '0',
   },
   origin.txOptions,
@@ -83,19 +93,30 @@ const [originOrganization, auxiliaryOrganization] = await Setup.organizations(
 
 ## State Root Providers
 
+In mosaic, you need state root providers that provide state roots of the respective other chain.
+On origin you need a state root provider that provides the state root of auxiliary and vice versa.
+
+If you don't have any state root providers deployed, yet, mosaic can help you deploy anchors on
+origin and auxiliary.
+Anchors are simple, restricted state root providers that you can use to test your deployment.
+
 ```js
 const [originAnchor, auxiliaryAnchor] = await Setup.anchors(
   origin.web3,
   auxiliary.web3,
   {
+    // The chain id of the chain that is tracked by this anchor:
     remoteChainId: auxiliary.chainId,
+    // Anchors use ring buffers to limit the number of state roots they store:
     maxStateRoots: '10',
     organization: originOrganization.address,
     organizationOwner: origin.organization,
     deployer: origin.deployer,
   },
   {
+    // The chain id of the chain that is tracked by this anchor:
     remoteChainId: origin.chainId,
+    // Anchors use ring buffers to limit the number of state roots they store:
     maxStateRoots: '10',
     organization: auxiliaryOrganization.address,
     organizationOwner: auxiliary.organization,
@@ -108,27 +129,42 @@ const [originAnchor, auxiliaryAnchor] = await Setup.anchors(
 
 ## Gateways
 
+You use gateways to transfer your tokens from origin to auxiliary and back.
+Gateways require an organization for management tasks and state root providers in order to enable
+Merkle-Patricia-Proofs for the partner-gateway on the other chain.
+
+Mosaic can help you deploy and activate gateways on origin and auxiliary:
+
 ```js
 const [originGateway, auxiliaryCoGateway] = await Setup.gateways(
   origin.web3,
   auxiliary.web3,
   {
+    // The EIP20 token that you want to use for your economy:
     token: origin.token,
+    // The EIP20 token that is used as the base token on auxiliary:
     baseToken: origin.baseToken,
     stateRootProvider: originAnchor.address,
+    // The bounty is the amount that facilitators will earn for progressing stake processes:
     bounty: '0',
     organization: originOrganization.address,
-    burner: ZERO_ADDRESS,
+    // The burner address is the address where burnt tokens will be transferred to:
+    burner: origin.burner,
     deployer: origin.deployer,
     organizationOwner: origin.organization,
   },
   {
-    valueToken: auxiliary.valueToken,
+    // The original EIP20 token of your economy:
+    valueToken: origin.token,
+    // The utility token wraps and unwraps base tokens of auxiliary to be transferred as EIP20
+    // tokens through the gateway:
     utilityToken: auxiliary.utilityToken,
     stateRootProvider: auxiliaryAnchor.address,
+    // The bounty is the amount that facilitators will earn for progressing stake processes:
     bounty: '0',
     organization: auxiliaryOrganization.address,
-    burner: ZERO_ADDRESS,
+    // The burner address is the address where burnt tokens will be transferred to:
+    burner: auxiliary.burner,
     deployer: auxiliary.deployer,
     organizationOwner: auxiliary.organization,
   },
@@ -215,16 +251,24 @@ const [originOrganization, auxiliaryOrganization] = await Setup.organizations(
   auxiliary.web3,
   {
     deployer: origin.deployer,
+    // The owner of an organization contract has all privileges:
     owner: origin.organization,
+    // Some privileges are delegated to an admin:
     admin: origin.organization,
+    // Workers are optional and can help with some simple tasks:
     workers: [],
+    // Workers always expire at a certain block height:
     workerExpirationHeight: '0',
   },
   {
     deployer: auxiliary.deployer,
+    // The owner of an organization contract has all privileges:
     owner: auxiliary.organization,
+    // Some privileges are delegated to an admin:
     admin: auxiliary.organization,
+    // Workers are optional and can help with some simple tasks:
     workers: [],
+    // Workers always expire at a certain block height:
     workerExpirationHeight: '0',
   },
   origin.txOptions,
@@ -235,14 +279,18 @@ const [originAnchor, auxiliaryAnchor] = await Setup.anchors(
   origin.web3,
   auxiliary.web3,
   {
+    // The chain id of the chain that is tracked by this anchor:
     remoteChainId: auxiliary.chainId,
+    // Anchors use ring buffers to limit the number of state roots they store:
     maxStateRoots: '10',
     organization: originOrganization.address,
     organizationOwner: origin.organization,
     deployer: origin.deployer,
   },
   {
+    // The chain id of the chain that is tracked by this anchor:
     remoteChainId: origin.chainId,
+    // Anchors use ring buffers to limit the number of state roots they store:
     maxStateRoots: '10',
     organization: auxiliaryOrganization.address,
     organizationOwner: auxiliary.organization,
@@ -256,22 +304,31 @@ const [originGateway, auxiliaryCoGateway] = await Setup.gateways(
   origin.web3,
   auxiliary.web3,
   {
+    // The EIP20 token that you want to use for your economy:
     token: origin.token,
+    // The EIP20 token that is used as the base token on auxiliary:
     baseToken: origin.baseToken,
     stateRootProvider: originAnchor.address,
+    // The bounty is the amount that facilitators will earn for progressing stake processes:
     bounty: '0',
     organization: originOrganization.address,
-    burner: ZERO_ADDRESS,
+    // The burner address is the address where burnt tokens will be transferred to:
+    burner: origin.burner,
     deployer: origin.deployer,
     organizationOwner: origin.organization,
   },
   {
-    valueToken: auxiliary.valueToken,
+    // The original EIP20 token of your economy:
+    valueToken: origin.token,
+    // The utility token wraps and unwraps base tokens of auxiliary to be transferred as EIP20
+    // tokens through the gateway:
     utilityToken: auxiliary.utilityToken,
     stateRootProvider: auxiliaryAnchor.address,
+    // The bounty is the amount that facilitators will earn for progressing stake processes:
     bounty: '0',
     organization: auxiliaryOrganization.address,
-    burner: ZERO_ADDRESS,
+    // The burner address is the address where burnt tokens will be transferred to:
+    burner: auxiliary.burner,
     deployer: auxiliary.deployer,
     organizationOwner: auxiliary.organization,
   },
