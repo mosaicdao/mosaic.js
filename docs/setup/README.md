@@ -6,7 +6,7 @@ This document goes through the steps you need to take to set up a token gateway.
 
 You need:
 
-* a connection to nodes that are connected to origin and auxiliary (for help see [how to connect]('../test_net/README.md))
+* a connection to nodes that are connected to origin and auxiliary (for help see [how to connect](../test_net/README.md))
 * OST on auxiliary to deploy contracts
 * an EIP20 token deployed on origin
 * a utility token deployed on auxiliary
