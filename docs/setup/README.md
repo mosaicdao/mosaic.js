@@ -154,8 +154,6 @@ const [originGateway, auxiliaryCoGateway] = await Setup.gateways(
     organizationOwner: origin.organization,
   },
   {
-    // The original EIP20 token of your economy:
-    valueToken: origin.token,
     // The utility token wraps and unwraps base tokens of auxiliary to be transferred as EIP20
     // tokens through the gateway:
     utilityToken: auxiliary.utilityToken,
@@ -318,8 +316,6 @@ const [originGateway, auxiliaryCoGateway] = await Setup.gateways(
     organizationOwner: origin.organization,
   },
   {
-    // The original EIP20 token of your economy:
-    valueToken: origin.token,
     // The utility token wraps and unwraps base tokens of auxiliary to be transferred as EIP20
     // tokens through the gateway:
     utilityToken: auxiliary.utilityToken,

@@ -108,8 +108,8 @@ class EIP20Gateway {
    * @param {Object} originTxOptions Transaction options on Origin.
    * @param {Object} auxiliaryTxOptions Transaction options on Auxiliary.
    *
-   * @returns {Promise<EIP20Gateway>} Promise containing the EIP20Gateway instance that
-   *                                  has been set up.
+   * @returns {Promise<Object>} Promise containing an object with two properties: EIP20Gateway and
+   *                            EIP20CoGateway.
    */
   static setupPair(
     originWeb3,
