@@ -97,8 +97,9 @@ class EIP20Gateway {
   }
 
   /**
-   * Setup for EIP20Gateway. Deploys EIP20Gateway and EIP20CoGateway,
-   * and links them.
+   * Setup for EIP20Gateway and EIP20coGateway.
+   * Deploys EIP20Gateway on origin and EIP20CoGateway on auxiliary. It also activates the
+   * EIP20Gateway.
    *
    * @param {Object} originWeb3 Web3 object.
    * @param {Object} auxiliaryWeb3 Web3 object.
@@ -107,8 +108,8 @@ class EIP20Gateway {
    * @param {Object} originTxOptions Transaction options on Origin.
    * @param {Object} auxiliaryTxOptions Transaction options on Auxiliary.
    *
-   * @returns {Promise<EIP20Gateway>} Promise containing the EIP20Gateway instance that
-   *                                  has been set up.
+   * @returns {Promise<Object>} Promise containing an object with two properties: EIP20Gateway and
+   *                            EIP20CoGateway.
    */
   static setupPair(
     originWeb3,

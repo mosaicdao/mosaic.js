@@ -95,6 +95,14 @@ class Contracts {
     return contract;
   }
 
+  static getUtilityToken(web3, address, options) {
+    const web3Obj = Contracts._getWeb3(web3);
+    const contractName = 'UtilityToken';
+    const jsonInterface = abProvider.getABI(contractName);
+    const contract = new web3Obj.eth.Contract(jsonInterface, address, options);
+    return contract;
+  }
+
   static _getWeb3(web3) {
     if (web3 instanceof Web3) {
       return web3;

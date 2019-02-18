@@ -1,5 +1,5 @@
 /**
- * @typedef AnchorSetupConfig
+ * @typedef {Object} AnchorSetupConfig
  *
  * @property {string} remoteChainId The chain id of the chain that is tracked
  *                    by this Anchor.

@@ -38,7 +38,6 @@ describe('EIP20Token', async () => {
     const { web3 } = shared.origin;
     const contract = new web3.eth.Contract(abi, undefined, txOptions);
 
-    console.log('* Deploying EIP20Token Contract');
     await contract
       .deploy(
         {
@@ -52,19 +51,12 @@ describe('EIP20Token', async () => {
         },
         txOptions,
       )
-      .send(txOptions, (error, transactionHash) => {
-        console.log(error, transactionHash);
-      })
+      .send(txOptions)
       .on('error', (error) => {
         assert(false, `Could not deploy EIP20Token: ${error}`);
       })
       .on('receipt', (receipt) => {
         assertDeploymentReceipt(receipt);
-
-        console.log(
-          '\t - EIP20Token Contract Address:',
-          receipt.contractAddress,
-        );
         shared.origin.addresses.EIP20Token = receipt.contractAddress;
       });
   });

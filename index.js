@@ -6,6 +6,7 @@ const ChainSetup = require('./src/ChainSetup');
 const Contracts = require('./src/Contracts');
 const Facilitator = require('./src/Facilitator');
 const Redeemer = require('./src/Redeemer');
+const Setup = require('./src/Setup');
 const Staker = require('./src/Staker');
 const StakeHelper = require('./src/helpers/StakeHelper');
 const TypedData = require('./src/utils/EIP712SignerExtension/TypedData');
@@ -14,7 +15,12 @@ const Anchor = require('./src/ContractInteract/Anchor');
 const EIP20CoGateway = require('./src/ContractInteract/EIP20CoGateway');
 const EIP20Gateway = require('./src/ContractInteract/EIP20Gateway');
 const EIP20Token = require('./src/ContractInteract/EIP20Token');
+const GatewayLib = require('./src/ContractInteract/GatewayLib');
+const MerklePatriciaProof = require('./src/ContractInteract/MerklePatriciaProof');
+const MessageBus = require('./src/ContractInteract/MessageBus');
+const Organization = require('./src/ContractInteract/Organization');
 const OSTPrime = require('./src/ContractInteract/OSTPrime');
+const UtilityToken = require('./src/ContractInteract/UtilityToken');
 const Mosaic = require('./src/Mosaic');
 
 const Utils = require('./src/utils/Utils');
@@ -64,7 +70,12 @@ class MosaicWithExports extends Mosaic {
       EIP20CoGateway,
       EIP20Gateway,
       EIP20Token,
+      GatewayLib,
+      MerklePatriciaProof,
+      MessageBus,
+      Organization,
       OSTPrime,
+      UtilityToken,
     };
   }
 
@@ -80,12 +91,19 @@ class MosaicWithExports extends Mosaic {
     return Redeemer;
   }
 
+  static get Setup() {
+    return Setup;
+  }
+
   static get Staker() {
     return Staker;
   }
 
   static get Utils() {
-    return { EIP712TypedData: TypedData };
+    return {
+      EIP712TypedData: TypedData,
+      createSecretHashLock: Utils.createSecretHashLock,
+    };
   }
 }
 
