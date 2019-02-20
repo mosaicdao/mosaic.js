@@ -18,12 +18,15 @@ It requires [mosaic-contracts](https://github.com/OpenSTFoundation/mosaic-contra
   * EIP20Gateway and EIP20CoGateway ([#42](https://github.com/OpenSTFoundation/mosaic.js/pull/42)).
   * EIP20Token ([#42](https://github.com/OpenSTFoundation/mosaic.js/pull/42)).
   * OSTPrime ([#51](https://github.com/OpenSTFoundation/mosaic.js/pull/51)).
-  * Libraries ([#62](https://github.com/OpenSTFoundation/mosaic.js/pull/62)).
+  * UtilityToken ([#117](https://github.com/OpenSTFoundation/mosaic.js/pull/117)).
+  * Libraries ([#62](https://github.com/OpenSTFoundation/mosaic.js/pull/62), [#115](https://github.com/OpenSTFoundation/mosaic.js/pull/115)).
+* New Setup module simplifies deployment (see also [documentation](https://openst.gitbook.io/docs/setup)) ([#119](https://github.com/OpenSTFoundation/mosaic.js/pull/119)).
+* ProofGenerator is now exposed to consumers ([#124](https://github.com/OpenSTFoundation/mosaic.js/pull/124)).
 * Non-private functions no longer start with an underscore ([#97](https://github.com/OpenSTFoundation/mosaic.js/pull/97)).
 * ABIs and BINs are now accessed as a dependency on [mosaic-contracts](https://github.com/OpenSTFoundation/mosaic-contracts) ([#39](https://github.com/OpenSTFoundation/mosaic.js/pull/39)).
 * `web3` and `web3-eth-accounts` are now peer dependencies ([#85](https://github.com/OpenSTFoundation/mosaic.js/pull/85)).
 
-#### Deprecations
+### Deprecations
 
 * `ChainSetup` and setup helpers are now deprecated ([#62](https://github.com/OpenSTFoundation/mosaic.js/pull/62)).
   * See ([#57](https://github.com/OpenSTFoundation/mosaic.js/pull/57)) for help on how to migrate.
