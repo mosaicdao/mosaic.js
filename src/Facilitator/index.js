@@ -5,7 +5,7 @@ const Web3 = require('web3');
 const EIP20Gateway = require('../ContractInteract/EIP20Gateway');
 const EIP20CoGateway = require('../ContractInteract/EIP20CoGateway');
 const Utils = require('../utils/Utils');
-const Proof = require('../utils/Proof');
+const ProofGenerator = require('../utils/ProofGenerator');
 const Message = require('../utils/Message');
 const Logger = require('../../logger/Logger');
 const Mosaic = require('../Mosaic');
@@ -1332,7 +1332,7 @@ class Facilitator {
       return Promise.reject(err);
     }
     return this.coGateway.getLatestAnchorInfo().then((latestAnchorInfo) => {
-      const proofGenerator = new Proof(
+      const proofGenerator = new ProofGenerator(
         this.mosaic.origin.web3,
         this.mosaic.auxiliary.web3,
       );
@@ -1359,7 +1359,7 @@ class Facilitator {
       return Promise.reject(err);
     }
     return this.gateway.getLatestAnchorInfo().then((latestAnchorInfo) => {
-      const proofGenerator = new Proof(
+      const proofGenerator = new ProofGenerator(
         this.mosaic.auxiliary.web3,
         this.mosaic.origin.web3,
       );
@@ -1375,7 +1375,7 @@ class Facilitator {
   /**
    * Gets the proof and validates it.
    * @private
-   * @param {Object} proofGenerator Proof generator object
+   * @param {Object} proofGenerator ProofGenerator object
    * @param {string} accountAddress Account address.
    * @param {Object} latestAnchorInfo Object containing state root and block height.
    * @param {string} messageHash Message hash.

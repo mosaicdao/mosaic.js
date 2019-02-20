@@ -11,7 +11,7 @@ const MESSAGE_INBOX_OFFSET = '8';
 /**
  * Utils class to generate inbox and outbox proof.
  */
-class Proof {
+class ProofGenerator {
   /**
    *
    * @param {Web3} sourceWeb3 Web3 instance connected to source chain.
@@ -33,8 +33,8 @@ class Proof {
    * Get proof for inbox
    * @param {string} address Address of ethereum account for which proof needs
    *                         to be generated.
-   * @param {String[]}keys Array of keys for a mapping in solidity.
-   * @param {String }blockNumber Block number in hex.
+   * @param {string[]} keys Array of keys of mapping
+   * @param {string } blockNumber Block number in hex.
    *
    * @return {Object} Proof data.
    */
@@ -77,7 +77,7 @@ class Proof {
    * @param {string} address Address of ethereum account for which proof needs
    *                         to be generated.
    * @param {string[]} keys Array of keys for a mapping in solidity.
-   * @param {string} blockNumber Block number in hex.
+   * @param {string} [blockNumber] Block number in hex.
    *
    * @return {Object} Proof data.
    */
@@ -106,10 +106,10 @@ class Proof {
    * @param {Web3} web3 web3 instance of chain from which proof is generated.
    * @param {string} address Address of ethereum account for which proof needs
    *                         to be generated.
-   * @param {String[]} storageKeys Array of keys for a mapping in solidity.
-   * @param {string} blockNumber Block number in hex.
+   * @param {string[]} storageKeys Array of keys for a mapping in solidity.
+   * @param {string} [blockNumber] Block number in hex.
    *
-   * @return {Promise<Proof>}
+   * @return {Promise<Object>}
    */
   async _fetchProof(web3, address, storageKeys = [], blockNumber = 'latest') {
     const params = [address, storageKeys, blockNumber];
@@ -130,7 +130,7 @@ class Proof {
               response.result.serializedAccountProof = this._serializeProof(
                 accountProof,
               );
-              response.result.encodedAccountValue = Proof._encodedAccountValue(
+              response.result.encodedAccountValue = ProofGenerator._encodedAccountValue(
                 response.result.serializedAccountProof,
               );
 
@@ -153,9 +153,10 @@ class Proof {
    *
    * @param {Web3} web3 web3 instance of chain from which proof is generated.
    * @param {string} storageIndex Position of storage in the contract.
-   * @param {String[]}mappings  list of keys in case storage is mapping.
+   * @param {string[]} mappings  list of keys in case storage is mapping.
    *
    * @return {string} Storage path.
+   *
    * @private
    */
   _storagePath(web3, storageIndex, mappings) {
@@ -204,4 +205,4 @@ class Proof {
   }
 }
 
-module.exports = Proof;
+module.exports = ProofGenerator;

@@ -18,13 +18,12 @@ const EIP20Token = require('./src/ContractInteract/EIP20Token');
 const GatewayLib = require('./src/ContractInteract/GatewayLib');
 const MerklePatriciaProof = require('./src/ContractInteract/MerklePatriciaProof');
 const MessageBus = require('./src/ContractInteract/MessageBus');
+const Mosaic = require('./src/Mosaic');
 const Organization = require('./src/ContractInteract/Organization');
 const OSTPrime = require('./src/ContractInteract/OSTPrime');
+const ProofGenerator = require('./src/utils/ProofGenerator');
 const UtilityToken = require('./src/ContractInteract/UtilityToken');
-const Mosaic = require('./src/Mosaic');
-
 const Utils = require('./src/utils/Utils');
-const ProofGenerator = require('./src/utils/Proof');
 
 // FIXME: https://github.com/OpenSTFoundation/mosaic.js/issues/66 Entry should not run the extender.
 require('./src/utils/EIP712SignerExtension/extender')();
@@ -104,7 +103,7 @@ class MosaicWithExports extends Mosaic {
     return {
       EIP712TypedData: TypedData,
       createSecretHashLock: Utils.createSecretHashLock,
-      ProofGenerator: ProofGenerator,
+      ProofGenerator,
     };
   }
 }

@@ -5,7 +5,7 @@ const BN = require('bn.js');
 const sinon = require('sinon');
 const Facilitator = require('../../src/Facilitator');
 const TestMosaic = require('../../test_utils/TestMosaic');
-const Proof = require('../../src/utils/Proof');
+const ProofGenerator = require('../../src/utils/ProofGenerator');
 const SpyAssert = require('../../test_utils/SpyAssert');
 const AssertAsync = require('../../test_utils/AssertAsync');
 
@@ -41,7 +41,10 @@ describe('Facilitator._getProof()', () => {
   beforeEach(() => {
     mosaic = TestMosaic.mosaic();
     facilitator = new Facilitator(mosaic);
-    proofGenerator = new Proof(mosaic.auxiliary.web3, mosaic.origin.web3);
+    proofGenerator = new ProofGenerator(
+      mosaic.auxiliary.web3,
+      mosaic.origin.web3,
+    );
     getOutboxProofResult = {
       encodedAccountValue: '0x1',
       serializedAccountProof: '0x2',
