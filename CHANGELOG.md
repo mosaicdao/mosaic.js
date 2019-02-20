@@ -21,6 +21,7 @@ It requires [mosaic-contracts](https://github.com/OpenSTFoundation/mosaic-contra
   * UtilityToken ([#117](https://github.com/OpenSTFoundation/mosaic.js/pull/117)).
   * Libraries ([#62](https://github.com/OpenSTFoundation/mosaic.js/pull/62), [#115](https://github.com/OpenSTFoundation/mosaic.js/pull/115)).
 * New Setup module simplifies deployment (see also [documentation](https://openst.gitbook.io/docs/setup)) ([#119](https://github.com/OpenSTFoundation/mosaic.js/pull/119)).
+* ProofGenerator is now exposed to consumers ([#124](https://github.com/OpenSTFoundation/mosaic.js/pull/124)).
 * Non-private functions no longer start with an underscore ([#97](https://github.com/OpenSTFoundation/mosaic.js/pull/97)).
 * ABIs and BINs are now accessed as a dependency on [mosaic-contracts](https://github.com/OpenSTFoundation/mosaic-contracts) ([#39](https://github.com/OpenSTFoundation/mosaic.js/pull/39)).
 * `web3` and `web3-eth-accounts` are now peer dependencies ([#85](https://github.com/OpenSTFoundation/mosaic.js/pull/85)).
