@@ -62,13 +62,14 @@ class Proof {
   }
 
   /**
-   * Get proof data
+   * Get proof data, if blockNumber is not passed it will generate proof for
+   * latest block.
    *
    * @param {Web3} web3 web3 instance of chain from which proof is generated.
    * @param {string} index Storage index.
    * @param {string} address Address of ethereum account for which proof needs
    *                         to be generated.
-   * @param {String[]} keys Array of keys for a mapping in solidity.
+   * @param {string[]} keys Array of keys for a mapping in solidity.
    * @param {string} blockNumber Block number in hex.
    *
    * @return {Object} Proof data.
@@ -93,11 +94,14 @@ class Proof {
   }
 
   /**
+   * Fetch proof from geth RPC call and serialize it in desired format.
+   *
    * @param {Web3} web3 web3 instance of chain from which proof is generated.
    * @param {string} address Address of ethereum account for which proof needs
    *                         to be generated.
    * @param {String[]} storageKeys Array of keys for a mapping in solidity.
    * @param {string} blockNumber Block number in hex.
+   *
    * @return {Promise<Proof>}
    */
   async _fetchProof(web3, address, storageKeys = [], blockNumber = 'latest') {
@@ -139,9 +143,11 @@ class Proof {
 
   /**
    * Provides storage path.
+   *
    * @param {Web3} web3 web3 instance of chain from which proof is generated.
    * @param {string} storageIndex Position of storage in the contract.
    * @param {String[]}mappings  list of keys in case storage is mapping.
+   *
    * @return {string} Storage path.
    * @private
    */
@@ -162,8 +168,11 @@ class Proof {
 
   /**
    * Flatten the array of nodes.
+   *
    * @param {Object} proof Array of nodes representing merkel proof.
+   *
    * @return {string} Serialized proof.
+   *
    * @private
    */
   _serializeProof(proof) {
@@ -173,9 +182,12 @@ class Proof {
   }
 
   /**
-   *  Fetch rlp encoded account value (nonce, balance, codehash, storageRoot)
+   *  Fetch rlp encoded account value (nonce, balance, code hash, storageRoot)
+   *
    * @param {string} accountProof Account proof.
+   *
    * @return {string}
+   *
    * @private
    */
   static _encodedAccountValue(accountProof) {
