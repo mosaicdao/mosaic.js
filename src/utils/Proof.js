@@ -20,6 +20,13 @@ class Proof {
   constructor(sourceWeb3, targetWeb3) {
     this.sourceWeb3 = sourceWeb3;
     this.targetWeb3 = targetWeb3;
+
+    this.getInboxProof = this.getInboxProof.bind(this);
+    this.getOutboxProof = this.getOutboxProof.bind(this);
+    this._getProof = this._getProof.bind(this);
+    this._fetchProof = this._fetchProof.bind(this);
+    this._storagePath = this._storagePath.bind(this);
+    this._serializeProof = this._serializeProof.bind(this);
   }
 
   /**
