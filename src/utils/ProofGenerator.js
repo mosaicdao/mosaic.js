@@ -34,7 +34,7 @@ class ProofGenerator {
    * @param {string} address Address of ethereum account for which proof needs
    *                         to be generated.
    * @param {string[]} keys Array of keys of mapping
-   * @param {string } blockNumber Block number in hex.
+   * @param {string} blockNumber Block number in hex.
    *
    * @return {Object} Proof data.
    */
@@ -153,7 +153,7 @@ class ProofGenerator {
    *
    * @param {Web3} web3 web3 instance of chain from which proof is generated.
    * @param {string} storageIndex Position of storage in the contract.
-   * @param {string[]} mappings  list of keys in case storage is mapping.
+   * @param {string[]} mappings List of keys in case storage is mapping.
    *
    * @return {string} Storage path.
    *

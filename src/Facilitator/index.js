@@ -1375,7 +1375,7 @@ class Facilitator {
   /**
    * Gets the proof and validates it.
    * @private
-   * @param {Object} proofGenerator ProofGenerator object
+   * @param {Object} proofGenerator ProofGenerator instance.
    * @param {string} accountAddress Account address.
    * @param {Object} latestAnchorInfo Object containing state root and block height.
    * @param {string} messageHash Message hash.
