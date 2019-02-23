@@ -1,6 +1,6 @@
 {
   "name": "@openstfoundation/mosaic.js",
-  "version": "0.10.0-beta.3",
+  "version": "0.10.0-beta.4",
   "description": "mosaic.js provides a JS abstraction layer to interact with contracts on mosaic chains.",
   "main": "lib/mosaic.node.js",
   "browser": "lib/mosaic.web.js",
