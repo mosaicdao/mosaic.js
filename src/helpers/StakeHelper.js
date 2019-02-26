@@ -7,12 +7,12 @@ const Contracts = require('../Contracts');
 const Utils = require('../utils/Utils');
 
 class StakeHelper {
-  constructor(originWeb3, simpleToken, gateway, staker, txOptions) {
+  constructor(originWeb3, simpleToken, gateway, staker, txOptions, valueToken) {
     Utils.deprecationNoticeStakeHelper();
 
     const oThis = this;
     oThis.web3 = originWeb3;
-    oThis.valueToken = simpleToken;
+    oThis.valueToken = valueToken;
     oThis.simpleToken = simpleToken;
     oThis.gateway = gateway;
     oThis.staker = staker;
