@@ -139,29 +139,12 @@ class Facilitator {
 
     const facilitatorAddress = txOption.from;
 
-    logger.info('Checking if staker has approved gateway for token transfer');
-    const isStakeAmountApproved = await this.gateway
-      .isStakeAmountApproved(staker, amount)
-      .catch((exception) => {
-        logger.error('  - Exception while checking stake amount approval');
-        return Promise.reject(exception);
-      });
-
-    logger.info(`  - Approval status is ${isStakeAmountApproved}`);
-
-    if (!isStakeAmountApproved) {
+    if (!await this._isStakeApproved(staker, amount)) {
       if (staker === facilitatorAddress) {
         logger.info(
           '  - As staker is facilitator, approving gateway for token transfer',
         );
-        await this.gateway
-          .approveStakeAmount(amount, txOption)
-          .catch((exception) => {
-            logger.error(
-              '  - Failed to approve gateway contract for token transfer',
-            );
-            return Promise.reject(exception);
-          });
+        await this._approveStake(amount, txOption);
       } else {
         logger.error('  - Cannot perform stake.');
         const err = new Error('Transfer of stake amount must be approved.');
@@ -169,34 +152,11 @@ class Facilitator {
       }
     }
 
-    logger.info(
-      'Checking if facilitator has approved gateway for bounty token transfer',
-    );
-    const isBountyAmountApproved = await this.gateway
-      .isBountyAmountApproved(facilitatorAddress)
-      .catch((exception) => {
-        logger.error('  - Exception while checking bounty amount approval');
-        return Promise.reject(exception);
-      });
-
-    logger.info(`  - Approval status is ${isBountyAmountApproved}`);
-
-    if (!isBountyAmountApproved) {
-      logger.info('  - Approving gateway contract for bounty transfer');
-      await this.gateway.approveBountyAmount(txOption).catch((exception) => {
-        logger.error(
-          '  - Failed to approve gateway contract for bounty transfer',
-        );
-        return Promise.reject(exception);
-      });
+    if (!await this._isStakeBountyApproved(facilitatorAddress)) {
+      await this._approveStakeBounty(txOption);
     }
 
-    logger.info('Getting nonce for the staker account');
-    const nonce = await this.gateway.getNonce(staker).catch((exception) => {
-      logger.error('  - Failed to get staker nonce');
-      return Promise.reject(exception);
-    });
-    logger.info(`  - Staker's nonce is ${nonce}`);
+    const nonce = await this._getStakeNonce(staker);
 
     logger.info('Performing stake');
     return this.gateway
@@ -1434,6 +1394,105 @@ class Facilitator {
     }
 
     return hashLock;
+  }
+
+  /**
+   * Checks if a given stake amount is approved to be transferred to the gateway.
+   * @private
+   * @param {string} staker The address of the staker that the tokens should be transferred from.
+   * @param {string} amount The amount to stake.
+   *
+   * @returns {bool} True if the transfer has been approved.
+   */
+  async _isStakeApproved(staker, amount) {
+    logger.info('Checking if staker has approved gateway for token transfer');
+    const isStakeAmountApproved = await this.gateway
+      .isStakeAmountApproved(staker, amount)
+      .catch((exception) => {
+        logger.error('  - Exception while checking stake amount approval');
+        return Promise.reject(exception);
+      });
+
+    logger.info(`  - Approval status is ${isStakeAmountApproved}`);
+
+    return isStakeAmountApproved;
+  }
+
+  /**
+   * Approves the amount to be transferred to the gateway.
+   * @private
+   * @param {string} amount The amount to approve.
+   * @param {Object} txOption Transaction options.
+   *
+   * @returns {Promise<Object>} Promise that resolves to transaction receipt.
+   */
+  _approveStake(amount, txOption) {
+    return this.gateway
+      .approveStakeAmount(amount, txOption)
+      .catch((exception) => {
+        logger.error(
+          '  - Failed to approve gateway contract for token transfer',
+        );
+        return Promise.reject(exception);
+      });
+  }
+
+  /**
+   * Checks if a given bounty amount is approved to be transferred to the gateway.
+   * @private
+   * @param {string} facilitatorAddress The address of the facilitator that executes the stake.
+   *
+   * @returns {bool} True if the transfer has been approved.
+   */
+  async _isStakeBountyApproved(facilitatorAddress) {
+    logger.info(
+      'Checking if facilitator has approved gateway for bounty token transfer',
+    );
+    const isBountyAmountApproved = await this.gateway
+      .isBountyAmountApproved(facilitatorAddress)
+      .catch((exception) => {
+        logger.error('  - Exception while checking bounty amount approval');
+        return Promise.reject(exception);
+      });
+
+    logger.info(`  - Approval status is ${isBountyAmountApproved}`);
+
+    return isBountyAmountApproved;
+  }
+
+  /**
+   * Approves the amount to be transferred as bounty.
+   * @private
+   * @param {Object} txOption Transaction options.
+   *
+   * @returns {Promise<Object>} Promise that resolves to transaction receipt.
+   */
+  _approveStakeBounty(txOption) {
+    logger.info('  - Approving gateway contract for bounty transfer');
+    return this.gateway.approveBountyAmount(txOption).catch((exception) => {
+      logger.error(
+        '  - Failed to approve gateway contract for bounty transfer',
+      );
+      return Promise.reject(exception);
+    });
+  }
+
+  /**
+   * Returns the current nonce for the given staker at the gateway of this Facilitator.
+   * @private
+   * @param {string} staker Address of the staker account.
+   *
+   * @returns {string} The current nonce from the gateway.
+   */
+  async _getStakeNonce(staker) {
+    logger.info('Getting nonce for the staker account');
+    const nonce = await this.gateway.getNonce(staker).catch((exception) => {
+      logger.error('  - Failed to get staker nonce');
+      return Promise.reject(exception);
+    });
+    logger.info(`  - Staker's nonce is ${nonce}`);
+
+    return nonce;
   }
 }
 
