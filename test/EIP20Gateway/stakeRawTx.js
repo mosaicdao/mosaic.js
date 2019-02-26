@@ -64,7 +64,7 @@ describe('EIP20Gateway.stakeRawTx()', () => {
     );
   });
 
-  it('should throw error when beneficiary address is undefined', async function() {
+  it('should throw error when beneficiary address is undefined', async () => {
     await AssertAsync.reject(
       gateway.stakeRawTx(
         stakeParams.amount,
@@ -78,7 +78,7 @@ describe('EIP20Gateway.stakeRawTx()', () => {
     );
   });
 
-  it('should throw error when gas price is undefined', async function() {
+  it('should throw error when gas price is undefined', async () => {
     await AssertAsync.reject(
       gateway.stakeRawTx(
         stakeParams.amount,
@@ -92,7 +92,7 @@ describe('EIP20Gateway.stakeRawTx()', () => {
     );
   });
 
-  it('should throw error when gas limit is undefined', async function() {
+  it('should throw error when gas limit is undefined', async () => {
     await AssertAsync.reject(
       gateway.stakeRawTx(
         stakeParams.amount,
@@ -131,6 +131,20 @@ describe('EIP20Gateway.stakeRawTx()', () => {
         undefined,
       ),
       'Invalid hash lock: undefined.',
+    );
+  });
+
+  it('should throw an error when the possible reward is greater than the amount', async () => {
+    await AssertAsync.reject(
+      gateway.stakeRawTx(
+        '99',
+        stakeParams.beneficiary,
+        '2',
+        '50',
+        stakeParams.nonce,
+        stakeParams.hashLock,
+      ),
+      'The maximum possible reward of gasPrice*gasLimit is greater than the stake amount. It must be less.\n    gasPrice: 2\n    gasLimit: 50\n    stake amount: 99',
     );
   });
 

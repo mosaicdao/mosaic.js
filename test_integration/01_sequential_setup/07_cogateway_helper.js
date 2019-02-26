@@ -18,7 +18,7 @@ const assertReceipt = (receipt) => {
 
 const assertDeploymentReceipt = (receipt) => {
   assertReceipt(receipt);
-  const contractAddress = receipt.contractAddress;
+  const { contractAddress } = receipt;
   assert.isNotEmpty(
     contractAddress,
     'Deployment Receipt is missing contractAddress',
@@ -42,13 +42,12 @@ describe('CoGatewayHelper', () => {
     };
   });
 
-  const someValidAddress = '0x2222222222222222222222222222222222222222';
   it('should deploy new CoGateway contract', () => {
-    const _token = someValidAddress;
+    const _token = shared.origin.addresses.EIP20Gateway;
     const _utilityToken = shared.auxiliary.addresses.OSTPrime;
     const _anchor = shared.auxiliary.addresses.Anchor;
     const _bounty = 1000;
-    const _gateway = shared.origin.addresses.Gateway;
+    const _gateway = shared.origin.addresses.EIP20Gateway;
 
     return subject
       .deploy(
@@ -64,7 +63,7 @@ describe('CoGatewayHelper', () => {
       )
       .then(assertDeploymentReceipt)
       .then((receipt) => {
-        shared.auxiliary.addresses.CoGateway = receipt.contractAddress;
+        shared.auxiliary.addresses.EIP20CoGateway = receipt.contractAddress;
       });
   });
 });

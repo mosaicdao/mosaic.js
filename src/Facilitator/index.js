@@ -80,7 +80,8 @@ class Facilitator {
    * @param {string} hashLock Hash lock.
    * @param {Object} txOption Transaction options.
    *
-   * @returns {Promise<Object>} Promise that resolves to transaction receipt.
+   * @returns {Promise<Object>} Promise that resolves to an Object with two properties:
+   *                            messageHash and nonce.
    */
   async stake(
     staker,
@@ -169,12 +170,16 @@ class Facilitator {
         hashLock,
         txOption,
       )
-      .then((stakeResult) => {
+      .then((stakeReceipt) => {
         logger.win('  - Successfully performed stake.');
-        return Promise.resolve(stakeResult);
+        const stakeIntentDeclaredEvent = stakeReceipt.events.StakeIntentDeclared;
+        return Promise.resolve({
+          nonce: stakeIntentDeclaredEvent.returnValues._stakerNonce,
+          messageHash: stakeIntentDeclaredEvent.returnValues._messageHash,
+        });
       })
       .catch((exception) => {
-        logger.error('  - Failed to performed stake.');
+        logger.error('  - Failed to perform stake.');
         return Promise.reject(exception);
       });
   }

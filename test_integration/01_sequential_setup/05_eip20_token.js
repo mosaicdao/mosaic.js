@@ -28,17 +28,22 @@ const assertDeploymentReceipt = (receipt) => {
 };
 
 describe('EIP20Token', async () => {
-  it('should deploy new EIP20Token contract', async () => {
-    const txOptions = {
+  let txOptions;
+  let eip20Contract;
+
+  beforeEach(() => {
+    txOptions = {
       from: shared.setupConfig.deployerAddress,
       gasPrice: shared.setupConfig.gasPrice,
       gasLimit: 700000,
     };
+  });
 
+  it('should deploy new EIP20Token contract', async () => {
     const { web3 } = shared.origin;
-    const contract = new web3.eth.Contract(abi, undefined, txOptions);
+    eip20Contract = new web3.eth.Contract(abi, undefined, txOptions);
 
-    await contract
+    await eip20Contract
       .deploy(
         {
           data: bin,
@@ -58,6 +63,33 @@ describe('EIP20Token', async () => {
       .on('receipt', (receipt) => {
         assertDeploymentReceipt(receipt);
         shared.origin.addresses.EIP20Token = receipt.contractAddress;
+      });
+  });
+
+  it('should deploy new base token contract', async () => {
+    const { web3 } = shared.origin;
+    eip20Contract = new web3.eth.Contract(abi, undefined, txOptions);
+
+    await eip20Contract
+      .deploy(
+        {
+          data: bin,
+          arguments: [
+            'ST',
+            'Simple Token',
+            '800000000000000000000000000', // 800 mio.
+            '18',
+          ],
+        },
+        txOptions,
+      )
+      .send(txOptions)
+      .on('error', (error) => {
+        assert(false, `Could not deploy base token: ${error}`);
+      })
+      .on('receipt', (receipt) => {
+        assertDeploymentReceipt(receipt);
+        shared.origin.addresses.OST = receipt.contractAddress;
       });
   });
 });
