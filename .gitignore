@@ -61,9 +61,6 @@ typings/
 .next
 .DS_Store
 
-#Ignore Lock File
-package-lock.json
-
 #Webpack related files.
 tmp/*
 !tmp/.gitkeep
