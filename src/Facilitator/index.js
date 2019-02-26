@@ -37,9 +37,7 @@ class Facilitator {
     }
     if (!Web3.utils.isAddress(mosaic.origin.contractAddresses.EIP20Gateway)) {
       const err = new TypeError(
-        `Invalid Gateway address: ${
-          mosaic.origin.contractAddresses.EIP20Gateway
-        }.`,
+        `Invalid Gateway address: ${mosaic.origin.contractAddresses.EIP20Gateway}.`,
       );
       throw err;
     }
@@ -47,9 +45,7 @@ class Facilitator {
       !Web3.utils.isAddress(mosaic.auxiliary.contractAddresses.EIP20CoGateway)
     ) {
       const err = new TypeError(
-        `Invalid CoGateway address: ${
-          mosaic.auxiliary.contractAddresses.EIP20CoGateway
-        }.`,
+        `Invalid CoGateway address: ${mosaic.auxiliary.contractAddresses.EIP20CoGateway}.`,
       );
       throw err;
     }
@@ -67,7 +63,6 @@ class Facilitator {
     this.stake = this.stake.bind(this);
     this.progressStake = this.progressStake.bind(this);
     this.confirmStakeIntent = this.confirmStakeIntent.bind(this);
-    this._getProof = this._getProof.bind(this);
     this.progressStakeMessage = this.progressStakeMessage.bind(this);
     this.performProgressStake = this.performProgressStake.bind(this);
     this.performProgressMint = this.performProgressMint.bind(this);
@@ -303,14 +298,10 @@ class Facilitator {
 
     if (!new BN(txOptions.value).eq(new BN(bounty))) {
       logger.error(
-        `  - Value in transaction option ${
-          txOptions.value
-        } is not equal to the bounty amount ${bounty}`,
+        `  - Value in transaction option ${txOptions.value} is not equal to the bounty amount ${bounty}`,
       );
       const err = new Error(
-        `Value passed in transaction object ${
-          txOptions.value
-        } must be equal to bounty amount ${bounty}`,
+        `Value passed in transaction object ${txOptions.value} must be equal to bounty amount ${bounty}`,
       );
       return Promise.reject(err);
     }
@@ -468,9 +459,7 @@ class Facilitator {
 
     if (!Web3.utils.isAddress(txOptionAuxiliary.from)) {
       const err = new TypeError(
-        `Invalid auxiliary chain facilitator address: ${
-          txOptionAuxiliary.from
-        }.`,
+        `Invalid auxiliary chain facilitator address: ${txOptionAuxiliary.from}.`,
       );
       return Promise.reject(err);
     }
@@ -593,9 +582,7 @@ class Facilitator {
 
     if (!Web3.utils.isAddress(txOptionAuxiliary.from)) {
       const err = new TypeError(
-        `Invalid auxiliary chain facilitator address: ${
-          txOptionAuxiliary.from
-        }.`,
+        `Invalid auxiliary chain facilitator address: ${txOptionAuxiliary.from}.`,
       );
       return Promise.reject(err);
     }
@@ -737,9 +724,9 @@ class Facilitator {
     logger.info(`  - CoGateway's inbox message hash is ${mintMessageStatus}`);
 
     if (
-      mintMessageStatus === MessageStatus.DECLARED ||
-      mintMessageStatus === MessageStatus.PROGRESSED ||
-      mintMessageStatus === MessageStatus.REVOKED
+      mintMessageStatus === MessageStatus.DECLARED
+      || mintMessageStatus === MessageStatus.PROGRESSED
+      || mintMessageStatus === MessageStatus.REVOKED
     ) {
       logger.win('  - Stake intent already confirmed on CoGateway');
       return Promise.resolve(true);
@@ -895,9 +882,9 @@ class Facilitator {
     logger.info(`  - Gateway's inbox message hash is ${unstakeMessageStatus}`);
 
     if (
-      unstakeMessageStatus === MessageStatus.DECLARED ||
-      unstakeMessageStatus === MessageStatus.PROGRESSED ||
-      unstakeMessageStatus === MessageStatus.REVOKED
+      unstakeMessageStatus === MessageStatus.DECLARED
+      || unstakeMessageStatus === MessageStatus.PROGRESSED
+      || unstakeMessageStatus === MessageStatus.REVOKED
     ) {
       logger.win('  - Redeem intent already confirmed on Gateway');
       return Promise.resolve(true);
@@ -978,9 +965,7 @@ class Facilitator {
     }
     if (!Web3.utils.isAddress(txOptionOrigin.from)) {
       const err = new TypeError(
-        `Invalid from address ${
-          txOptionOrigin.from
-        } in origin transaction options.`,
+        `Invalid from address ${txOptionOrigin.from} in origin transaction options.`,
       );
       return Promise.reject(err);
     }
@@ -992,9 +977,7 @@ class Facilitator {
     }
     if (!Web3.utils.isAddress(txOptionAuxiliary.from)) {
       const err = new TypeError(
-        `Invalid from address ${
-          txOptionAuxiliary.from
-        } in auxiliary transaction options.`,
+        `Invalid from address ${txOptionAuxiliary.from} in auxiliary transaction options.`,
       );
       return Promise.reject(err);
     }
@@ -1085,18 +1068,16 @@ class Facilitator {
 
     const stakeMessageStatus = await this.gateway
       .getOutboxMessageStatus(messageHash)
-      .catch((exception) => {
-        return Promise.reject(exception);
-      });
+      .catch(exception => Promise.reject(exception));
 
     logger.info(
       `  - Gateway's outbox message status is ${stakeMessageStatus}`,
     );
 
     if (
-      stakeMessageStatus === MessageStatus.UNDECLARED ||
-      stakeMessageStatus === MessageStatus.REVOCATION_DECLARED ||
-      stakeMessageStatus === MessageStatus.REVOKED
+      stakeMessageStatus === MessageStatus.UNDECLARED
+      || stakeMessageStatus === MessageStatus.REVOCATION_DECLARED
+      || stakeMessageStatus === MessageStatus.REVOKED
     ) {
       logger.error('  - Cannot perform progress stake.');
       const err = Error('Message cannot be progressed.');
@@ -1151,18 +1132,16 @@ class Facilitator {
 
     const mintMessageStatus = await this.coGateway
       .getInboxMessageStatus(messageHash)
-      .catch((exception) => {
-        return Promise.reject(exception);
-      });
+      .catch(exception => Promise.reject(exception));
 
     logger.info(
       `  - CoGateway's inbox message status is ${mintMessageStatus}`,
     );
 
     if (
-      mintMessageStatus === MessageStatus.UNDECLARED ||
-      mintMessageStatus === MessageStatus.REVOKED ||
-      mintMessageStatus === MessageStatus.REVOCATION_DECLARED
+      mintMessageStatus === MessageStatus.UNDECLARED
+      || mintMessageStatus === MessageStatus.REVOKED
+      || mintMessageStatus === MessageStatus.REVOCATION_DECLARED
     ) {
       logger.error('  - Cannot perform progress mint.');
       const err = new TypeError('Message cannot be progressed.');
@@ -1217,18 +1196,16 @@ class Facilitator {
 
     const unstakeMessageStatus = await this.gateway
       .getInboxMessageStatus(messageHash)
-      .catch((exception) => {
-        return Promise.reject(exception);
-      });
+      .catch(exception => Promise.reject(exception));
 
     logger.info(
       `  - Gateway's inbox message status is ${unstakeMessageStatus}`,
     );
 
     if (
-      unstakeMessageStatus === MessageStatus.UNDECLARED ||
-      unstakeMessageStatus === MessageStatus.REVOKED ||
-      unstakeMessageStatus === MessageStatus.REVOCATION_DECLARED
+      unstakeMessageStatus === MessageStatus.UNDECLARED
+      || unstakeMessageStatus === MessageStatus.REVOKED
+      || unstakeMessageStatus === MessageStatus.REVOCATION_DECLARED
     ) {
       logger.info('  - Cannot perform progress unstake.');
       const err = new TypeError('Message cannot be progressed.');
@@ -1283,18 +1260,16 @@ class Facilitator {
 
     const redeemMessageStatus = await this.coGateway
       .getOutboxMessageStatus(messageHash)
-      .catch((exception) => {
-        return Promise.reject(exception);
-      });
+      .catch(exception => Promise.reject(exception));
 
     logger.info(
       `  - CoGateway's outbox message status is ${redeemMessageStatus}`,
     );
 
     if (
-      redeemMessageStatus === MessageStatus.UNDECLARED ||
-      redeemMessageStatus === MessageStatus.REVOCATION_DECLARED ||
-      redeemMessageStatus === MessageStatus.REVOKED
+      redeemMessageStatus === MessageStatus.UNDECLARED
+      || redeemMessageStatus === MessageStatus.REVOCATION_DECLARED
+      || redeemMessageStatus === MessageStatus.REVOKED
     ) {
       logger.info('  - Cannot perform progress redeem.');
       const err = Error('Message cannot be progressed.');
@@ -1336,7 +1311,7 @@ class Facilitator {
         this.mosaic.origin.web3,
         this.mosaic.auxiliary.web3,
       );
-      return this._getProof(
+      return Facilitator._getProof(
         proofGenerator,
         this.gateway.address,
         latestAnchorInfo,
@@ -1363,7 +1338,7 @@ class Facilitator {
         this.mosaic.auxiliary.web3,
         this.mosaic.origin.web3,
       );
-      return this._getProof(
+      return Facilitator._getProof(
         proofGenerator,
         this.coGateway.address,
         latestAnchorInfo,
@@ -1382,7 +1357,7 @@ class Facilitator {
    *
    * @returns {Promise<Object>} Promise that resolves to proof data.
    */
-  async _getProof(
+  static async _getProof(
     proofGenerator,
     accountAddress,
     latestAnchorInfo,
@@ -1449,7 +1424,7 @@ class Facilitator {
    *
    * @returns {Object} An object containing hash lock and unlock secret.
    */
-  getHashLock(unlockSecret) {
+  static getHashLock(unlockSecret) {
     let hashLock = {};
 
     if (unlockSecret === undefined) {
