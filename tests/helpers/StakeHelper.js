@@ -230,7 +230,7 @@ describe('tests/ChainSetup', function() {
 
   it('should perform staking', function() {
     this.timeout(30 * 60 * 1000); //30 Minutes
-    let helper = new StakeHelper(web3, caMockToken, caGateway, staker);
+    let helper = new StakeHelper(web3, caMockToken, caMockToken, caGateway, staker);
     let _amount = amountToStake;
     let _beneficiary = staker;
     let _gasPrice = '0';
