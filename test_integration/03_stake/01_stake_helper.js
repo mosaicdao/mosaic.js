@@ -82,12 +82,11 @@ describe('StakeHelper', () => {
   it('should perform staking', () => {
     const helper = new StakeHelper(
       shared.origin.web3,
+      // FIXME: The following line should become OST if #136 gets merged:
+      shared.origin.addresses.EIP20Token,
       shared.origin.addresses.EIP20Token,
       shared.origin.addresses.Gateway,
       shared.setupConfig.deployerAddress,
-      undefined,
-      // FIXME: The following line should become OST if #136 gets merged:
-      shared.origin.addresses.EIP20Token,
     );
 
     // Only for testing purposes we re-use the same address:

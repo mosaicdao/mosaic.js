@@ -7,7 +7,7 @@ const Contracts = require('../Contracts');
 const Utils = require('../utils/Utils');
 
 class StakeHelper {
-  constructor(originWeb3, simpleToken, gateway, staker, txOptions, valueToken) {
+  constructor(originWeb3, valueToken, simpleToken, gateway, staker, txOptions) {
     Utils.deprecationNoticeStakeHelper();
 
     const oThis = this;
@@ -149,17 +149,17 @@ class StakeHelper {
     console.log(`* Approving Stake Amount`);
     return tx
       .send(txOptions)
-      .on('transactionHash', function(transactionHash) {
+      .on('transactionHash', function (transactionHash) {
         console.log('\t - transaction hash:', transactionHash);
       })
-      .on('receipt', function(receipt) {
+      .on('receipt', function (receipt) {
         console.log(
           '\t - Receipt:\n\x1b[2m',
           JSON.stringify(receipt),
           '\x1b[0m\n',
         );
       })
-      .on('error', function(error) {
+      .on('error', function (error) {
         console.log('\t !! Error !!', error, '\n\t !! ERROR !!\n');
         return Promise.reject(error);
       });
@@ -228,17 +228,17 @@ class StakeHelper {
     console.log(`* Staking SimpleToken`);
     return tx
       .send(txOptions)
-      .on('transactionHash', function(transactionHash) {
+      .on('transactionHash', function (transactionHash) {
         console.log('\t - transaction hash:', transactionHash);
       })
-      .on('receipt', function(receipt) {
+      .on('receipt', function (receipt) {
         console.log(
           '\t - Receipt:\n\x1b[2m',
           JSON.stringify(receipt),
           '\x1b[0m\n',
         );
       })
-      .on('error', function(error) {
+      .on('error', function (error) {
         console.log('\t !! Error !!', error, '\n\t !! ERROR !!\n');
         return Promise.reject(error);
       });
