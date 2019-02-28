@@ -18,6 +18,8 @@ describe('Facilitator.stake()', () => {
   let txOptions;
   let mosaic;
 
+  let hashLock;
+
   beforeEach(() => {
     staker = shared.setupConfig.deployerAddress;
     beneficiary = shared.setupConfig.deployerAddress;
@@ -40,8 +42,8 @@ describe('Facilitator.stake()', () => {
     mosaic = new Mosaic(origin, auxiliary);
   });
 
-  it('should return nonce and message hash', async () => {
-    const { hashLock } = Utils.createSecretHashLock();
+  it('should stake', async () => {
+    hashLock = Utils.createSecretHashLock();
 
     const facilitator = new Facilitator(mosaic);
 
@@ -51,11 +53,47 @@ describe('Facilitator.stake()', () => {
       beneficiary,
       gasPrice,
       gasLimit,
-      hashLock,
+      hashLock.hashLock,
       txOptions,
     );
 
     assert.typeOf(response.messageHash, 'string', 'The message hash must be part of the response.');
     assert.strictEqual(response.nonce, '1', 'The nonce should be 1 for the first call.');
   });
+
+  // FIXME: Add this test as soon as we use a test node that can generate proofs.
+  // The current augurproject/dev-node-geth cannot.
+  // Response to getting proof:
+  // {"jsonrpc":"2.0","id":1551373707415,"result":null}
+  //
+  // Use `response` from previous test to access required fields.
+  //
+  // it('should progress stake', async () => {
+  //   // First we need to make the state root known on target.
+  //   const anchor = new Anchor(shared.auxiliary.web3, shared.auxiliary.addresses.Anchor);
+  //   const block = await shared.origin.web3.eth.getBlock('latest');
+  //   await anchor.anchorStateRoot(
+  //     block.number.toString(),
+  //     block.stateRoot,
+  //     {
+  //       ...txOptions,
+  //       from: shared.setupConfig.organizationOwner,
+  //     },
+  //   );
+  //
+  //   console.log('Progressing Stake');
+  //   const facilitator = new Facilitator(mosaic);
+  //   await facilitator.progressStake(
+  //     staker,
+  //     amount,
+  //     beneficiary,
+  //     gasPrice,
+  //     gasLimit,
+  //     stakingResponse.nonce.toString(),
+  //     hashLock.hashLock,
+  //     hashLock.unlockSecret,
+  //     txOptions,
+  //     txOptions,
+  //   );
+  // });
 });

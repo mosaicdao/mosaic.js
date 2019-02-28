@@ -517,7 +517,7 @@ class EIP20Gateway {
       const err = new TypeError(`Invalid hash lock: ${hashLock}.`);
       return Promise.reject(err);
     }
-    if (EIP20Gateway._maxRewardTooBig(amount, gasPrice, gasLimit)) {
+    if (Utils.maxRewardTooBig(amount, gasPrice, gasLimit)) {
       const err = new Error(`The maximum possible reward of gasPrice*gasLimit is greater than the stake amount. It must be less.\n    gasPrice: ${gasPrice}\n    gasLimit: ${gasLimit}\n    stake amount: ${amount}`);
       return Promise.reject(err);
     }
@@ -1096,11 +1096,6 @@ class EIP20Gateway {
 
     const tx = this.contract.methods.activateGateway(coGatewayAddress);
     return Promise.resolve(tx);
-  }
-
-  static _maxRewardTooBig(amount, gasPrice, gasLimit) {
-    const maxReward = new BN(gasPrice).mul(new BN(gasLimit));
-    return (maxReward.gt(new BN(amount)));
   }
 }
 

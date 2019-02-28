@@ -43,19 +43,15 @@ describe('CoGatewayHelper', () => {
   });
 
   it('should deploy new CoGateway contract', () => {
-    const _token = shared.origin.addresses.EIP20Gateway;
-    const _utilityToken = shared.auxiliary.addresses.OSTPrime;
-    const _anchor = shared.auxiliary.addresses.Anchor;
-    const _bounty = 1000;
-    const _gateway = shared.origin.addresses.EIP20Gateway;
+    const bounty = '10';
 
     return subject
       .deploy(
-        _token,
-        _utilityToken,
-        _anchor,
-        _bounty,
-        _gateway,
+        shared.origin.addresses.EIP20Token,
+        shared.auxiliary.addresses.OSTPrime,
+        shared.auxiliary.addresses.Anchor,
+        bounty,
+        shared.origin.addresses.EIP20Gateway,
         shared.auxiliary.addresses.Organization,
         shared.auxiliary.addresses.MessageBus,
         shared.auxiliary.addresses.GatewayLib,

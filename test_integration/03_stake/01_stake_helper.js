@@ -95,12 +95,11 @@ describe('StakeHelper', () => {
   it('should perform staking', () => {
     const helper = new StakeHelper(
       shared.origin.web3,
-      shared.origin.addresses.OST,
       shared.origin.addresses.EIP20Token,
-      shared.origin.addresses.Gateway,
+      shared.origin.addresses.OST,
+      shared.origin.addresses.EIP20Gateway,
       shared.setupConfig.deployerAddress,
     );
-    helper.valueToken = shared.origin.addresses.EIP20Token;
 
     // Only for testing purposes we re-use the same address:
     const beneficiary = shared.setupConfig.deployerAddress;

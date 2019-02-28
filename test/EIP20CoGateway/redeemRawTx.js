@@ -82,12 +82,12 @@ describe('EIP20CoGateway.redeemRawTx()', () => {
   });
 
   it('should throw error when beneficiary address is invalid', async () => {
-    const expectedErrorMessage = `Invalid beneficiary address: 0x123.`;
+    const expectedErrorMessage = 'Invalid beneficiary address: 0x123.';
 
     await AssertAsync.reject(
       coGateway.redeemRawTx(
         redeemParams.amount,
-        `0x123`,
+        '0x123',
         redeemParams.gasPrice,
         redeemParams.gasLimit,
         redeemParams.nonce,
@@ -158,6 +158,20 @@ describe('EIP20CoGateway.redeemRawTx()', () => {
         undefined,
       ),
       expectedErrorMessage,
+    );
+  });
+
+  it('should throw an error when the possible reward is greater than the amount', async () => {
+    await AssertAsync.reject(
+      coGateway.redeemRawTx(
+        '99',
+        redeemParams.beneficiary,
+        '2',
+        '50',
+        redeemParams.nonce,
+        redeemParams.hashLock,
+      ),
+      'The maximum possible reward of gasPrice*gasLimit is greater than the redeem amount. It must be less.\n    gasPrice: 2\n    gasLimit: 50\n    redeem amount: 99',
     );
   });
 

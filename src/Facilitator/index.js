@@ -173,6 +173,7 @@ class Facilitator {
       .then((stakeReceipt) => {
         logger.win('  - Successfully performed stake.');
         const stakeIntentDeclaredEvent = stakeReceipt.events.StakeIntentDeclared;
+
         return Promise.resolve({
           nonce: stakeIntentDeclaredEvent.returnValues._stakerNonce,
           messageHash: stakeIntentDeclaredEvent.returnValues._messageHash,
@@ -185,7 +186,8 @@ class Facilitator {
   }
 
   /**
-   * Perform redeem.
+   * Perform redeem. When you redeem it is important that the `value` of the `txOptions` is equal to
+   * the bounty on the co-gateway.
    *
    * @param {string} redeemer Redeemer address.
    * @param {string} amount Redeem amount
@@ -255,51 +257,35 @@ class Facilitator {
 
     const facilitatorAddress = txOptions.from;
 
-    logger.info('Getting bounty amount');
-    const bounty = await this.coGateway.getBounty().catch((exception) => {
-      logger.error('  - Exception while getting bounty amount');
-      return Promise.reject(exception);
-    });
+    let bounty;
+    try {
+      bounty = await this._getRedeemBounty();
+    } catch (error) {
+      return Promise.reject(error);
+    }
 
     if (!new BN(txOptions.value).eq(new BN(bounty))) {
-      logger.error(
-        `  - Value in transaction option ${txOptions.value} is not equal to the bounty amount ${bounty}`,
-      );
-      const err = new Error(
-        `Value passed in transaction object ${txOptions.value} must be equal to bounty amount ${bounty}`,
-      );
+      const message = `Value passed in transaction object ${txOptions.value} must be equal to bounty amount ${bounty}`;
+      logger.error(`  - ${message}`);
+      const err = new Error(message);
+
       return Promise.reject(err);
     }
 
-    logger.info(
-      'Checking if redeemer has approved CoGateway for token transfer',
-    );
+    let isRedeemApproved;
+    try {
+      isRedeemApproved = await this._isRedeemApproved(redeemer, amount);
+    } catch (error) {
+      return Promise.reject(error);
+    }
 
-    const isRedeemAmountApproved = await this.coGateway
-      .isRedeemAmountApproved(redeemer, amount)
-      .catch((exception) => {
-        logger.error('  - Exception while checking redeem amount approval');
-        return Promise.reject(exception);
-      });
-
-    logger.info(`  - Approval status is ${isRedeemAmountApproved}`);
-
-    if (!isRedeemAmountApproved) {
+    if (!isRedeemApproved) {
       if (redeemer === facilitatorAddress) {
-        logger.info(
-          '  - As Redeemer is facilitator, approving CoGateway for token transfer',
-        );
-        const approvalTxOption = Object.assign({}, txOptions);
-        delete approvalTxOption.value;
-        await this.coGateway
-          .approveRedeemAmount(amount, approvalTxOption)
-          .catch((exception) => {
-            logger.error(
-              '  - Failed to approve CoGateway contract for token transfer',
-            );
-            return Promise.reject(exception);
-          });
-        logger.info('  - Approval done.');
+        try {
+          await this._approveRedeem();
+        } catch (error) {
+          return Promise.reject(error);
+        }
       } else {
         logger.error('  - Cannot perform redeem.');
         const err = new Error('Transfer of redeem amount must be approved.');
@@ -307,14 +293,12 @@ class Facilitator {
       }
     }
 
-    logger.info('Getting nonce for the redeemer account');
-    const nonce = await this.coGateway
-      .getNonce(redeemer)
-      .catch((exception) => {
-        logger.error('  - Failed to get redeemer nonce');
-        return Promise.reject(exception);
-      });
-    logger.info(`  - Redeemer's nonce is ${nonce}`);
+    let nonce;
+    try {
+      nonce = await this._getRedeemNonce(redeemer);
+    } catch (error) {
+      return Promise.reject(error);
+    }
 
     logger.info('Performing Redeem');
     return this.coGateway
@@ -327,9 +311,14 @@ class Facilitator {
         hashLock,
         txOptions,
       )
-      .then((redeemResult) => {
+      .then((redeemReceipt) => {
         logger.win('  - Successfully performed redeem.');
-        return Promise.resolve(redeemResult);
+        const redeemIntentDeclaredEvent = redeemReceipt.events.RedeemIntentDeclared;
+
+        return Promise.resolve({
+          nonce: redeemIntentDeclaredEvent.returnValues._redeemerNonce,
+          messageHash: redeemIntentDeclaredEvent.returnValues._messageHash,
+        });
       })
       .catch((exception) => {
         logger.error('  - Failed to performed redeem.');
@@ -1496,6 +1485,93 @@ class Facilitator {
       return Promise.reject(exception);
     });
     logger.info(`  - Staker's nonce is ${nonce}`);
+
+    return nonce;
+  }
+
+  /**
+   * Returns the bounty amount required to do a redeem.
+   * @private
+   *
+   * @throws when the co-gateway could not be called.
+   */
+  async _getRedeemBounty() {
+    logger.info('Getting bounty amount');
+    const bounty = await this.coGateway.getBounty().catch((exception) => {
+      logger.error('  - Exception while getting bounty amount');
+      throw exception;
+    });
+
+    return bounty;
+  }
+
+  /**
+   * Returns true if the redeem amount has been approved on the utility token.
+   * @private
+   * @param {string} redeemer The address of the redeemer.
+   * @param {string} amount The amount to redeem.
+   *
+   * @throws when the co-gateway could not be called.
+   */
+  async _isRedeemApproved(redeemer, amount) {
+    logger.info('Checking if redeemer has approved CoGateway for token transfer');
+
+    const isRedeemAmountApproved = await this.coGateway
+      .isRedeemAmountApproved(redeemer, amount)
+      .catch((exception) => {
+        logger.error('  - Exception while checking redeem amount approval');
+        throw exception;
+      });
+
+    logger.info(`  - Approval status is ${isRedeemAmountApproved}`);
+
+    return isRedeemAmountApproved;
+  }
+
+  /**
+   * Approves the redeem amount from the sender to the co-gateway on the utility token.
+   * @private
+   * @param {string} amount Amount to approve.
+   * @param {Object} txOptions Web3 transaction options.
+   *
+   * @throws when the amount could not be approved.
+   */
+  async _approveRedeem(amount, txOptions) {
+    logger.info('  - As Redeemer is facilitator, approving CoGateway for token transfer');
+
+    const approvalTxOption = Object.assign({}, txOptions);
+    delete approvalTxOption.value;
+
+    await this.coGateway
+      .approveRedeemAmount(amount, approvalTxOption)
+      .catch((exception) => {
+        logger.error(
+          '  - Failed to approve CoGateway contract for token transfer',
+        );
+        throw exception;
+      });
+
+    logger.info('  - Approval done.');
+  }
+
+  /**
+   * Returns the current nonce for the redeemer address.
+   * @private
+   * @param {string} redeemer Address of the redeemer.
+   *
+   * @throws when the co-gateway could not be called.
+   */
+  async _getRedeemNonce(redeemer) {
+    logger.info('Getting nonce for the redeemer account');
+
+    const nonce = await this.coGateway
+      .getNonce(redeemer)
+      .catch((exception) => {
+        logger.error('  - Failed to get redeemer nonce');
+        throw exception;
+      });
+
+    logger.info(`  - Redeemer's nonce is ${nonce}`);
 
     return nonce;
   }
