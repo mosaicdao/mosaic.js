@@ -126,14 +126,14 @@ describe('Facilitator.progressRedeemMessage()', () => {
       [
         progressRedeemMessageParams.messageHash,
         progressRedeemMessageParams.unlockSecret,
-        progressRedeemMessageParams.txOptionOrigin,
+        progressRedeemMessageParams.txOptionAuxiliary,
       ],
     ]);
     SpyAssert.assert(spyPerformProgressUnstake, 1, [
       [
         progressRedeemMessageParams.messageHash,
         progressRedeemMessageParams.unlockSecret,
-        progressRedeemMessageParams.txOptionAuxiliary,
+        progressRedeemMessageParams.txOptionOrigin,
       ],
     ]);
     SpyAssert.assert(spyCall, 1, [

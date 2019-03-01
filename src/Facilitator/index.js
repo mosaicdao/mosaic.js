@@ -1045,11 +1045,11 @@ class Facilitator {
     }
 
     return Promise.all([
-      this.performProgressRedeem(messageHash, unlockSecret, txOptionOrigin),
+      this.performProgressRedeem(messageHash, unlockSecret, txOptionAuxiliary),
       this.performProgressUnstake(
         messageHash,
         unlockSecret,
-        txOptionAuxiliary,
+        txOptionOrigin,
       ),
     ]);
   }
