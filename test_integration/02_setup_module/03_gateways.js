@@ -22,22 +22,19 @@ describe('Setup.gateways', () => {
 
   it('should deploy new gateways', async () => {
     const originConfig = {
-      // Placeholders for token addresses:
       token: shared.origin.addresses.EIP20Token,
-      baseToken: shared.origin.addresses.EIP20Token,
+      baseToken: shared.origin.addresses.OST,
       stateRootProvider: shared.setupModule.originAnchor.address,
-      bounty: '0',
+      bounty: '10',
       organization: shared.setupModule.originOrganization.address,
       burner: ZERO_ADDRESS,
       deployer: shared.setupConfig.deployerAddress,
       organizationOwner: shared.setupConfig.deployerAddress,
     };
     const auxiliaryConfig = {
-      // Placeholders for token addresses:
-      valueToken: shared.auxiliary.addresses.OSTPrime,
       utilityToken: shared.auxiliary.addresses.OSTPrime,
       stateRootProvider: shared.setupModule.auxiliaryAnchor.address,
-      bounty: '0',
+      bounty: '10',
       organization: shared.setupModule.auxiliaryOrganization.address,
       burner: ZERO_ADDRESS,
       deployer: shared.setupConfig.deployerAddress,
@@ -63,5 +60,8 @@ describe('Setup.gateways', () => {
       true,
       `CoGateway does not have a valid address: ${auxiliaryCoGateway.address}`,
     );
+
+    shared.setupModule.originGateway = originGateway.address;
+    shared.setupModule.auxiliaryCoGateway = auxiliaryCoGateway.address;
   });
 });

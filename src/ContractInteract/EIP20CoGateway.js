@@ -336,7 +336,7 @@ class EIP20CoGateway {
       blockHeight,
       encodedAccount,
       accountProof,
-    ).then((tx) => Utils.sendTransaction(tx, txOptions));
+    ).then(tx => Utils.sendTransaction(tx, txOptions));
   }
 
   /**
@@ -421,7 +421,7 @@ class EIP20CoGateway {
       hashLock,
       blockHeight,
       storageProof,
-    ).then((tx) => Utils.sendTransaction(tx, txOptions));
+    ).then(tx => Utils.sendTransaction(tx, txOptions));
   }
 
   /**
@@ -533,8 +533,8 @@ class EIP20CoGateway {
       );
       return Promise.reject(err);
     }
-    return this.progressMintRawTx(messageHash, unlockSecret).then((tx) =>
-      Utils.sendTransaction(tx, txOptions),
+    return this.progressMintRawTx(messageHash, unlockSecret).then(
+      tx => Utils.sendTransaction(tx, txOptions),
     );
   }
 
@@ -581,8 +581,8 @@ class EIP20CoGateway {
       );
       return Promise.reject(err);
     }
-    return this.progressRedeemRawTx(messageHash, unlockSecret).then((tx) =>
-      Utils.sendTransaction(tx, txOptions),
+    return this.progressRedeemRawTx(messageHash, unlockSecret).then(
+      tx => Utils.sendTransaction(tx, txOptions),
     );
   }
 
@@ -739,7 +739,7 @@ class EIP20CoGateway {
       gasLimit,
       nonce,
       hashLock,
-    ).then((tx) => Utils.sendTransaction(tx, txOptions));
+    ).then(tx => Utils.sendTransaction(tx, txOptions));
   }
 
   /**
@@ -783,6 +783,11 @@ class EIP20CoGateway {
       const err = new TypeError(`Invalid hash lock: ${hashLock}.`);
       return Promise.reject(err);
     }
+    if (Utils.maxRewardTooBig(amount, gasPrice, gasLimit)) {
+      const err = new Error(`The maximum possible reward of gasPrice*gasLimit is greater than the redeem amount. It must be less.\n    gasPrice: ${gasPrice}\n    gasLimit: ${gasLimit}\n    redeem amount: ${amount}`);
+      return Promise.reject(err);
+    }
+
     const tx = this.contract.methods.redeem(
       amount,
       beneficiary,
@@ -811,9 +816,9 @@ class EIP20CoGateway {
       const err = new TypeError(`Invalid redeem amount: ${amount}.`);
       return Promise.reject(err);
     }
-    return this.getUtilityTokenContract().then((eip20ValueToken) => {
-      return eip20ValueToken.isAmountApproved(redeemer, this.address, amount);
-    });
+    return this.getUtilityTokenContract().then(
+      eip20ValueToken => eip20ValueToken.isAmountApproved(redeemer, this.address, amount),
+    );
   }
 
   /**
@@ -837,9 +842,9 @@ class EIP20CoGateway {
       const err = new TypeError(`Invalid redeem amount: ${amount}.`);
       return Promise.reject(err);
     }
-    return this.getUtilityTokenContract().then((eip20Token) => {
-      return eip20Token.approve(this.address, amount, txOptions);
-    });
+    return this.getUtilityTokenContract().then(
+      eip20Token => eip20Token.approve(this.address, amount, txOptions),
+    );
   }
 
   /**
@@ -861,10 +866,11 @@ class EIP20CoGateway {
   /**
    * Get the latest state root and block height.
    *
-   * @returns {Promise<Object>} Promise object that resolves to object containing state root and block height.
+   * @returns {Promise<Object>} Promise object that resolves to object containing state root and
+   *                            block height.
    */
   async getLatestAnchorInfo() {
-    return this.getAnchor().then((anchor) => anchor.getLatestInfo());
+    return this.getAnchor().then(anchor => anchor.getLatestInfo());
   }
 
   /**

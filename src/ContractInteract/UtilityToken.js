@@ -208,8 +208,8 @@ class UtilityToken {
       const err = new TypeError(`Invalid from address: ${txOptions.from}.`);
       return Promise.reject(err);
     }
-    return this.approveRawTx(spenderAddress, amount).then((tx) =>
-      Utils.sendTransaction(tx, txOptions),
+    return this.approveRawTx(spenderAddress, amount).then(
+      tx => Utils.sendTransaction(tx, txOptions),
     );
   }
 
@@ -284,9 +284,7 @@ class UtilityToken {
       return Promise.reject(err);
     }
     return this.allowance(ownerAddress, spenderAddress).then(
-      (approvedAllowance) => {
-        return new BN(amount).lte(new BN(approvedAllowance));
-      },
+      approvedAllowance => new BN(amount).lte(new BN(approvedAllowance)),
     );
   }
 
@@ -319,8 +317,8 @@ class UtilityToken {
       return Promise.reject(err);
     }
 
-    return this.setCoGatewayRawTx(coGateway).then((tx) =>
-      Utils.sendTransaction(tx, txOptions),
+    return this.setCoGatewayRawTx(coGateway).then(
+      tx => Utils.sendTransaction(tx, txOptions),
     );
   }
 

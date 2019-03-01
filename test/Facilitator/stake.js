@@ -18,6 +18,7 @@ describe('Facilitator.stake()', () => {
   let approveStakeAmountResult;
   let approveBountyAmountResult;
   let nonce;
+  let messageHash;
   let stakeResult;
 
   let spyIsStakeAmountApproved;
@@ -88,8 +89,18 @@ describe('Facilitator.stake()', () => {
     isBountyAmountApproved = true;
     approveStakeAmountResult = true;
     approveBountyAmountResult = true;
-    nonce = '1';
-    stakeResult = true;
+    nonce = '3';
+    messageHash = '0x22ad37e16438758a75c1e31496c7c0eef0d04fc90a2f0fb285f48bb68ef6d28e';
+    stakeResult = {
+      events: {
+        StakeIntentDeclared: {
+          returnValues: {
+            _stakerNonce: nonce,
+            _messageHash: messageHash,
+          },
+        },
+      },
+    };
   });
 
   it('should throw an error when staker address is undefined', async () => {
@@ -247,8 +258,8 @@ describe('Facilitator.stake()', () => {
     );
 
     assert.strictEqual(
-      result,
-      true,
+      result.messageHash,
+      messageHash,
       'Returned valued must match with the expected value',
     );
 
@@ -267,7 +278,7 @@ describe('Facilitator.stake()', () => {
         stakeParams.beneficiary,
         stakeParams.gasPrice,
         stakeParams.gasLimit,
-        '1',
+        nonce,
         stakeParams.hashLock,
         txOptions,
       ],
@@ -300,8 +311,8 @@ describe('Facilitator.stake()', () => {
     );
 
     assert.strictEqual(
-      result,
-      true,
+      result.messageHash,
+      messageHash,
       'Returned valued must match with the expected value',
     );
 
@@ -350,8 +361,8 @@ describe('Facilitator.stake()', () => {
     );
 
     assert.strictEqual(
-      result,
-      true,
+      result.messageHash,
+      messageHash,
       'Returned valued must match with the expected value',
     );
 
@@ -368,7 +379,7 @@ describe('Facilitator.stake()', () => {
         stakeParams.beneficiary,
         stakeParams.gasPrice,
         stakeParams.gasLimit,
-        '1',
+        nonce,
         stakeParams.hashLock,
         txOptions,
       ],
@@ -384,6 +395,33 @@ describe('Facilitator.stake()', () => {
         txOptions,
       ],
     ]);
+    teardown();
+  });
+
+  it('should return the message hash and nonce', async () => {
+    setup();
+
+    const expectedResponse = {
+      messageHash,
+      nonce,
+    };
+
+    const response = await facilitator.stake(
+      stakeParams.staker,
+      stakeParams.amount,
+      stakeParams.beneficiary,
+      stakeParams.gasPrice,
+      stakeParams.gasLimit,
+      stakeParams.hashLock,
+      txOptions,
+    );
+
+    assert.deepEqual(
+      response,
+      expectedResponse,
+      'Staking did not return the expected parameters.',
+    );
+
     teardown();
   });
 });

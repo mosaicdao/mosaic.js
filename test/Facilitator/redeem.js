@@ -8,6 +8,8 @@ const AssertAsync = require('../../test_utils/AssertAsync');
 const SpyAssert = require('../../test_utils/SpyAssert');
 
 describe('Facilitator.redeem()', () => {
+  const messageHash = '0x22ad37e16438758a75c1e31496c7c0eef0d04fc90a2f0fb285f48bb68ef6d28e';
+
   let mosaic;
   let redeemParams;
   let txOptions;
@@ -82,7 +84,16 @@ describe('Facilitator.redeem()', () => {
     approveRedeemAmountResult = true;
     bounty = '100';
     nonce = '1';
-    redeemResult = true;
+    redeemResult = {
+      events: {
+        RedeemIntentDeclared: {
+          returnValues: {
+            _redeemerNonce: nonce,
+            _messageHash: messageHash,
+          },
+        },
+      },
+    };
   });
 
   it('should throw an error when redeemer address is undefined', async () => {
@@ -219,9 +230,7 @@ describe('Facilitator.redeem()', () => {
         redeemParams.hashLock,
         txOptions,
       ),
-      `Value passed in transaction object ${
-        txOptions.value
-      } must be equal to bounty amount ${bounty}`,
+      `Value passed in transaction object ${txOptions.value} must be equal to bounty amount ${bounty}`,
     );
     teardown();
   });
@@ -240,8 +249,8 @@ describe('Facilitator.redeem()', () => {
     );
 
     assert.strictEqual(
-      result,
-      true,
+      result.messageHash,
+      messageHash,
       'Returned valued must match with the expected value',
     );
 
@@ -291,8 +300,8 @@ describe('Facilitator.redeem()', () => {
     );
 
     assert.strictEqual(
-      result,
-      true,
+      result.messageHash,
+      messageHash,
       'Returned valued must match with the expected value',
     );
 
@@ -324,6 +333,33 @@ describe('Facilitator.redeem()', () => {
         txOptions,
       ],
     ]);
+    teardown();
+  });
+
+  it('should return the message hash and nonce', async () => {
+    setup();
+
+    const expectedResponse = {
+      messageHash,
+      nonce,
+    };
+
+    const response = await facilitator.redeem(
+      redeemParams.redeemer,
+      redeemParams.amount,
+      redeemParams.beneficiary,
+      redeemParams.gasPrice,
+      redeemParams.gasLimit,
+      redeemParams.hashLock,
+      txOptions,
+    );
+
+    assert.deepEqual(
+      response,
+      expectedResponse,
+      'Staking did not return the expected parameters.',
+    );
+
     teardown();
   });
 });

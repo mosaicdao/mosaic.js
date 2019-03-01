@@ -19,7 +19,7 @@ const assertReceipt = (receipt) => {
 
 const assertDeploymentReceipt = (receipt) => {
   assertReceipt(receipt);
-  const contractAddress = receipt.contractAddress;
+  const { contractAddress } = receipt;
   assert.isNotEmpty(
     contractAddress,
     'Deployment Receipt is missing contractAddress',
@@ -34,6 +34,7 @@ const assertDeploymentReceipt = (receipt) => {
 describe('GatewayHelper', () => {
   let deployParams;
   let tokenAddress;
+  let baseTokenAddress;
   let anchorAddress;
 
   before(() => {
@@ -43,23 +44,20 @@ describe('GatewayHelper', () => {
     };
 
     tokenAddress = shared.origin.addresses.EIP20Token;
+    baseTokenAddress = shared.origin.addresses.OST;
     anchorAddress = shared.origin.addresses.Anchor;
   });
 
   it('should deploy new Gateway contract', () => {
-    const _token = tokenAddress;
-    const _baseToken = tokenAddress;
-    const _anchor = anchorAddress;
-    const _bounty = 1000;
-
+    const bounty = 1000;
     const subject = new GatewayHelper(shared.origin.web3);
 
     return subject
       .deploy(
-        _token,
-        _baseToken,
-        _anchor,
-        _bounty,
+        tokenAddress,
+        baseTokenAddress,
+        anchorAddress,
+        bounty,
         shared.origin.addresses.Organization,
         shared.origin.addresses.MessageBus,
         shared.origin.addresses.GatewayLib,
@@ -67,18 +65,16 @@ describe('GatewayHelper', () => {
       )
       .then(assertDeploymentReceipt)
       .then((receipt) => {
-        shared.origin.addresses.Gateway = receipt.contractAddress;
+        shared.origin.addresses.EIP20Gateway = receipt.contractAddress;
       });
   });
 
   // Test Setup
   it('should setup Gateway and CoGateway', () => {
-    const simpleToken = tokenAddress;
-
     const gatewayConfig = {
       deployer: shared.setupConfig.deployerAddress,
-      token: simpleToken,
-      baseToken: simpleToken,
+      token: tokenAddress,
+      baseToken: baseTokenAddress,
       organization: shared.origin.addresses.Organization,
       organizationOwner: shared.setupConfig.organizationOwner,
       stateRootProvider: shared.origin.addresses.Anchor,
@@ -90,7 +86,7 @@ describe('GatewayHelper', () => {
 
     const coGatewayConfig = {
       deployer: shared.setupConfig.deployerAddress,
-      valueToken: simpleToken,
+      valueToken: tokenAddress,
       utilityToken: shared.auxiliary.addresses.OSTPrime,
       organization: shared.auxiliary.addresses.Organization,
       stateRootProvider: shared.auxiliary.addresses.Anchor,

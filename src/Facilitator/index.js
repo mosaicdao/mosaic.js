@@ -37,9 +37,7 @@ class Facilitator {
     }
     if (!Web3.utils.isAddress(mosaic.origin.contractAddresses.EIP20Gateway)) {
       const err = new TypeError(
-        `Invalid Gateway address: ${
-          mosaic.origin.contractAddresses.EIP20Gateway
-        }.`,
+        `Invalid Gateway address: ${mosaic.origin.contractAddresses.EIP20Gateway}.`,
       );
       throw err;
     }
@@ -47,9 +45,7 @@ class Facilitator {
       !Web3.utils.isAddress(mosaic.auxiliary.contractAddresses.EIP20CoGateway)
     ) {
       const err = new TypeError(
-        `Invalid CoGateway address: ${
-          mosaic.auxiliary.contractAddresses.EIP20CoGateway
-        }.`,
+        `Invalid CoGateway address: ${mosaic.auxiliary.contractAddresses.EIP20CoGateway}.`,
       );
       throw err;
     }
@@ -67,7 +63,6 @@ class Facilitator {
     this.stake = this.stake.bind(this);
     this.progressStake = this.progressStake.bind(this);
     this.confirmStakeIntent = this.confirmStakeIntent.bind(this);
-    this._getProof = this._getProof.bind(this);
     this.progressStakeMessage = this.progressStakeMessage.bind(this);
     this.performProgressStake = this.performProgressStake.bind(this);
     this.performProgressMint = this.performProgressMint.bind(this);
@@ -85,7 +80,8 @@ class Facilitator {
    * @param {string} hashLock Hash lock.
    * @param {Object} txOption Transaction options.
    *
-   * @returns {Promise<Object>} Promise that resolves to transaction receipt.
+   * @returns {Promise<Object>} Promise that resolves to an Object with two properties:
+   *                            messageHash and nonce.
    */
   async stake(
     staker,
@@ -144,29 +140,12 @@ class Facilitator {
 
     const facilitatorAddress = txOption.from;
 
-    logger.info('Checking if staker has approved gateway for token transfer');
-    const isStakeAmountApproved = await this.gateway
-      .isStakeAmountApproved(staker, amount)
-      .catch((exception) => {
-        logger.error('  - Exception while checking stake amount approval');
-        return Promise.reject(exception);
-      });
-
-    logger.info(`  - Approval status is ${isStakeAmountApproved}`);
-
-    if (!isStakeAmountApproved) {
+    if (!await this._isStakeApproved(staker, amount)) {
       if (staker === facilitatorAddress) {
         logger.info(
           '  - As staker is facilitator, approving gateway for token transfer',
         );
-        await this.gateway
-          .approveStakeAmount(amount, txOption)
-          .catch((exception) => {
-            logger.error(
-              '  - Failed to approve gateway contract for token transfer',
-            );
-            return Promise.reject(exception);
-          });
+        await this._approveStake(amount, txOption);
       } else {
         logger.error('  - Cannot perform stake.');
         const err = new Error('Transfer of stake amount must be approved.');
@@ -174,34 +153,11 @@ class Facilitator {
       }
     }
 
-    logger.info(
-      'Checking if facilitator has approved gateway for bounty token transfer',
-    );
-    const isBountyAmountApproved = await this.gateway
-      .isBountyAmountApproved(facilitatorAddress)
-      .catch((exception) => {
-        logger.error('  - Exception while checking bounty amount approval');
-        return Promise.reject(exception);
-      });
-
-    logger.info(`  - Approval status is ${isBountyAmountApproved}`);
-
-    if (!isBountyAmountApproved) {
-      logger.info('  - Approving gateway contract for bounty transfer');
-      await this.gateway.approveBountyAmount(txOption).catch((exception) => {
-        logger.error(
-          '  - Failed to approve gateway contract for bounty transfer',
-        );
-        return Promise.reject(exception);
-      });
+    if (!await this._isStakeBountyApproved(facilitatorAddress)) {
+      await this._approveStakeBounty(txOption);
     }
 
-    logger.info('Getting nonce for the staker account');
-    const nonce = await this.gateway.getNonce(staker).catch((exception) => {
-      logger.error('  - Failed to get staker nonce');
-      return Promise.reject(exception);
-    });
-    logger.info(`  - Staker's nonce is ${nonce}`);
+    const nonce = await this._getStakeNonce(staker);
 
     logger.info('Performing stake');
     return this.gateway
@@ -214,18 +170,24 @@ class Facilitator {
         hashLock,
         txOption,
       )
-      .then((stakeResult) => {
+      .then((stakeReceipt) => {
         logger.win('  - Successfully performed stake.');
-        return Promise.resolve(stakeResult);
+        const stakeIntentDeclaredEvent = stakeReceipt.events.StakeIntentDeclared;
+
+        return Promise.resolve({
+          nonce: stakeIntentDeclaredEvent.returnValues._stakerNonce,
+          messageHash: stakeIntentDeclaredEvent.returnValues._messageHash,
+        });
       })
       .catch((exception) => {
-        logger.error('  - Failed to performed stake.');
+        logger.error('  - Failed to perform stake.');
         return Promise.reject(exception);
       });
   }
 
   /**
-   * Perform redeem.
+   * Perform redeem. When you redeem it is important that the `value` of the `txOptions` is equal to
+   * the bounty on the co-gateway.
    *
    * @param {string} redeemer Redeemer address.
    * @param {string} amount Redeem amount
@@ -295,55 +257,35 @@ class Facilitator {
 
     const facilitatorAddress = txOptions.from;
 
-    logger.info('Getting bounty amount');
-    const bounty = await this.coGateway.getBounty().catch((exception) => {
-      logger.error('  - Exception while getting bounty amount');
-      return Promise.reject(exception);
-    });
+    let bounty;
+    try {
+      bounty = await this._getRedeemBounty();
+    } catch (error) {
+      return Promise.reject(error);
+    }
 
     if (!new BN(txOptions.value).eq(new BN(bounty))) {
-      logger.error(
-        `  - Value in transaction option ${
-          txOptions.value
-        } is not equal to the bounty amount ${bounty}`,
-      );
-      const err = new Error(
-        `Value passed in transaction object ${
-          txOptions.value
-        } must be equal to bounty amount ${bounty}`,
-      );
+      const message = `Value passed in transaction object ${txOptions.value} must be equal to bounty amount ${bounty}`;
+      logger.error(`  - ${message}`);
+      const err = new Error(message);
+
       return Promise.reject(err);
     }
 
-    logger.info(
-      'Checking if redeemer has approved CoGateway for token transfer',
-    );
+    let isRedeemApproved;
+    try {
+      isRedeemApproved = await this._isRedeemApproved(redeemer, amount);
+    } catch (error) {
+      return Promise.reject(error);
+    }
 
-    const isRedeemAmountApproved = await this.coGateway
-      .isRedeemAmountApproved(redeemer, amount)
-      .catch((exception) => {
-        logger.error('  - Exception while checking redeem amount approval');
-        return Promise.reject(exception);
-      });
-
-    logger.info(`  - Approval status is ${isRedeemAmountApproved}`);
-
-    if (!isRedeemAmountApproved) {
+    if (!isRedeemApproved) {
       if (redeemer === facilitatorAddress) {
-        logger.info(
-          '  - As Redeemer is facilitator, approving CoGateway for token transfer',
-        );
-        const approvalTxOption = Object.assign({}, txOptions);
-        delete approvalTxOption.value;
-        await this.coGateway
-          .approveRedeemAmount(amount, approvalTxOption)
-          .catch((exception) => {
-            logger.error(
-              '  - Failed to approve CoGateway contract for token transfer',
-            );
-            return Promise.reject(exception);
-          });
-        logger.info('  - Approval done.');
+        try {
+          await this._approveRedeem();
+        } catch (error) {
+          return Promise.reject(error);
+        }
       } else {
         logger.error('  - Cannot perform redeem.');
         const err = new Error('Transfer of redeem amount must be approved.');
@@ -351,14 +293,12 @@ class Facilitator {
       }
     }
 
-    logger.info('Getting nonce for the redeemer account');
-    const nonce = await this.coGateway
-      .getNonce(redeemer)
-      .catch((exception) => {
-        logger.error('  - Failed to get redeemer nonce');
-        return Promise.reject(exception);
-      });
-    logger.info(`  - Redeemer's nonce is ${nonce}`);
+    let nonce;
+    try {
+      nonce = await this._getRedeemNonce(redeemer);
+    } catch (error) {
+      return Promise.reject(error);
+    }
 
     logger.info('Performing Redeem');
     return this.coGateway
@@ -371,9 +311,14 @@ class Facilitator {
         hashLock,
         txOptions,
       )
-      .then((redeemResult) => {
+      .then((redeemReceipt) => {
         logger.win('  - Successfully performed redeem.');
-        return Promise.resolve(redeemResult);
+        const redeemIntentDeclaredEvent = redeemReceipt.events.RedeemIntentDeclared;
+
+        return Promise.resolve({
+          nonce: redeemIntentDeclaredEvent.returnValues._redeemerNonce,
+          messageHash: redeemIntentDeclaredEvent.returnValues._messageHash,
+        });
       })
       .catch((exception) => {
         logger.error('  - Failed to performed redeem.');
@@ -468,9 +413,7 @@ class Facilitator {
 
     if (!Web3.utils.isAddress(txOptionAuxiliary.from)) {
       const err = new TypeError(
-        `Invalid auxiliary chain facilitator address: ${
-          txOptionAuxiliary.from
-        }.`,
+        `Invalid auxiliary chain facilitator address: ${txOptionAuxiliary.from}.`,
       );
       return Promise.reject(err);
     }
@@ -593,9 +536,7 @@ class Facilitator {
 
     if (!Web3.utils.isAddress(txOptionAuxiliary.from)) {
       const err = new TypeError(
-        `Invalid auxiliary chain facilitator address: ${
-          txOptionAuxiliary.from
-        }.`,
+        `Invalid auxiliary chain facilitator address: ${txOptionAuxiliary.from}.`,
       );
       return Promise.reject(err);
     }
@@ -737,9 +678,9 @@ class Facilitator {
     logger.info(`  - CoGateway's inbox message hash is ${mintMessageStatus}`);
 
     if (
-      mintMessageStatus === MessageStatus.DECLARED ||
-      mintMessageStatus === MessageStatus.PROGRESSED ||
-      mintMessageStatus === MessageStatus.REVOKED
+      mintMessageStatus === MessageStatus.DECLARED
+      || mintMessageStatus === MessageStatus.PROGRESSED
+      || mintMessageStatus === MessageStatus.REVOKED
     ) {
       logger.win('  - Stake intent already confirmed on CoGateway');
       return Promise.resolve(true);
@@ -895,9 +836,9 @@ class Facilitator {
     logger.info(`  - Gateway's inbox message hash is ${unstakeMessageStatus}`);
 
     if (
-      unstakeMessageStatus === MessageStatus.DECLARED ||
-      unstakeMessageStatus === MessageStatus.PROGRESSED ||
-      unstakeMessageStatus === MessageStatus.REVOKED
+      unstakeMessageStatus === MessageStatus.DECLARED
+      || unstakeMessageStatus === MessageStatus.PROGRESSED
+      || unstakeMessageStatus === MessageStatus.REVOKED
     ) {
       logger.win('  - Redeem intent already confirmed on Gateway');
       return Promise.resolve(true);
@@ -978,9 +919,7 @@ class Facilitator {
     }
     if (!Web3.utils.isAddress(txOptionOrigin.from)) {
       const err = new TypeError(
-        `Invalid from address ${
-          txOptionOrigin.from
-        } in origin transaction options.`,
+        `Invalid from address ${txOptionOrigin.from} in origin transaction options.`,
       );
       return Promise.reject(err);
     }
@@ -992,9 +931,7 @@ class Facilitator {
     }
     if (!Web3.utils.isAddress(txOptionAuxiliary.from)) {
       const err = new TypeError(
-        `Invalid from address ${
-          txOptionAuxiliary.from
-        } in auxiliary transaction options.`,
+        `Invalid from address ${txOptionAuxiliary.from} in auxiliary transaction options.`,
       );
       return Promise.reject(err);
     }
@@ -1085,18 +1022,16 @@ class Facilitator {
 
     const stakeMessageStatus = await this.gateway
       .getOutboxMessageStatus(messageHash)
-      .catch((exception) => {
-        return Promise.reject(exception);
-      });
+      .catch(exception => Promise.reject(exception));
 
     logger.info(
       `  - Gateway's outbox message status is ${stakeMessageStatus}`,
     );
 
     if (
-      stakeMessageStatus === MessageStatus.UNDECLARED ||
-      stakeMessageStatus === MessageStatus.REVOCATION_DECLARED ||
-      stakeMessageStatus === MessageStatus.REVOKED
+      stakeMessageStatus === MessageStatus.UNDECLARED
+      || stakeMessageStatus === MessageStatus.REVOCATION_DECLARED
+      || stakeMessageStatus === MessageStatus.REVOKED
     ) {
       logger.error('  - Cannot perform progress stake.');
       const err = Error('Message cannot be progressed.');
@@ -1151,18 +1086,16 @@ class Facilitator {
 
     const mintMessageStatus = await this.coGateway
       .getInboxMessageStatus(messageHash)
-      .catch((exception) => {
-        return Promise.reject(exception);
-      });
+      .catch(exception => Promise.reject(exception));
 
     logger.info(
       `  - CoGateway's inbox message status is ${mintMessageStatus}`,
     );
 
     if (
-      mintMessageStatus === MessageStatus.UNDECLARED ||
-      mintMessageStatus === MessageStatus.REVOKED ||
-      mintMessageStatus === MessageStatus.REVOCATION_DECLARED
+      mintMessageStatus === MessageStatus.UNDECLARED
+      || mintMessageStatus === MessageStatus.REVOKED
+      || mintMessageStatus === MessageStatus.REVOCATION_DECLARED
     ) {
       logger.error('  - Cannot perform progress mint.');
       const err = new TypeError('Message cannot be progressed.');
@@ -1217,18 +1150,16 @@ class Facilitator {
 
     const unstakeMessageStatus = await this.gateway
       .getInboxMessageStatus(messageHash)
-      .catch((exception) => {
-        return Promise.reject(exception);
-      });
+      .catch(exception => Promise.reject(exception));
 
     logger.info(
       `  - Gateway's inbox message status is ${unstakeMessageStatus}`,
     );
 
     if (
-      unstakeMessageStatus === MessageStatus.UNDECLARED ||
-      unstakeMessageStatus === MessageStatus.REVOKED ||
-      unstakeMessageStatus === MessageStatus.REVOCATION_DECLARED
+      unstakeMessageStatus === MessageStatus.UNDECLARED
+      || unstakeMessageStatus === MessageStatus.REVOKED
+      || unstakeMessageStatus === MessageStatus.REVOCATION_DECLARED
     ) {
       logger.info('  - Cannot perform progress unstake.');
       const err = new TypeError('Message cannot be progressed.');
@@ -1283,18 +1214,16 @@ class Facilitator {
 
     const redeemMessageStatus = await this.coGateway
       .getOutboxMessageStatus(messageHash)
-      .catch((exception) => {
-        return Promise.reject(exception);
-      });
+      .catch(exception => Promise.reject(exception));
 
     logger.info(
       `  - CoGateway's outbox message status is ${redeemMessageStatus}`,
     );
 
     if (
-      redeemMessageStatus === MessageStatus.UNDECLARED ||
-      redeemMessageStatus === MessageStatus.REVOCATION_DECLARED ||
-      redeemMessageStatus === MessageStatus.REVOKED
+      redeemMessageStatus === MessageStatus.UNDECLARED
+      || redeemMessageStatus === MessageStatus.REVOCATION_DECLARED
+      || redeemMessageStatus === MessageStatus.REVOKED
     ) {
       logger.info('  - Cannot perform progress redeem.');
       const err = Error('Message cannot be progressed.');
@@ -1336,7 +1265,7 @@ class Facilitator {
         this.mosaic.origin.web3,
         this.mosaic.auxiliary.web3,
       );
-      return this._getProof(
+      return Facilitator._getProof(
         proofGenerator,
         this.gateway.address,
         latestAnchorInfo,
@@ -1363,7 +1292,7 @@ class Facilitator {
         this.mosaic.auxiliary.web3,
         this.mosaic.origin.web3,
       );
-      return this._getProof(
+      return Facilitator._getProof(
         proofGenerator,
         this.coGateway.address,
         latestAnchorInfo,
@@ -1382,7 +1311,7 @@ class Facilitator {
    *
    * @returns {Promise<Object>} Promise that resolves to proof data.
    */
-  async _getProof(
+  static async _getProof(
     proofGenerator,
     accountAddress,
     latestAnchorInfo,
@@ -1449,7 +1378,7 @@ class Facilitator {
    *
    * @returns {Object} An object containing hash lock and unlock secret.
    */
-  getHashLock(unlockSecret) {
+  static getHashLock(unlockSecret) {
     let hashLock = {};
 
     if (unlockSecret === undefined) {
@@ -1459,6 +1388,192 @@ class Facilitator {
     }
 
     return hashLock;
+  }
+
+  /**
+   * Checks if a given stake amount is approved to be transferred to the gateway.
+   * @private
+   * @param {string} staker The address of the staker that the tokens should be transferred from.
+   * @param {string} amount The amount to stake.
+   *
+   * @returns {bool} True if the transfer has been approved.
+   */
+  async _isStakeApproved(staker, amount) {
+    logger.info('Checking if staker has approved gateway for token transfer');
+    const isStakeAmountApproved = await this.gateway
+      .isStakeAmountApproved(staker, amount)
+      .catch((exception) => {
+        logger.error('  - Exception while checking stake amount approval');
+        return Promise.reject(exception);
+      });
+
+    logger.info(`  - Approval status is ${isStakeAmountApproved}`);
+
+    return isStakeAmountApproved;
+  }
+
+  /**
+   * Approves the amount to be transferred to the gateway.
+   * @private
+   * @param {string} amount The amount to approve.
+   * @param {Object} txOption Transaction options.
+   *
+   * @returns {Promise<Object>} Promise that resolves to transaction receipt.
+   */
+  _approveStake(amount, txOption) {
+    return this.gateway
+      .approveStakeAmount(amount, txOption)
+      .catch((exception) => {
+        logger.error(
+          '  - Failed to approve gateway contract for token transfer',
+        );
+        return Promise.reject(exception);
+      });
+  }
+
+  /**
+   * Checks if a given bounty amount is approved to be transferred to the gateway.
+   * @private
+   * @param {string} facilitatorAddress The address of the facilitator that executes the stake.
+   *
+   * @returns {bool} True if the transfer has been approved.
+   */
+  async _isStakeBountyApproved(facilitatorAddress) {
+    logger.info(
+      'Checking if facilitator has approved gateway for bounty token transfer',
+    );
+    const isBountyAmountApproved = await this.gateway
+      .isBountyAmountApproved(facilitatorAddress)
+      .catch((exception) => {
+        logger.error('  - Exception while checking bounty amount approval');
+        return Promise.reject(exception);
+      });
+
+    logger.info(`  - Approval status is ${isBountyAmountApproved}`);
+
+    return isBountyAmountApproved;
+  }
+
+  /**
+   * Approves the amount to be transferred as bounty.
+   * @private
+   * @param {Object} txOption Transaction options.
+   *
+   * @returns {Promise<Object>} Promise that resolves to transaction receipt.
+   */
+  _approveStakeBounty(txOption) {
+    logger.info('  - Approving gateway contract for bounty transfer');
+    return this.gateway.approveBountyAmount(txOption).catch((exception) => {
+      logger.error(
+        '  - Failed to approve gateway contract for bounty transfer',
+      );
+      return Promise.reject(exception);
+    });
+  }
+
+  /**
+   * Returns the current nonce for the given staker at the gateway of this Facilitator.
+   * @private
+   * @param {string} staker Address of the staker account.
+   *
+   * @returns {string} The current nonce from the gateway.
+   */
+  async _getStakeNonce(staker) {
+    logger.info('Getting nonce for the staker account');
+    const nonce = await this.gateway.getNonce(staker).catch((exception) => {
+      logger.error('  - Failed to get staker nonce');
+      return Promise.reject(exception);
+    });
+    logger.info(`  - Staker's nonce is ${nonce}`);
+
+    return nonce;
+  }
+
+  /**
+   * Returns the bounty amount required to do a redeem.
+   * @private
+   *
+   * @throws when the co-gateway could not be called.
+   */
+  async _getRedeemBounty() {
+    logger.info('Getting bounty amount');
+    const bounty = await this.coGateway.getBounty().catch((exception) => {
+      logger.error('  - Exception while getting bounty amount');
+      throw exception;
+    });
+
+    return bounty;
+  }
+
+  /**
+   * Returns true if the redeem amount has been approved on the utility token.
+   * @private
+   * @param {string} redeemer The address of the redeemer.
+   * @param {string} amount The amount to redeem.
+   *
+   * @throws when the co-gateway could not be called.
+   */
+  async _isRedeemApproved(redeemer, amount) {
+    logger.info('Checking if redeemer has approved CoGateway for token transfer');
+
+    const isRedeemAmountApproved = await this.coGateway
+      .isRedeemAmountApproved(redeemer, amount)
+      .catch((exception) => {
+        logger.error('  - Exception while checking redeem amount approval');
+        throw exception;
+      });
+
+    logger.info(`  - Approval status is ${isRedeemAmountApproved}`);
+
+    return isRedeemAmountApproved;
+  }
+
+  /**
+   * Approves the redeem amount from the sender to the co-gateway on the utility token.
+   * @private
+   * @param {string} amount Amount to approve.
+   * @param {Object} txOptions Web3 transaction options.
+   *
+   * @throws when the amount could not be approved.
+   */
+  async _approveRedeem(amount, txOptions) {
+    logger.info('  - As Redeemer is facilitator, approving CoGateway for token transfer');
+
+    const approvalTxOption = Object.assign({}, txOptions);
+    delete approvalTxOption.value;
+
+    await this.coGateway
+      .approveRedeemAmount(amount, approvalTxOption)
+      .catch((exception) => {
+        logger.error(
+          '  - Failed to approve CoGateway contract for token transfer',
+        );
+        throw exception;
+      });
+
+    logger.info('  - Approval done.');
+  }
+
+  /**
+   * Returns the current nonce for the redeemer address.
+   * @private
+   * @param {string} redeemer Address of the redeemer.
+   *
+   * @throws when the co-gateway could not be called.
+   */
+  async _getRedeemNonce(redeemer) {
+    logger.info('Getting nonce for the redeemer account');
+
+    const nonce = await this.coGateway
+      .getNonce(redeemer)
+      .catch((exception) => {
+        logger.error('  - Failed to get redeemer nonce');
+        throw exception;
+      });
+
+    logger.info(`  - Redeemer's nonce is ${nonce}`);
+
+    return nonce;
   }
 }
 
