@@ -2,6 +2,7 @@
 
 const { assert } = require('chai');
 const BN = require('bn.js');
+const { abi } = require('../contracts/EIP20Token.json');
 const StakeHelper = require('../../src/helpers/StakeHelper');
 const shared = require('../shared');
 
@@ -14,8 +15,8 @@ const validateReceipt = (receipt) => {
 };
 
 describe('StakeHelper', () => {
-  const amountToStake = new BN('10000000000');
-  let amountToApprove;
+  const amountToStake = '10000000000';
+  let bountyAmount;
 
   it('should generate valid hashLock', () => {
     const expectedOutput = {
@@ -42,7 +43,7 @@ describe('StakeHelper', () => {
       .getNonce(
         shared.setupConfig.deployerAddress,
         shared.origin.web3,
-        shared.origin.addresses.Gateway,
+        shared.origin.addresses.EIP20Gateway,
       )
       .then((stakerNonce) => {
         assert.equal(1, stakerNonce, 'Staker nonce should be 1');
@@ -55,13 +56,10 @@ describe('StakeHelper', () => {
       .getBounty(
         shared.setupConfig.deployerAddress,
         shared.origin.web3,
-        shared.origin.addresses.Gateway,
+        shared.origin.addresses.EIP20Gateway,
       )
       .then((bounty) => {
-        const bnBounty = new BN(bounty);
-        // The below amount will be reused in the following test.
-        amountToApprove = bnBounty.add(amountToStake).toString(10);
-        console.log('### Amount to approve', amountToApprove);
+        bountyAmount = new BN(bounty);
       });
   });
 
@@ -69,23 +67,37 @@ describe('StakeHelper', () => {
     const helper = new StakeHelper();
     return helper
       .approveStakeAmount(
-        amountToApprove,
+        amountToStake,
         undefined,
         shared.origin.web3,
         shared.origin.addresses.EIP20Token,
-        shared.origin.addresses.Gateway,
+        shared.origin.addresses.EIP20Gateway,
         shared.setupConfig.deployerAddress,
       )
+      .then(validateReceipt);
+  });
+
+  it('should approve bounty amount', async () => {
+    const baseToken = new shared.origin.web3.eth.Contract(
+      abi,
+      shared.origin.addresses.OST,
+    );
+
+    return baseToken.methods
+      .approve(
+        shared.origin.addresses.EIP20Gateway,
+        bountyAmount.toString(10),
+      )
+      .send({ from: shared.setupConfig.deployerAddress })
       .then(validateReceipt);
   });
 
   it('should perform staking', () => {
     const helper = new StakeHelper(
       shared.origin.web3,
-      // FIXME: The following line should become OST if #136 gets merged:
       shared.origin.addresses.EIP20Token,
-      shared.origin.addresses.EIP20Token,
-      shared.origin.addresses.Gateway,
+      shared.origin.addresses.OST,
+      shared.origin.addresses.EIP20Gateway,
       shared.setupConfig.deployerAddress,
     );
 

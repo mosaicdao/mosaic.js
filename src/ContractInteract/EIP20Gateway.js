@@ -405,7 +405,7 @@ class EIP20Gateway {
       blockHeight,
       encodedAccount,
       accountProof,
-    ).then((tx) => Utils.sendTransaction(tx, txOptions));
+    ).then(tx => Utils.sendTransaction(tx, txOptions));
   }
 
   /**
@@ -473,7 +473,7 @@ class EIP20Gateway {
       gasLimit,
       nonce,
       hashLock,
-    ).then((tx) => Utils.sendTransaction(tx, txOptions));
+    ).then(tx => Utils.sendTransaction(tx, txOptions));
   }
 
   /**
@@ -517,6 +517,11 @@ class EIP20Gateway {
       const err = new TypeError(`Invalid hash lock: ${hashLock}.`);
       return Promise.reject(err);
     }
+    if (Utils.maxRewardTooBig(amount, gasPrice, gasLimit)) {
+      const err = new Error(`The maximum possible reward of gasPrice*gasLimit is greater than the stake amount. It must be less.\n    gasPrice: ${gasPrice}\n    gasLimit: ${gasLimit}\n    stake amount: ${amount}`);
+      return Promise.reject(err);
+    }
+
     const tx = this.contract.methods.stake(
       amount,
       beneficiary,
@@ -548,8 +553,8 @@ class EIP20Gateway {
       );
       return Promise.reject(err);
     }
-    return this.progressStakeRawTx(messageHash, unlockSecret).then((tx) =>
-      Utils.sendTransaction(tx, txOptions),
+    return this.progressStakeRawTx(messageHash, unlockSecret).then(
+      tx => Utils.sendTransaction(tx, txOptions),
     );
   }
 
@@ -624,7 +629,7 @@ class EIP20Gateway {
       blockNumber,
       hashLock,
       storageProof,
-    ).then((tx) => Utils.sendTransaction(tx, txOptions));
+    ).then(tx => Utils.sendTransaction(tx, txOptions));
   }
 
   /**
@@ -736,8 +741,8 @@ class EIP20Gateway {
       );
       return Promise.reject(err);
     }
-    return this.progressUnstakeRawTx(messageHash, unlockSecret).then((tx) =>
-      Utils.sendTransaction(tx, txOptions),
+    return this.progressUnstakeRawTx(messageHash, unlockSecret).then(
+      tx => Utils.sendTransaction(tx, txOptions),
     );
   }
 
@@ -901,38 +906,38 @@ class EIP20Gateway {
       const err = new TypeError(`Invalid stake amount: ${amount}.`);
       return Promise.reject(err);
     }
-    return this.getValueTokenContract().then((eip20ValueToken) => {
-      return eip20ValueToken.isAmountApproved(
+    return this.getValueTokenContract().then(
+      eip20ValueToken => eip20ValueToken.isAmountApproved(
         stakerAddress,
         this.address,
         amount,
-      );
-    });
+      ),
+    );
   }
 
   /**
    * Check if the account has approved gateway contract for bounty amount transfer.
    *
-   * @param {string} facilityAddress Facilitator address.
+   * @param {string} facilitatorAddress Facilitator address.
    *
    * @returns {Promise<boolean>} Promise that resolves to `true` if approved.
    */
-  isBountyAmountApproved(facilityAddress) {
-    if (!Web3.utils.isAddress(facilityAddress)) {
+  isBountyAmountApproved(facilitatorAddress) {
+    if (!Web3.utils.isAddress(facilitatorAddress)) {
       const err = new TypeError(
-        `Invalid facilitator address: ${facilityAddress}.`,
+        `Invalid facilitator address: ${facilitatorAddress}.`,
       );
       return Promise.reject(err);
     }
-    return this.getBaseTokenContract().then((eip20BaseToken) => {
-      return this.getBounty().then((bounty) => {
-        return eip20BaseToken.isAmountApproved(
-          facilityAddress,
+    return this.getBaseTokenContract().then(
+      eip20BaseToken => this.getBounty().then(
+        bounty => eip20BaseToken.isAmountApproved(
+          facilitatorAddress,
           this.address,
           bounty,
-        );
-      });
-    });
+        ),
+      ),
+    );
   }
 
   /**
@@ -988,8 +993,8 @@ class EIP20Gateway {
       const err = new TypeError(`Invalid stake amount: ${amount}.`);
       return Promise.reject(err);
     }
-    return this.getValueTokenContract().then((eip20Token) =>
-      eip20Token.approve(this.address, amount, txOptions),
+    return this.getValueTokenContract().then(
+      eip20Token => eip20Token.approve(this.address, amount, txOptions),
     );
   }
 
@@ -1010,11 +1015,11 @@ class EIP20Gateway {
       const err = new TypeError(`Invalid from address: ${txOptions.from}.`);
       return Promise.reject(err);
     }
-    return this.getBaseTokenContract().then((eip20BaseToken) => {
-      return this.getBounty().then((bounty) =>
-        eip20BaseToken.approve(this.address, bounty, txOptions),
-      );
-    });
+    return this.getBaseTokenContract().then(
+      eip20BaseToken => this.getBounty().then(
+        bounty => eip20BaseToken.approve(this.address, bounty, txOptions),
+      ),
+    );
   }
 
   /**
@@ -1036,10 +1041,11 @@ class EIP20Gateway {
   /**
    * Get the latest state root and block height.
    *
-   * @returns {Promise<Object>} Promise object that resolves to object containing state root and block height.
+   * @returns {Promise<Object>} Promise object that resolves to object containing state root and
+   *                            block height.
    */
   async getLatestAnchorInfo() {
-    return this.getAnchor().then((anchor) => anchor.getLatestInfo());
+    return this.getAnchor().then(anchor => anchor.getLatestInfo());
   }
 
   /**
@@ -1070,8 +1076,8 @@ class EIP20Gateway {
       return Promise.reject(err);
     }
 
-    return this.activateGatewayRawTx(coGatewayAddress).then((tx) =>
-      Utils.sendTransaction(tx, txOptions),
+    return this.activateGatewayRawTx(coGatewayAddress).then(
+      tx => Utils.sendTransaction(tx, txOptions),
     );
   }
 
