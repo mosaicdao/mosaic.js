@@ -76,7 +76,7 @@ class Utils {
 
   /**
    * Prints a deprecation warning for deprecated ChainSetup methods.
-   * See {@link https://github.com/OpenSTFoundation/mosaic.js/issues/57}.
+   * See {@link https://github.com/openst/mosaic.js/issues/57}.
    *
    * @param {string} object Identifier of the chain setup related object that has been deprecated.
    */
@@ -87,7 +87,7 @@ class Utils {
 
   /**
    * Prints a deprecation warning for deprecated StakeHelper.
-   * See {@link https://github.com/OpenSTFoundation/mosaic.js/issues/86}.
+   * See {@link https://github.com/openst/mosaic.js/issues/86}.
    *
    * @param {string} [method] The method on the StakeHelper that is deprecated.
    */
@@ -110,7 +110,7 @@ class Utils {
    */
   static deprecationNotice(object, issueNumber) {
     console.warn(
-      `⚠️ '${object}' has been deprecated. See https://github.com/OpenSTFoundation/mosaic.js/issues/${issueNumber} for migration instructions.`,
+      `⚠️ '${object}' has been deprecated. See https://github.com/openst/mosaic.js/issues/${issueNumber} for migration instructions.`,
     );
   }
 }

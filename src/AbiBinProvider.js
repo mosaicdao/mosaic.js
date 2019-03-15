@@ -6,7 +6,7 @@
 
 'use strict';
 
-const mosaicContracts = require('@openstfoundation/mosaic-contracts');
+const mosaicContracts = require('@openst/mosaic-contracts');
 
 const { loadContracts } = require('./AbiBinProvider-node.js');
 const Linker = require('../src/utils/linker');

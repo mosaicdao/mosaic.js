@@ -25,7 +25,7 @@ const ProofGenerator = require('./src/utils/ProofGenerator');
 const UtilityToken = require('./src/ContractInteract/UtilityToken');
 const Utils = require('./src/utils/Utils');
 
-// FIXME: https://github.com/OpenSTFoundation/mosaic.js/issues/66 Entry should not run the extender.
+// FIXME: https://github.com/openst/mosaic.js/issues/66 Entry should not run the extender.
 require('./src/utils/EIP712SignerExtension/extender')();
 
 /*

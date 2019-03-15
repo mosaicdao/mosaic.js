@@ -17,6 +17,6 @@ You can read [the draft of the mosaic whitepaper][mosaic whitepaper] or [the ori
 
 * read about setting up gateways: [setup]
 
-[mosaic whitepaper]: https://github.com/OpenSTFoundation/mosaic-contracts/blob/develop/docs/mosaicv0.pdf
+[mosaic whitepaper]: https://github.com/OpenST/mosaic-contracts/blob/develop/docs/mosaicv0.pdf
 [openst whitepaper]: https://drive.google.com/file/d/0Bwgf8QuAEOb7Z2xIeUlLd21DSjQ/view
 [setup]: ./setup/README.md
