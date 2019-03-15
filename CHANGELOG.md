@@ -25,6 +25,8 @@ It requires [mosaic-contracts](https://github.com/OpenSTFoundation/mosaic-contra
 * Non-private functions no longer start with an underscore ([#97](https://github.com/OpenSTFoundation/mosaic.js/pull/97)).
 * ABIs and BINs are now accessed as a dependency on [mosaic-contracts](https://github.com/OpenSTFoundation/mosaic-contracts) ([#39](https://github.com/OpenSTFoundation/mosaic.js/pull/39)).
 * `web3` and `web3-eth-accounts` are now peer dependencies ([#85](https://github.com/OpenSTFoundation/mosaic.js/pull/85)).
+* `Utils.sendTransaction()` is now exposed to the consumer ([#135](https://github.com/OpenSTFoundation/mosaic.js/pull/135)).
+* Stake helper now accepts value token in the constructor ([#140](https://github.com/OpenSTFoundation/mosaic.js/pull/140)).
 
 ### Deprecations
 
