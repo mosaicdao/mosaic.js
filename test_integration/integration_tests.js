@@ -19,12 +19,12 @@ const runTests = async () => {
 
   Mocha.utils
     .lookupFiles(__dirname, ['js'], true)
-    .filter((file) => file.substr(-20) !== 'integration_tests.js')
+    .filter(file => file.substr(-20) !== 'integration_tests.js')
     .forEach((file) => {
       mocha.addFile(file);
     });
 
-  mocha.run(function(failures) {
+  mocha.run((failures) => {
     dockerTeardown();
     process.exitCode = failures ? 1 : 0;
   });

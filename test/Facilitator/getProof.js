@@ -11,7 +11,6 @@ const AssertAsync = require('../../test_utils/AssertAsync');
 
 describe('Facilitator._getProof()', () => {
   let mosaic;
-  let facilitator;
 
   let proofGenerator;
   let accountAddress;
@@ -24,8 +23,8 @@ describe('Facilitator._getProof()', () => {
   let spyGetOutboxProof;
   let spyCall;
 
-  let setup = () => {
-    spyCall = sinon.spy(facilitator, '_getProof');
+  const setup = () => {
+    spyCall = sinon.spy(Facilitator, '_getProof');
     mockProofGenerator = sinon.mock(proofGenerator);
     spyGetOutboxProof = sinon.replace(
       mockProofGenerator.object,
@@ -33,14 +32,13 @@ describe('Facilitator._getProof()', () => {
       sinon.fake.resolves(getOutboxProofResult),
     );
   };
-  let teardown = () => {
+  const teardown = () => {
     mockProofGenerator.restore();
     sinon.restore();
     spyCall.restore();
   };
   beforeEach(() => {
     mosaic = TestMosaic.mosaic();
-    facilitator = new Facilitator(mosaic);
     proofGenerator = new ProofGenerator(
       mosaic.auxiliary.web3,
       mosaic.origin.web3,
@@ -51,8 +49,7 @@ describe('Facilitator._getProof()', () => {
       storageProof: [{ serializedProof: '0x3' }],
     };
     accountAddress = '0x0000000000000000000000000000000000000001';
-    messageHash =
-      '0x0000000000000000000000000000000000000000000000000000000000000001';
+    messageHash = '0x0000000000000000000000000000000000000000000000000000000000000001';
     latestAnchorInfo = {
       blockHeight: '100',
       stateRoot:
@@ -62,7 +59,7 @@ describe('Facilitator._getProof()', () => {
 
   it('should throw an error when proofGenerator object is undefined', async () => {
     await AssertAsync.reject(
-      facilitator._getProof(
+      Facilitator._getProof(
         undefined,
         accountAddress,
         latestAnchorInfo,
@@ -74,7 +71,7 @@ describe('Facilitator._getProof()', () => {
 
   it('should throw an error when account address is undefined', async () => {
     await AssertAsync.reject(
-      facilitator._getProof(
+      Facilitator._getProof(
         proofGenerator,
         undefined,
         latestAnchorInfo,
@@ -86,7 +83,7 @@ describe('Facilitator._getProof()', () => {
 
   it('should throw an error when anchor info object is undefined', async () => {
     await AssertAsync.reject(
-      facilitator._getProof(
+      Facilitator._getProof(
         proofGenerator,
         accountAddress,
         undefined,
@@ -98,7 +95,7 @@ describe('Facilitator._getProof()', () => {
 
   it('should throw an error when anchor info object is undefined', async () => {
     await AssertAsync.reject(
-      facilitator._getProof(
+      Facilitator._getProof(
         proofGenerator,
         accountAddress,
         latestAnchorInfo,
@@ -110,7 +107,7 @@ describe('Facilitator._getProof()', () => {
 
   it('should pass when correct params are passed', async () => {
     setup();
-    const result = await facilitator._getProof(
+    const result = await Facilitator._getProof(
       mockProofGenerator.object,
       accountAddress,
       latestAnchorInfo,
@@ -155,9 +152,7 @@ describe('Facilitator._getProof()', () => {
     assert.strictEqual(
       new BN(spyGetOutboxProof.args[0][2].slice(2), 16).toString(10),
       latestAnchorInfo.blockHeight,
-      `Third argument for get outbox proof call must be ${
-        latestAnchorInfo.blockHeight
-      }`,
+      `Third argument for get outbox proof call must be ${latestAnchorInfo.blockHeight}`,
     );
     SpyAssert.assert(spyCall, 1, [
       [

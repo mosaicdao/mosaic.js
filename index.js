@@ -102,8 +102,9 @@ class MosaicWithExports extends Mosaic {
   static get Utils() {
     return {
       EIP712TypedData: TypedData,
-      createSecretHashLock: Utils.createSecretHashLock,
       ProofGenerator,
+      createSecretHashLock: Utils.createSecretHashLock,
+      sendTransaction: Utils.sendTransaction,
     };
   }
 }

@@ -1,8 +1,8 @@
 'use strict';
 
-const Web3Utils = require('web3-utils');
-const Web3 = require('web3');
+const BN = require('bn.js');
 const Crypto = require('crypto');
+const Web3Utils = require('web3-utils');
 
 /**
  * This class includes the utitity functions.
@@ -68,10 +68,22 @@ class Utils {
       }
 
       tx.send(txOptions)
-        .on('receipt', (receipt) => onResolve(receipt))
-        .on('error', (error) => onReject(error))
-        .catch((exception) => onReject(exception));
+        .on('receipt', receipt => onResolve(receipt))
+        .on('error', error => onReject(error))
+        .catch(exception => onReject(exception));
     });
+  }
+
+  /**
+   * Checks if the max reward exceeds the amount. In that case it could not pay out the expected
+   * reward.
+   * @param {string} amount The amount to stake or redeem.
+   * @param {string} gasPrice Gas price of the reward.
+   * @param {string} gasLimit Gas limit of the process.
+   */
+  static maxRewardTooBig(amount, gasPrice, gasLimit) {
+    const maxReward = new BN(gasPrice).mul(new BN(gasLimit));
+    return (maxReward.gt(new BN(amount)));
   }
 
   /**

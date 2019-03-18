@@ -34,7 +34,7 @@ describe('Activate deployed contracts', () => {
   });
 
   it('should set CoGateway on OSTPrime', () => {
-    const addressCoGateway = shared.auxiliary.addresses.CoGateway;
+    const addressCoGateway = shared.auxiliary.addresses.EIP20CoGateway;
     const txOptions = {
       from: shared.setupConfig.organizationOwner,
     };
@@ -49,14 +49,14 @@ describe('Activate deployed contracts', () => {
   });
 
   it('should activate gateway', () => {
-    const addressCoGateway = shared.auxiliary.addresses.CoGateway;
+    const addressCoGateway = shared.auxiliary.addresses.EIP20CoGateway;
     const txOptions = {
       from: shared.setupConfig.organizationOwner,
     };
 
     const subject = new GatewayHelper(
       shared.origin.web3,
-      shared.origin.addresses.Gateway,
+      shared.origin.addresses.EIP20Gateway,
     );
     return subject
       .activateGateway(addressCoGateway, txOptions)

@@ -27,7 +27,7 @@ describe('Facilitator.getCoGatewayProof()', () => {
       sinon.fake.resolves(getLatestAnchorInfoResult),
     );
     spyGetProof = sinon.replace(
-      facilitator,
+      Facilitator,
       '_getProof',
       sinon.fake.resolves(getProofResult),
     );
@@ -41,8 +41,7 @@ describe('Facilitator.getCoGatewayProof()', () => {
   beforeEach(() => {
     mosaic = TestMosaic.mosaic();
     facilitator = new Facilitator(mosaic);
-    messageHash =
-      '0x0000000000000000000000000000000000000000000000000000000000000001';
+    messageHash = '0x0000000000000000000000000000000000000000000000000000000000000001';
     getLatestAnchorInfoResult = sinon.fake();
     getProofResult = true;
   });
