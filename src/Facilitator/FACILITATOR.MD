@@ -1,13 +1,13 @@
 # Using facilitator
 #### Install Package.
 ```js
-npm install @openstfoundation/mosaic.js
+npm install @openst/mosaic.js
 ```
 
 #### Creating a mosaic object.
 ```js
 const Web3 = require('web3');
-const Mosaic = require('@openstfoundation/mosaic.js');
+const Mosaic = require('@openst/mosaic.js');
 
 const originContractAddresses = {
   EIP20Gateway: '0x0000000000000eip20gatewaycontractaddress',

@@ -1,4 +1,4 @@
-const { Setup } = require('@openstfoundation/mosaic.js');
+const { Setup } = require('@openst/mosaic.js');
 const Web3 = require('web3');
 
 // Set-up your configuration (origin and auxiliary):

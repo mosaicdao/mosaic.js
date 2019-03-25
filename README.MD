@@ -1,8 +1,8 @@
 # 💠 mosaic.js
 
-![Build master](https://img.shields.io/travis/OpenSTFoundation/mosaic.js/master.svg?label=build%20master&style=flat)
-![Build develop](https://img.shields.io/travis/OpenSTFoundation/mosaic.js/develop.svg?label=build%20develop&style=flat)
-![npm version](https://img.shields.io/npm/v/@openstfoundation/mosaic.js.svg?style=flat)
+![Build master](https://img.shields.io/travis/openst/mosaic.js/master.svg?label=build%20master&style=flat)
+![Build develop](https://img.shields.io/travis/openst/mosaic.js/develop.svg?label=build%20develop&style=flat)
+![npm version](https://img.shields.io/npm/v/@openst/mosaic.js.svg?style=flat)
 [![Discuss on Discourse](https://img.shields.io/discourse/https/discuss.openst.org/topics.svg?style=flat)][discourse]
 [![Chat on Gitter](https://img.shields.io/gitter/room/OpenSTFoundation/SimpleToken.svg?style=flat)][gitter]
 
@@ -27,7 +27,7 @@ You can read [the draft of the mosaic whitepaper][mosaic whitepaper] or [the ori
 ### Installation
 
 ```bash
-npm install @openstfoundation/mosaic.js web3 web3-eth-accounts
+npm install @openst/mosaic.js web3 web3-eth-accounts
 ```
 > ℹ️ Note that `web3` and `web3-eth-accounts` are peer-dependencies.
 
@@ -37,7 +37,7 @@ npm install @openstfoundation/mosaic.js web3 web3-eth-accounts
 
 ```js
 const Web3 = require('web3');
-const Mosaic = require('@openstfoundation/mosaic.js');
+const Mosaic = require('@openst/mosaic.js');
 
 const originWeb3 = new Web3('http://localhost:8546');
 const auxiliaryWeb3 = new Web3('http://localhost:8547');
@@ -259,7 +259,7 @@ You can use [mosaic-contracts] directly to deploy a new mosaic chain.
 ### Set-up
 
 ```bash
-git clone git@github.com:OpenSTFoundation/mosaic.js.git
+git clone git@github.com:openst/mosaic.js.git
 cd mosaic.js
 npm install
 npm run test
@@ -281,11 +281,11 @@ To contribute code, please ensure that your submissions adhere to the [Style Gui
 * [Forum][discourse]
 * [Gitter]
 
-[code of conduct]: https://github.com/OpenSTFoundation/mosaic.js/blob/develop/CODE_OF_CONDUCT.md
+[code of conduct]: https://github.com/openst/mosaic.js/blob/develop/CODE_OF_CONDUCT.md
 [discourse]: https://discuss.openst.org/
 [gitter]: https://gitter.im/OpenSTFoundation/SimpleToken
-[issues]: https://github.com/OpenSTFoundation/mosaic.js/issues
-[mosaic-contracts]: https://github.com/OpenSTFoundation/mosaic-contracts
-[mosaic whitepaper]: https://github.com/OpenSTFoundation/mosaic-contracts/blob/develop/docs/mosaicv0.pdf
+[issues]: https://github.com/openst/mosaic.js/issues
+[mosaic-contracts]: https://github.com/openst/mosaic-contracts
+[mosaic whitepaper]: https://github.com/openst/mosaic-contracts/blob/develop/docs/mosaicv0.pdf
 [openst whitepaper]: https://drive.google.com/file/d/0Bwgf8QuAEOb7Z2xIeUlLd21DSjQ/view
-[style guide]: https://github.com/OpenSTFoundation/mosaic.js/blob/develop/SOLIDITY_STYLE_GUIDE.md
+[style guide]: https://github.com/openst/mosaic.js/blob/develop/SOLIDITY_STYLE_GUIDE.md

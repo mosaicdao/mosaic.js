@@ -16,7 +16,7 @@ You need:
 The following is required to use mosaic.js setup:
 
 ```js
-const { Setup } = require('@openstfoundation/mosaic.js');
+const { Setup } = require('@openst/mosaic.js');
 const Web3 = require('web3');
 
 const origin = {
@@ -171,7 +171,7 @@ const [originGateway, auxiliaryCoGateway] = await Setup.gateways(
 );
 ```
 
-> ℹ️ The entire code in a single file can be found on [GitHub](https://github.com/OpenSTFoundation/mosaic.js/blob/develop/examples/setup.js).
+> ℹ️ The entire code in a single file can be found on [GitHub](https://github.com/openst/mosaic.js/blob/develop/examples/setup.js).
 
 ## Continue Reading
 
