@@ -1,54 +1,69 @@
 {
-  "name": "@openstfoundation/openst-platform",
-  "version": "0.9.4",
-  "description": "OpenST Platform provides a web3 interface to tokenise mainstream consumer applications with crypto-assets on Ethereum",
+  "name": "@openst/mosaic.js",
+  "version": "0.10.0-beta.5",
+  "description": "mosaic.js provides a JS abstraction layer to interact with contracts on mosaic chains.",
+  "main": "lib/mosaic.node.js",
+  "browser": "lib/mosaic.web.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/openst/mosaic.js.git"
+  },
   "keywords": [
-    "web3",
-    "openST",
+    "OpenST",
     "OST",
-    "simpletoken",
-    "utility-token",
-    "ethereum",
-    "erc20"
+    "Mosaic",
+    "Simple Token",
+    "Token Economy",
+    "web3",
+    "Ethereum",
+    "EIP20"
   ],
   "homepage": "https://openst.org",
   "author": "OpenST Ltd.",
-  "license": "LGPL-3.0",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/OpenSTFoundation/openst-platform.git"
-  },
+  "license": "LGPL-3.0-only",
   "bugs": {
-    "url": "https://github.com/OpenSTFoundation/openst-platform/issues"
+    "url": "https://github.com/openst/mosaic.js/issues"
   },
   "scripts": {
-    "start": "index.js",
-    "setup": "node tools/setup/index.js",
-    "make-docs": "node_modules/.bin/jsdoc -c .jsdoc.json"
+    "test": "MOSAIC_LOG_LEVEL=0 mocha --recursive --timeout 5000",
+    "test:integration": "node test_integration/integration_tests.js",
+    "build": "webpack --mode=production",
+    "prepack": "npm install && npm run build"
   },
   "dependencies": {
-    "@openstfoundation/openst-base": "0.9.1",
-    "@openstfoundation/openst-notification": "1.0.2",
-    "@openstfoundation/openst-storage": "1.0.0",
-    "abi-decoder": "1.0.9",
-    "bignumber.js": "4.1.0",
-    "child_process": "1.0.2",
-    "cli-spinner": "0.2.7",
-    "continuation-local-storage": "3.2.1",
-    "debug": "2.2.0",
-    "edit-json-file": "1.0.8",
-    "node-cmd": "3.0.0",
-    "readline": "1.3.0",
-    "shell-source": "1.1.0",
-    "shelljs": "0.8.1",
-    "shortid": "2.2.8",
-    "uuid": "3.1.0",
-    "web3": "1.0.0-beta.33"
+    "@openst/mosaic-contracts": "^0.10.0-rc.1",
+    "bn.js": "4.11.8",
+    "js-scrypt": "^0.2.0"
+  },
+  "peerDependencies": {
+    "web3": "1.0.0-beta.37",
+    "web3-eth-accounts": "1.0.0-beta.37"
   },
   "devDependencies": {
-    "chai": "4.1.2",
-    "ink-docstrap": "1.3.2",
-    "jsdoc": "3.5.5",
-    "mocha": "5.0.0"
-  }
+    "@babel/core": "7.1.0",
+    "@babel/polyfill": "7.0.0",
+    "@babel/preset-env": "7.1.0",
+    "@babel/runtime": "7.0.0",
+    "babel-loader": "8.0.2",
+    "chai": "4.2.0",
+    "eslint": "^5.12.1",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.15.0",
+    "lint-staged": "8.0.3",
+    "mocha": "5.2.0",
+    "npm-run-all": "4.1.3",
+    "package-json-cleanup-loader": "1.0.3",
+    "rlp": "2.1.0",
+    "sinon": "7.2.3",
+    "wait-port": "^0.2.2",
+    "webpack": "4.19.1",
+    "webpack-cli": "3.1.0",
+    "webpack-uglify-js-plugin": "1.1.9",
+    "web3": "1.0.0-beta.37",
+    "web3-eth-accounts": "1.0.0-beta.37"
+  },
+  "files": [
+    "lib"
+  ]
 }
