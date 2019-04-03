@@ -1,6 +1,6 @@
 {
   "name": "@openst/mosaic.js",
-  "version": "0.10.0-beta.5",
+  "version": "0.10.0",
   "description": "mosaic.js provides a JS abstraction layer to interact with contracts on mosaic chains.",
   "main": "lib/mosaic.node.js",
   "browser": "lib/mosaic.web.js",
@@ -31,7 +31,7 @@
     "prepack": "npm install && npm run build"
   },
   "dependencies": {
-    "@openst/mosaic-contracts": "^0.10.0-rc.1",
+    "@openst/mosaic-contracts": ">=0.10.0 <0.11.0",
     "bn.js": "4.11.8",
     "js-scrypt": "^0.2.0"
   },
