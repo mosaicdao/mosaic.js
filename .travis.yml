@@ -1,6 +1,6 @@
-dist: trusty
 language: node_js
-sudo: required
+node_js:
+  - "11"
 branches:
   only:
   - master
@@ -12,12 +12,6 @@ notifications:
       - ci.report@ost.com
     on_success: always
     on_failure: always
-node_js:
-  - "9"
-before_install:
-  - node --version
-install:
-  - npm install
 script:
   - npm run test
   - npm run test:integration
