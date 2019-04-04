@@ -258,13 +258,10 @@ describe('Facilitator.redeem()', () => {
       [redeemParams.redeemer, redeemParams.amount],
     ]);
 
-    const spyApproveRedeemAmountArgs = spyApproveRedeemAmount.args[0];
-    SpyAssert.assertCall(spyApproveRedeemAmount, 1);
-    assert.strictEqual(redeemParams.amount, spyApproveRedeemAmountArgs[0]);
-    assert.strictEqual(txOptions.from, spyApproveRedeemAmountArgs[1].from);
-    assert.strictEqual(txOptions.gas, spyApproveRedeemAmountArgs[1].gas);
+    const txOptionApproveRedeemAmount = Object.assign({},txOptions);
+    delete testOption.value;
+    SpyAssert.assert(spyApproveRedeemAmount, 1 , [[redeemParams.amount, txOptionApproveRedeemAmount]]);
 
-    SpyAssert.assertCall(spyApproveRedeemAmount, 1);
     SpyAssert.assert(spyGetBounty, 1, [[]]);
     SpyAssert.assert(spyGetNonce, 1, [[redeemParams.redeemer]]);
     SpyAssert.assert(spyGatewayRedeem, 1, [

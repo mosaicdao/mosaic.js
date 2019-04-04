@@ -32,7 +32,7 @@ class SpyAssert {
           'Expected and actual argument counts should be same',
         );
         for (let params = 0; params < actualArguments.length; params += 1) {
-          assert.strictEqual(
+          assert.deepStrictEqual(
             actualArguments[params],
             expectedArguments[params],
             `Input param value ${
