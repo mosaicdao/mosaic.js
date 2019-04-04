@@ -282,7 +282,7 @@ class Facilitator {
     if (!isRedeemApproved) {
       if (redeemer === facilitatorAddress) {
         try {
-          await this._approveRedeem();
+          await this._approveRedeem(amount, txOptions);
         } catch (error) {
           return Promise.reject(error);
         }
