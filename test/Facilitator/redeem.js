@@ -259,7 +259,7 @@ describe('Facilitator.redeem()', () => {
     ]);
 
     const txOptionApproveRedeemAmount = Object.assign({},txOptions);
-    delete testOption.value;
+    delete txOptionApproveRedeemAmount.value;
     SpyAssert.assert(spyApproveRedeemAmount, 1 , [[redeemParams.amount, txOptionApproveRedeemAmount]]);
 
     SpyAssert.assert(spyGetBounty, 1, [[]]);
