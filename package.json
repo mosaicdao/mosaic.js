@@ -28,7 +28,7 @@
     "test": "MOSAIC_LOG_LEVEL=0 mocha --recursive --timeout 5000",
     "test:integration": "node test_integration/integration_tests.js",
     "build": "webpack --mode=production",
-    "prepack": "npm install && npm run build"
+    "prepack": "npm ci && npm run build"
   },
   "dependencies": {
     "@openst/mosaic-contracts": ">=0.10.0 <0.11.0",
