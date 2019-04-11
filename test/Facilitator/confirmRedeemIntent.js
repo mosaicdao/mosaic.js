@@ -82,6 +82,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
       nonce: '1',
       hashLock:
         '0x0000000000000000000000000000000000000000000000000000000000000001',
+      blockNumber: '100',
     };
     txOptions = {
       from: redeemParams.redeemer,
@@ -113,6 +114,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
         redeemParams.gasPrice,
         redeemParams.gasLimit,
         redeemParams.hashLock,
+        redeemParams.blockNumber,
         txOptions,
       ),
       'Invalid redeemer address: undefined.',
@@ -129,6 +131,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
         redeemParams.gasPrice,
         redeemParams.gasLimit,
         redeemParams.hashLock,
+        redeemParams.blockNumber,
         txOptions,
       ),
       `Redeem amount must be greater than zero: ${'0'}.`,
@@ -145,6 +148,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
         redeemParams.gasPrice,
         redeemParams.gasLimit,
         redeemParams.hashLock,
+        redeemParams.blockNumber,
         txOptions,
       ),
       'Invalid beneficiary address: undefined.',
@@ -161,6 +165,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
         undefined,
         redeemParams.gasLimit,
         redeemParams.hashLock,
+        redeemParams.blockNumber,
         txOptions,
       ),
       'Invalid gas price: undefined.',
@@ -177,6 +182,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
         redeemParams.gasPrice,
         undefined,
         redeemParams.hashLock,
+        redeemParams.blockNumber,
         txOptions,
       ),
       'Invalid gas limit: undefined.',
@@ -193,6 +199,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
         redeemParams.gasPrice,
         redeemParams.gasLimit,
         redeemParams.hashLock,
+        redeemParams.blockNumber,
         txOptions,
       ),
       'Invalid redeemer nonce: undefined.',
@@ -209,6 +216,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
         redeemParams.gasPrice,
         redeemParams.gasLimit,
         undefined,
+        redeemParams.blockNumber,
         txOptions,
       ),
       'Invalid hash lock: undefined.',
@@ -225,6 +233,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
         redeemParams.gasPrice,
         redeemParams.gasLimit,
         redeemParams.hashLock,
+        redeemParams.blockNumber,
         undefined,
       ),
       'Invalid transaction options: undefined.',
@@ -242,6 +251,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
         redeemParams.gasPrice,
         redeemParams.gasLimit,
         redeemParams.hashLock,
+        redeemParams.blockNumber,
         txOptions,
       ),
       `Invalid facilitator address: ${txOptions.from}.`,
@@ -260,6 +270,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
         redeemParams.gasPrice,
         redeemParams.gasLimit,
         redeemParams.hashLock,
+        redeemParams.blockNumber,
         txOptions,
       ),
       'Redeem message hash must be declared.',
@@ -278,6 +289,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
       redeemParams.gasPrice,
       redeemParams.gasLimit,
       redeemParams.hashLock,
+      redeemParams.blockNumber,
       txOptions,
     );
 
@@ -317,6 +329,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
         redeemParams.gasPrice,
         redeemParams.gasLimit,
         redeemParams.hashLock,
+        redeemParams.blockNumber,
         txOptions,
       ],
     ]);
@@ -335,6 +348,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
       redeemParams.gasPrice,
       redeemParams.gasLimit,
       redeemParams.hashLock,
+      redeemParams.blockNumber,
       txOptions,
     );
 
@@ -374,6 +388,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
         redeemParams.gasPrice,
         redeemParams.gasLimit,
         redeemParams.hashLock,
+        redeemParams.blockNumber,
         txOptions,
       ],
     ]);
@@ -392,6 +407,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
       redeemParams.gasPrice,
       redeemParams.gasLimit,
       redeemParams.hashLock,
+      redeemParams.blockNumber,
       txOptions,
     );
 
@@ -431,6 +447,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
         redeemParams.gasPrice,
         redeemParams.gasLimit,
         redeemParams.hashLock,
+        redeemParams.blockNumber,
         txOptions,
       ],
     ]);
@@ -448,6 +465,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
       redeemParams.gasPrice,
       redeemParams.gasLimit,
       redeemParams.hashLock,
+      redeemParams.blockNumber,
       txOptions,
     );
 
@@ -507,6 +525,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
         redeemParams.gasPrice,
         redeemParams.gasLimit,
         redeemParams.hashLock,
+        redeemParams.blockNumber,
         txOptions,
       ],
     ]);

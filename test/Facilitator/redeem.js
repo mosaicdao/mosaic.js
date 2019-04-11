@@ -19,6 +19,7 @@ describe('Facilitator.redeem()', () => {
   let approveRedeemAmountResult;
   let bounty;
   let nonce;
+  let blockNumber;
   let redeemResult;
 
   let spyIsRedeemAmountApproved;
@@ -84,7 +85,9 @@ describe('Facilitator.redeem()', () => {
     approveRedeemAmountResult = true;
     bounty = '100';
     nonce = '1';
+    blockNumber = '100';
     redeemResult = {
+      number: blockNumber,
       events: {
         RedeemIntentDeclared: {
           returnValues: {
@@ -344,6 +347,7 @@ describe('Facilitator.redeem()', () => {
     const expectedResponse = {
       messageHash,
       nonce,
+      blockNumber,
     };
 
     const response = await facilitator.redeem(
@@ -359,7 +363,7 @@ describe('Facilitator.redeem()', () => {
     assert.deepEqual(
       response,
       expectedResponse,
-      'Staking did not return the expected parameters.',
+      'Redeeming did not return the expected parameters.',
     );
 
     teardown();

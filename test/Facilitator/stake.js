@@ -19,6 +19,7 @@ describe('Facilitator.stake()', () => {
   let approveBountyAmountResult;
   let nonce;
   let messageHash;
+  let blockNumber;
   let stakeResult;
 
   let spyIsStakeAmountApproved;
@@ -90,8 +91,10 @@ describe('Facilitator.stake()', () => {
     approveStakeAmountResult = true;
     approveBountyAmountResult = true;
     nonce = '3';
+    blockNumber = '100';
     messageHash = '0x22ad37e16438758a75c1e31496c7c0eef0d04fc90a2f0fb285f48bb68ef6d28e';
     stakeResult = {
+      number: blockNumber,
       events: {
         StakeIntentDeclared: {
           returnValues: {
@@ -404,6 +407,7 @@ describe('Facilitator.stake()', () => {
     const expectedResponse = {
       messageHash,
       nonce,
+      blockNumber,
     };
 
     const response = await facilitator.stake(

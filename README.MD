@@ -104,6 +104,7 @@ facilitator
     nonce,
     hashLock,
     unlockSecret,
+    blockNumber,
     txOptionOrigin,
     txOptionAuxiliary,
   )

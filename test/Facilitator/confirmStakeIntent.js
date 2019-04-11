@@ -81,6 +81,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
       nonce: '1',
       hashLock:
         '0x0000000000000000000000000000000000000000000000000000000000000001',
+      blockNumber: '100',
     };
     txOptions = {
       from: stakeParams.staker,
@@ -112,6 +113,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
         stakeParams.gasLimit,
         stakeParams.nonce,
         stakeParams.hashLock,
+        stakeParams.blockNumber,
         txOptions,
       ),
       'Invalid staker address: undefined.',
@@ -128,6 +130,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
         stakeParams.gasLimit,
         stakeParams.nonce,
         stakeParams.hashLock,
+        stakeParams.blockNumber,
         txOptions,
       ),
       `Stake amount must be greater than be zero: ${'0'}.`,
@@ -144,6 +147,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
         stakeParams.gasLimit,
         stakeParams.nonce,
         stakeParams.hashLock,
+        stakeParams.blockNumber,
         txOptions,
       ),
       'Invalid beneficiary address: undefined.',
@@ -160,6 +164,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
         stakeParams.gasLimit,
         stakeParams.nonce,
         stakeParams.hashLock,
+        stakeParams.blockNumber,
         txOptions,
       ),
       'Invalid gas price: undefined.',
@@ -176,6 +181,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
         undefined,
         stakeParams.nonce,
         stakeParams.hashLock,
+        stakeParams.blockNumber,
         txOptions,
       ),
       'Invalid gas limit: undefined.',
@@ -192,6 +198,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
         stakeParams.gasLimit,
         undefined,
         stakeParams.hashLock,
+        stakeParams.blockNumber,
         txOptions,
       ),
       'Invalid staker nonce: undefined.',
@@ -208,6 +215,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
         stakeParams.gasLimit,
         stakeParams.nonce,
         undefined,
+        stakeParams.blockNumber,
         txOptions,
       ),
       'Invalid hash lock: undefined.',
@@ -224,6 +232,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
         stakeParams.gasLimit,
         stakeParams.nonce,
         stakeParams.hashLock,
+        stakeParams.blockNumber,
         undefined,
       ),
       'Invalid transaction options: undefined.',
@@ -241,6 +250,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
         stakeParams.gasLimit,
         stakeParams.nonce,
         stakeParams.hashLock,
+        stakeParams.blockNumber,
         txOptions,
       ),
       `Invalid facilitator address: ${txOptions.from}.`,
@@ -259,6 +269,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
         stakeParams.gasLimit,
         stakeParams.nonce,
         stakeParams.hashLock,
+        stakeParams.blockNumber,
         txOptions,
       ),
       'Stake message hash must be declared.',
@@ -277,6 +288,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
       stakeParams.gasLimit,
       stakeParams.nonce,
       stakeParams.hashLock,
+      stakeParams.blockNumber,
       txOptions,
     );
 
@@ -316,6 +328,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
         stakeParams.gasLimit,
         stakeParams.nonce,
         stakeParams.hashLock,
+        stakeParams.blockNumber,
         txOptions,
       ],
     ]);
@@ -334,6 +347,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
       stakeParams.gasLimit,
       stakeParams.nonce,
       stakeParams.hashLock,
+      stakeParams.blockNumber,
       txOptions,
     );
 
@@ -373,6 +387,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
         stakeParams.gasLimit,
         stakeParams.nonce,
         stakeParams.hashLock,
+        stakeParams.blockNumber,
         txOptions,
       ],
     ]);
@@ -391,6 +406,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
       stakeParams.gasLimit,
       stakeParams.nonce,
       stakeParams.hashLock,
+      stakeParams.blockNumber,
       txOptions,
     );
 
@@ -430,6 +446,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
         stakeParams.gasLimit,
         stakeParams.nonce,
         stakeParams.hashLock,
+        stakeParams.blockNumber,
         txOptions,
       ],
     ]);
@@ -447,6 +464,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
       stakeParams.gasLimit,
       stakeParams.nonce,
       stakeParams.hashLock,
+      stakeParams.blockNumber,
       txOptions,
     );
 
@@ -506,6 +524,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
         stakeParams.gasLimit,
         stakeParams.nonce,
         stakeParams.hashLock,
+        stakeParams.blockNumber,
         txOptions,
       ],
     ]);

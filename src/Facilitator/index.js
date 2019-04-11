@@ -177,6 +177,7 @@ class Facilitator {
         return Promise.resolve({
           nonce: stakeIntentDeclaredEvent.returnValues._stakerNonce,
           messageHash: stakeIntentDeclaredEvent.returnValues._messageHash,
+          blockNumber: stakeReceipt.number,
         });
       })
       .catch((exception) => {
@@ -318,6 +319,7 @@ class Facilitator {
         return Promise.resolve({
           nonce: redeemIntentDeclaredEvent.returnValues._redeemerNonce,
           messageHash: redeemIntentDeclaredEvent.returnValues._messageHash,
+          blockNumber: redeemReceipt.number,
         });
       })
       .catch((exception) => {
@@ -337,6 +339,7 @@ class Facilitator {
    * @param {string} nonce Stake nonce.
    * @param {string} hashLock Hash lock.
    * @param {string} unlockSecret Unlock secret.
+   * @param {string} blockNumber Block number at which stake was done.
    * @param {Object} txOptionOrigin Transaction options for origin chain.
    * @param {Object} txOptionAuxiliary Transaction options for auxiliary chain.
    *
@@ -351,6 +354,7 @@ class Facilitator {
     nonce,
     hashLock,
     unlockSecret,
+    blockNumber,
     txOptionOrigin,
     txOptionAuxiliary,
   ) {
@@ -426,6 +430,7 @@ class Facilitator {
       gasLimit,
       nonce,
       hashLock,
+      blockNumber,
       txOptionAuxiliary,
     ).then(() => {
       const messageHash = Message.getStakeMessageHash(
@@ -460,6 +465,7 @@ class Facilitator {
    * @param {string} nonce Stake nonce.
    * @param {string} hashLock Hash lock.
    * @param {string} unlockSecret Unlock secret.
+   * @param {string} blockNumber Block number at which redeem was done.
    * @param {Object} txOptionOrigin Transaction options for origin chain.
    * @param {Object} txOptionAuxiliary Transaction options for auxiliary chain.
    *
@@ -474,6 +480,7 @@ class Facilitator {
     gasLimit,
     hashLock,
     unlockSecret,
+    blockNumber,
     txOptionOrigin,
     txOptionAuxiliary,
   ) {
@@ -549,6 +556,7 @@ class Facilitator {
       gasPrice,
       gasLimit,
       hashLock,
+      blockNumber,
       txOptionOrigin,
     ).then(() => {
       const messageHash = Message.getRedeemMessageHash(
@@ -581,6 +589,7 @@ class Facilitator {
    * @param {string} gasLimit Maximum gas for reward calculation.
    * @param {string} nonce Stake nonce.
    * @param {string} hashLock Hash lock.
+   * @param {string} blockNumber Block number at which stake was done.
    * @param {Object} txOptions Transaction options.
    *
    * @returns {Promise<Object>} Promise that resolves to transaction receipt.
@@ -593,6 +602,7 @@ class Facilitator {
     gasLimit,
     nonce,
     hashLock,
+    blockNumber,
     txOptions,
   ) {
     logger.info('Confirming stake intent');
@@ -689,6 +699,12 @@ class Facilitator {
     return this.getGatewayProof(messageHash).then(async (proofData) => {
       logger.info('Proving Gateway account on CoGateway');
 
+      if ((new BN(proofData.blockNumber)).lt(new BN(blockNumber))) {
+        logger.error('Latest available state root on target is lower than the height at which stake was done!');
+        const err = new TypeError(`Latest available state root on target is lower than the height at which stake was done!`);
+        return Promise.reject(err);
+      }
+
       return this.coGateway
         .proveGateway(
           proofData.blockNumber,
@@ -737,6 +753,7 @@ class Facilitator {
    * @param {string} gasPrice Gas price for reward calculation.
    * @param {string} gasLimit Maximum gas for reward calculation.
    * @param {string} hashLock Hash lock.
+   * @param {string} blockNumber Block number at which redeem was done.
    * @param {Object} txOptions Transaction options.
    *
    * @returns {Promise<Object>} Promise that resolves to transaction receipt.
@@ -749,6 +766,7 @@ class Facilitator {
     gasPrice,
     gasLimit,
     hashLock,
+    blockNumber,
     txOptions,
   ) {
     logger.info('Confirming redeem intent');
@@ -847,6 +865,11 @@ class Facilitator {
     return this.getCoGatewayProof(messageHash).then(async (proofData) => {
       logger.info('Proving CoGateway account on Gateway');
 
+      if ((new BN(proofData.blockNumber)).lt(new BN(blockNumber))) {
+        logger.error('Latest available state root on target is lower than the height at which redeem was done!');
+        const err = new TypeError(`Latest available state root on target is lower than the height at which redeem was done!`);
+        return Promise.reject(err);
+      }
       return this.gateway
         .proveGateway(
           proofData.blockNumber,
@@ -1260,6 +1283,7 @@ class Facilitator {
       const err = new TypeError(`Invalid message hash: ${messageHash}.`);
       return Promise.reject(err);
     }
+
     return this.coGateway.getLatestAnchorInfo().then((latestAnchorInfo) => {
       const proofGenerator = new ProofGenerator(
         this.mosaic.origin.web3,
