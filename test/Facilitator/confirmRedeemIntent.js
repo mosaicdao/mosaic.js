@@ -22,6 +22,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
   let getCoGatewayProofResult;
   let proveGatewayResult;
   let confirmRedeemIntentResult;
+  let anchorInfoResult;
 
   let spyGetRedeemMessageHash;
   let spyGetOutboxMessageStatus;
@@ -30,6 +31,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
   let spyProveGateway;
   let spyConfirmRedeemIntent;
   let spyCall;
+  let spyAnchorInfo;
 
   const setup = () => {
     spyGetRedeemMessageHash = sinon.replace(
@@ -61,6 +63,11 @@ describe('Facilitator.confirmRedeemIntent()', () => {
       facilitator.gateway,
       'confirmRedeemIntent',
       sinon.fake.resolves(confirmRedeemIntentResult),
+    );
+    spyAnchorInfo = sinon.replace(
+      facilitator.gateway,
+      'getLatestAnchorInfo',
+      sinon.fake.resolves(anchorInfoResult),
     );
     spyCall = sinon.spy(facilitator, 'confirmRedeemIntent');
   };
@@ -102,6 +109,10 @@ describe('Facilitator.confirmRedeemIntent()', () => {
     };
     proveGatewayResult = true;
     confirmRedeemIntentResult = true;
+    anchorInfoResult = {
+      blockHeight: '100',
+      stateRoot: '0x2322e2e22e22000esfdgdgs',
+    };
   });
 
   it('should throw an error when redeemer address is undefined', async () => {
@@ -255,6 +266,28 @@ describe('Facilitator.confirmRedeemIntent()', () => {
         txOptions,
       ),
       `Invalid facilitator address: ${txOptions.from}.`,
+    );
+  });
+
+  it('should throw an exception when available state root on target is lower than the height at which redeem was done.', async () => {
+    spyAnchorInfo = sinon.replace(
+      facilitator.gateway,
+      'getLatestAnchorInfo',
+      sinon.fake.resolves({blockHeight: '99'}),
+    );
+    await AssertAsync.reject(
+      facilitator.confirmRedeemIntent(
+        redeemParams.redeemer,
+        redeemParams.nonce,
+        redeemParams.beneficiary,
+        redeemParams.amount,
+        redeemParams.gasPrice,
+        redeemParams.gasLimit,
+        redeemParams.hashLock,
+        redeemParams.blockNumber,
+        txOptions,
+      ),
+      'Latest available state root on target is lower than the height at which redeem was done!',
     );
   });
 

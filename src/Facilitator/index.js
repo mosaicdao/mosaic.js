@@ -80,8 +80,8 @@ class Facilitator {
    * @param {string} hashLock Hash lock.
    * @param {Object} txOption Transaction options.
    *
-   * @returns {Promise<Object>} Promise that resolves to an Object with two properties:
-   *                            messageHash and nonce.
+   * @returns {Promise<Object>} Promise that resolves to an Object with three properties:
+   *                            messageHash, nonce and blockNumber.
    */
   async stake(
     staker,
@@ -197,7 +197,9 @@ class Facilitator {
    * @param {string} gasLimit Gas limit.
    * @param {string} hashLock Hash lock;
    * @param {Object} txOptions Transaction options.
-   * @returns {Promise<Object>} Promise that resolves to transaction receipt.
+   *
+   * @returns {Promise<Object>} Promise that resolves to an Object with three properties:
+   *                            nonce, messageHash and blockNumber.
    */
   async redeem(
     redeemer,
@@ -649,6 +651,12 @@ class Facilitator {
       );
       return Promise.reject(err);
     }
+    const latestAnchorInfo = await this.coGateway.getLatestAnchorInfo();
+    if ((new BN(latestAnchorInfo.blockHeight)).lt(new BN(blockNumber))) {
+      logger.error('Latest available state root on target is lower than the height at which stake was done!');
+      const err = new TypeError(`Latest available state root on target is lower than the height at which stake was done!`);
+      return Promise.reject(err);
+    }
 
     logger.info('Generating message hash with given stake parameters');
     const messageHash = Message.getStakeMessageHash(
@@ -698,12 +706,6 @@ class Facilitator {
 
     return this.getGatewayProof(messageHash).then(async (proofData) => {
       logger.info('Proving Gateway account on CoGateway');
-
-      if ((new BN(proofData.blockNumber)).lt(new BN(blockNumber))) {
-        logger.error('Latest available state root on target is lower than the height at which stake was done!');
-        const err = new TypeError(`Latest available state root on target is lower than the height at which stake was done!`);
-        return Promise.reject(err);
-      }
 
       return this.coGateway
         .proveGateway(
@@ -813,6 +815,12 @@ class Facilitator {
       );
       return Promise.reject(err);
     }
+    const latestAnchorInfo = await this.gateway.getLatestAnchorInfo();
+    if ((new BN(latestAnchorInfo.blockHeight)).lt(new BN(blockNumber))) {
+      logger.error('Latest available state root on target is lower than the height at which redeem was done!');
+      const err = new TypeError(`Latest available state root on target is lower than the height at which redeem was done!`);
+      return Promise.reject(err);
+    }
 
     logger.info('Generating message hash with given redeem parameters');
     const messageHash = Message.getRedeemMessageHash(
@@ -864,12 +872,6 @@ class Facilitator {
 
     return this.getCoGatewayProof(messageHash).then(async (proofData) => {
       logger.info('Proving CoGateway account on Gateway');
-
-      if ((new BN(proofData.blockNumber)).lt(new BN(blockNumber))) {
-        logger.error('Latest available state root on target is lower than the height at which redeem was done!');
-        const err = new TypeError(`Latest available state root on target is lower than the height at which redeem was done!`);
-        return Promise.reject(err);
-      }
       return this.gateway
         .proveGateway(
           proofData.blockNumber,

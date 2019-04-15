@@ -94,6 +94,8 @@ const unlockSecret = '0x0000000000000000000000000000000000000000000000000000unlo
 const txOptionOrigin = { from: '0x0000000000000000originfacilitatoraddress' };
 const txOptionAuxiliary = { from: '0x0000000000000auxiliaryfacilitatoraddress' };
 
+// blockNumber: Block height at which stake was done. 
+// Facilitator.stake returns blockNumber.
 facilitator
   .progressStake(
     staker,
@@ -145,6 +147,8 @@ const unlockSecret = '0x0000000000000000000000000000000000000000000000000000unlo
 const txOptionOriginRedeem = { from: '0x000000000facilitatoraddressonoriginchain' };
 const txOptionAuxiliaryRedeem = { from: '0x000000facilitatoraddressonauxiliarychain' };
 
+// blockNumber: Block height at which redeem was done. 
+// Facilitator.redeem returns blockNumber.
 facilitator
   .progressRedeem(
     redeemer,
@@ -155,6 +159,7 @@ facilitator
     gasLimit,
     hashLock,
     unlockSecret,
+    blockNumber,
     txOptionOriginRedeem,
     txOptionAuxiliaryRedeem,
   )

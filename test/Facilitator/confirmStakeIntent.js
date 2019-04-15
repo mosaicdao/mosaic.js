@@ -22,6 +22,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
   let getGatewayProofResult;
   let proveGatewayResult;
   let confirmStakeIntentResult;
+  let anchorInfoResult;
 
   let spyGetStakeMessageHash;
   let spyGetOutboxMessageStatus;
@@ -30,6 +31,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
   let spyProveGateway;
   let spyConfirmStakeIntent;
   let spyCall;
+  let spyAnchorInfo;
 
   const setup = () => {
     spyGetStakeMessageHash = sinon.replace(
@@ -61,6 +63,11 @@ describe('Facilitator.confirmStakeIntent()', () => {
       facilitator.coGateway,
       'confirmStakeIntent',
       sinon.fake.resolves(confirmStakeIntentResult),
+    );
+    spyAnchorInfo = sinon.replace(
+      facilitator.coGateway,
+      'getLatestAnchorInfo',
+      sinon.fake.resolves(anchorInfoResult),
     );
     spyCall = sinon.spy(facilitator, 'confirmStakeIntent');
   };
@@ -101,6 +108,10 @@ describe('Facilitator.confirmStakeIntent()', () => {
     };
     proveGatewayResult = true;
     confirmStakeIntentResult = true;
+    anchorInfoResult = {
+      blockHeight: '100',
+      stateRoot: '0x2322e2e22e22000esfdgdgs',
+    };
   });
 
   it('should throw an error when staker address is undefined', async () => {
@@ -254,6 +265,28 @@ describe('Facilitator.confirmStakeIntent()', () => {
         txOptions,
       ),
       `Invalid facilitator address: ${txOptions.from}.`,
+    );
+  });
+
+  it('should throw an exception when available state root on target is lower than the height at which stake was done.', async () => {
+    spyAnchorInfo = sinon.replace(
+      facilitator.coGateway,
+      'getLatestAnchorInfo',
+      sinon.fake.resolves({blockHeight: '99'}),
+    );
+    await AssertAsync.reject(
+      facilitator.confirmStakeIntent(
+        stakeParams.staker,
+        stakeParams.amount,
+        stakeParams.beneficiary,
+        stakeParams.gasPrice,
+        stakeParams.gasLimit,
+        stakeParams.nonce,
+        stakeParams.hashLock,
+        stakeParams.blockNumber,
+        txOptions,
+      ),
+      'Latest available state root on target is lower than the height at which stake was done!',
     );
   });
 
