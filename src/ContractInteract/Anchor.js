@@ -288,7 +288,7 @@ class Anchor {
    * @returns {Promise<Object>} Promise that resolves to transaction receipt.
    */
   anchorStateRoot(blockHeight, stateRoot, txOptions) {
-    if (typeof blockHeight !== 'string') {
+    if (isNaN(blockHeight)) {
       const err = new TypeError(`Invalid block height: ${blockHeight}.`);
       return Promise.reject(err);
     }

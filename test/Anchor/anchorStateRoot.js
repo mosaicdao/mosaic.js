@@ -53,6 +53,39 @@ describe('Anchor.anchorStateRoot', () => {
     SpyAssert.assert(spySendTransaction, 1, [[mockTx, txOptions]]);
   });
 
+  it('should pass when called with block height as number', async () => {
+    sinon.restore();
+    let blockHeight = 10;
+    let stateRoot = web3.utils.sha3('1');
+    let mockTx = 'mockTx';
+
+    let txOptions = {
+      from: '0x0000000000000000000000000000000000000003',
+    };
+
+    let spyAnchorStateRoot = sinon.replace(
+      anchor.contract.methods,
+      'anchorStateRoot',
+      sinon.fake.returns(mockTx),
+    );
+
+    let spySendTransaction = sinon.replace(
+      Utils,
+      'sendTransaction',
+      sinon.fake.resolves(true),
+    );
+    let result = await anchor.anchorStateRoot(
+      blockHeight,
+      stateRoot,
+      txOptions,
+    );
+
+    assert.isTrue(result, 'Anchor state root should return true');
+
+    SpyAssert.assert(spyAnchorStateRoot, 1, [[blockHeight, stateRoot]]);
+
+  });
+
   it('should throw for undefined block height', async () => {
     let blockHeight = undefined;
     let stateRoot = web3.utils.sha3('1');
