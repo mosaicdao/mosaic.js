@@ -653,8 +653,8 @@ class Facilitator {
     }
     const latestAnchorInfo = await this.coGateway.getLatestAnchorInfo();
     if ((new BN(latestAnchorInfo.blockHeight)).lt(new BN(blockNumber))) {
-      logger.error('Latest available state root on target is lower than the height at which stake was done!');
-      const err = new TypeError(`Latest available state root on target is lower than the height at which stake was done!`);
+      logger.error('Block number should be less or equal to the latest available state root block height!');
+      const err = new Error(`Block number should be less or equal to the latest available state root block height!`);
       return Promise.reject(err);
     }
 
@@ -817,8 +817,8 @@ class Facilitator {
     }
     const latestAnchorInfo = await this.gateway.getLatestAnchorInfo();
     if ((new BN(latestAnchorInfo.blockHeight)).lt(new BN(blockNumber))) {
-      logger.error('Latest available state root on target is lower than the height at which redeem was done!');
-      const err = new TypeError(`Latest available state root on target is lower than the height at which redeem was done!`);
+      logger.error('Block number should be less or equal to the latest available state root block height!');
+      const err = new Error(`Block number should be less or equal to the latest available state root block height!`);
       return Promise.reject(err);
     }
 

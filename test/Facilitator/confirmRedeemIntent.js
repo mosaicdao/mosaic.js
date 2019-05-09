@@ -287,7 +287,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
         redeemParams.blockNumber,
         txOptions,
       ),
-      'Latest available state root on target is lower than the height at which redeem was done!',
+      'Block number should be less or equal to the latest available state root block height!',
     );
   });
 
