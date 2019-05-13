@@ -11,21 +11,16 @@ describe('Facilitator.getGatewayProof()', () => {
   let mosaic;
   let facilitator;
   let messageHash;
+  let blockNumber;
 
   let getLatestAnchorInfoResult;
   let getProofResult;
 
-  let spyGetLatestAnchorInfo;
   let spyGetProof;
   let spyCall;
 
   const setup = () => {
     spyCall = sinon.spy(facilitator, 'getGatewayProof');
-    spyGetLatestAnchorInfo = sinon.replace(
-      facilitator.coGateway,
-      'getLatestAnchorInfo',
-      sinon.fake.resolves(getLatestAnchorInfoResult),
-    );
     spyGetProof = sinon.replace(
       Facilitator,
       '_getProof',
@@ -42,28 +37,35 @@ describe('Facilitator.getGatewayProof()', () => {
     mosaic = TestMosaic.mosaic();
     facilitator = new Facilitator(mosaic);
     messageHash = '0x0000000000000000000000000000000000000000000000000000000000000001';
-    getLatestAnchorInfoResult = sinon.fake();
+    blockNumber = '100';
+    getLatestAnchorInfoResult = { blockHeight: blockNumber };
     getProofResult = true;
   });
 
   it('should throw an error when message hash is undefined', async () => {
     await AssertAsync.reject(
-      facilitator.getGatewayProof(),
+      facilitator.getGatewayProof(undefined, blockNumber),
       'Invalid message hash: undefined.',
+    );
+  });
+
+  it('should throw an error when blockNumber is undefined', async () => {
+    await AssertAsync.reject(
+      facilitator.getGatewayProof(messageHash, undefined),
+      'Invalid block height: undefined.',
     );
   });
 
   it('should pass with valid arguments', async () => {
     setup();
-    const result = await facilitator.getGatewayProof(messageHash);
+    const result = await facilitator.getGatewayProof(messageHash, blockNumber);
     assert.strictEqual(
       result,
       getProofResult,
       'Result of getGatewayProof must be true.',
     );
 
-    SpyAssert.assert(spyGetLatestAnchorInfo, 1, [[]]);
-    SpyAssert.assert(spyCall, 1, [[messageHash]]);
+    SpyAssert.assert(spyCall, 1, [[messageHash, blockNumber]]);
     SpyAssert.assertCall(spyGetProof, 1);
 
     assert.strictEqual(
@@ -78,10 +80,10 @@ describe('Facilitator.getGatewayProof()', () => {
       'Second argument for get proof call must be gateway contract address',
     );
 
-    assert.strictEqual(
+    assert.deepEqual(
       spyGetProof.args[0][2],
       getLatestAnchorInfoResult,
-      'Third argument for get proof call must be the fake object',
+      'Third argument for get proof call must be the anchorInfo object',
     );
 
     assert.strictEqual(

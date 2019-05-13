@@ -543,7 +543,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
     SpyAssert.assert(spyGetInboxMessageStatus, 1, [
       [getRedeemMessageHashResult],
     ]);
-    SpyAssert.assert(spyGetCoGatewayProof, 1, [[getRedeemMessageHashResult]]);
+    SpyAssert.assert(spyGetCoGatewayProof, 1, [[getRedeemMessageHashResult, redeemParams.blockNumber]]);
     SpyAssert.assert(spyProveGateway, 1, [
       [
         getCoGatewayProofResult.blockNumber,

@@ -542,7 +542,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
     SpyAssert.assert(spyGetInboxMessageStatus, 1, [
       [getStakeMessageHashResult],
     ]);
-    SpyAssert.assert(spyGetGatewayProof, 1, [[getStakeMessageHashResult]]);
+    SpyAssert.assert(spyGetGatewayProof, 1, [[getStakeMessageHashResult, stakeParams.blockNumber]]);
     SpyAssert.assert(spyProveGateway, 1, [
       [
         getGatewayProofResult.blockNumber,

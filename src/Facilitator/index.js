@@ -723,12 +723,12 @@ class Facilitator {
       return Promise.resolve(true);
     }
 
-    return this.getGatewayProof(messageHash).then(async (proofData) => {
+    return this.getGatewayProof(messageHash, latestAnchorInfo.blockHeight).then(async (proofData) => {
       logger.info('Proving Gateway account on CoGateway');
 
       return this.coGateway
         .proveGateway(
-          proofData.blockNumber,
+          proofData.blockNumber, // Same as latestAnchorInfo.blockHeight
           proofData.accountData,
           proofData.accountProof,
           txOptions,
@@ -894,11 +894,11 @@ class Facilitator {
       return Promise.resolve(true);
     }
 
-    return this.getCoGatewayProof(messageHash).then(async (proofData) => {
+    return this.getCoGatewayProof(messageHash, latestAnchorInfo.blockHeight).then(async (proofData) => {
       logger.info('Proving CoGateway account on Gateway');
       return this.gateway
         .proveGateway(
-          proofData.blockNumber,
+          proofData.blockNumber, // Same as latestAnchorInfo.blockHeight
           proofData.accountData,
           proofData.accountProof,
           txOptions,
@@ -1300,55 +1300,62 @@ class Facilitator {
    * Gets the gateway proof and validates it.
    *
    * @param {string} messageHash Message hash.
+   * @param {string} blockNumber Block height at which proof is fetched.
    *
    * @returns {Promise<Object>} Promise that resolves to Gateway proof data.
    */
-  getGatewayProof(messageHash) {
+  getGatewayProof(messageHash, blockNumber) {
     logger.info('Generating Gateway proof data');
     if (typeof messageHash !== 'string') {
       const err = new TypeError(`Invalid message hash: ${messageHash}.`);
       return Promise.reject(err);
     }
+    if (!blockNumber) {
+      const err = new TypeError(`Invalid block height: ${blockNumber}.`);
+      return Promise.reject(err);
+    }
 
-    return this.coGateway.getLatestAnchorInfo().then((latestAnchorInfo) => {
-      const proofGenerator = new ProofGenerator(
-        this.mosaic.origin.web3,
-        this.mosaic.auxiliary.web3,
-      );
-      return Facilitator._getProof(
-        proofGenerator,
-        this.gateway.address,
-        latestAnchorInfo,
-        messageHash,
-      );
-    });
+    const proofGenerator = new ProofGenerator(
+      this.mosaic.origin.web3,
+      this.mosaic.auxiliary.web3,
+    );
+    return Facilitator._getProof(
+      proofGenerator,
+      this.gateway.address,
+      { blockHeight: blockNumber },
+      messageHash,
+    );
   }
 
   /**
    * Gets the CoGateway proof and validates it.
    *
    * @param {string} messageHash Message hash.
+   * @param {string} blockNumber Block height at which proof is fetched.
    *
    * @returns {Promise<Object>} Promise that resolves to CoGateway proof data.
    */
-  getCoGatewayProof(messageHash) {
+  getCoGatewayProof(messageHash, blockNumber) {
     logger.info('Generating CoGateway proof data');
     if (typeof messageHash !== 'string') {
       const err = new TypeError(`Invalid message hash: ${messageHash}.`);
       return Promise.reject(err);
     }
-    return this.gateway.getLatestAnchorInfo().then((latestAnchorInfo) => {
-      const proofGenerator = new ProofGenerator(
-        this.mosaic.auxiliary.web3,
-        this.mosaic.origin.web3,
-      );
-      return Facilitator._getProof(
-        proofGenerator,
-        this.coGateway.address,
-        latestAnchorInfo,
-        messageHash,
-      );
-    });
+    if (!blockNumber) {
+      const err = new TypeError(`Invalid block height: ${blockNumber}.`);
+      return Promise.reject(err);
+    }
+
+    const proofGenerator = new ProofGenerator(
+      this.mosaic.auxiliary.web3,
+      this.mosaic.origin.web3,
+    );
+    return Facilitator._getProof(
+      proofGenerator,
+      this.coGateway.address,
+      { blockHeight: blockNumber },
+      messageHash,
+    );
   }
 
   /**
