@@ -268,6 +268,23 @@ describe('Facilitator.confirmStakeIntent()', () => {
     );
   });
 
+  it('should throw an error when blockNumber is undefined', async () => {
+    await AssertAsync.reject(
+      facilitator.confirmStakeIntent(
+        stakeParams.staker,
+        stakeParams.amount,
+        stakeParams.beneficiary,
+        stakeParams.gasPrice,
+        stakeParams.gasLimit,
+        stakeParams.nonce,
+        stakeParams.hashLock,
+        undefined,
+        txOptions,
+      ),
+      `Invalid block height: ${undefined}.`,
+    );
+  });
+
   it('should throw an exception when available state root on target is lower than the height at which stake was done.', async () => {
     spyAnchorInfo = sinon.replace(
       facilitator.coGateway,

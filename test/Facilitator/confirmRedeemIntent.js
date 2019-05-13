@@ -269,6 +269,23 @@ describe('Facilitator.confirmRedeemIntent()', () => {
     );
   });
 
+  it('should throw an exception when blockNumber is undefined.', async () => {
+    await AssertAsync.reject(
+      facilitator.confirmRedeemIntent(
+        redeemParams.redeemer,
+        redeemParams.nonce,
+        redeemParams.beneficiary,
+        redeemParams.amount,
+        redeemParams.gasPrice,
+        redeemParams.gasLimit,
+        redeemParams.hashLock,
+        undefined,
+        txOptions,
+      ),
+      `Invalid block height: ${undefined}.`,
+    );
+  });
+
   it('should throw an exception when available state root on target is lower than the height at which redeem was done.', async () => {
     spyAnchorInfo = sinon.replace(
       facilitator.gateway,

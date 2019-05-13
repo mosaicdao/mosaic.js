@@ -1,3 +1,19 @@
+/**
+ * @typedef {Object} StakeResponse
+ *
+ * @property {string} messageHash Stake request identifier unique for each request.
+ * @property {string} nonce Nonce of the staker address.
+ * @property {blockNumber} Block height at which stake is done.
+ */
+
+/**
+ * @typedef {Object} RedeemResponse
+ *
+ * @property {string} messageHash Redeem request identifier unique for each request.
+ * @property {string} nonce Nonce of the redeemer address.
+ * @property {blockNumber} Block height at which redeem is done.
+ */
+
 'use strict';
 
 const BN = require('bn.js');
@@ -80,8 +96,7 @@ class Facilitator {
    * @param {string} hashLock Hash lock.
    * @param {Object} txOption Transaction options.
    *
-   * @returns {Promise<Object>} Promise that resolves to an Object with three properties:
-   *                            messageHash, nonce and blockNumber.
+   * @returns {Promise<StakeResponse>} Promise that resolves to StakeResponse Object.
    */
   async stake(
     staker,
@@ -198,8 +213,7 @@ class Facilitator {
    * @param {string} hashLock Hash lock;
    * @param {Object} txOptions Transaction options.
    *
-   * @returns {Promise<Object>} Promise that resolves to an Object with three properties:
-   *                            nonce, messageHash and blockNumber.
+   * @returns {Promise<RedeemResponse>} Promise that resolves to an RedeemResponse Object.
    */
   async redeem(
     redeemer,
@@ -319,8 +333,8 @@ class Facilitator {
         const redeemIntentDeclaredEvent = redeemReceipt.events.RedeemIntentDeclared;
 
         return Promise.resolve({
-          nonce: redeemIntentDeclaredEvent.returnValues._redeemerNonce,
           messageHash: redeemIntentDeclaredEvent.returnValues._messageHash,
+          nonce: redeemIntentDeclaredEvent.returnValues._redeemerNonce,
           blockNumber: redeemReceipt.number,
         });
       })
@@ -651,10 +665,15 @@ class Facilitator {
       );
       return Promise.reject(err);
     }
+    if (!blockNumber) {
+      const err = new TypeError(`Invalid block height: ${blockNumber}.`);
+      return Promise.reject(err);
+    }
     const latestAnchorInfo = await this.coGateway.getLatestAnchorInfo();
     if ((new BN(latestAnchorInfo.blockHeight)).lt(new BN(blockNumber))) {
-      logger.error('Block number should be less or equal to the latest available state root block height!');
-      const err = new Error(`Block number should be less or equal to the latest available state root block height!`);
+      const errMsg = 'Block number should be less or equal to the latest available state root block height!';
+      logger.error(errMsg);
+      const err = new Error(errMsg);
       return Promise.reject(err);
     }
 
@@ -815,10 +834,15 @@ class Facilitator {
       );
       return Promise.reject(err);
     }
+    if (!blockNumber) {
+      const err = new TypeError(`Invalid block height: ${blockNumber}.`);
+      return Promise.reject(err);
+    }
     const latestAnchorInfo = await this.gateway.getLatestAnchorInfo();
     if ((new BN(latestAnchorInfo.blockHeight)).lt(new BN(blockNumber))) {
-      logger.error('Block number should be less or equal to the latest available state root block height!');
-      const err = new Error(`Block number should be less or equal to the latest available state root block height!`);
+       const errMsg = 'Block number should be less or equal to the latest available state root block height!';
+      logger.error(errMsg);
+      const err = new Error(errMsg);
       return Promise.reject(err);
     }
 
