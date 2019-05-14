@@ -1397,9 +1397,6 @@ class Facilitator {
     logger.info(
       `  - Last committed block height is ${latestAnchorInfo.blockHeight}`,
     );
-    logger.info(
-      `  - Last committed state root is ${latestAnchorInfo.stateRoot}`,
-    );
 
     const blockHeight = `0x${new BN(latestAnchorInfo.blockHeight).toString(
       16,
@@ -1418,7 +1415,6 @@ class Facilitator {
           accountProof: proof.serializedAccountProof,
           storageProof: proof.storageProof[0].serializedProof,
           blockNumber: latestAnchorInfo.blockHeight,
-          stateRoot: latestAnchorInfo.stateRoot,
         };
       })
       .catch((exception) => {
