@@ -38,7 +38,6 @@ describe('Facilitator.getGatewayProof()', () => {
     facilitator = new Facilitator(mosaic);
     messageHash = '0x0000000000000000000000000000000000000000000000000000000000000001';
     blockNumber = '100';
-    getLatestAnchorInfoResult = { blockHeight: blockNumber };
     getProofResult = true;
   });
 
@@ -82,8 +81,8 @@ describe('Facilitator.getGatewayProof()', () => {
 
     assert.deepEqual(
       spyGetProof.args[0][2],
-      getLatestAnchorInfoResult,
-      'Third argument for get proof call must be the anchorInfo object',
+      blockNumber,
+      'Third argument for get proof call must be the block number',
     );
 
     assert.strictEqual(

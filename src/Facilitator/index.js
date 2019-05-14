@@ -1322,7 +1322,7 @@ class Facilitator {
     return Facilitator._getProof(
       proofGenerator,
       this.gateway.address,
-      { blockHeight: blockNumber },
+      blockNumber,
       messageHash,
     );
   }
@@ -1353,7 +1353,7 @@ class Facilitator {
     return Facilitator._getProof(
       proofGenerator,
       this.coGateway.address,
-      { blockHeight: blockNumber },
+      blockNumber,
       messageHash,
     );
   }
@@ -1363,7 +1363,7 @@ class Facilitator {
    * @private
    * @param {Object} proofGenerator ProofGenerator instance.
    * @param {string} accountAddress Account address.
-   * @param {Object} latestAnchorInfo Object containing state root and block height.
+   * @param {Object} blockNumber Block height at which proof is fetched.
    * @param {string} messageHash Message hash.
    *
    * @returns {Promise<Object>} Promise that resolves to proof data.
@@ -1371,7 +1371,7 @@ class Facilitator {
   static async _getProof(
     proofGenerator,
     accountAddress,
-    latestAnchorInfo,
+    blockNumber,
     messageHash,
   ) {
     if (proofGenerator === undefined) {
@@ -1384,9 +1384,9 @@ class Facilitator {
       const err = new TypeError(`Invalid account address: ${accountAddress}`);
       return Promise.reject(err);
     }
-    if (latestAnchorInfo === undefined) {
+    if (blockNumber === undefined) {
       const err = new TypeError(
-        `Invalid anchor info object: ${latestAnchorInfo}`,
+        `Invalid block number: ${blockNumber}`,
       );
       return Promise.reject(err);
     }
@@ -1395,10 +1395,10 @@ class Facilitator {
       return Promise.reject(err);
     }
     logger.info(
-      `  - Last committed block height is ${latestAnchorInfo.blockHeight}`,
+      `  - Last committed block height is ${blockNumber}`,
     );
 
-    const blockHeight = `0x${new BN(latestAnchorInfo.blockHeight).toString(
+    const blockHeight = `0x${new BN(blockNumber).toString(
       16,
     )}`;
 
@@ -1414,7 +1414,7 @@ class Facilitator {
           accountData: proof.encodedAccountValue,
           accountProof: proof.serializedAccountProof,
           storageProof: proof.storageProof[0].serializedProof,
-          blockNumber: latestAnchorInfo.blockHeight,
+          blockNumber: blockNumber,
         };
       })
       .catch((exception) => {
