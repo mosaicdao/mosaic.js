@@ -22,6 +22,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
   let getCoGatewayProofResult;
   let proveGatewayResult;
   let confirmRedeemIntentResult;
+  let anchorInfoResult;
 
   let spyGetRedeemMessageHash;
   let spyGetOutboxMessageStatus;
@@ -30,6 +31,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
   let spyProveGateway;
   let spyConfirmRedeemIntent;
   let spyCall;
+  let spyAnchorInfo;
 
   const setup = () => {
     spyGetRedeemMessageHash = sinon.replace(
@@ -62,6 +64,11 @@ describe('Facilitator.confirmRedeemIntent()', () => {
       'confirmRedeemIntent',
       sinon.fake.resolves(confirmRedeemIntentResult),
     );
+    spyAnchorInfo = sinon.replace(
+      facilitator.gateway,
+      'getLatestAnchorInfo',
+      sinon.fake.resolves(anchorInfoResult),
+    );
     spyCall = sinon.spy(facilitator, 'confirmRedeemIntent');
   };
 
@@ -82,6 +89,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
       nonce: '1',
       hashLock:
         '0x0000000000000000000000000000000000000000000000000000000000000001',
+      blockNumber: '100',
     };
     txOptions = {
       from: redeemParams.redeemer,
@@ -101,6 +109,10 @@ describe('Facilitator.confirmRedeemIntent()', () => {
     };
     proveGatewayResult = true;
     confirmRedeemIntentResult = true;
+    anchorInfoResult = {
+      blockHeight: '100',
+      stateRoot: '0x2322e2e22e22000esfdgdgs',
+    };
   });
 
   it('should throw an error when redeemer address is undefined', async () => {
@@ -113,6 +125,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
         redeemParams.gasPrice,
         redeemParams.gasLimit,
         redeemParams.hashLock,
+        redeemParams.blockNumber,
         txOptions,
       ),
       'Invalid redeemer address: undefined.',
@@ -129,6 +142,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
         redeemParams.gasPrice,
         redeemParams.gasLimit,
         redeemParams.hashLock,
+        redeemParams.blockNumber,
         txOptions,
       ),
       `Redeem amount must be greater than zero: ${'0'}.`,
@@ -145,6 +159,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
         redeemParams.gasPrice,
         redeemParams.gasLimit,
         redeemParams.hashLock,
+        redeemParams.blockNumber,
         txOptions,
       ),
       'Invalid beneficiary address: undefined.',
@@ -161,6 +176,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
         undefined,
         redeemParams.gasLimit,
         redeemParams.hashLock,
+        redeemParams.blockNumber,
         txOptions,
       ),
       'Invalid gas price: undefined.',
@@ -177,6 +193,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
         redeemParams.gasPrice,
         undefined,
         redeemParams.hashLock,
+        redeemParams.blockNumber,
         txOptions,
       ),
       'Invalid gas limit: undefined.',
@@ -193,6 +210,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
         redeemParams.gasPrice,
         redeemParams.gasLimit,
         redeemParams.hashLock,
+        redeemParams.blockNumber,
         txOptions,
       ),
       'Invalid redeemer nonce: undefined.',
@@ -209,6 +227,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
         redeemParams.gasPrice,
         redeemParams.gasLimit,
         undefined,
+        redeemParams.blockNumber,
         txOptions,
       ),
       'Invalid hash lock: undefined.',
@@ -225,6 +244,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
         redeemParams.gasPrice,
         redeemParams.gasLimit,
         redeemParams.hashLock,
+        redeemParams.blockNumber,
         undefined,
       ),
       'Invalid transaction options: undefined.',
@@ -242,9 +262,49 @@ describe('Facilitator.confirmRedeemIntent()', () => {
         redeemParams.gasPrice,
         redeemParams.gasLimit,
         redeemParams.hashLock,
+        redeemParams.blockNumber,
         txOptions,
       ),
       `Invalid facilitator address: ${txOptions.from}.`,
+    );
+  });
+
+  it('should throw an exception when blockNumber is undefined.', async () => {
+    await AssertAsync.reject(
+      facilitator.confirmRedeemIntent(
+        redeemParams.redeemer,
+        redeemParams.nonce,
+        redeemParams.beneficiary,
+        redeemParams.amount,
+        redeemParams.gasPrice,
+        redeemParams.gasLimit,
+        redeemParams.hashLock,
+        undefined,
+        txOptions,
+      ),
+      `Invalid block height: ${undefined}.`,
+    );
+  });
+
+  it('should throw an exception when available state root on target is lower than the height at which redeem was done.', async () => {
+    spyAnchorInfo = sinon.replace(
+      facilitator.gateway,
+      'getLatestAnchorInfo',
+      sinon.fake.resolves({blockHeight: '99'}),
+    );
+    await AssertAsync.reject(
+      facilitator.confirmRedeemIntent(
+        redeemParams.redeemer,
+        redeemParams.nonce,
+        redeemParams.beneficiary,
+        redeemParams.amount,
+        redeemParams.gasPrice,
+        redeemParams.gasLimit,
+        redeemParams.hashLock,
+        redeemParams.blockNumber,
+        txOptions,
+      ),
+      'Block number should be less or equal to the latest available state root block height!',
     );
   });
 
@@ -260,6 +320,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
         redeemParams.gasPrice,
         redeemParams.gasLimit,
         redeemParams.hashLock,
+        redeemParams.blockNumber,
         txOptions,
       ),
       'Redeem message hash must be declared.',
@@ -278,6 +339,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
       redeemParams.gasPrice,
       redeemParams.gasLimit,
       redeemParams.hashLock,
+      redeemParams.blockNumber,
       txOptions,
     );
 
@@ -317,6 +379,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
         redeemParams.gasPrice,
         redeemParams.gasLimit,
         redeemParams.hashLock,
+        redeemParams.blockNumber,
         txOptions,
       ],
     ]);
@@ -335,6 +398,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
       redeemParams.gasPrice,
       redeemParams.gasLimit,
       redeemParams.hashLock,
+      redeemParams.blockNumber,
       txOptions,
     );
 
@@ -374,6 +438,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
         redeemParams.gasPrice,
         redeemParams.gasLimit,
         redeemParams.hashLock,
+        redeemParams.blockNumber,
         txOptions,
       ],
     ]);
@@ -392,6 +457,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
       redeemParams.gasPrice,
       redeemParams.gasLimit,
       redeemParams.hashLock,
+      redeemParams.blockNumber,
       txOptions,
     );
 
@@ -431,6 +497,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
         redeemParams.gasPrice,
         redeemParams.gasLimit,
         redeemParams.hashLock,
+        redeemParams.blockNumber,
         txOptions,
       ],
     ]);
@@ -448,6 +515,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
       redeemParams.gasPrice,
       redeemParams.gasLimit,
       redeemParams.hashLock,
+      redeemParams.blockNumber,
       txOptions,
     );
 
@@ -475,7 +543,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
     SpyAssert.assert(spyGetInboxMessageStatus, 1, [
       [getRedeemMessageHashResult],
     ]);
-    SpyAssert.assert(spyGetCoGatewayProof, 1, [[getRedeemMessageHashResult]]);
+    SpyAssert.assert(spyGetCoGatewayProof, 1, [[getRedeemMessageHashResult, redeemParams.blockNumber]]);
     SpyAssert.assert(spyProveGateway, 1, [
       [
         getCoGatewayProofResult.blockNumber,
@@ -507,6 +575,7 @@ describe('Facilitator.confirmRedeemIntent()', () => {
         redeemParams.gasPrice,
         redeemParams.gasLimit,
         redeemParams.hashLock,
+        redeemParams.blockNumber,
         txOptions,
       ],
     ]);

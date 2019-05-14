@@ -14,7 +14,7 @@ describe('Facilitator._getProof()', () => {
 
   let proofGenerator;
   let accountAddress;
-  let latestAnchorInfo;
+  let blockNumber;
   let messageHash;
 
   let getOutboxProofResult;
@@ -50,11 +50,7 @@ describe('Facilitator._getProof()', () => {
     };
     accountAddress = '0x0000000000000000000000000000000000000001';
     messageHash = '0x0000000000000000000000000000000000000000000000000000000000000001';
-    latestAnchorInfo = {
-      blockHeight: '100',
-      stateRoot:
-        '0x0000000000000000000000000000000000000000000000000000000000000002',
-    };
+    blockNumber = '100';
   });
 
   it('should throw an error when proofGenerator object is undefined', async () => {
@@ -62,7 +58,7 @@ describe('Facilitator._getProof()', () => {
       Facilitator._getProof(
         undefined,
         accountAddress,
-        latestAnchorInfo,
+        blockNumber,
         messageHash,
       ),
       `Invalid proof generator object: ${undefined}`,
@@ -74,7 +70,7 @@ describe('Facilitator._getProof()', () => {
       Facilitator._getProof(
         proofGenerator,
         undefined,
-        latestAnchorInfo,
+        blockNumber,
         messageHash,
       ),
       `Invalid account address: ${undefined}`,
@@ -89,7 +85,7 @@ describe('Facilitator._getProof()', () => {
         undefined,
         messageHash,
       ),
-      `Invalid anchor info object: ${undefined}`,
+      `Invalid block number: ${undefined}`,
     );
   });
 
@@ -98,7 +94,7 @@ describe('Facilitator._getProof()', () => {
       Facilitator._getProof(
         proofGenerator,
         accountAddress,
-        latestAnchorInfo,
+        blockNumber,
         undefined,
       ),
       `Invalid message hash: ${undefined}`,
@@ -110,7 +106,7 @@ describe('Facilitator._getProof()', () => {
     const result = await Facilitator._getProof(
       mockProofGenerator.object,
       accountAddress,
-      latestAnchorInfo,
+      blockNumber,
       messageHash,
     );
 
@@ -131,13 +127,8 @@ describe('Facilitator._getProof()', () => {
     );
     assert.strictEqual(
       result.blockNumber,
-      latestAnchorInfo.blockHeight,
+      blockNumber,
       "Result's block height must be equal to the mocked block height.",
-    );
-    assert.strictEqual(
-      result.stateRoot,
-      latestAnchorInfo.stateRoot,
-      "Result's state root must be equal to the mocked state root.",
     );
     assert.strictEqual(
       spyGetOutboxProof.args[0][0],
@@ -151,14 +142,14 @@ describe('Facilitator._getProof()', () => {
     );
     assert.strictEqual(
       new BN(spyGetOutboxProof.args[0][2].slice(2), 16).toString(10),
-      latestAnchorInfo.blockHeight,
-      `Third argument for get outbox proof call must be ${latestAnchorInfo.blockHeight}`,
+      blockNumber,
+      `Third argument for get outbox proof call must be ${blockNumber}`,
     );
     SpyAssert.assert(spyCall, 1, [
       [
         mockProofGenerator.object,
         accountAddress,
-        latestAnchorInfo,
+        blockNumber,
         messageHash,
       ],
     ]);

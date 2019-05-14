@@ -74,7 +74,7 @@ const gasLimit = '150000000';
 const hashLock = '0x00000000000000000000000000000000000000000000000000000000hashlock';
 const txOptions = { from: staker };
 
-facilitator
+const stakeResponse = facilitator
   .stake(
     staker,
     amount,
@@ -94,6 +94,7 @@ const unlockSecret = '0x0000000000000000000000000000000000000000000000000000unlo
 const txOptionOrigin = { from: '0x0000000000000000originfacilitatoraddress' };
 const txOptionAuxiliary = { from: '0x0000000000000auxiliaryfacilitatoraddress' };
 
+// stakeResponse.blockNumber: Block height at which stake was done.
 facilitator
   .progressStake(
     staker,
@@ -104,6 +105,7 @@ facilitator
     nonce,
     hashLock,
     unlockSecret,
+    stakeResponse.blockNumber,
     txOptionOrigin,
     txOptionAuxiliary,
   )
@@ -124,7 +126,7 @@ const txOptionRedeem = {
   value: '100', // This must be equal to the bounty amount!
 };
 
-facilitator
+const redeemResponse = facilitator
   .redeem(
     redeemer,
     redeemAmount,
@@ -144,6 +146,7 @@ const unlockSecret = '0x0000000000000000000000000000000000000000000000000000unlo
 const txOptionOriginRedeem = { from: '0x000000000facilitatoraddressonoriginchain' };
 const txOptionAuxiliaryRedeem = { from: '0x000000facilitatoraddressonauxiliarychain' };
 
+// redeemResponse.blockNumber: Block height at which redeem was done.
 facilitator
   .progressRedeem(
     redeemer,
@@ -154,6 +157,7 @@ facilitator
     gasLimit,
     hashLock,
     unlockSecret,
+    redeemResponse.blockNumber,
     txOptionOriginRedeem,
     txOptionAuxiliaryRedeem,
   )

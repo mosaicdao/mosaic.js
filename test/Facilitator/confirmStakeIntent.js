@@ -22,6 +22,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
   let getGatewayProofResult;
   let proveGatewayResult;
   let confirmStakeIntentResult;
+  let anchorInfoResult;
 
   let spyGetStakeMessageHash;
   let spyGetOutboxMessageStatus;
@@ -30,6 +31,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
   let spyProveGateway;
   let spyConfirmStakeIntent;
   let spyCall;
+  let spyAnchorInfo;
 
   const setup = () => {
     spyGetStakeMessageHash = sinon.replace(
@@ -62,6 +64,11 @@ describe('Facilitator.confirmStakeIntent()', () => {
       'confirmStakeIntent',
       sinon.fake.resolves(confirmStakeIntentResult),
     );
+    spyAnchorInfo = sinon.replace(
+      facilitator.coGateway,
+      'getLatestAnchorInfo',
+      sinon.fake.resolves(anchorInfoResult),
+    );
     spyCall = sinon.spy(facilitator, 'confirmStakeIntent');
   };
 
@@ -81,6 +88,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
       nonce: '1',
       hashLock:
         '0x0000000000000000000000000000000000000000000000000000000000000001',
+      blockNumber: '100',
     };
     txOptions = {
       from: stakeParams.staker,
@@ -100,6 +108,10 @@ describe('Facilitator.confirmStakeIntent()', () => {
     };
     proveGatewayResult = true;
     confirmStakeIntentResult = true;
+    anchorInfoResult = {
+      blockHeight: '100',
+      stateRoot: '0x2322e2e22e22000esfdgdgs',
+    };
   });
 
   it('should throw an error when staker address is undefined', async () => {
@@ -112,6 +124,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
         stakeParams.gasLimit,
         stakeParams.nonce,
         stakeParams.hashLock,
+        stakeParams.blockNumber,
         txOptions,
       ),
       'Invalid staker address: undefined.',
@@ -128,6 +141,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
         stakeParams.gasLimit,
         stakeParams.nonce,
         stakeParams.hashLock,
+        stakeParams.blockNumber,
         txOptions,
       ),
       `Stake amount must be greater than be zero: ${'0'}.`,
@@ -144,6 +158,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
         stakeParams.gasLimit,
         stakeParams.nonce,
         stakeParams.hashLock,
+        stakeParams.blockNumber,
         txOptions,
       ),
       'Invalid beneficiary address: undefined.',
@@ -160,6 +175,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
         stakeParams.gasLimit,
         stakeParams.nonce,
         stakeParams.hashLock,
+        stakeParams.blockNumber,
         txOptions,
       ),
       'Invalid gas price: undefined.',
@@ -176,6 +192,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
         undefined,
         stakeParams.nonce,
         stakeParams.hashLock,
+        stakeParams.blockNumber,
         txOptions,
       ),
       'Invalid gas limit: undefined.',
@@ -192,6 +209,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
         stakeParams.gasLimit,
         undefined,
         stakeParams.hashLock,
+        stakeParams.blockNumber,
         txOptions,
       ),
       'Invalid staker nonce: undefined.',
@@ -208,6 +226,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
         stakeParams.gasLimit,
         stakeParams.nonce,
         undefined,
+        stakeParams.blockNumber,
         txOptions,
       ),
       'Invalid hash lock: undefined.',
@@ -224,6 +243,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
         stakeParams.gasLimit,
         stakeParams.nonce,
         stakeParams.hashLock,
+        stakeParams.blockNumber,
         undefined,
       ),
       'Invalid transaction options: undefined.',
@@ -241,9 +261,49 @@ describe('Facilitator.confirmStakeIntent()', () => {
         stakeParams.gasLimit,
         stakeParams.nonce,
         stakeParams.hashLock,
+        stakeParams.blockNumber,
         txOptions,
       ),
       `Invalid facilitator address: ${txOptions.from}.`,
+    );
+  });
+
+  it('should throw an error when blockNumber is undefined', async () => {
+    await AssertAsync.reject(
+      facilitator.confirmStakeIntent(
+        stakeParams.staker,
+        stakeParams.amount,
+        stakeParams.beneficiary,
+        stakeParams.gasPrice,
+        stakeParams.gasLimit,
+        stakeParams.nonce,
+        stakeParams.hashLock,
+        undefined,
+        txOptions,
+      ),
+      `Invalid block height: ${undefined}.`,
+    );
+  });
+
+  it('should throw an exception when available state root on target is lower than the height at which stake was done.', async () => {
+    spyAnchorInfo = sinon.replace(
+      facilitator.coGateway,
+      'getLatestAnchorInfo',
+      sinon.fake.resolves({blockHeight: '99'}),
+    );
+    await AssertAsync.reject(
+      facilitator.confirmStakeIntent(
+        stakeParams.staker,
+        stakeParams.amount,
+        stakeParams.beneficiary,
+        stakeParams.gasPrice,
+        stakeParams.gasLimit,
+        stakeParams.nonce,
+        stakeParams.hashLock,
+        stakeParams.blockNumber,
+        txOptions,
+      ),
+      'Block number should be less or equal to the latest available state root block height!',
     );
   });
 
@@ -259,6 +319,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
         stakeParams.gasLimit,
         stakeParams.nonce,
         stakeParams.hashLock,
+        stakeParams.blockNumber,
         txOptions,
       ),
       'Stake message hash must be declared.',
@@ -277,6 +338,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
       stakeParams.gasLimit,
       stakeParams.nonce,
       stakeParams.hashLock,
+      stakeParams.blockNumber,
       txOptions,
     );
 
@@ -316,6 +378,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
         stakeParams.gasLimit,
         stakeParams.nonce,
         stakeParams.hashLock,
+        stakeParams.blockNumber,
         txOptions,
       ],
     ]);
@@ -334,6 +397,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
       stakeParams.gasLimit,
       stakeParams.nonce,
       stakeParams.hashLock,
+      stakeParams.blockNumber,
       txOptions,
     );
 
@@ -373,6 +437,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
         stakeParams.gasLimit,
         stakeParams.nonce,
         stakeParams.hashLock,
+        stakeParams.blockNumber,
         txOptions,
       ],
     ]);
@@ -391,6 +456,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
       stakeParams.gasLimit,
       stakeParams.nonce,
       stakeParams.hashLock,
+      stakeParams.blockNumber,
       txOptions,
     );
 
@@ -430,6 +496,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
         stakeParams.gasLimit,
         stakeParams.nonce,
         stakeParams.hashLock,
+        stakeParams.blockNumber,
         txOptions,
       ],
     ]);
@@ -447,6 +514,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
       stakeParams.gasLimit,
       stakeParams.nonce,
       stakeParams.hashLock,
+      stakeParams.blockNumber,
       txOptions,
     );
 
@@ -474,7 +542,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
     SpyAssert.assert(spyGetInboxMessageStatus, 1, [
       [getStakeMessageHashResult],
     ]);
-    SpyAssert.assert(spyGetGatewayProof, 1, [[getStakeMessageHashResult]]);
+    SpyAssert.assert(spyGetGatewayProof, 1, [[getStakeMessageHashResult, stakeParams.blockNumber]]);
     SpyAssert.assert(spyProveGateway, 1, [
       [
         getGatewayProofResult.blockNumber,
@@ -506,6 +574,7 @@ describe('Facilitator.confirmStakeIntent()', () => {
         stakeParams.gasLimit,
         stakeParams.nonce,
         stakeParams.hashLock,
+        stakeParams.blockNumber,
         txOptions,
       ],
     ]);
